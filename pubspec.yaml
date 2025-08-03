@@ -1,0 +1,42 @@
+name: dixlearning
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.7.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_animate: ^4.5.0
+  audioplayers: ^5.2.1
+  provider: ^6.0.5
+  fluentui_system_icons: ^1.1.217
+  flutter_switch: ^0.3.2
+  google_fonts: ^6.2.1
+  shared_preferences: ^2.2.2
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/giris/disgrafi1/ses1.mp3
+    - assets/giris/disgrafi1/ses2.mp3
+    - assets/asama3/
+    - assets/erkek_maskot.png
+    - assets/kiz_maskot.png
+    - assets/az_cok_asa1/
+    - assets/konusma_balonu.png
+    - assets/SIRALAMA_RESIMLERI/
+    - assets/uzun_kisa/
+    - assets/buyuk_kucuk/
+    - assets/kalin_ince_asa1/
