@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
+import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -131,6 +132,9 @@ class _SeninWidgetState extends State<SeninWidget>
                           const SizedBox(height: 30),
                           ElevatedButton(
                             onPressed: () {
+                              // Etkinlik tamamlandı
+                              ActivityTracker.completeActivity();
+                              
                               Navigator.of(context).pop();
                               Navigator.pushReplacement(
                                 context,

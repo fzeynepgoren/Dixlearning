@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'soru5.dart';
 import '../screens/home_screen.dart';
+import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -63,6 +64,9 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
 
           if (matchedLeft.every((element) => element)) {
             allMatched = true;
+            // Etkinlik tamamlandı
+            ActivityTracker.completeActivity();
+            
             Future.delayed(const Duration(seconds: 1), () {
               if (mounted) {
                 Navigator.pushReplacement(

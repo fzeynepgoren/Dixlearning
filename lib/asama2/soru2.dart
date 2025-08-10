@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'soru3.dart';
 import '../screens/home_screen.dart';
+import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -78,6 +79,9 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
         });
 
         if (matchedLeft.every((element) => element)) {
+          // Etkinlik tamamlandı
+          ActivityTracker.completeActivity();
+          
           Future.delayed(const Duration(seconds: 1), () {
             if (mounted) {
               Navigator.pushReplacement(

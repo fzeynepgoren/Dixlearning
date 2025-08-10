@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'soru2.dart';
 import '../screens/home_screen.dart';
+import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -102,6 +103,9 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                   selectedRightIndex = null;
                 });
               } else {
+                // Etkinlik tamamlandı, sayacı artır
+                ActivityTracker.completeActivity();
+                
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => const GDisgrafi1()),

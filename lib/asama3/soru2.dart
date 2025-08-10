@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'soru3.dart';
 
 class HarfHayvanEsle extends StatefulWidget {
@@ -72,6 +73,12 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
           if (matchedLeft.every((element) => element)) {
             Future.delayed(const Duration(seconds: 1), () {
               if (mounted) {
+                // Etkinlik tamamlandı
+
+                ActivityTracker.completeActivity();
+
+                
+
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => const Soru3()),
@@ -106,6 +113,12 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
       _dialogShown = true;
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
+          // Etkinlik tamamlandı
+
+          ActivityTracker.completeActivity();
+
+          
+
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const Soru3()),

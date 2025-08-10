@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'giris_etkinlikleri_screen.dart';
 import 'profile_screen.dart';
 import 'settings_screen.dart';
 import 'matching_questions_screen.dart';
 import 'classification_questions_screen.dart';
 import 'karsilastirma_sorulari_screen.dart';
+import 'login_screen.dart';
 import '../giris_etkinlikleri/disleksi1.dart';
 import '../giris_etkinlikleri/disleksi2.dart';
 import '../giris_etkinlikleri/disleksi4.dart';
@@ -20,6 +22,7 @@ import '../widgets/custom_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import 'sorting_activities_screen.dart';
+import 'dart:convert'; // Added for json.decode
 
 class HomeScreen extends StatefulWidget {
   final void Function(ThemeMode)? onThemeChanged;
@@ -37,8 +40,71 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int _selectedIndex = 1; // Home is selected by default
+  int _completedToday = 0; // Dinamik etkinlik sayısı
+  String _currentUserEmail = '';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _loadTodayActivities();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Uygulama geri geldiğinde sayacı yenile
+      _loadTodayActivities();
+    }
+  }
+
+  void _loadTodayActivities() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? currentUserJson = prefs.getString('current_user');
+      
+      if (currentUserJson != null) {
+        final currentUser = Map<String, dynamic>.from(json.decode(currentUserJson));
+        _currentUserEmail = currentUser['email'] ?? '';
+        
+        // Bugünün tarihini al
+        final today = DateTime.now();
+        final todayKey = '${today.year}-${today.month}-${today.day}';
+        final userActivityKey = '${_currentUserEmail}_activities_$todayKey';
+        final lastDateKey = '${_currentUserEmail}_last_activity_date';
+        
+        // Son etkinlik tarihini kontrol et
+        final lastDate = prefs.getString(lastDateKey);
+        
+        if (lastDate != null && lastDate != todayKey) {
+          // Farklı bir gün, sayacı sıfırla
+          await prefs.setInt(userActivityKey, 0);
+        }
+        
+        // Son etkinlik tarihini güncelle
+        await prefs.setString(lastDateKey, todayKey);
+        
+        // Bugünkü etkinlik sayısını al
+        final todayActivities = prefs.getInt(userActivityKey) ?? 0;
+        
+        setState(() {
+          _completedToday = todayActivities;
+        });
+      }
+    } catch (e) {
+      print('Error loading today activities: $e');
+    }
+  }
+
+
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) return;
@@ -65,6 +131,39 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _logout() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_logged_in', false);
+      await prefs.remove('current_user');
+      
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LoginScreen(
+              onThemeChanged: widget.onThemeChanged,
+              themeMode: widget.themeMode,
+              isEnglish: widget.isEnglish,
+              onLanguageChanged: widget.onLanguageChanged,
+            ),
+          ),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      print('Logout failed: $e');
+    }
+  }
+
+  void _navigateToActivity(Widget screen) {
+    // Etkinliğe git
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
@@ -73,7 +172,6 @@ class _HomeScreenState extends State<HomeScreen> {
     const String userName =
         'Kullanıcı'; // (isteğe bağlı: ayarlardan alınabilir)
     const String avatar = '👦'; // (isteğe bağlı: ayarlardan alınabilir)
-    const int completedToday = 2; // (dummy, ileride state ile)
     final activities = [
       {
         'emoji': '🎲',
@@ -82,15 +180,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ? 'Warm-up games and fun!'
             : 'Isınma oyunları ve eğlence!',
         'onTap': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => GirisEtkinlikleriScreen(
-                isEnglish: isEnglish,
-                onLanguageChanged: widget.onLanguageChanged,
-              ),
-            ),
-          );
+          _navigateToActivity(GirisEtkinlikleriScreen(
+            isEnglish: isEnglish,
+            onLanguageChanged: widget.onLanguageChanged,
+          ));
         },
       },
       {
@@ -100,12 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ? 'Test your matching skills!'
             : 'Eşleştirme becerilerini test et!',
         'onTap': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MatchingQuestionsScreen(),
-            ),
-          );
+          _navigateToActivity(const MatchingQuestionsScreen());
         },
       },
       {
@@ -115,12 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ? 'Test your classification skills!'
             : 'Sınıflandırma becerilerini test et!',
         'onTap': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ClassificationQuestionsScreen(),
-            ),
-          );
+          _navigateToActivity(const ClassificationQuestionsScreen());
         },
       },
       {
@@ -131,12 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ? 'Learn comparison concepts!'
             : 'Karşılaştırma kavramlarını öğren!',
         'onTap': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const KarsilastirmaSorulariScreen(),
-            ),
-          );
+          _navigateToActivity(const KarsilastirmaSorulariScreen());
         },
       },
       {
@@ -146,12 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ? 'Test your sorting skills!'
             : 'Sıralama becerilerini test et!',
         'onTap': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const SortingActivitiesScreen(),
-            ),
-          );
+          _navigateToActivity(const SortingActivitiesScreen());
         },
       },
     ];
@@ -196,26 +269,75 @@ class _HomeScreenState extends State<HomeScreen> {
                             size: 40, color: Colors.white),
                       ),
                       const SizedBox(width: 18),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            isEnglish ? 'Home' : 'Ana Sayfa',
-                            style: const TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            isEnglish
-                                ? 'Start activities!'
-                                : 'Etkinliklere başla!',
-                            style: const TextStyle(
-                                fontSize: 16, color: Colors.white70),
-                          ),
-                        ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              isEnglish ? 'Home' : 'Ana Sayfa',
+                              style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              isEnglish
+                                  ? 'Start activities!'
+                                  : 'Etkinliklere başla!',
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Çıkış butonu
+                      IconButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text(
+                                  isEnglish ? 'Logout' : 'Çıkış Yap',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                content: Text(
+                                  isEnglish 
+                                      ? 'Are you sure you want to logout?'
+                                      : 'Çıkış yapmak istediğinizden emin misiniz?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    child: Text(
+                                      isEnglish ? 'Cancel' : 'İptal',
+                                      style: TextStyle(color: Colors.grey[600]),
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      _logout();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      foregroundColor: Colors.white,
+                                    ),
+                                    child: Text(isEnglish ? 'Logout' : 'Çıkış'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        icon: const Icon(
+                          Icons.logout,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                        tooltip: isEnglish ? 'Logout' : 'Çıkış Yap',
                       ),
                     ],
                   ),
@@ -301,9 +423,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(width: 14),
                           Expanded(
                             child: Text(
-                              isEnglish
-                                  ? 'You completed $completedToday activities today!'
-                                  : 'Bugün $completedToday etkinlik tamamladın!',
+                                                          isEnglish
+                                ? 'You completed $_completedToday activities today!'
+                                : 'Bugün $_completedToday etkinlik tamamladın!',
                               style: const TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w600,

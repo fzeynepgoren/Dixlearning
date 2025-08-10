@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'soru2.dart';
 import '../giris_etkinlikleri/intro_flow_controller.dart';
 import '../../main.dart';
@@ -107,6 +108,12 @@ class _ActivityMatchingState extends State<ActivityMatching>
               _dialogShown = true;
               Future.delayed(const Duration(milliseconds: 500), () {
                 if (mounted) {
+                  // Etkinlik tamamlandı
+
+                  ActivityTracker.completeActivity();
+
+                  
+
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import '../screens/home_screen.dart';
 
 class EmojiAnimalMatching extends StatefulWidget {
@@ -125,6 +126,12 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
                           ElevatedButton(
                             onPressed: () {
                               Navigator.of(context).pop();
+                              // Etkinlik tamamlandı
+
+                              ActivityTracker.completeActivity();
+
+                              
+
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(

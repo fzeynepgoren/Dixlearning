@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'soru4.dart';
 
 class BoyutSinifla extends StatefulWidget {
@@ -85,6 +86,12 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
         _dialogShown = true;
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
+            // Etkinlik tamamlandı
+
+            ActivityTracker.completeActivity();
+
+            
+
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(

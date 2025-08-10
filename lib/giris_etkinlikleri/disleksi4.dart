@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'dart:math';
 import "package:flutter_animate/flutter_animate.dart";
 import 'diskalkuli1.dart';
@@ -165,6 +166,12 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                               Future.delayed(const Duration(milliseconds: 1000),
                                   () {
                                 if (mounted) {
+                                  // Etkinlik tamamlandı
+
+                                  ActivityTracker.completeActivity();
+
+                                  
+
                                   Navigator.pushReplacement(
                                     context,
                                     PageRouteBuilder(

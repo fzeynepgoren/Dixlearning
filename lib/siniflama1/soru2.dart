@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import 'soru4.dart';
@@ -92,6 +93,12 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
         _dialogShown = true;
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
+            // Etkinlik tamamlandı
+
+            ActivityTracker.completeActivity();
+
+            
+
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(

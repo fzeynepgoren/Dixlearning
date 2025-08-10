@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'diskalkuli3.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
@@ -72,6 +73,12 @@ class _Diskalkuli1State extends State<Diskalkuli1> {
       } else {
         if (mounted) {
           print('Diskalkuli1 tamamlandı, bir sonraki aktiviteye geçiliyor');
+          // Etkinlik tamamlandı
+
+          ActivityTracker.completeActivity();
+
+          
+
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const Diskalkuli3()),

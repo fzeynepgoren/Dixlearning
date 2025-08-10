@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'soru2.dart';
 
 class CinsiyetEsleme extends StatefulWidget {
@@ -36,6 +37,12 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme> {
   void kontrolVeIlerle(BuildContext context) {
     if (eslesenler.length == emojiler.length) {
       Future.delayed(const Duration(milliseconds: 300), () {
+        // Etkinlik tamamlandı
+
+        ActivityTracker.completeActivity();
+
+        
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const UzunKisaSinifla()),

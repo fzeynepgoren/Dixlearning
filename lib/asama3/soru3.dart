@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'soru4.dart';
 
 class Soru3 extends StatefulWidget {
@@ -91,6 +92,12 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
           _dialogShown = true;
           Future.delayed(const Duration(milliseconds: 500), () {
             if (mounted) {
+              // Etkinlik tamamlandı
+
+              ActivityTracker.completeActivity();
+
+              
+
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const YapiNesneEsle()),

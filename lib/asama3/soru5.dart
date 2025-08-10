@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import '../../main.dart';
 import '../screens/home_screen.dart';
 import 'package:provider/provider.dart';
@@ -181,6 +182,12 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
                     ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
+                        // Etkinlik tamamlandı
+
+                        ActivityTracker.completeActivity();
+
+                        
+
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
@@ -223,6 +230,12 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
+            // Etkinlik tamamlandı
+
+            ActivityTracker.completeActivity();
+
+            
+
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const HomeScreen()),

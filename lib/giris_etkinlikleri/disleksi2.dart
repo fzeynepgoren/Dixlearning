@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'dart:math';
 import 'disleksi4.dart';
 import 'package:provider/provider.dart';
@@ -160,6 +161,12 @@ class _Disleksi2State extends State<Disleksi2>
       });
     } else {
       // Oyun bittiğinde Disleksi4'e geç
+      // Etkinlik tamamlandı
+
+      ActivityTracker.completeActivity();
+
+      
+
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(

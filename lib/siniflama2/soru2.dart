@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'soru4.dart';
 
 class CanliCansizSinifla extends StatefulWidget {
@@ -65,6 +66,12 @@ class _CanliCansizSiniflaState extends State<CanliCansizSinifla>
         _dialogShown = true;
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
+            // Etkinlik tamamlandı
+
+            ActivityTracker.completeActivity();
+
+            
+
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(

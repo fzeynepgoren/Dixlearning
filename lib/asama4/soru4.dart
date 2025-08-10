@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'soru5.dart';
 
 class MevsimHavaEsle extends StatefulWidget {
@@ -75,6 +76,12 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
             _dialogShown = true;
             Future.delayed(const Duration(milliseconds: 500), () {
               if (mounted) {
+                // Etkinlik tamamlandı
+
+                ActivityTracker.completeActivity();
+
+                
+
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(

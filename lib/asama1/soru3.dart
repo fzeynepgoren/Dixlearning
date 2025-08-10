@@ -1,5 +1,6 @@
 import 'package:dixlearning/asama1/soru4.dart';
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 
 void main() {
   runApp(const MyApp());
@@ -122,6 +123,9 @@ class _GeometricMatchingState extends State<GeometricMatching>
         matches[leftShape] = rightShape;
       });
       if (matches.length == leftShapes.length) {
+        // Etkinlik tamamlandı
+        ActivityTracker.completeActivity();
+        
         Future.delayed(const Duration(seconds: 1), () {
           if (mounted) {
             Navigator.pushReplacement(

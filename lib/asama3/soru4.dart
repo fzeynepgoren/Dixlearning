@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'soru5.dart';
 import '../screens/home_screen.dart';
 import 'package:provider/provider.dart';
@@ -103,6 +104,12 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
             _dialogShown = true;
             Future.delayed(const Duration(milliseconds: 500), () {
               if (mounted) {
+                // Etkinlik tamamlandı
+
+                ActivityTracker.completeActivity();
+
+                
+
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
@@ -134,6 +141,12 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
       _dialogShown = true;
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
+          // Etkinlik tamamlandı
+
+          ActivityTracker.completeActivity();
+
+          
+
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const RenkNesneEsle()),

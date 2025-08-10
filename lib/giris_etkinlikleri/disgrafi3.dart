@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'dart:math';
 import 'disgrafi1.dart';
 import 'package:provider/provider.dart';
@@ -105,6 +106,12 @@ class _HeceDoldurmaState extends State<HeceDoldurma>
     } else {
       if (mounted) {
         print('Disgrafi3 tamamlandı, bir sonraki aktiviteye geçiliyor');
+        // Etkinlik tamamlandı
+
+        ActivityTracker.completeActivity();
+
+        
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

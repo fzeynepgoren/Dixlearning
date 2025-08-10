@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'disgrafi3.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
@@ -32,6 +33,12 @@ class _Disgrafi2State extends State<Disgrafi2> {
       Future.delayed(const Duration(seconds: 1), () {
         if (mounted) {
           print('Disgrafi2 tamamlandı, bir sonraki aktiviteye geçiliyor');
+          // Etkinlik tamamlandı
+
+          ActivityTracker.completeActivity();
+
+          
+
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const HeceDoldurma()),

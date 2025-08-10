@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'package:dixlearning/asama4/soru2.dart';
 
 class DuyguYuzEsle extends StatefulWidget {
@@ -92,6 +93,12 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
           _dialogShown = true;
           Future.delayed(const Duration(milliseconds: 500), () {
             if (mounted) {
+              // Etkinlik tamamlandı
+
+              ActivityTracker.completeActivity();
+
+              
+
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const DuyuOrganEsle()),

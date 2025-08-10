@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'dart:async';
 import 'package:dixlearning/asama4/soru3.dart';
 
@@ -76,6 +77,12 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
             _dialogShown = true;
             Future.delayed(const Duration(milliseconds: 500), () {
               if (mounted) {
+                // Etkinlik tamamlandı
+
+                ActivityTracker.completeActivity();
+
+                
+
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => const Soru3()),

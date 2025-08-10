@@ -1,6 +1,7 @@
 import 'package:dixlearning/asama1/soru3.dart';
 import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
+import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -83,6 +84,9 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
         });
 
         if (matchedPairs == leftToys.length) {
+          // Etkinlik tamamlandı
+          ActivityTracker.completeActivity();
+          
           Future.delayed(const Duration(seconds: 1), () {
             if (mounted) {
               Navigator.pushReplacement(

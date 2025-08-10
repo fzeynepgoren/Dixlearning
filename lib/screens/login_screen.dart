@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import 'home_screen.dart';
 import 'register_screen.dart';
 
@@ -307,6 +309,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    // Check if user is already logged in
+    _checkAutoLogin();
     // Show mascot on first open
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
@@ -316,6 +320,32 @@ class _LoginScreenState extends State<LoginScreen> {
             : 'Merhaba dostum, ben Dixy.\nHoş geldin!';
       });
     });
+  }
+
+  void _checkAutoLogin() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final bool isLoggedIn = prefs.getBool('is_logged_in') ?? false;
+      final String? currentUser = prefs.getString('current_user');
+      
+      if (isLoggedIn && currentUser != null && mounted) {
+        // Kullanıcı zaten giriş yapmış, ana ekrana yönlendir
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(
+              onThemeChanged: widget.onThemeChanged,
+              themeMode: widget.themeMode,
+              isEnglish: widget.isEnglish,
+              onLanguageChanged: widget.onLanguageChanged,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      // Hata durumunda normal giriş ekranında kal
+      print('Auto login check failed: $e');
+    }
   }
 
   @override
@@ -334,28 +364,67 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _isLoading = true;
       });
-      await Future.delayed(const Duration(seconds: 1)); // Simulate login
-      // TODO: Replace with real authentication
-      if (_emailController.text == "demo@demo.com" &&
-          _passwordController.text == "123456") {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomeScreen(
-              onThemeChanged: widget.onThemeChanged,
-              themeMode: widget.themeMode,
-              isEnglish: widget.isEnglish,
-              onLanguageChanged: widget.onLanguageChanged,
-            ),
-          ),
+      
+      try {
+        // SharedPreferences'ten kayıtlı kullanıcıları al
+        final prefs = await SharedPreferences.getInstance();
+        final String? usersJson = prefs.getString('registered_users');
+        
+        if (usersJson == null) {
+          setState(() {
+            _errorMessage = widget.isEnglish == true
+                ? "No registered users found. Please register first."
+                : "Kayıtlı kullanıcı bulunamadı. Lütfen önce kayıt olun.";
+            _isLoading = false;
+          });
+          return;
+        }
+        
+        List<Map<String, dynamic>> users = List<Map<String, dynamic>>.from(json.decode(usersJson));
+        
+        // Kullanıcıyı bul
+        Map<String, dynamic>? user = users.firstWhere(
+          (user) => user['email'] == _emailController.text.trim() && user['password'] == _passwordController.text,
+          orElse: () => {},
         );
-      } else {
+        
+        if (user.isEmpty) {
+          setState(() {
+            _errorMessage = widget.isEnglish == true
+                ? "Invalid email or password"
+                : "Geçersiz e-posta veya şifre";
+            _isLoading = false;
+          });
+          return;
+        }
+        
+        // Giriş başarılı - kullanıcı bilgilerini kaydet
+        await prefs.setString('current_user', json.encode(user));
+        await prefs.setBool('is_logged_in', true);
+        
+        // Ana ekrana yönlendir
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(
+                onThemeChanged: widget.onThemeChanged,
+                themeMode: widget.themeMode,
+                isEnglish: widget.isEnglish,
+                onLanguageChanged: widget.onLanguageChanged,
+              ),
+            ),
+          );
+        }
+        
+      } catch (e) {
         setState(() {
           _errorMessage = widget.isEnglish == true
-              ? "Invalid email or password"
-              : "Geçersiz e-posta veya şifre";
+              ? "An error occurred. Please try again."
+              : "Bir hata oluştu. Lütfen tekrar deneyin.";
         });
       }
+      
       setState(() {
         _isLoading = false;
       });

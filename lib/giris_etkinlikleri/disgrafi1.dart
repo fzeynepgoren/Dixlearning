@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'disgrafi2.dart';
 import 'package:provider/provider.dart';
@@ -102,6 +103,12 @@ class _Disgrafi1State extends State<Disgrafi1> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
+                  // Etkinlik tamamlandı
+
+                  ActivityTracker.completeActivity();
+
+                  
+
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const Disgrafi2()),

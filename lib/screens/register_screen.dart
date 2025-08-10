@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class RegisterScreen extends StatefulWidget {
   final bool? isEnglish;
@@ -40,9 +42,68 @@ class _RegisterScreenState extends State<RegisterScreen> {
       setState(() {
         _isLoading = true;
       });
-      await Future.delayed(const Duration(seconds: 1)); // Simulate register
-      // TODO: Replace with real register logic
-      Navigator.pop(context); // Return to login screen
+      
+      try {
+        // SharedPreferences'ten kayıtlı kullanıcıları al
+        final prefs = await SharedPreferences.getInstance();
+        final String? usersJson = prefs.getString('registered_users');
+        List<Map<String, dynamic>> users = [];
+        
+        if (usersJson != null) {
+          users = List<Map<String, dynamic>>.from(json.decode(usersJson));
+        }
+        
+        // Email'in zaten kayıtlı olup olmadığını kontrol et
+        bool emailExists = users.any((user) => user['email'] == _emailController.text.trim());
+        
+        if (emailExists) {
+          setState(() {
+            _errorMessage = widget.isEnglish == true
+                ? "This email is already registered"
+                : "Bu e-posta zaten kayıtlı";
+            _isLoading = false;
+          });
+          return;
+        }
+        
+        // Yeni kullanıcıyı ekle
+        users.add({
+          'name': _nameController.text.trim(),
+          'email': _emailController.text.trim(),
+          'password': _passwordController.text, // Gerçek uygulamada şifrelenmeli
+          'registrationDate': DateTime.now().toIso8601String(),
+        });
+        
+        // Kullanıcıları kaydet
+        await prefs.setString('registered_users', json.encode(users));
+        
+        // Başarı mesajı göster
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                widget.isEnglish == true
+                    ? 'Account created successfully! You can now login.'
+                    : 'Hesap başarıyla oluşturuldu! Artık giriş yapabilirsiniz.',
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              ),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+          
+          // Giriş ekranına dön
+          Navigator.pop(context);
+        }
+        
+      } catch (e) {
+        setState(() {
+          _errorMessage = widget.isEnglish == true
+              ? "An error occurred. Please try again."
+              : "Bir hata oluştu. Lütfen tekrar deneyin.";
+        });
+      }
+      
       setState(() {
         _isLoading = false;
       });

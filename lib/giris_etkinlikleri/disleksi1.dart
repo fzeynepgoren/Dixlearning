@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/activity_tracker.dart';
 import 'disleksi2.dart';
 import '../main.dart';
 import '../screens/home_screen.dart';
@@ -126,6 +127,12 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                     ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
+                        // Etkinlik tamamlandı
+
+                        ActivityTracker.completeActivity();
+
+                        
+
                         Navigator.pushReplacement(
                           context,
                           PageRouteBuilder(
