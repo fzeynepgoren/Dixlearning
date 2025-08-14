@@ -1,6 +1,5 @@
 import 'package:dixlearning/asama1/soru4.dart';
 import 'package:flutter/material.dart';
-import '../utils/activity_tracker.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,6 +14,7 @@ class MyApp extends StatelessWidget {
       title: 'Şekil Eşleştirme Oyunu',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        fontFamily: 'Roboto',
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
@@ -29,39 +29,60 @@ class MainMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE1F5FE),
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Ana Menü'),
+        title: const Text('Şekil Eşleştirme Oyunu'),
         centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
+        backgroundColor: Colors.blue.shade300,
+        elevation: 4,
+        toolbarHeight: 80,
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.blue.shade300, Colors.blue.shade100, Colors.white],
+            stops: const [0.0, 0.4, 1.0],
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple.shade400,
+                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 25),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  elevation: 8,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const GeometricMatching(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Oyunu Başlat',
+                  style: TextStyle(
+                    fontSize: 24,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const GeometricMatching()),
-                );
-              },
-              child: const Text(
-                'Oyunu Başlat',
-                style: TextStyle(fontSize: 20, color: Colors.white),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -78,21 +99,20 @@ class GeometricMatching extends StatefulWidget {
 class _GeometricMatchingState extends State<GeometricMatching>
     with TickerProviderStateMixin {
   final List<Shape> leftShapes = [
-    Shape(shape: 'Kare', color: const Color(0xFFE57373), icon: Icons.square),
-    Shape(shape: 'Daire', color: const Color(0xFF81C784), icon: Icons.circle),
-    Shape(
-        shape: 'Üçgen',
-        color: const Color(0xFF64B5F6),
-        icon: Icons.change_history),
+    Shape(shape: 'Kare', color: const Color(0xFFE57373), icon: Icons.square_outlined),
+    Shape(shape: 'Daire', color: const Color(0xFF81C784), icon: Icons.circle_outlined),
+    Shape(shape: 'Üçgen', color: const Color(0xFF64B5F6), icon: Icons.change_history),
   ];
 
   late List<Shape> rightShapes;
-  Shape? draggedShape;
+  Shape? selectedLeftShape;
   Map<String, String> matches = {};
   bool showFeedback = false;
   bool isCorrect = false;
 
   late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
@@ -100,13 +120,26 @@ class _GeometricMatchingState extends State<GeometricMatching>
     rightShapes = List.from(leftShapes)..shuffle();
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 600),
     );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
@@ -114,6 +147,7 @@ class _GeometricMatchingState extends State<GeometricMatching>
     setState(() {
       isCorrect = leftShape == rightShape;
       showFeedback = true;
+      selectedLeftShape = null; // Seçimi sıfırla
     });
 
     _feedbackController.forward(from: 0);
@@ -123,9 +157,6 @@ class _GeometricMatchingState extends State<GeometricMatching>
         matches[leftShape] = rightShape;
       });
       if (matches.length == leftShapes.length) {
-        // Etkinlik tamamlandı
-        ActivityTracker.completeActivity();
-        
         Future.delayed(const Duration(seconds: 1), () {
           if (mounted) {
             Navigator.pushReplacement(
@@ -154,99 +185,36 @@ class _GeometricMatchingState extends State<GeometricMatching>
     }
   }
 
-  Color? getMatchedColor(String shapeName) {
-    if (matches.containsKey(shapeName)) {
-      return leftShapes.firstWhere((s) => s.shape == shapeName).color;
-    }
-    return null;
-  }
+  // Şekil kartlarının modern tasarımı
+  Widget buildShapeCard(Shape shape, {bool isMatched = false, bool isShadow = false, bool isSelected = false}) {
+    Color cardColor = isMatched
+        ? shape.color
+        : isShadow
+        ? Colors.grey.shade200
+        : shape.color;
 
-  Widget buildLeftShapeContainer(Shape shape, {bool isDragging = false}) {
-    final matchedColor = getMatchedColor(shape.shape);
+    Color iconColor = isShadow && !isMatched
+        ? Colors.grey.shade600
+        : Colors.white;
 
-    return Container(
+    Border? border = isSelected
+        ? Border.all(color: Colors.green.shade400, width: 4)
+        : null;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
       width: 120,
       height: 120,
+      margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: matchedColor ?? shape.color,
+        color: cardColor,
         borderRadius: BorderRadius.circular(20),
+        border: border,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
             blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Center(
-        child: shape.shape == 'Üçgen'
-            ? SizedBox(
-                width: 50,
-                height: 50,
-                child: CustomPaint(
-                  painter: TrianglePainter(color: Colors.white),
-                ),
-              )
-            : Icon(
-                shape.icon,
-                size: 50,
-                color: Colors.white,
-              ),
-      ),
-    );
-  }
-
-  Widget buildRightShapeContainer(Shape shape, {bool isTarget = false}) {
-    final matchedColor = getMatchedColor(shape.shape);
-
-    return Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        color: matchedColor ?? (isTarget ? Colors.blue.shade200 : Colors.white),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Center(
-        child: shape.shape == 'Üçgen'
-            ? SizedBox(
-                width: 50,
-                height: 50,
-                child: CustomPaint(
-                  painter: TrianglePainter(
-                    color: matchedColor != null
-                        ? Colors.white
-                        : Colors.grey.shade800,
-                  ),
-                ),
-              )
-            : Icon(
-                shape.icon,
-                size: 50,
-                color:
-                    matchedColor != null ? Colors.white : Colors.grey.shade800,
-              ),
-      ),
-    );
-  }
-
-  Widget buildDraggingShape(Shape shape) {
-    return Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        color: shape.color,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
@@ -254,156 +222,207 @@ class _GeometricMatchingState extends State<GeometricMatching>
       child: Center(
         child: shape.shape == 'Üçgen'
             ? SizedBox(
-                width: 50,
-                height: 50,
-                child: CustomPaint(
-                  painter: TrianglePainter(color: Colors.white),
-                ),
-              )
+          width: 50,
+          height: 50,
+          child: CustomPaint(
+            painter: TrianglePainter(color: iconColor),
+          ),
+        )
             : Icon(
-                shape.icon,
-                size: 50,
-                color: Colors.white,
-              ),
+          shape.icon,
+          size: 50,
+          color: iconColor,
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFE1F5FE),
-      appBar: AppBar(
-        title: const Text(
-          'Şekil Eşleştirme Oyunu',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue.shade200,
+              Colors.blue.shade200,
+              const Color(0xffffffff),
+            ],
+            stops: const [0.0, 0.5, 1.0],
           ),
         ),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const SizedBox(height: 12),
-            const Text(
-              'Renkli şekilleri gölgelerine sürükle!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            Expanded(
-              child: Row(
+        child: SafeArea(
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ...leftShapes.map((shape) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Draggable<String>(
-                              data: shape.shape,
-                              feedback: Material(
-                                elevation: 8,
-                                child: buildDraggingShape(shape),
-                              ),
-                              childWhenDragging: buildLeftShapeContainer(shape),
-                              child: buildLeftShapeContainer(shape),
-                            ),
-                          );
-                        }),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 4,
-                    height: MediaQuery.of(context).size.height * 0.5,
-                    margin: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurple,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ...rightShapes.map((shape) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: DragTarget<String>(
-                              builder: (context, candidateData, rejectedData) {
-                                return buildRightShapeContainer(
-                                  shape,
-                                  isTarget: candidateData.isNotEmpty,
-                                );
-                              },
-                              onWillAcceptWithDetails: (details) =>
-                                  !matches.containsKey(details.data) &&
-                                  !matches.containsValue(shape.shape),
-                              onAcceptWithDetails: (details) =>
-                                  checkMatch(details.data, shape.shape),
-                            ),
-                          );
-                        }),
-                      ],
-                    ),
+                  IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.black, size: screenSize.width * 0.065),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 20),
-            if (showFeedback)
-              ScaleTransition(
-                scale: CurvedAnimation(
-                  parent: _feedbackController,
-                  curve: Curves.elasticOut,
-                ),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        isCorrect ? Icons.check_circle : Icons.cancel,
-                        color: isCorrect ? Colors.green : Colors.red,
-                        size: 28,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          fontWeight: FontWeight.bold,
+              Expanded(
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.95),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                          child: const Text(
+                            'Renkli şekillere tıkla ve gölgeleriyle eşleştir!',
+                            style: TextStyle(
+                              fontSize: 23,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    ...leftShapes.map((shape) {
+                                      final isMatched = matches.containsKey(shape.shape);
+                                      final isSelected = selectedLeftShape?.shape == shape.shape;
+
+                                      return GestureDetector(
+                                        onTap: isMatched
+                                            ? null
+                                            : () {
+                                          setState(() {
+                                            selectedLeftShape = shape;
+                                          });
+                                        },
+                                        child: buildShapeCard(
+                                          shape,
+                                          isSelected: isSelected,
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: 4,
+                                height: screenSize.height * 0.45,
+                                margin: const EdgeInsets.symmetric(horizontal: 12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(4),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      blurRadius: 5,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    ...rightShapes.map((shape) {
+                                      final isMatched = matches.containsValue(shape.shape);
+                                      return GestureDetector(
+                                        onTap: isMatched || selectedLeftShape == null
+                                            ? null
+                                            : () {
+                                          if (selectedLeftShape != null) {
+                                            checkMatch(selectedLeftShape!.shape, shape.shape);
+                                          }
+                                        },
+                                        child: buildShapeCard(
+                                          shape,
+                                          isShadow: !isMatched,
+                                          isMatched: isMatched,
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            const SizedBox(height: 20),
-          ],
+              Container(
+                height: 80,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: showFeedback
+                    ? ScaleTransition(
+                  scale: CurvedAnimation(
+                    parent: _feedbackController,
+                    curve: Curves.elasticOut,
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isCorrect ? Icons.check_circle : Icons.cancel,
+                          color: isCorrect ? Colors.green : Colors.red,
+                          size: 28,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: isCorrect ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                    : const SizedBox.shrink(),
+              ),
+            ],
+          ),
         ),
       ),
     );
