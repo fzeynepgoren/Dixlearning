@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import '../utils/activity_tracker.dart';
 import 'disleksi2.dart';
-import '../main.dart';
 import '../screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
@@ -47,19 +45,34 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
   String? selectedLetter;
 
   late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 600),
     );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
@@ -73,112 +86,16 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
 
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
-        setState(() {
-          showFeedback = false;
-        });
         if (currentQuestionIndex == questions.length - 1) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.deepPurple.shade100,
-                      Colors.deepPurple.shade50,
-                    ],
-                  ),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.emoji_events,
-                      size: 80,
-                      color: Colors.amber,
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Congratulations! 🎉',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Harika bir iş çıkardınız!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        // Etkinlik tamamlandı
-
-                        ActivityTracker.completeActivity();
-
-                        
-
-                        Navigator.pushReplacement(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                                    const Disleksi2(),
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              const begin = Offset(1.0, 0.0);
-                              const end = Offset.zero;
-                              const curve = Curves.ease;
-                              var tween = Tween(begin: begin, end: end)
-                                  .chain(CurveTween(curve: curve));
-                              return SlideTransition(
-                                position: animation.drive(tween),
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      child: const Text(
-                        'Next Activity',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const Disleksi2()),
           );
         } else {
           setState(() {
             currentQuestionIndex++;
             selectedLetter = null;
+            showFeedback = false;
           });
         }
       }
@@ -189,164 +106,194 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final question = questions[currentQuestionIndex];
-    final displayedWord = showFeedback
+    final displayedWord = showFeedback && isCorrect
         ? question.incompleteWord.replaceFirst('_', question.correctLetter)
         : question.incompleteWord.replaceFirst('_', selectedLetter ?? '_');
+
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
 
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        backgroundColor: const Color(0xFFE1F5FE),
-        appBar: AppBar(
-          title: Text(isEnglish
-              ? 'Missing Letter Placement'
-              : 'Eksik Harf Yerleştirme'),
-          centerTitle: true,
-          backgroundColor: Colors.deepPurple,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      const HomeScreen(),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    const begin = Offset(-1.0, 0.0);
-                    const end = Offset.zero;
-                    const curve = Curves.ease;
-                    var tween = Tween(begin: begin, end: end)
-                        .chain(CurveTween(curve: curve));
-                    return SlideTransition(
-                      position: animation.drive(tween),
-                      child: child,
-                    );
-                  },
-                ),
-                (route) => false,
-              );
-            },
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
           ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 500),
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              return FadeTransition(
-                opacity: animation,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(1, 0),
-                    end: Offset.zero,
-                  ).animate(animation),
-                  child: child,
-                ),
-              );
-            },
+          child: SafeArea(
             child: Column(
-              key: ValueKey<int>(currentQuestionIndex),
               children: [
-                const SizedBox(height: 12),
-                Text(
-                  isEnglish
-                      ? 'Question ${currentQuestionIndex + 1}/${questions.length}'
-                      : 'Soru ${currentQuestionIndex + 1}/${questions.length}',
-                  style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  question.emoji,
-                  style: const TextStyle(fontSize: 80),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Select the correct letter for the blank below!',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  displayedWord,
-                  style: const TextStyle(
-                    fontSize: 44,
-                    letterSpacing: 2,
-                    color: Color(0xFF37474F),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 36),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: question.options.map((option) {
-                    Color? getButtonColor() {
-                      if (!showFeedback) return Colors.pinkAccent;
-                      if (option == question.correctLetter) return Colors.green;
-                      if (selectedLetter == option &&
-                          option != question.correctLetter) {
-                        return Colors.red;
-                      }
-                      return Colors.pinkAccent;
-                    }
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => const HomeScreen()),
+                              (route) => false,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 500),
+                        transitionBuilder: (Widget child, Animation<double> animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(1, 0),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: Column(
+                          key: ValueKey<int>(currentQuestionIndex),
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Text(
+                                question.emoji,
+                                style: const TextStyle(fontSize: 80),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Text(
+                                isEnglish
+                                    ? 'Select the correct letter for the blank below!'
+                                    : 'Aşağıdaki boşluğa doğru harfi seçin!',
+                                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Text(
+                              displayedWord,
+                              style: const TextStyle(
+                                fontSize: 44,
+                                letterSpacing: 2,
+                                color: Color(0xFF37474F),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 36),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: question.options.map((option) {
+                                Color getButtonColor() {
+                                  if (!showFeedback) return Colors.blue.shade200;
+                                  if (option == question.correctLetter) return Colors.green.shade500;
+                                  if (selectedLetter == option && option != question.correctLetter) {
+                                    return Colors.red.shade500;
+                                  }
+                                  return Colors.blue.shade200;
+                                }
 
-                    return ElevatedButton(
-                      onPressed:
-                          showFeedback ? null : () => checkAnswer(option),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 24),
-                        backgroundColor: getButtonColor(),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
+                                return ElevatedButton(
+                                  onPressed: showFeedback ? null : () => checkAnswer(option),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+                                    backgroundColor: getButtonColor(),
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    option,
+                                    style: const TextStyle(
+                                      fontSize: 36,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ],
                         ),
                       ),
-                      child: Text(
-                        option,
-                        style: const TextStyle(
-                            fontSize: 36, fontWeight: FontWeight.bold),
-                      ),
-                    );
-                  }).toList(),
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 40),
-                if (showFeedback)
-                  ScaleTransition(
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: showFeedback
+                      ? ScaleTransition(
                     scale: CurvedAnimation(
                       parent: _feedbackController,
                       curve: Curves.elasticOut,
                     ),
                     child: Container(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                       decoration: BoxDecoration(
                         color: isCorrect ? Colors.green : Colors.red,
                         borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(isCorrect ? Icons.check_circle : Icons.cancel,
-                              color: Colors.white, size: 24),
-                          const SizedBox(width: 8),
+                          Icon(
+                            isCorrect ? Icons.check_circle : Icons.cancel,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 10),
                           Text(
-                            isCorrect
-                                ? 'Well done! 🎉'
-                                : 'Sorry, wrong answer! 😔',
+                            isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
                             style: const TextStyle(
                               fontSize: 18,
-                              fontWeight: FontWeight.bold,
                               color: Colors.white,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                const SizedBox(height: 24),
+                  )
+                      : const SizedBox.shrink(),
+                ),
               ],
             ),
           ),
