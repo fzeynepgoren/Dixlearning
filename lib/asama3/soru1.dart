@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import '../utils/activity_tracker.dart';
 import 'soru2.dart';
-import '../giris_etkinlikleri/intro_flow_controller.dart';
-import '../../main.dart';
 import '../screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
@@ -20,6 +17,7 @@ class MyApp extends StatelessWidget {
       title: 'Görsel-Eylem Eşleştirme',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        fontFamily: 'Roboto',
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
@@ -49,164 +47,199 @@ class _ActivityMatchingState extends State<ActivityMatching>
         description: 'Topa vuruyor'),
   ];
 
-  final List<String> rightDescriptions = [
-    'Bloklarla kule yapıyor',
-    'Parmak boyasıyla resim yapıyor',
-    'Topa vuruyor',
-  ];
-
   late List<String> shuffledDescriptions;
-  String? draggedDescription;
-  Map<String, String> matches = {};
+  int? selectedLeftIndex;
+  int? selectedRightIndex;
+  List<bool> matchedLeft = [false, false, false];
+  List<bool> matchedRight = [false, false, false];
   bool showFeedback = false;
   bool isCorrect = false;
-  bool _dialogShown = false;
+  bool allMatched = false;
   String? wrongDescription;
-  String? wrongLeftDescription;
+  String? wrongLeftImage;
 
   late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
-    shuffledDescriptions = List.from(rightDescriptions)..shuffle();
+    shuffledDescriptions = List.from(
+        leftActivities.map((e) => e.description).toList())
+      ..shuffle();
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 600),
     );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
-  void checkMatch(String imagePath, String description) {
+  void _handleTap(int index, bool isLeft) {
+    if (allMatched) return;
+
     setState(() {
-      final correctDescription =
-          leftActivities.firstWhere((a) => a.image == imagePath).description;
-      isCorrect = description == correctDescription;
-      showFeedback = true;
-      if (!isCorrect) {
-        wrongDescription = description;
-        wrongLeftDescription = correctDescription;
+      if (isLeft) {
+        if (matchedLeft[index]) return;
+        selectedLeftIndex = index;
+      } else {
+        if (matchedRight[index]) return;
+        selectedRightIndex = index;
       }
+
+      if (selectedLeftIndex != null && selectedRightIndex != null) {
+        _checkMatch();
+      }
+    });
+  }
+
+  void _checkMatch() {
+    setState(() {
+      isCorrect = leftActivities[selectedLeftIndex!].description ==
+          shuffledDescriptions[selectedRightIndex!];
+      showFeedback = true;
     });
 
     _feedbackController.forward(from: 0);
 
     if (isCorrect) {
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) {
-          setState(() {
-            matches[imagePath] = description;
-            showFeedback = false;
-            wrongDescription = null;
-            wrongLeftDescription = null;
-            if (matches.length == leftActivities.length && !_dialogShown) {
-              _dialogShown = true;
-              Future.delayed(const Duration(milliseconds: 500), () {
-                if (mounted) {
-                  // Etkinlik tamamlandı
-
-                  ActivityTracker.completeActivity();
-
-                  
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const HarfHayvanEsle()),
-                  );
-                }
-              });
-            }
-          });
-        }
+      setState(() {
+        matchedLeft[selectedLeftIndex!] = true;
+        matchedRight[selectedRightIndex!] = true;
       });
-    } else {
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) {
-          setState(() {
-            showFeedback = false;
-            wrongDescription = null;
-            wrongLeftDescription = null;
-          });
-        }
-      });
+
+      if (matchedLeft.every((element) => element)) {
+        allMatched = true;
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HarfHayvanEsle()),
+            );
+          }
+        });
+      }
     }
+
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          showFeedback = false;
+          selectedLeftIndex = null;
+          selectedRightIndex = null;
+        });
+      }
+    });
   }
 
-  Widget buildLeftActivityContainer(Activity activity,
-      {bool isMatched = false, bool isDragging = false}) {
-    final bool isWrong = wrongLeftDescription == activity.description &&
-        showFeedback &&
-        !isCorrect;
-    return Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        color: isMatched
-            ? Colors.green.shade300
-            : isWrong
-                ? Colors.red.shade200
-                : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Image.asset(
-            activity.image,
-            fit: BoxFit.contain, // Resimlerin orantılı şekilde sığması için
+  Widget _buildLeftCard(int index) {
+    final activity = leftActivities[index];
+    final bool isSelected = selectedLeftIndex == index;
+    final bool isMatched = matchedLeft[index];
+    final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
+
+    Color cardColor = isMatched
+        ? Colors.green.shade200
+        : isWrongSelection
+        ? Colors.red.shade200
+        : Colors.white;
+
+    return GestureDetector(
+      onTap: isMatched ? null : () => _handleTap(index, true),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        width: 120,
+        height: 120,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(20),
+          border: isSelected && !isMatched ? Border.all(color: Colors.lightGreen.shade400, width: 4) : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(
+              activity.image,
+              fit: BoxFit.contain,
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget buildRightDescriptionContainer(String description,
-      {bool isMatched = false, bool isTarget = false}) {
-    final bool isWrong =
-        wrongDescription == description && showFeedback && !isCorrect;
-    return Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        color: isMatched
-            ? Colors.green.shade300
-            : isWrong
-                ? Colors.red.shade200
-                : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Text(
-            description,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.deepPurple,
+  Widget _buildRightCard(int index) {
+    final description = shuffledDescriptions[index];
+    final bool isSelected = selectedRightIndex == index;
+    final bool isMatched = matchedRight[index];
+    final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
+
+    Color cardColor = isMatched
+        ? Colors.green.shade200
+        : isWrongSelection
+        ? Colors.red.shade200
+        : Colors.white;
+
+    return GestureDetector(
+      onTap: isMatched ? null : () => _handleTap(index, false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        width: 120,
+        height: 120,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(20),
+          border: isSelected && !isMatched ? Border.all(color: Colors.lightGreen.shade400, width: 4) : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
-            textAlign: TextAlign.center,
+          ],
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Text(
+              description,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       ),
@@ -215,135 +248,135 @@ class _ActivityMatchingState extends State<ActivityMatching>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFE1F5FE),
-      appBar: AppBar(
-        title: const Text('Görsel-Eylem Eşleştirme',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-      ),
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
+          ),
+          child: SafeArea(
             child: Column(
               children: [
-                const SizedBox(height: 24),
-                const Text(
-                  'Resimdeki çocukların yaptığı etkinliği açıklamalara sürükle!',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
-                  ),
-                  textAlign: TextAlign.center,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => const HomeScreen()),
+                              (route) => false,
+                        );
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 24),
                 Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment
-                              .spaceEvenly, // Öğeler arası boşluk eklendi
-                          children: [
-                            ...leftActivities.map((activity) {
-                              final isMatched =
-                                  matches.containsKey(activity.image);
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                child: Draggable<String>(
-                                  data: activity.description,
-                                  feedback: Material(
-                                    elevation: 8,
-                                    borderRadius: BorderRadius.circular(24),
-                                    child: buildLeftActivityContainer(activity,
-                                        isDragging: true),
-                                  ),
-                                  childWhenDragging: buildLeftActivityContainer(
-                                    activity,
-                                    isMatched: isMatched,
-                                  ),
-                                  child: buildLeftActivityContainer(
-                                    activity,
-                                    isMatched: isMatched,
-                                  ),
-                                ),
-                              );
-                            }),
-                          ],
-                        ),
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
                       ),
-                      Container(
-                        width: 4,
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.deepPurple,
-                          borderRadius: BorderRadius.circular(2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.deepPurple.withOpacity(0.3),
-                              spreadRadius: 1,
-                              blurRadius: 3,
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                            child: Text(
+                              isEnglish
+                                  ? 'Tap the picture and its matching description!'
+                                  : 'Resme tıkla ve doğru açıklamayla eşleştir!',
+                              style: const TextStyle(
+                                fontSize: 23,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment
-                              .spaceEvenly, // Öğeler arası boşluk eklendi
-                          children: [
-                            ...shuffledDescriptions.map((description) {
-                              final isMatched =
-                                  matches.containsValue(description);
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                child: DragTarget<String>(
-                                  builder:
-                                      (context, candidateData, rejectedData) {
-                                    return buildRightDescriptionContainer(
-                                      description,
-                                      isMatched: isMatched,
-                                      isTarget: candidateData.isNotEmpty,
-                                    );
-                                  },
-                                  onWillAcceptWithDetails: (data) =>
-                                      !isMatched &&
-                                      !matches.containsValue(description),
-                                  onAcceptWithDetails: (data) {
-                                    final imagePath = leftActivities
-                                        .firstWhere(
-                                            (a) => a.description == data)
-                                        .image;
-                                    checkMatch(imagePath, description);
-                                  },
+                          ),
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: List.generate(
+                                      leftActivities.length,
+                                          (index) => _buildLeftCard(index),
+                                    ),
+                                  ),
                                 ),
-                              );
-                            }),
-                          ],
-                        ),
+                                Container(
+                                  width: 4,
+                                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade400,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: List.generate(
+                                      shuffledDescriptions.length,
+                                          (index) => _buildRightCard(index),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 24),
-                if (showFeedback)
-                  ScaleTransition(
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: showFeedback
+                      ? ScaleTransition(
                     scale: CurvedAnimation(
                       parent: _feedbackController,
                       curve: Curves.elasticOut,
                     ),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                       decoration: BoxDecoration(
-                        color: Colors.transparent,
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -351,15 +384,13 @@ class _ActivityMatchingState extends State<ActivityMatching>
                           Icon(
                             isCorrect ? Icons.check_circle : Icons.cancel,
                             color: isCorrect ? Colors.green : Colors.red,
-                            size: 30,
+                            size: 28,
                           ),
                           const SizedBox(width: 10),
                           Text(
-                            isCorrect
-                                ? 'Aferin! 🎉'
-                                : 'Üzgünüm, yanlış eşleştirme! 😔',
+                            isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
                             style: TextStyle(
-                              fontSize: 17,
+                              fontSize: 18,
                               color: isCorrect ? Colors.green : Colors.red,
                               fontWeight: FontWeight.bold,
                             ),
@@ -367,11 +398,13 @@ class _ActivityMatchingState extends State<ActivityMatching>
                         ],
                       ),
                     ),
-                  ),
+                  )
+                      : const SizedBox.shrink(),
+                ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
