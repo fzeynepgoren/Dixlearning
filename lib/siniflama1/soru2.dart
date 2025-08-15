@@ -97,8 +97,6 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
 
             ActivityTracker.completeActivity();
 
-            
-
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -150,8 +148,10 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
               children: [
                 const SizedBox(height: 12),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(15),
@@ -224,11 +224,13 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                                       itemBuilder: (context, index) {
                                         return Padding(
                                           padding: const EdgeInsets.symmetric(
-                                              vertical: 8.0),
+                                            vertical: 8.0,
+                                          ),
                                           child: Text(
                                             longGroup[index]['emoji'],
-                                            style:
-                                                const TextStyle(fontSize: 48),
+                                            style: const TextStyle(
+                                              fontSize: 48,
+                                            ),
                                             textAlign: TextAlign.center,
                                           ),
                                         );
@@ -240,8 +242,8 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                             );
                           },
                           onWillAcceptWithDetails: (item) => true,
-                          onAcceptWithDetails: (item) =>
-                              _handleDrag(item.data, true),
+                          onAcceptWithDetails:
+                              (item) => _handleDrag(item.data, true),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -289,11 +291,13 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                                       itemBuilder: (context, index) {
                                         return Padding(
                                           padding: const EdgeInsets.symmetric(
-                                              vertical: 8.0),
+                                            vertical: 8.0,
+                                          ),
                                           child: Text(
                                             shortGroup[index]['emoji'],
-                                            style:
-                                                const TextStyle(fontSize: 48),
+                                            style: const TextStyle(
+                                              fontSize: 48,
+                                            ),
                                             textAlign: TextAlign.center,
                                           ),
                                         );
@@ -305,8 +309,8 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                             );
                           },
                           onWillAcceptWithDetails: (item) => true,
-                          onAcceptWithDetails: (item) =>
-                              _handleDrag(item.data, false),
+                          onAcceptWithDetails:
+                              (item) => _handleDrag(item.data, false),
                         ),
                       ),
                     ],
@@ -322,7 +326,7 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
                         blurRadius: 6,
-                        offset: const Offset(0, 3),
+                        offset: const Offset(0, 5),
                       ),
                     ],
                   ),

@@ -94,84 +94,98 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
             showDialog(
               context: context,
               barrierDismissible: false,
-              builder: (context) => Dialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.deepPurple.shade100,
-                        Colors.deepPurple.shade50,
-                      ],
+              builder:
+                  (context) => Dialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.deepPurple.shade100,
+                            Colors.deepPurple.shade50,
+                          ],
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.emoji_events,
+                            size: 80,
+                            color: Colors.amber,
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            Provider.of<LanguageProvider>(
+                                  context,
+                                  listen: false,
+                                ).isEnglish
+                                ? 'Congratulations! 🎉'
+                                : 'Tebrikler! 🎉',
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepPurple,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            Provider.of<LanguageProvider>(
+                                  context,
+                                  listen: false,
+                                ).isEnglish
+                                ? 'You have completed stage 5!'
+                                : '5. aşamayı tamamladınız!',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.deepPurple,
+                            ),
+                          ),
+                          const SizedBox(height: 30),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const HomeScreen(),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.deepPurple,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 40,
+                                vertical: 15,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            child: Text(
+                              Provider.of<LanguageProvider>(
+                                    context,
+                                    listen: false,
+                                  ).isEnglish
+                                  ? 'Back to Menu'
+                                  : 'Ana Menüye Dön',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.emoji_events,
-                          size: 80, color: Colors.amber),
-                      const SizedBox(height: 20),
-                      Text(
-                        Provider.of<LanguageProvider>(context, listen: false)
-                                .isEnglish
-                            ? 'Congratulations! 🎉'
-                            : 'Tebrikler! 🎉',
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        Provider.of<LanguageProvider>(context, listen: false)
-                                .isEnglish
-                            ? 'You have completed stage 5!'
-                            : '5. aşamayı tamamladınız!',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.deepPurple,
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HomeScreen(),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 40, vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                        ),
-                        child: Text(
-                          Provider.of<LanguageProvider>(context, listen: false)
-                                  .isEnglish
-                              ? 'Back to Menu'
-                              : 'Ana Menüye Dön',
-                          style: const TextStyle(
-                              fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             );
           }
         });
@@ -220,8 +234,10 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
               children: [
                 const SizedBox(height: 12),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(15),
@@ -297,12 +313,18 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Draggable<Map<String, dynamic>>(
                             data: item,
-                            feedback: Text(item['emoji'],
-                                style: const TextStyle(fontSize: 48)),
-                            childWhenDragging:
-                                const SizedBox(width: 60, height: 60),
-                            child: Text(item['emoji'],
-                                style: const TextStyle(fontSize: 48)),
+                            feedback: Text(
+                              item['emoji'],
+                              style: const TextStyle(fontSize: 48),
+                            ),
+                            childWhenDragging: const SizedBox(
+                              width: 60,
+                              height: 60,
+                            ),
+                            child: Text(
+                              item['emoji'],
+                              style: const TextStyle(fontSize: 48),
+                            ),
                           ),
                         );
                       }
@@ -314,10 +336,14 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                 if (showFeedback)
                   ScaleTransition(
                     scale: CurvedAnimation(
-                        parent: _feedbackController, curve: Curves.elasticOut),
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -352,8 +378,13 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
     );
   }
 
-  Widget _buildGroup(String title, List<Map<String, dynamic>> group,
-      bool isFourLegs, Color bgColor, Color textColor) {
+  Widget _buildGroup(
+    String title,
+    List<Map<String, dynamic>> group,
+    bool isFourLegs,
+    Color bgColor,
+    Color textColor,
+  ) {
     return DragTarget<Map<String, dynamic>>(
       onWillAcceptWithDetails: (data) => true,
       onAcceptWithDetails: (data) => _handleDrag(data.data, isFourLegs),
