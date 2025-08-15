@@ -336,32 +336,36 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
               ),
-              const SizedBox(height: 8),
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 8,
-                children:
-                    group
-                        .map(
-                          (item) => Text(
-                            item['emoji'],
-                            style: const TextStyle(
-                              fontSize: 36,
-                              color: Color(0xFF999999),
+              Expanded(
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 4,
+                  children:
+                      group
+                          .map(
+                            (item) => Text(
+                              item['emoji'],
+                              style: const TextStyle(
+                                fontSize: 36,
+                                color: Color(0xFF999999),
+                              ),
                             ),
-                          ),
-                        )
-                        .toList(),
+                          )
+                          .toList(),
+                ),
               ),
             ],
           ),
