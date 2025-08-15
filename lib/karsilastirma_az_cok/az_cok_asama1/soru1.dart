@@ -150,7 +150,7 @@ class _AzCokSoru1State extends State<AzCokSoru1> with TickerProviderStateMixin {
                                   ? 'Choose the one with fewer.'
                                   : 'Az olanı işaretle.',
                               style: const TextStyle(
-                                fontSize: 23,
+                                fontSize: 25,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
