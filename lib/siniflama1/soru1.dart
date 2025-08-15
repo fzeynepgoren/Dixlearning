@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'package:dixlearning/karsilastirma_kalin_ince/kalin_ince_asama1/soru3.dart';
+import 'soru2.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/home_screen.dart';
@@ -104,7 +104,7 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const KalinInceSoru3()),
+          MaterialPageRoute(builder: (context) => const UzunKisaSinifla()),
         );
       }
     });
