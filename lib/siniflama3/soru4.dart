@@ -193,7 +193,7 @@ class _TasitSiniflaState extends State<TasitSinifla>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                flex: 2,
+                                flex: 3,
                                 child: Column(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
@@ -224,7 +224,7 @@ class _TasitSiniflaState extends State<TasitSinifla>
                               ),
                               const SizedBox(width: 16),
                               Expanded(
-                                flex: 3,
+                                flex: 2,
                                 child: SingleChildScrollView(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -347,9 +347,10 @@ class _TasitSiniflaState extends State<TasitSinifla>
       onAcceptWithDetails: (data) => _handleDrag(data.data, type),
       builder: (context, candidateData, rejectedData) {
         return Container(
-          width: 180,
-          height: 120,
-          margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          width: double.infinity,
+          height: 145,
+          margin: const EdgeInsets.symmetric(vertical: 7),
+          padding: const EdgeInsets.all(7),
           decoration: BoxDecoration(
             color: boxColor,
             border: Border.all(color: borderColor, width: 2),
@@ -368,24 +369,22 @@ class _TasitSiniflaState extends State<TasitSinifla>
                   ),
                 ),
               ),
-              Expanded(
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 10,
-                  runSpacing: 4,
-                  children:
-                      group
-                          .map(
-                            (item) => Text(
-                              item['emoji'],
-                              style: const TextStyle(
-                                fontSize: 32,
-                                color: Color(0xFF999999),
-                              ),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 10,
+                runSpacing: 4,
+                children:
+                    group
+                        .map(
+                          (item) => Text(
+                            item['emoji'],
+                            style: const TextStyle(
+                              fontSize: 32,
+                              color: Color(0xFF999999),
                             ),
-                          )
-                          .toList(),
-                ),
+                          ),
+                        )
+                        .toList(),
               ),
             ],
           ),
@@ -397,8 +396,8 @@ class _TasitSiniflaState extends State<TasitSinifla>
   Widget _buildDraggableItem(Map<String, dynamic> item) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
-      width: 70,
-      height: 70,
+      width: 64,
+      height: 64,
       child: Center(
         child: Text(
           item['emoji'],
