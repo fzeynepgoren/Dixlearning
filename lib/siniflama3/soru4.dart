@@ -193,9 +193,10 @@ class _TasitSiniflaState extends State<TasitSinifla>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                flex: 3,
+                                flex: 2,
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
                                   children: [
                                     _buildGroup(
                                       isEnglish ? 'Land' : 'Kara',
@@ -204,7 +205,6 @@ class _TasitSiniflaState extends State<TasitSinifla>
                                       Colors.green.shade50,
                                       Colors.green,
                                     ),
-                                    const SizedBox(height: 16),
                                     _buildGroup(
                                       isEnglish ? 'Sea' : 'Deniz',
                                       seaGroup,
@@ -212,7 +212,6 @@ class _TasitSiniflaState extends State<TasitSinifla>
                                       Colors.blue.shade50,
                                       Colors.lightBlue,
                                     ),
-                                    const SizedBox(height: 16),
                                     _buildGroup(
                                       isEnglish ? 'Air' : 'Hava',
                                       airGroup,
@@ -225,33 +224,37 @@ class _TasitSiniflaState extends State<TasitSinifla>
                               ),
                               const SizedBox(width: 16),
                               Expanded(
-                                flex: 2,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children:
-                                      items
-                                          .where((item) => !item['isPlaced'])
-                                          .map((item) {
-                                            return Draggable<
-                                              Map<String, dynamic>
-                                            >(
-                                              data: item,
-                                              feedback: Material(
-                                                color: Colors.transparent,
+                                flex: 3,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children:
+                                        items
+                                            .where((item) => !item['isPlaced'])
+                                            .map((item) {
+                                              return Draggable<
+                                                Map<String, dynamic>
+                                              >(
+                                                data: item,
+                                                feedback: Material(
+                                                  color: Colors.transparent,
+                                                  child: _buildDraggableItem(
+                                                    item,
+                                                  ),
+                                                ),
+                                                childWhenDragging: Opacity(
+                                                  opacity: 0.3,
+                                                  child: _buildDraggableItem(
+                                                    item,
+                                                  ),
+                                                ),
                                                 child: _buildDraggableItem(
                                                   item,
                                                 ),
-                                              ),
-                                              childWhenDragging: Opacity(
-                                                opacity: 0.3,
-                                                child: _buildDraggableItem(
-                                                  item,
-                                                ),
-                                              ),
-                                              child: _buildDraggableItem(item),
-                                            );
-                                          })
-                                          .toList(),
+                                              );
+                                            })
+                                            .toList(),
+                                  ),
                                 ),
                               ),
                             ],
@@ -344,9 +347,9 @@ class _TasitSiniflaState extends State<TasitSinifla>
       onAcceptWithDetails: (data) => _handleDrag(data.data, type),
       builder: (context, candidateData, rejectedData) {
         return Container(
-          width: double.infinity,
-          height: 100,
-          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+          width: 180,
+          height: 120,
+          margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           decoration: BoxDecoration(
             color: boxColor,
             border: Border.all(color: borderColor, width: 2),
@@ -396,17 +399,6 @@ class _TasitSiniflaState extends State<TasitSinifla>
       margin: const EdgeInsets.symmetric(vertical: 6),
       width: 70,
       height: 70,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Center(
         child: Text(
           item['emoji'],
