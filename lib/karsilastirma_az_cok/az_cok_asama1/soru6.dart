@@ -116,30 +116,11 @@ class _AzCokSoru6State extends State<AzCokSoru6> with TickerProviderStateMixin {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
                               builder: (context) => const HomeScreen()),
-                          (route) => false,
+                              (route) => false,
                         );
                       },
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.04,
-                        vertical: screenHeight * 0.008,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                            color: const Color(0xFF8FC8F7), width: 2),
-                        borderRadius: BorderRadius.circular(screenWidth * 0.2),
-                      ),
-                      child: Text(
-                        '2. Aşama',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: stageFontSize,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
+
                     SizedBox(width: iconSize),
                   ],
                 ),
@@ -182,6 +163,7 @@ class _AzCokSoru6State extends State<AzCokSoru6> with TickerProviderStateMixin {
 
                           const SizedBox(height: 15),
 
+
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
@@ -204,6 +186,7 @@ class _AzCokSoru6State extends State<AzCokSoru6> with TickerProviderStateMixin {
 
                           const SizedBox(height: 8),
 
+
                           SizedBox(
                             width: double.infinity,
                             height: 40,
@@ -212,8 +195,8 @@ class _AzCokSoru6State extends State<AzCokSoru6> with TickerProviderStateMixin {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: selectedAnswer == true
                                     ? (isCorrect
-                                        ? Colors.green.shade500
-                                        : Colors.red.shade500)
+                                    ? Colors.green.shade500
+                                    : Colors.red.shade500)
                                     : const Color(0xFFC7A3E2),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
@@ -222,8 +205,8 @@ class _AzCokSoru6State extends State<AzCokSoru6> with TickerProviderStateMixin {
                                 elevation: selectedAnswer == true ? 8 : 4,
                                 shadowColor: selectedAnswer == true
                                     ? (isCorrect
-                                        ? Colors.green.shade300
-                                        : Colors.red.shade300)
+                                    ? Colors.green.shade300
+                                    : Colors.red.shade300)
                                     : const Color(0xFFC7A3E2),
                               ),
                               child: const Text(
@@ -238,6 +221,7 @@ class _AzCokSoru6State extends State<AzCokSoru6> with TickerProviderStateMixin {
                           ),
 
                           const SizedBox(height: 70),
+
 
                           Expanded(
                             child: Container(
@@ -261,6 +245,7 @@ class _AzCokSoru6State extends State<AzCokSoru6> with TickerProviderStateMixin {
 
                           const SizedBox(height: 8),
 
+
                           SizedBox(
                             width: double.infinity,
                             height: 40,
@@ -269,8 +254,8 @@ class _AzCokSoru6State extends State<AzCokSoru6> with TickerProviderStateMixin {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: selectedAnswer == false
                                     ? (isCorrect
-                                        ? Colors.green.shade500
-                                        : Colors.red.shade500)
+                                    ? Colors.green.shade500
+                                    : Colors.red.shade500)
                                     : const Color(0xFFC7A3E2),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
@@ -279,8 +264,8 @@ class _AzCokSoru6State extends State<AzCokSoru6> with TickerProviderStateMixin {
                                 elevation: selectedAnswer == false ? 8 : 4,
                                 shadowColor: selectedAnswer == false
                                     ? (isCorrect
-                                        ? Colors.green.shade300
-                                        : Colors.red.shade300)
+                                    ? Colors.green.shade300
+                                    : Colors.red.shade300)
                                     : const Color(0xFFC7A3E2),
                               ),
                               child: const Text(
@@ -303,49 +288,49 @@ class _AzCokSoru6State extends State<AzCokSoru6> with TickerProviderStateMixin {
                 Container(
                   height: 80,
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: showFeedback
                       ? ScaleTransition(
-                          scale: CurvedAnimation(
-                            parent: _feedbackController,
-                            curve: Curves.elasticOut,
+                    scale: CurvedAnimation(
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            isCorrect ? Icons.check_circle : Icons.cancel,
+                            color: isCorrect ? Colors.green : Colors.red,
+                            size: 28,
                           ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  isCorrect ? Icons.check_circle : Icons.cancel,
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  isCorrect
-                                      ? (isEnglish
-                                          ? 'Well done! 🎉'
-                                          : 'Aferin! 🎉')
-                                      : (isEnglish
-                                          ? 'Try again! 😔'
-                                          : 'Tekrar dene! 😔'),
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
+                          const SizedBox(width: 10),
+                          Text(
+                            isCorrect
+                                ? (isEnglish
+                                ? 'Well done! 🎉'
+                                : 'Aferin! 🎉')
+                                : (isEnglish
+                                ? 'Try again! 😔'
+                                : 'Tekrar dene! 😔'),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color:
+                              isCorrect ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        )
+                        ],
+                      ),
+                    ),
+                  )
                       : const SizedBox.shrink(),
                 ),
               ],
