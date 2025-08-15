@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'soru5.dart';
 import '../screens/home_screen.dart';
-import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -23,6 +22,8 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
   bool isCorrect = false;
   bool allMatched = false;
   late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
@@ -30,13 +31,26 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
     rightNumbers = List.from([1, 2, 4])..shuffle();
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 600),
     );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
@@ -47,47 +61,54 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
       if (isLeft) {
         if (matchedLeft[index]) return;
         selectedLeftIndex = index;
+        if (selectedRightIndex != null && selectedLeftIndex != null) {
+          _checkMatch();
+        }
       } else {
         if (matchedRight[index]) return;
         selectedRightIndex = index;
-      }
-
-      if (selectedLeftIndex != null && selectedRightIndex != null) {
-        isCorrect = leftNumbers[selectedLeftIndex!] ==
-            rightNumbers[selectedRightIndex!];
-        showFeedback = true;
-        _feedbackController.forward(from: 0);
-
-        if (isCorrect) {
-          matchedLeft[selectedLeftIndex!] = true;
-          matchedRight[selectedRightIndex!] = true;
-
-          if (matchedLeft.every((element) => element)) {
-            allMatched = true;
-            // Etkinlik tamamlandı
-            ActivityTracker.completeActivity();
-            
-            Future.delayed(const Duration(seconds: 1), () {
-              if (mounted) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SeninWidget(),
-                  ),
-                );
-              }
-            });
-          }
+        if (selectedLeftIndex != null && selectedRightIndex != null) {
+          _checkMatch();
         }
+      }
+    });
+  }
 
+  void _checkMatch() {
+    setState(() {
+      isCorrect = leftNumbers[selectedLeftIndex!] == rightNumbers[selectedRightIndex!];
+      showFeedback = true;
+    });
+
+    _feedbackController.forward(from: 0);
+
+    if (isCorrect) {
+      setState(() {
+        matchedLeft[selectedLeftIndex!] = true;
+        matchedRight[selectedRightIndex!] = true;
+      });
+
+      if (matchedLeft.every((element) => element)) {
+        allMatched = true;
         Future.delayed(const Duration(seconds: 1), () {
           if (mounted) {
-            setState(() {
-              showFeedback = false;
-              selectedLeftIndex = null;
-              selectedRightIndex = null;
-            });
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SeninWidget(),
+              ),
+            );
           }
+        });
+      }
+    }
+
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          showFeedback = false;
+          selectedLeftIndex = null;
+          selectedRightIndex = null;
         });
       }
     });
@@ -100,194 +121,229 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
     return '🍬' * number;
   }
 
+  Widget _buildCard({
+    required int index,
+    required bool isLeft,
+    required String text,
+    required TextStyle style,
+  }) {
+    final bool isSelected = isLeft ? selectedLeftIndex == index : selectedRightIndex == index;
+    final bool isMatched = isLeft ? matchedLeft[index] : matchedRight[index];
+    final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
+
+    Color cardColor = Colors.white;
+    if (isMatched) {
+      cardColor = Colors.green.shade200;
+    } else if (isWrongSelection) {
+      cardColor = Colors.red.shade200;
+    } else if (isSelected) {
+      cardColor = Colors.blue.shade200;
+    }
+
+    return GestureDetector(
+      onTap: isMatched ? null : () => _handleTap(index, isLeft),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        width: 120,
+        height: 120,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: style,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        backgroundColor: const Color(0xFFE1F5FE),
-        appBar: AppBar(
-          title: Text(
-            isEnglish ? 'Number-Candy Matching' : 'Sayı-Şeker Eşleştirme',
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
           ),
-          centerTitle: true,
-          backgroundColor: Colors.deepPurple,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
-          ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-              Text(
-                isEnglish
-                    ? 'Count and match the candies!'
-                    : 'Şekerleri say ve eşleştir!',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: Row(
+          child: SafeArea(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          leftNumbers.length,
-                          (index) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: GestureDetector(
-                              onTap: () => _handleTap(index, true),
-                              child: Container(
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  color: matchedLeft[index]
-                                      ? Colors.green.shade300
-                                      : (showFeedback &&
-                                              !isCorrect &&
-                                              selectedLeftIndex == index)
-                                          ? Colors.red.shade200
-                                          : selectedLeftIndex == index
-                                              ? Colors.blue.shade200
-                                              : Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    leftNumbers[index].toString(),
-                                    style: const TextStyle(
-                                      fontSize: 42,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.deepPurple,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 4,
-                      height: MediaQuery.of(context).size.height * 0.5,
-                      margin: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurple,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          rightNumbers.length,
-                          (index) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: GestureDetector(
-                              onTap: () => _handleTap(index, false),
-                              child: Container(
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  color: matchedRight[index]
-                                      ? Colors.green.shade300
-                                      : (showFeedback &&
-                                              !isCorrect &&
-                                              selectedRightIndex == index)
-                                          ? Colors.red.shade200
-                                          : selectedRightIndex == index
-                                              ? Colors.blue.shade200
-                                              : Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    _getCandies(rightNumbers[index]),
-                                    style: const TextStyle(
-                                      fontSize: 26,
-                                      height: 1.2,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                    IconButton(
+                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => const HomeScreen()),
+                              (route) => false,
+                        );
+                      },
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 20),
-              if (showFeedback)
-                ScaleTransition(
-                  scale: CurvedAnimation(
-                    parent: _feedbackController,
-                    curve: Curves.elasticOut,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
+                Expanded(
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                            child: Text(
+                              isEnglish ? 'Count and match the candies!' : 'Şekerleri say ve eşleştir!',
+                              style: const TextStyle(
+                                fontSize: 23,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: List.generate(
+                                      leftNumbers.length,
+                                          (index) => _buildCard(
+                                        index: index,
+                                        isLeft: true,
+                                        text: leftNumbers[index].toString(),
+                                        style: const TextStyle(
+                                          fontSize: 42,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 4,
+                                  height: screenSize.height * 0.45,
+                                  margin: const EdgeInsets.symmetric(horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade400,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: List.generate(
+                                      rightNumbers.length,
+                                          (index) => _buildCard(
+                                        index: index,
+                                        isLeft: false,
+                                        text: _getCandies(rightNumbers[index]),
+                                        style: const TextStyle(
+                                          fontSize: 26,
+                                          height: 1.2,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              const SizedBox(height: 20),
-            ],
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: showFeedback
+                      ? ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isCorrect ? Icons.check_circle : Icons.cancel,
+                            color: isCorrect ? Colors.green : Colors.red,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: isCorrect ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
