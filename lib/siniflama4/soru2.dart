@@ -14,15 +14,13 @@ class DuyuOrganlariSinifla extends StatefulWidget {
 class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
     with TickerProviderStateMixin {
   final List<Map<String, dynamic>> items = [
-    // Burun için öğeler
+    // Burun
     {'emoji': '🌸', 'id': 'cicek', 'organ': 'burun', 'isPlaced': false},
     {'emoji': '🧴', 'id': 'parfum', 'organ': 'burun', 'isPlaced': false},
-
-    // Kulak için öğeler
+    // Kulak
     {'emoji': '🎧', 'id': 'kulaklik', 'organ': 'kulak', 'isPlaced': false},
     {'emoji': '🎵', 'id': 'muzik', 'organ': 'kulak', 'isPlaced': false},
-
-    // Dil için öğeler
+    // Dil
     {'emoji': '🍫', 'id': 'cikolata', 'organ': 'dil', 'isPlaced': false},
     {'emoji': '🍭', 'id': 'seker', 'organ': 'dil', 'isPlaced': false},
   ];
@@ -45,8 +43,7 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    // Emojileri karıştır
-    items.shuffle();
+    items.shuffle(); // küçük bir çeşitlilik
   }
 
   @override
@@ -69,7 +66,6 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
           item['isPlaced'] = true;
         }
       });
-
       _checkCompletion();
     }
 
@@ -83,22 +79,18 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
   }
 
   void _checkCompletion() {
-    bool allPlaced = items.every((item) => item['isPlaced']);
+    final allPlaced = items.every((e) => e['isPlaced'] == true);
     if (allPlaced && !_dialogShown) {
       _dialogShown = true;
+
+      // Etkinlik tamamlandı
+      ActivityTracker.completeActivity();
+
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
-          // Etkinlik tamamlandı
-
-          ActivityTracker.completeActivity();
-
-          
-
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const AtikSinifla(),
-            ),
+            MaterialPageRoute(builder: (context) => const AtikSinifla()),
           );
         }
       });
@@ -108,280 +100,300 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    return Scaffold(
-      backgroundColor: const Color(0xFFE1F5FE),
-      appBar: AppBar(
-        title: Text(
-          isEnglish
-              ? 'Classify by Sensory Organs'
-              : 'Duyu Organlarına Göre Sınıfla',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.deepPurple.shade100,
-                  Colors.deepPurple.shade50,
-                  Colors.white,
-                ],
-              ),
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(24.0),
+          child: SafeArea(
             child: Column(
               children: [
-                const SizedBox(height: 12),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
+                // Üst geri butonu (TasitSinifla ile aynı)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
                       ),
-                    ],
-                  ),
-                  child: Text(
-                    isEnglish
-                        ? 'Drag the objects to the correct sensory organ!'
-                        : 'Nesneleri doğru duyu organına sürükle!',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.deepPurple,
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 32),
+                // Kart gövde
                 Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: _buildOrganGroup(
-                          isEnglish ? 'Nose' : 'Burun',
-                          'burun',
-                          '👃',
-                          Colors.purple.shade200,
-                          isEnglish,
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.95),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildOrganGroup(
-                          isEnglish ? 'Ear' : 'Kulak',
-                          'kulak',
-                          '👂',
-                          Colors.orange.shade200,
-                          isEnglish,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildOrganGroup(
-                          isEnglish ? 'Tongue' : 'Dil',
-                          'dil',
-                          '👅',
-                          Colors.red.shade200,
-                          isEnglish,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      if (!item['isPlaced']) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Draggable<Map<String, dynamic>>(
-                            data: item,
-                            feedback: Text(
-                              item['emoji'],
-                              style: const TextStyle(fontSize: 48),
-                            ),
-                            childWhenDragging: Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: Text(
-                              item['emoji'],
-                              style: const TextStyle(fontSize: 48),
-                            ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        // Başlık (aynı stil)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 1,
                           ),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20),
-                if (showFeedback)
-                  Center(
-                    child: ScaleTransition(
-                      scale: CurvedAnimation(
-                        parent: _feedbackController,
-                        curve: Curves.elasticOut,
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 24,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isCorrect ? Icons.check_circle : Icons.cancel,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              size: 32,
+                          child: Text(
+                            isEnglish
+                                ? 'Drag to the correct organ!'
+                                : 'Nesneleri doğru duyuya sürükle!',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
-                            const SizedBox(width: 12),
-                            Text(
-                              isCorrect
-                                  ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                  : (isEnglish
-                                      ? 'Try again! 😔'
-                                      : 'Tekrar dene! 😔'),
-                              style: TextStyle(
-                                fontSize: 24,
-                                color: isCorrect ? Colors.green : Colors.red,
-                                fontWeight: FontWeight.bold,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        // İçerik: Sol grup kolonları + Sağ draggable liste
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Sol: 3 grup kutusu (dikey), TasitSinifla ile aynı hiyerarşi
+                              Expanded(
+                                flex: 3,
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    _buildGroup(
+                                      isEnglish ? 'Nose' : 'Burun',
+                                      organGroups['burun']!,
+                                      'burun',
+                                      Colors.green.shade50,
+                                      Colors.green,
+                                    ),
+                                    _buildGroup(
+                                      isEnglish ? 'Ear' : 'Kulak',
+                                      organGroups['kulak']!,
+                                      'kulak',
+                                      Colors.blue.shade50,
+                                      Colors.lightBlue,
+                                    ),
+                                    _buildGroup(
+                                      isEnglish ? 'Tongue' : 'Dil',
+                                      organGroups['dil']!,
+                                      'dil',
+                                      Colors.purple.shade50,
+                                      Colors.deepPurpleAccent,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 16),
+                              // Sağ: Yerleştirilmemiş öğeler listesi
+                              Expanded(
+                                flex: 2,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children:
+                                        items
+                                            .where((item) => !item['isPlaced'])
+                                            .map((item) {
+                                              return Draggable<
+                                                Map<String, dynamic>
+                                              >(
+                                                data: item,
+                                                feedback: Material(
+                                                  color: Colors.transparent,
+                                                  child: _buildDraggableItem(
+                                                    item,
+                                                  ),
+                                                ),
+                                                childWhenDragging: Opacity(
+                                                  opacity: 0.3,
+                                                  child: _buildDraggableItem(
+                                                    item,
+                                                  ),
+                                                ),
+                                                child: _buildDraggableItem(
+                                                  item,
+                                                ),
+                                              );
+                                            })
+                                            .toList(),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
-                const SizedBox(height: 20),
+                ),
+                // Alt geri bildirim alanı (aynı animasyon ve ölçüler)
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
+                ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildOrganGroup(
-      String title, String organ, String emoji, Color color, bool isEnglish) {
+  Widget _buildGroup(
+    String title,
+    List<Map<String, dynamic>> group,
+    String organType,
+    Color boxColor,
+    Color borderColor,
+  ) {
     return DragTarget<Map<String, dynamic>>(
-      onWillAcceptWithDetails: (data) => true,
-      onAcceptWithDetails: (data) => _handleDrag(data.data, organ),
-      builder: (context, candidateItems, rejectedItems) {
+      onWillAcceptWithDetails: (_) => true,
+      onAcceptWithDetails: (details) => _handleDrag(details.data, organType),
+      builder: (context, candidateData, rejectedData) {
         return Container(
+          width: double.infinity,
+          height: 145,
+          margin: const EdgeInsets.symmetric(vertical: 7),
+          padding: const EdgeInsets.all(7),
           decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
+            color: boxColor,
+            border: Border.all(color: borderColor, width: 2),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    topRight: Radius.circular(15),
-                  ),
-                ),
-                width: double.infinity,
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        emoji,
-                        style: const TextStyle(fontSize: 30),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize:
-                              title == (isEnglish ? 'Tongue' : 'Dil') ? 36 : 54,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
               ),
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: organGroups[organ]!
-                        .map((item) => Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 12.0),
-                              child: Text(
-                                item['emoji'],
-                                style: const TextStyle(fontSize: 48),
-                                textAlign: TextAlign.center,
-                              ),
-                            ))
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 10,
+                runSpacing: 4,
+                children:
+                    group
+                        .map(
+                          (item) => Text(
+                            item['emoji'],
+                            style: const TextStyle(
+                              fontSize: 32,
+                              color: Color(0xFF999999),
+                            ),
+                          ),
+                        )
                         .toList(),
-                  ),
-                ),
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _buildDraggableItem(Map<String, dynamic> item) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      width: 64,
+      height: 64,
+      child: Center(
+        child: Text(
+          item['emoji'],
+          style: const TextStyle(fontSize: 32, color: Colors.black),
+        ),
+      ),
     );
   }
 }
