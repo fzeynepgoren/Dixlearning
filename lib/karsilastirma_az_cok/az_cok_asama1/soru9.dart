@@ -76,209 +76,191 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
     }
   }
 
-@override
-Widget build(BuildContext context) {
-  final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-  final screenSize = MediaQuery.of(context).size;
-  final screenWidth = screenSize.width;
-  final screenHeight = screenSize.height;
+  @override
+  Widget build(BuildContext context) {
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
+    final screenHeight = screenSize.height;
 
-  final iconSize = screenWidth * 0.065;
-  final stageFontSize = screenWidth * 0.038;
+    final iconSize = screenWidth * 0.065;
+    final stageFontSize = screenWidth * 0.038;
 
-  return WillPopScope(
-    onWillPop: () async => false,
-    child: Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.blue.shade200,
-              Colors.blue.shade200,
-              const Color(0xffffffff),
-            ],
-            stops: const [0.0, 0.5, 1.0],
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back,
-                        color: Colors.black, size: iconSize),
-                    onPressed: () {
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (context) => const HomeScreen()),
-                            (route) => false,
-                      );
-                    },
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth * 0.04,
-                      vertical: screenHeight * 0.008,
+          child: SafeArea(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back,
+                          color: Colors.black, size: iconSize),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => const HomeScreen()),
+                              (route) => false,
+                        );
+                      },
                     ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: const Color(0xFF8FC8F7), width: 2),
-                      borderRadius: BorderRadius.circular(screenWidth * 0.2),
-                    ),
-                    child: Text(
-                      '3. Aşama',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: stageFontSize,
-                        color: Colors.black,
+
+                    SizedBox(width: iconSize),
+                  ],
+                ),
+                Expanded(
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
-                  SizedBox(width: iconSize),
-                ],
-              ),
-              Expanded(
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.95),
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          isEnglish
-                              ? 'Choose the one with more.'
-                              : 'Çok olanı işaretle.',
-                          style: const TextStyle(
-                            fontSize: 23,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 15),
-                        Expanded(
-                          child: Image.asset(
-                            'assets/az_cok_asa1/soru9/az_papatya.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 40,
-                          child: ElevatedButton(
-                            onPressed: () => checkAnswer(false),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: selectedAnswer == false
-                                  ? (isCorrect
-                                  ? Colors.green.shade500
-                                  : Colors.red.shade500)
-                                  : const Color(0xfffdbe00),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                      child: Column(
+                        children: [
+                          Text(
+                            isEnglish
+                                ? 'Choose the one with more.'
+                                : 'Çok olanı işaretle.',
+                            style: const TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
-                            child: const Text(
-                              'Seç',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: Image.asset(
+                              'assets/az_cok_asa1/soru9/az_papatya.png',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 40,
+                            child: ElevatedButton(
+                              onPressed: () => checkAnswer(false),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: selectedAnswer == false
+                                    ? (isCorrect
+                                    ? Colors.green.shade500
+                                    : Colors.red.shade500)
+                                    : const Color(0xfffdbe00),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: const Text(
+                                'Seç',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 70),
-                        Expanded(
-                          child: Image.asset(
-                            'assets/az_cok_asa1/soru9/cok_sekil.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 40,
-                          child: ElevatedButton(
-                            onPressed: () => checkAnswer(true),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: selectedAnswer == true
-                                  ? (isCorrect
-                                  ? Colors.green.shade500
-                                  : Colors.red.shade500)
-                                  : const Color(0xfffdbe00),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: const Text(
-                              'Seç',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
+                          const SizedBox(height: 70),
+                          Expanded(
+                            child: Image.asset(
+                              'assets/az_cok_asa1/soru9/cok_sekil.png',
+                              fit: BoxFit.contain,
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 40,
+                            child: ElevatedButton(
+                              onPressed: () => checkAnswer(true),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: selectedAnswer == true
+                                    ? (isCorrect
+                                    ? Colors.green.shade500
+                                    : Colors.red.shade500)
+                                    : const Color(0xfffdbe00),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: const Text(
+                                'Seç',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                height: 80,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: showFeedback
-                    ? ScaleTransition(
-                  scale: CurvedAnimation(
-                    parent: _feedbackController,
-                    curve: Curves.elasticOut,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        isCorrect ? Icons.check_circle : Icons.cancel,
-                        color: isCorrect ? Colors.green : Colors.red,
-                        size: 28,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        isCorrect
-                            ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                            : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
-                        style: TextStyle(
-                          fontSize: 18,
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: showFeedback
+                      ? ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          isCorrect ? Icons.check_circle : Icons.cancel,
                           color: isCorrect ? Colors.green : Colors.red,
-                          fontWeight: FontWeight.bold,
+                          size: 28,
                         ),
-                      ),
-                    ],
-                  ),
-                )
-                    : const SizedBox.shrink(),
-              ),
-            ],
+                        const SizedBox(width: 10),
+                        Text(
+                          isCorrect
+                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                              : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: isCorrect ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
