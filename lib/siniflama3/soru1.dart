@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
 import 'soru2.dart';
-
-void main() => runApp(const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SekilSiniflama(),
-    ));
+import 'package:provider/provider.dart';
+import '../../providers/language_provider.dart';
+import '../../screens/home_screen.dart';
+import 'package:dixlearning/karsilastirma_kalin_ince/kalin_ince_asama1/soru3.dart'; // Bu dosyayı kendi sonraki sayfa dosyanızla değiştirin
 
 class SekilSiniflama extends StatefulWidget {
   const SekilSiniflama({super.key});
@@ -15,7 +14,8 @@ class SekilSiniflama extends StatefulWidget {
   State<SekilSiniflama> createState() => _SekilSiniflamaState();
 }
 
-class _SekilSiniflamaState extends State<SekilSiniflama> {
+class _SekilSiniflamaState extends State<SekilSiniflama>
+    with TickerProviderStateMixin {
   final Map<String, String> dogruEslesmeler = {
     'ucgen1': 'Üçgen',
     'kare1': 'Kare',
@@ -31,10 +31,16 @@ class _SekilSiniflamaState extends State<SekilSiniflama> {
 
   Set<String> eslesenler = {};
   Map<String, Color?> sekilRenkleri = {};
+  Map<String, Color?> kategoriRenkleri = {};
 
-  String? mesaj;
-  Color? mesajRenk;
-  IconData? mesajIkon;
+  String feedbackText = 'Sürükle bırak ile eşleştir!';
+  Color feedbackColor = Colors.yellow.shade800;
+  IconData feedbackIcon = Icons.lightbulb_outline;
+  bool showFeedback = false;
+
+  late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
@@ -43,219 +49,328 @@ class _SekilSiniflamaState extends State<SekilSiniflama> {
     kategoriler.shuffle(Random());
     shuffledSekiller = List<String>.from(sekiller);
     shuffledSekiller.shuffle(Random());
+
+    _feedbackController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+    _slideController.forward();
   }
 
-  void gosterMesaj(String text, Color renk, IconData ikon) {
+  @override
+  void dispose() {
+    _feedbackController.dispose();
+    _slideController.dispose();
+    super.dispose();
+  }
+
+  void gosterGeriBildirim(String mesaj, Color renk, IconData ikon) {
     setState(() {
-      mesaj = text;
-      mesajRenk = renk;
-      mesajIkon = ikon;
+      feedbackText = mesaj;
+      feedbackColor = renk;
+      feedbackIcon = ikon;
+      showFeedback = true;
     });
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        mesaj = null;
+
+    _feedbackController.forward(from: 0).then((_) {
+      if (eslesenler.length == dogruEslesmeler.length) {
+        kontrolVeIlerle(context);
+      }
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted && eslesenler.length != dogruEslesmeler.length) {
+          setState(() {
+            feedbackText = 'Sürükle bırak ile eşleştir!';
+            feedbackColor = Colors.yellow.shade800;
+            feedbackIcon = Icons.lightbulb_outline;
+            showFeedback = false;
+          });
+        }
       });
     });
   }
 
-  void renkliGoster(String id, Color renk) {
-    setState(() {
-      sekilRenkleri[id] = renk;
-    });
-    Future.delayed(const Duration(seconds: 1), () {
-      setState(() {
-        sekilRenkleri[id] = null;
-      });
+  void kontrolVeIlerle(BuildContext context) {
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const BoyutSinifla()), // Sayfa geçişi soru2.dart'a yönlendirildi
+        );
+      }
     });
   }
 
-  // ✅ SADECE BURAYI GÜNCELLEDİM
+  void kutuyuRenklendir(String kategori, Color renk) {
+    setState(() {
+      kategoriRenkleri[kategori] = renk;
+    });
+
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        setState(() {
+          kategoriRenkleri[kategori] = null;
+        });
+      }
+    });
+  }
+
   void eslesmeYapildi(String data, String kategori) {
     if (dogruEslesmeler[data] == kategori) {
       setState(() {
         eslesenler.add(data);
       });
-      renkliGoster(data, Colors.green.shade200);
-      gosterMesaj('Aferin! 🎉', Colors.green, Icons.check_circle);
-
-      if (eslesenler.length == dogruEslesmeler.length) {
-        Future.delayed(const Duration(seconds: 1), () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const BoyutSinifla()),
-          );
-        });
-      }
+      gosterGeriBildirim(
+        'Aferin! 🎉',
+        Colors.green,
+        Icons.check_circle,
+      );
+      kutuyuRenklendir(kategori, Colors.green.shade200);
     } else {
-      renkliGoster(data, Colors.red.shade300);
-      gosterMesaj('Tekrar dene! 😔', Colors.red, Icons.cancel);
+      gosterGeriBildirim(
+        'Tekrar dene! 😔',
+        Colors.red,
+        Icons.cancel,
+      );
+      kutuyuRenklendir(kategori, Colors.red.shade200);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F3FF),
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text('Üçgen, Kare, Daireyi Sınıflama'),
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 16),
-            const Text(
-              'Şekilleri türlerine göre uygun kutuya sürükle!',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: kategoriler.map((kategori) {
-                        Color renk = const Color(0xFFE0F7FA);
-                        Color border = Colors.black;
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
 
-                        return Expanded(
-                          child: DragTarget<String>(
-                            builder: (context, _, __) {
-                              final eslesenSekiller = eslesenler
-                                  .where((e) => dogruEslesmeler[e] == kategori)
-                                  .toList();
-                              return Container(
-                                width: double.infinity,
-                                margin: const EdgeInsets.symmetric(vertical: 7),
-                                padding: const EdgeInsets.all(7),
-                                decoration: BoxDecoration(
-                                  color: renk,
-                                  border: Border.all(color: border, width: 2),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Center(
-                                      child: Text(
-                                        kategori,
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: border,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: eslesenSekiller
-                                          .map((e) => Padding(
-                                                padding: const EdgeInsets.only(
-                                                    bottom: 12),
-                                                child: _buildSekil(e,
-                                                    small: true,
-                                                    renk: sekilRenkleri[e]),
-                                              ))
-                                          .toList(),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            onWillAcceptWithDetails: (data) =>
-                                data != null && !eslesenler.contains(data),
-                            onAcceptWithDetails: (data) {
-                              eslesmeYapildi(data.data, kategori);
-                            },
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: shuffledSekiller.map((id) {
-                        bool eslesti = eslesenler.contains(id);
-                        return eslesti
-                            ? SizedBox(
-                                width: 64,
-                                height: 64,
-                                child: Center(
-                                  child: _buildSekil(id,
-                                      small: false,
-                                      eslesti: true,
-                                      renk: sekilRenkleri[id]),
-                                ),
-                              )
-                            : Draggable<String>(
-                                data: id,
-                                feedback: Material(
-                                  color: Colors.transparent,
-                                  child: SizedBox(
-                                    width: 64,
-                                    height: 64,
-                                    child: Center(
-                                      child: _buildSekil(id,
-                                          small: false,
-                                          renk: sekilRenkleri[id]),
-                                    ),
-                                  ),
-                                ),
-                                childWhenDragging: Opacity(
-                                  opacity: 0.3,
-                                  child: _buildSekil(id,
-                                      small: false, renk: sekilRenkleri[id]),
-                                ),
-                                child: SizedBox(
-                                  width: 64,
-                                  height: 64,
-                                  child: Center(
-                                    child: _buildSekil(id,
-                                        small: false, renk: sekilRenkleri[id]),
-                                  ),
-                                ),
-                              );
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              ),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
             ),
-            if (mesaj != null) ...[
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(mesajIkon, color: mesajRenk),
-                  const SizedBox(width: 6),
-                  Text(
-                    mesaj!,
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: mesajRenk),
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => const HomeScreen()),
+                              (route) => false,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                            child: Text(
+                              isEnglish
+                                  ? 'Drag and drop the shapes to the correct box.'
+                                  : 'Şekilleri türlerine göre uygun kutuya sürükle!',
+                              style: const TextStyle(
+                                fontSize: 23,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: kategoriler.map((kategori) {
+                                      Color renk = const Color(0xFFE0F7FA);
+                                      Color border = Colors.black;
+
+                                      Color? dynamicBoxColor = kategoriRenkleri[kategori] ?? renk;
+
+                                      return Expanded(
+                                        child: DragTarget<String>(
+                                          builder: (context, _, __) {
+                                            final eslesenSekiller = eslesenler
+                                                .where((e) => dogruEslesmeler[e] == kategori)
+                                                .toList();
+                                            return Container(
+                                              width: double.infinity,
+                                              margin: const EdgeInsets.symmetric(vertical: 7),
+                                              padding: const EdgeInsets.all(7),
+                                              decoration: BoxDecoration(
+                                                color: dynamicBoxColor,
+                                                border: Border.all(color: border, width: 2),
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Center(
+                                                    child: Text(
+                                                      kategori,
+                                                      style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: border,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  Wrap(
+                                                    spacing: 8,
+                                                    alignment: WrapAlignment.center,
+                                                    children: eslesenSekiller
+                                                        .map((e) => _buildSekil(e, small: true, renk: sekilRenkleri[e]))
+                                                        .toList(),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                          onWillAccept: (data) => data != null && !eslesenler.contains(data),
+                                          onAccept: (data) {
+                                            eslesmeYapildi(data, kategori);
+                                          },
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: shuffledSekiller.map((id) {
+                                      bool eslesti = eslesenler.contains(id);
+                                      return eslesti
+                                          ? Container()
+                                          : Draggable<String>(
+                                        data: id,
+                                        feedback: Material(
+                                          color: Colors.transparent,
+                                          child: Container(
+                                            width: 64,
+                                            height: 64,
+                                            child: Center(child: _buildSekil(id, small: false, renk: sekilRenkleri[id])),
+                                          ),
+                                        ),
+                                        childWhenDragging: Opacity(
+                                          opacity: 0.3,
+                                          child: _buildSekil(id, small: false, renk: sekilRenkleri[id]),
+                                        ),
+                                        child: Container(
+                                          width: 64,
+                                          height: 64,
+                                          child: Center(child: _buildSekil(id, small: false, renk: sekilRenkleri[id])),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 12),
-            ],
-          ],
+                ),
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: showFeedback
+                      ? ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          )
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            feedbackIcon,
+                            color: feedbackColor,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            feedbackText,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: feedbackColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -281,8 +396,7 @@ class _SekilSiniflamaState extends State<SekilSiniflama> {
       baseColor = Colors.teal;
     }
 
-    Color finalRenk =
-        renk ?? (eslesti ? baseColor.withOpacity(0.4) : baseColor);
+    Color finalRenk = renk ?? (eslesti ? baseColor.withOpacity(0.4) : baseColor);
 
     if (id.contains('ucgen')) {
       sekil = CustomPaint(
@@ -308,7 +422,6 @@ class _SekilSiniflamaState extends State<SekilSiniflama> {
         ),
       );
     }
-
     return sekil;
   }
 }
@@ -334,17 +447,4 @@ class _TrianglePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// ✅ YENİ SORU SAYFASI - BOŞ
-class SonrakiSoru extends StatelessWidget {
-  const SonrakiSoru({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F3FF),
-      body: Center(child: Container()),
-    );
-  }
 }
