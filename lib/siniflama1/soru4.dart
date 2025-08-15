@@ -59,7 +59,6 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
           item['isPlaced'] = true;
         }
       });
-
       _checkCompletion();
     }
 
@@ -361,10 +360,7 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                           .map(
                             (item) => Text(
                               item['emoji'],
-                              style: const TextStyle(
-                                fontSize: 36,
-                                color: Color(0xFF999999),
-                              ),
+                              style: const TextStyle(fontSize: 36),
                             ),
                           )
                           .toList(),
@@ -381,27 +377,9 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
     Map<String, dynamic> item, {
     bool dragging = false,
   }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      width: 80,
-      height: 80,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          item['emoji'],
-          style: const TextStyle(fontSize: 38, color: Colors.black),
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Text(item['emoji'], style: const TextStyle(fontSize: 38)),
     );
   }
 }
