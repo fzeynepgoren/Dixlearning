@@ -58,7 +58,10 @@ class MainMenuScreen extends StatelessWidget {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple.shade400,
-                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 25),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 50,
+                    vertical: 25,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
@@ -99,9 +102,21 @@ class GeometricMatching extends StatefulWidget {
 class _GeometricMatchingState extends State<GeometricMatching>
     with TickerProviderStateMixin {
   final List<Shape> leftShapes = [
-    Shape(shape: 'Kare', color: const Color(0xFFE57373), icon: Icons.square_outlined),
-    Shape(shape: 'Daire', color: const Color(0xFF81C784), icon: Icons.circle_outlined),
-    Shape(shape: 'Üçgen', color: const Color(0xFF64B5F6), icon: Icons.change_history),
+    Shape(
+      shape: 'Kare',
+      color: const Color(0xFFE57373),
+      icon: Icons.square_outlined,
+    ),
+    Shape(
+      shape: 'Daire',
+      color: const Color(0xFF81C784),
+      icon: Icons.circle_outlined,
+    ),
+    Shape(
+      shape: 'Üçgen',
+      color: const Color(0xFF64B5F6),
+      icon: Icons.change_history,
+    ),
   ];
 
   late List<Shape> rightShapes;
@@ -129,10 +144,9 @@ class _GeometricMatchingState extends State<GeometricMatching>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -186,20 +200,24 @@ class _GeometricMatchingState extends State<GeometricMatching>
   }
 
   // Şekil kartlarının modern tasarımı
-  Widget buildShapeCard(Shape shape, {bool isMatched = false, bool isShadow = false, bool isSelected = false}) {
-    Color cardColor = isMatched
-        ? shape.color
-        : isShadow
-        ? Colors.grey.shade200
-        : shape.color;
+  Widget buildShapeCard(
+    Shape shape, {
+    bool isMatched = false,
+    bool isShadow = false,
+    bool isSelected = false,
+  }) {
+    Color cardColor =
+        isMatched
+            ? shape.color
+            : isShadow
+            ? Colors.grey.shade200
+            : shape.color;
 
-    Color iconColor = isShadow && !isMatched
-        ? Colors.grey.shade600
-        : Colors.white;
+    Color iconColor =
+        isShadow && !isMatched ? Colors.grey.shade600 : Colors.white;
 
-    Border? border = isSelected
-        ? Border.all(color: Colors.green.shade400, width: 4)
-        : null;
+    Border? border =
+        isSelected ? Border.all(color: Colors.green.shade400, width: 4) : null;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -220,19 +238,16 @@ class _GeometricMatchingState extends State<GeometricMatching>
         ],
       ),
       child: Center(
-        child: shape.shape == 'Üçgen'
-            ? SizedBox(
-          width: 50,
-          height: 50,
-          child: CustomPaint(
-            painter: TrianglePainter(color: iconColor),
-          ),
-        )
-            : Icon(
-          shape.icon,
-          size: 50,
-          color: iconColor,
-        ),
+        child:
+            shape.shape == 'Üçgen'
+                ? SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CustomPaint(
+                    painter: TrianglePainter(color: iconColor),
+                  ),
+                )
+                : Icon(shape.icon, size: 50, color: iconColor),
       ),
     );
   }
@@ -262,7 +277,11 @@ class _GeometricMatchingState extends State<GeometricMatching>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back, color: Colors.black, size: screenSize.width * 0.065),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: Colors.black,
+                      size: screenSize.width * 0.065,
+                    ),
                     onPressed: () {
                       Navigator.pop(context);
                     },
@@ -289,7 +308,10 @@ class _GeometricMatchingState extends State<GeometricMatching>
                     child: Column(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 1,
+                          ),
                           child: const Text(
                             'Renkli şekillere tıkla ve gölgeleriyle eşleştir!',
                             style: TextStyle(
@@ -306,33 +328,41 @@ class _GeometricMatchingState extends State<GeometricMatching>
                             children: [
                               Expanded(
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
                                   children: [
                                     ...leftShapes.map((shape) {
-                                      final isMatched = matches.containsKey(shape.shape);
-                                      final isSelected = selectedLeftShape?.shape == shape.shape;
+                                      final isMatched = matches.containsKey(
+                                        shape.shape,
+                                      );
+                                      final isSelected =
+                                          selectedLeftShape?.shape ==
+                                          shape.shape;
 
                                       return GestureDetector(
-                                        onTap: isMatched
-                                            ? null
-                                            : () {
-                                          setState(() {
-                                            selectedLeftShape = shape;
-                                          });
-                                        },
+                                        onTap:
+                                            isMatched
+                                                ? null
+                                                : () {
+                                                  setState(() {
+                                                    selectedLeftShape = shape;
+                                                  });
+                                                },
                                         child: buildShapeCard(
                                           shape,
                                           isSelected: isSelected,
                                         ),
                                       );
-                                    }).toList(),
+                                    }),
                                   ],
                                 ),
                               ),
                               Container(
                                 width: 4,
                                 height: screenSize.height * 0.45,
-                                margin: const EdgeInsets.symmetric(horizontal: 12),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(4),
@@ -346,25 +376,34 @@ class _GeometricMatchingState extends State<GeometricMatching>
                               ),
                               Expanded(
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
                                   children: [
                                     ...rightShapes.map((shape) {
-                                      final isMatched = matches.containsValue(shape.shape);
+                                      final isMatched = matches.containsValue(
+                                        shape.shape,
+                                      );
                                       return GestureDetector(
-                                        onTap: isMatched || selectedLeftShape == null
-                                            ? null
-                                            : () {
-                                          if (selectedLeftShape != null) {
-                                            checkMatch(selectedLeftShape!.shape, shape.shape);
-                                          }
-                                        },
+                                        onTap:
+                                            isMatched ||
+                                                    selectedLeftShape == null
+                                                ? null
+                                                : () {
+                                                  if (selectedLeftShape !=
+                                                      null) {
+                                                    checkMatch(
+                                                      selectedLeftShape!.shape,
+                                                      shape.shape,
+                                                    );
+                                                  }
+                                                },
                                         child: buildShapeCard(
                                           shape,
                                           isShadow: !isMatched,
                                           isMatched: isMatched,
                                         ),
                                       );
-                                    }).toList(),
+                                    }),
                                   ],
                                 ),
                               ),
@@ -378,48 +417,56 @@ class _GeometricMatchingState extends State<GeometricMatching>
               ),
               Container(
                 height: 80,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: showFeedback
-                    ? ScaleTransition(
-                  scale: CurvedAnimation(
-                    parent: _feedbackController,
-                    curve: Curves.elasticOut,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                child:
+                    showFeedback
+                        ? ScaleTransition(
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-                    : const SizedBox.shrink(),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                        : const SizedBox.shrink(),
               ),
             ],
           ),
@@ -434,11 +481,7 @@ class Shape {
   final Color color;
   final IconData icon;
 
-  Shape({
-    required this.shape,
-    required this.color,
-    required this.icon,
-  });
+  Shape({required this.shape, required this.color, required this.icon});
 }
 
 class TrianglePainter extends CustomPainter {
@@ -448,9 +491,10 @@ class TrianglePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
+    final paint =
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.fill;
 
     final path = Path();
     path.moveTo(size.width / 2, 0);

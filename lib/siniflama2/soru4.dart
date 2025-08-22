@@ -265,11 +265,11 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
+                                boxShadow: const [
                                   BoxShadow(
                                     color: Colors.black12,
                                     blurRadius: 10,
-                                    offset: const Offset(0, 5),
+                                    offset: Offset(0, 5),
                                   ),
                                 ],
                               ),
@@ -385,12 +385,8 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Center(

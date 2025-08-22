@@ -24,7 +24,7 @@ class ProfileScreen extends StatelessWidget {
           backgroundColor: Colors.transparent,
           automaticallyImplyLeading: false,
           flexibleSpace: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -33,8 +33,10 @@ class ProfileScreen extends StatelessWidget {
             ),
             child: SafeArea(
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 6,
+                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -44,8 +46,11 @@ class ProfileScreen extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                       padding: const EdgeInsets.all(8),
-                      child: const Icon(Icons.person,
-                          size: 32, color: Colors.white),
+                      child: const Icon(
+                        Icons.person,
+                        size: 32,
+                        color: Colors.white,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Column(
@@ -55,15 +60,18 @@ class ProfileScreen extends StatelessWidget {
                         Text(
                           isEnglish ? 'Profile' : 'Profil',
                           style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           isEnglish ? 'Discover yourself!' : 'Kendini keşfet!',
                           style: const TextStyle(
-                              fontSize: 13, color: Colors.white70),
+                            fontSize: 13,
+                            color: Colors.white70,
+                          ),
                         ),
                       ],
                     ),
@@ -81,7 +89,7 @@ class ProfileScreen extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: [
               mainColor.withOpacity(0.08),
-              accentColor.withOpacity(0.08)
+              accentColor.withOpacity(0.08),
             ],
           ),
         ),
@@ -93,7 +101,7 @@ class ProfileScreen extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: LinearGradient(
+                  gradient: const LinearGradient(
                     colors: [mainColor, accentColor],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -110,11 +118,7 @@ class ProfileScreen extends StatelessWidget {
                 child: const CircleAvatar(
                   radius: 54,
                   backgroundColor: Colors.white,
-                  child: Icon(
-                    Icons.person,
-                    size: 60,
-                    color: Color(0xFF6C63FF),
-                  ),
+                  child: Icon(Icons.person, size: 60, color: Color(0xFF6C63FF)),
                 ),
               ),
               const SizedBox(height: 24),
@@ -131,10 +135,7 @@ class ProfileScreen extends StatelessWidget {
                 isEnglish
                     ? 'Welcome! You can edit your profile.'
                     : 'Hoş geldin! Profilini düzenleyebilirsin.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[700],
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
               ),
               const SizedBox(height: 40),
               ElevatedButton.icon(
@@ -142,17 +143,18 @@ class ProfileScreen extends StatelessWidget {
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => LoginScreen(
-                              isEnglish: isEnglish,
-                            )),
+                      builder: (context) => LoginScreen(isEnglish: isEnglish),
+                    ),
                     (route) => false,
                   );
                 },
                 icon: const Icon(Icons.logout),
                 label: Text(isEnglish ? 'Logout' : 'Çıkış Yap'),
                 style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 18,
+                  ),
                   textStyle: const TextStyle(fontSize: 20),
                   backgroundColor: accentColor,
                   foregroundColor: Colors.white,
@@ -172,16 +174,12 @@ class ProfileScreen extends StatelessWidget {
           if (index == 1) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
-              ),
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
             );
           } else if (index == 2) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
-                builder: (context) => const SettingsScreen(),
-              ),
+              MaterialPageRoute(builder: (context) => const SettingsScreen()),
             );
           }
         },

@@ -267,11 +267,11 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
+                                boxShadow: const [
                                   BoxShadow(
                                     color: Colors.black12,
                                     blurRadius: 10,
-                                    offset: const Offset(0, 5),
+                                    offset: Offset(0, 5),
                                   ),
                                 ],
                               ),

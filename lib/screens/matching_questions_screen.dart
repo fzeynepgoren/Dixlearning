@@ -19,30 +19,28 @@ class MatchingQuestionsScreen extends StatelessWidget {
       {
         'emoji': '🍎',
         'title': isEnglish ? 'Stage 1 Questions' : '1.Aşama Soruları',
-        'desc': isEnglish
-            ? 'Fruit matching and more!'
-            : 'Meyve eşleştirme ve fazlası!',
+        'desc':
+            isEnglish
+                ? 'Fruit matching and more!'
+                : 'Meyve eşleştirme ve fazlası!',
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const MeyveEsle(),
-            ),
+            MaterialPageRoute(builder: (context) => const MeyveEsle()),
           );
         },
       },
       {
         'emoji': '🔤',
         'title': isEnglish ? 'Stage 2 Questions' : '2.Aşama Soruları',
-        'desc': isEnglish
-            ? 'Letter games and puzzles!'
-            : 'Harf oyunları ve bulmacalar!',
+        'desc':
+            isEnglish
+                ? 'Letter games and puzzles!'
+                : 'Harf oyunları ve bulmacalar!',
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const Soru1(),
-            ),
+            MaterialPageRoute(builder: (context) => const Soru1()),
           );
         },
       },
@@ -54,9 +52,7 @@ class MatchingQuestionsScreen extends StatelessWidget {
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const ActivityMatching(),
-            ),
+            MaterialPageRoute(builder: (context) => const ActivityMatching()),
           );
         },
       },
@@ -67,9 +63,7 @@ class MatchingQuestionsScreen extends StatelessWidget {
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const DuyguYuzEsle(),
-            ),
+            MaterialPageRoute(builder: (context) => const DuyguYuzEsle()),
           );
         },
       },
@@ -107,7 +101,7 @@ class MatchingQuestionsScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
+                  gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [mainColor, accentColor],

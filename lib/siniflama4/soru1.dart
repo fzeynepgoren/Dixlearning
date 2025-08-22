@@ -59,10 +59,9 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -128,18 +127,10 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
       setState(() {
         eslesenler.add(data);
       });
-      gosterGeriBildirim(
-        'Aferin! 🎉',
-        Colors.green,
-        Icons.check_circle,
-      );
+      gosterGeriBildirim('Aferin! 🎉', Colors.green, Icons.check_circle);
       kutuyuRenklendir(kategori, Colors.green.shade200);
     } else {
-      gosterGeriBildirim(
-        'Tekrar dene! 😔',
-        Colors.red,
-        Icons.cancel,
-      );
+      gosterGeriBildirim('Tekrar dene! 😔', Colors.red, Icons.cancel);
       kutuyuRenklendir(kategori, Colors.red.shade200);
     }
   }
@@ -173,11 +164,17 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
-                              (route) => false,
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
+                          ),
+                          (route) => false,
                         );
                       },
                     ),
@@ -203,7 +200,10 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
                       child: Column(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Drag and drop the faces to the correct box.'
@@ -223,91 +223,142 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
                                 Expanded(
                                   flex: 3,
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: kategoriler.map((kategori) {
-                                      const Color renk = Color(0xFFE0F7FA);
-                                      const Color border = Colors.black;
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children:
+                                        kategoriler.map((kategori) {
+                                          const Color renk = Color(0xFFE0F7FA);
+                                          const Color border = Colors.black;
 
-                                      Color? dynamicBoxColor = kategoriRenkleri[kategori] ?? renk;
+                                          Color? dynamicBoxColor =
+                                              kategoriRenkleri[kategori] ??
+                                              renk;
 
-                                      final eslesenYuzler = eslesenler
-                                          .where((e) => dogruEslesmeler[e] == kategori)
-                                          .toList();
+                                          final eslesenYuzler =
+                                              eslesenler
+                                                  .where(
+                                                    (e) =>
+                                                        dogruEslesmeler[e] ==
+                                                        kategori,
+                                                  )
+                                                  .toList();
 
-                                      return Expanded(
-                                        child: DragTarget<String>(
-                                          builder: (context, _, __) {
-                                            return Container(
-                                              width: double.infinity,
-                                              margin: const EdgeInsets.symmetric(vertical: 6),
-                                              padding: const EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                color: dynamicBoxColor,
-                                                border: Border.all(color: border, width: 1.5),
-                                                borderRadius: BorderRadius.circular(14),
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    kategori,
-                                                    style: const TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Colors.black,
+                                          return Expanded(
+                                            child: DragTarget<String>(
+                                              builder: (context, _, __) {
+                                                return Container(
+                                                  width: double.infinity,
+                                                  margin:
+                                                      const EdgeInsets.symmetric(
+                                                        vertical: 6,
+                                                      ),
+                                                  padding: const EdgeInsets.all(
+                                                    8,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: dynamicBoxColor,
+                                                    border: Border.all(
+                                                      color: border,
+                                                      width: 1.5,
                                                     ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          14,
+                                                        ),
                                                   ),
-                                                  const SizedBox(height: 8),
-                                                  Wrap(
-                                                    spacing: 8,
-                                                    runSpacing: 8,
-                                                    children: eslesenYuzler
-                                                        .map((e) => _buildYuz(e, small: true))
-                                                        .toList(),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                        kategori,
+                                                        style: const TextStyle(
+                                                          fontSize: 20,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.black,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 8),
+                                                      Wrap(
+                                                        spacing: 8,
+                                                        runSpacing: 8,
+                                                        children:
+                                                            eslesenYuzler
+                                                                .map(
+                                                                  (e) =>
+                                                                      _buildYuz(
+                                                                        e,
+                                                                        small:
+                                                                            true,
+                                                                      ),
+                                                                )
+                                                                .toList(),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                          onWillAccept: (data) => data != null && !eslesenler.contains(data),
-                                          onAccept: (data) {
-                                            eslesmeYapildi(data, kategori);
-                                          },
-                                        ),
-                                      );
-                                    }).toList(),
+                                                );
+                                              },
+                                              onWillAcceptWithDetails:
+                                                  (data) =>
+                                                      !eslesenler.contains(
+                                                        data,
+                                                      ),
+                                              onAcceptWithDetails: (data) {
+                                                eslesmeYapildi(
+                                                  data as String,
+                                                  kategori,
+                                                );
+                                              },
+                                            ),
+                                          );
+                                        }).toList(),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   flex: 2,
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: shuffledYuzler.map((id) {
-                                      bool eslesti = eslesenler.contains(id);
-                                      return eslesti
-                                          ? Container() // Eşleşen emojiyi gizle
-                                          : Draggable<String>(
-                                        data: id,
-                                        feedback: Material(
-                                          color: Colors.transparent,
-                                          child: SizedBox(
-                                            width: 76,
-                                            height: 76,
-                                            child: _buildYuz(id, small: false),
-                                          ),
-                                        ),
-                                        childWhenDragging: Opacity(
-                                          opacity: 0.3,
-                                          child: _buildYuz(id, small: false),
-                                        ),
-                                        child: SizedBox(
-                                          width: 76,
-                                          height: 76,
-                                          child: _buildYuz(id, small: false),
-                                        ),
-                                      );
-                                    }).toList(),
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children:
+                                        shuffledYuzler.map((id) {
+                                          bool eslesti = eslesenler.contains(
+                                            id,
+                                          );
+                                          return eslesti
+                                              ? Container() // Eşleşen emojiyi gizle
+                                              : Draggable<String>(
+                                                data: id,
+                                                feedback: Material(
+                                                  color: Colors.transparent,
+                                                  child: SizedBox(
+                                                    width: 76,
+                                                    height: 76,
+                                                    child: _buildYuz(
+                                                      id,
+                                                      small: false,
+                                                    ),
+                                                  ),
+                                                ),
+                                                childWhenDragging: Opacity(
+                                                  opacity: 0.3,
+                                                  child: _buildYuz(
+                                                    id,
+                                                    small: false,
+                                                  ),
+                                                ),
+                                                child: SizedBox(
+                                                  width: 76,
+                                                  height: 76,
+                                                  child: _buildYuz(
+                                                    id,
+                                                    small: false,
+                                                  ),
+                                                ),
+                                              );
+                                        }).toList(),
                                   ),
                                 ),
                               ],
@@ -320,49 +371,56 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
                 ),
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          )
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            feedbackIcon,
-                            color: feedbackColor,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            feedbackText,
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: feedbackColor,
-                              fontWeight: FontWeight.bold,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    feedbackIcon,
+                                    color: feedbackColor,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    feedbackText,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: feedbackColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
@@ -372,8 +430,7 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
     );
   }
 
-  Widget _buildYuz(String emoji,
-      {bool small = false, bool isMatched = false}) {
+  Widget _buildYuz(String emoji, {bool small = false}) {
     double size = small ? 52 : 76;
 
     return AnimatedContainer(
@@ -384,11 +441,7 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Center(
@@ -397,10 +450,7 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
           child: Text(
             emoji,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: size * 0.9,
-              height: 1.0,
-            ),
+            style: TextStyle(fontSize: size * 0.9, height: 1.0),
           ),
         ),
       ),

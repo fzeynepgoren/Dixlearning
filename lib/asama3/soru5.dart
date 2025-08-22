@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
-import '../../main.dart';
 import '../screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import 'soru2.dart'; // Eğer HarfHayvanEsle burada tanımlıysa
-import 'soru3.dart'; // soru2'de
-import 'soru4.dart'; // soru3'te
-import 'soru5.dart'; // soru4'te
+// Eğer HarfHayvanEsle burada tanımlıysa
+// soru2'de
+// soru3'te
+// soru4'te
 
 class RenkNesneEsle extends StatefulWidget {
   const RenkNesneEsle({super.key});
@@ -52,7 +51,9 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
     shuffledColors = List.from(isEnglish ? rightColorsEnglish : rightColors);
     shuffledColors.shuffle();
     while (_listsAreEqual(
-        isEnglish ? rightColorsEnglish : rightColors, shuffledColors)) {
+      isEnglish ? rightColorsEnglish : rightColors,
+      shuffledColors,
+    )) {
       shuffledColors.shuffle();
     }
     _feedbackController = AnimationController(
@@ -98,9 +99,10 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
       final isEnglish =
           Provider.of<LanguageProvider>(context, listen: false).isEnglish;
       setState(() {
-        isCorrect = isEnglish
-            ? imageToColorEnglish[left] == right
-            : imageToColor[left] == right;
+        isCorrect =
+            isEnglish
+                ? imageToColorEnglish[left] == right
+                : imageToColor[left] == right;
         showFeedback = true;
       });
       _feedbackController.forward(from: 0);
@@ -135,85 +137,84 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
           showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (context) => Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.deepPurple.shade100,
-                      Colors.deepPurple.shade50,
-                    ],
+            builder:
+                (context) => Dialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.deepPurple.shade100,
+                          Colors.deepPurple.shade50,
+                        ],
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.emoji_events,
+                          size: 80,
+                          color: Colors.amber,
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Tebrikler! 🎉',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          '3. aşamayı tamamladınız!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            // Etkinlik tamamlandı
+
+                            ActivityTracker.completeActivity();
+
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HomeScreen(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 15,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                          child: const Text(
+                            'Ana Menüye Dön',
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.emoji_events,
-                      size: 80,
-                      color: Colors.amber,
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Tebrikler! 🎉',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      '3. aşamayı tamamladınız!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        // Etkinlik tamamlandı
-
-                        ActivityTracker.completeActivity();
-
-                        
-
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const HomeScreen()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      child: const Text(
-                        'Ana Menüye Dön',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           );
         }
       });
@@ -222,8 +223,9 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
       backgroundColor: const Color(0xFFE1F5FE),
       appBar: AppBar(
         title: Text(
-            isEnglish ? 'Color-Object Matching' : 'Renk Nesne Eşleştirme',
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          isEnglish ? 'Color-Object Matching' : 'Renk Nesne Eşleştirme',
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         backgroundColor: Colors.deepPurple,
         elevation: 0,
@@ -233,8 +235,6 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
             // Etkinlik tamamlandı
 
             ActivityTracker.completeActivity();
-
-            
 
             Navigator.pushReplacement(
               context,
@@ -276,15 +276,16 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
                                 width: 120,
                                 height: 120,
                                 decoration: BoxDecoration(
-                                  color: matchedLeft[index]
-                                      ? Colors.green.shade300
-                                      : (showFeedback &&
+                                  color:
+                                      matchedLeft[index]
+                                          ? Colors.green.shade300
+                                          : (showFeedback &&
                                               !isCorrect &&
                                               selectedLeftIndex == index)
                                           ? Colors.red.shade200
                                           : selectedLeftIndex == index
-                                              ? Colors.blue.shade200
-                                              : Colors.white,
+                                          ? Colors.blue.shade200
+                                          : Colors.white,
                                   borderRadius: BorderRadius.circular(20),
                                   boxShadow: [
                                     BoxShadow(
@@ -339,15 +340,16 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
                                 width: 120,
                                 height: 120,
                                 decoration: BoxDecoration(
-                                  color: matchedRight[index]
-                                      ? Colors.green.shade300
-                                      : (showFeedback &&
+                                  color:
+                                      matchedRight[index]
+                                          ? Colors.green.shade300
+                                          : (showFeedback &&
                                               !isCorrect &&
                                               selectedRightIndex == index)
                                           ? Colors.red.shade200
                                           : selectedRightIndex == index
-                                              ? Colors.blue.shade200
-                                              : Colors.white,
+                                          ? Colors.blue.shade200
+                                          : Colors.white,
                                   borderRadius: BorderRadius.circular(20),
                                   boxShadow: [
                                     BoxShadow(
@@ -386,8 +388,10 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
                   curve: Curves.elasticOut,
                 ),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 20,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(16),
