@@ -110,6 +110,55 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
     });
   }
 
+  Widget _buildCard({
+    required int index,
+    required bool isLeft,
+    required String text,
+    required TextStyle style,
+  }) {
+    final bool isSelected = isLeft ? selectedLeftIndex == index : selectedRightIndex == index;
+    final bool isMatched = isLeft ? matchedLeft[index] : matchedRight[index];
+    final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
+
+    Color cardColor = Colors.white;
+    if (isMatched) {
+      cardColor = Colors.green.shade500;
+    } else if (isWrongSelection) {
+      cardColor = Colors.red.shade500;
+    } else if (isSelected) {
+      cardColor = isLeft ? Colors.blue.shade200 : Colors.blue.shade200;
+    }
+
+    return GestureDetector(
+      onTap: isMatched ? null : () => _handleTap(index, isLeft),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        width: 120,
+        height: 120,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(51),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: style,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
@@ -136,15 +185,13 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
             child: Column(
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: iconSize),
+                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                              builder: (context) => const HomeScreen()),
+                          MaterialPageRoute(builder: (context) => const HomeScreen()),
                               (route) => false,
                         );
                       },
@@ -155,14 +202,14 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
                   child: SlideTransition(
                     position: _slideAnimation,
                     child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
+                        color: Colors.white.withAlpha(242),
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withAlpha(26),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -171,67 +218,36 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
                       child: Column(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 1),
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
                             child: Text(
                               isEnglish
                                   ? 'Which image belongs to which animal? Match them.'
                                   : 'Hangi görsel hangi hayvana ait? Eşleştir.',
                               style: const TextStyle(
-                                fontSize: 25,
+                                fontSize: 23,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                               textAlign: TextAlign.center,
                             ),
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 15),
                           Expanded(
                             child: Row(
                               children: [
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: List.generate(
                                       leftBuildings.length,
-                                          (index) => Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8),
-                                          child: GestureDetector(
-                                            onTap: () => _handleTap(index, true),
-                                            child: Container(
-                                              margin: const EdgeInsets.all(4),
-                                              decoration: BoxDecoration(
-                                                color: matchedLeft[index]
-                                                    ? Colors.green.shade500
-                                                    : (showFeedback &&
-                                                    !isCorrect &&
-                                                    selectedLeftIndex ==
-                                                        index)
-                                                    ? Colors.red.shade500
-                                                    : selectedLeftIndex == index
-                                                    ? Colors.blue.shade200
-                                                    : Colors.white,
-                                                borderRadius: BorderRadius.circular(16),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black.withOpacity(0.1),
-                                                    blurRadius: 10,
-                                                    offset: const Offset(0, 5),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  leftBuildings[index],
-                                                  style: const TextStyle(
-                                                    fontSize: 90,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
+                                          (index) => _buildCard(
+                                        index: index,
+                                        isLeft: true,
+                                        text: leftBuildings[index],
+                                        style: const TextStyle(
+                                          fontSize: 42,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
                                         ),
                                       ),
                                     ),
@@ -239,65 +255,34 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
                                 ),
                                 Container(
                                   width: 4,
-                                  height: screenSize.height * 0.58,
-                                  margin:
-                                  const EdgeInsets.symmetric(horizontal: 15),
+                                  height: screenSize.height * 0.55,
+                                  margin: const EdgeInsets.symmetric(horizontal: 12),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
                                         Colors.blue.shade400,
                                         Colors.blue.shade200,
-                                        Colors.blue.shade100
+                                        Colors.blue.shade100,
                                       ],
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
                                     ),
-                                    borderRadius: BorderRadius.circular(20),
+                                    borderRadius: BorderRadius.circular(4),
                                   ),
                                 ),
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: List.generate(
                                       shuffledItems.length,
-                                          (index) => Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8),
-                                          child: GestureDetector(
-                                            onTap: () => _handleTap(index, false),
-                                            child: Container(
-                                              margin: const EdgeInsets.all(4),
-                                              decoration: BoxDecoration(
-                                                color: matchedRight[index]
-                                                    ? Colors.green.shade500
-                                                    : (showFeedback &&
-                                                    !isCorrect &&
-                                                    selectedRightIndex ==
-                                                        index)
-                                                    ? Colors.red.shade500
-                                                    : selectedRightIndex == index
-                                                    ? Colors.yellow.shade500
-                                                    : Colors.white,
-                                                borderRadius: BorderRadius.circular(16),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black.withOpacity(0.1),
-                                                    blurRadius: 10,
-                                                    offset: const Offset(0, 5),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  shuffledItems[index],
-                                                  style: const TextStyle(
-                                                    fontSize: 90,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
+                                          (index) => _buildCard(
+                                        index: index,
+                                        isLeft: false,
+                                        text: shuffledItems[index],
+                                        style: const TextStyle(
+                                          fontSize: 42,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
                                         ),
                                       ),
                                     ),
@@ -311,10 +296,10 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
+                // Alt bildirim alanı
                 Container(
                   height: 80,
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: showFeedback
                       ? ScaleTransition(
                     scale: CurvedAnimation(
@@ -334,14 +319,10 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
                         const SizedBox(width: 10),
                         Text(
                           isCorrect
-                              ? (isEnglish
-                              ? 'Well done! 🎉'
-                              : 'Aferin! 🎉')
-                              : (isEnglish
-                              ? 'Try again! 😔'
-                              : 'Tekrar dene! 😔'),
+                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                              : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 18,
                             color: isCorrect ? Colors.green : Colors.red,
                             fontWeight: FontWeight.bold,
                           ),

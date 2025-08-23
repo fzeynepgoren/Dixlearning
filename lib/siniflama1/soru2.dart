@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import 'soru4.dart';
@@ -14,10 +13,30 @@ class UzunKisaSinifla extends StatefulWidget {
 class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
     with TickerProviderStateMixin {
   final List<Map<String, dynamic>> items = [
-    {'emoji': '🧔🏻‍♂️', 'id': 'insan1', 'isLong': true, 'isPlaced': false},
-    {'emoji': '👶🏻', 'id': 'insan2', 'isLong': false, 'isPlaced': false},
-    {'emoji': '🌳', 'id': 'bitki1', 'isLong': true, 'isPlaced': false},
-    {'emoji': '🌱', 'id': 'bitki2', 'isLong': false, 'isPlaced': false},
+    {
+      'image': 'assets/siniflama1/kisa_kalem.png',
+      'id': 'kalem1',
+      'isLong': false,
+      'isPlaced': false
+    },
+    {
+      'image': 'assets/siniflama1/uzun_kalem.png',
+      'id': 'kalem2',
+      'isLong': true,
+      'isPlaced': false
+    },
+    {
+      'image': 'assets/siniflama1/kisa_cetvel.png',
+      'id': 'cetvel1',
+      'isLong': false,
+      'isPlaced': false
+    },
+    {
+      'image': 'assets/siniflama1/uzun_cetvel.png',
+      'id': 'cetvel2',
+      'isLong': true,
+      'isPlaced': false
+    },
   ];
 
   final List<Map<String, dynamic>> longGroup = [];
@@ -26,19 +45,34 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
   bool isCorrect = false;
   bool _dialogShown = false;
   late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 600),
     );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
@@ -60,7 +94,6 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
           item['isPlaced'] = true;
         }
       });
-
       _checkCompletion();
     }
 
@@ -93,10 +126,6 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
         _dialogShown = true;
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
-            // Etkinlik tamamlandı
-
-            ActivityTracker.completeActivity();
-
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -112,300 +141,302 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFE1F5FE),
-      appBar: AppBar(
-        title: Text(
-          isEnglish ? 'Classify Long and Short' : 'Uzun ve Kısa Sınıfla',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.deepPurple.shade100,
-                  Colors.deepPurple.shade50,
-                  Colors.white,
-                ],
-              ),
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue.shade200,
+              Colors.blue.shade200,
+              const Color(0xffffffff),
+            ],
+            stops: const [0.0, 0.5, 1.0],
           ),
-          Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    isEnglish
-                        ? 'Drag the objects to the correct group!'
-                        : 'Nesneleri doğru gruba sürükle!',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.deepPurple,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: DragTarget<Map<String, dynamic>>(
-                          builder: (context, candidateItems, rejectedItems) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: Colors.green.shade100,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green.shade200,
-                                      borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(20),
-                                        topRight: Radius.circular(20),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      isEnglish
-                                          ? 'Long Objects'
-                                          : 'Uzun Nesneler',
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.green,
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: ListView.builder(
-                                      padding: const EdgeInsets.all(16),
-                                      itemCount: longGroup.length,
-                                      itemBuilder: (context, index) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0,
-                                          ),
-                                          child: Text(
-                                            longGroup[index]['emoji'],
-                                            style: const TextStyle(
-                                              fontSize: 48,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                          onWillAcceptWithDetails: (item) => true,
-                          onAcceptWithDetails:
-                              (item) => _handleDrag(item.data, true),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: DragTarget<Map<String, dynamic>>(
-                          builder: (context, candidateItems, rejectedItems) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: Colors.blue.shade100,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue.shade200,
-                                      borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(20),
-                                        topRight: Radius.circular(20),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      isEnglish
-                                          ? 'Short Objects'
-                                          : 'Kısa Nesneler',
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.blue,
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: ListView.builder(
-                                      padding: const EdgeInsets.all(16),
-                                      itemCount: shortGroup.length,
-                                      itemBuilder: (context, index) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0,
-                                          ),
-                                          child: Text(
-                                            shortGroup[index]['emoji'],
-                                            style: const TextStyle(
-                                              fontSize: 48,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                          onWillAcceptWithDetails: (item) => true,
-                          onAcceptWithDetails:
-                              (item) => _handleDrag(item.data, false),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 6,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.all(16),
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      if (!item['isPlaced']) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Draggable<Map<String, dynamic>>(
-                            data: item,
-                            feedback: Text(
-                              item['emoji'],
-                              style: const TextStyle(fontSize: 48),
-                            ),
-                            childWhenDragging: const SizedBox(
-                              width: 60,
-                              height: 60,
-                            ),
-                            child: Text(
-                              item['emoji'],
-                              style: const TextStyle(fontSize: 48),
-                            ),
-                          ),
-                        );
-                      }
-                      return const SizedBox.shrink();
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Soru1'deki gibi, home'a dönmek için
                     },
                   ),
-                ),
-                const SizedBox(height: 20),
-                if (showFeedback)
-                  ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
+                ],
+              ),
+              Expanded(
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.95),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
                     ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                : (isEnglish
-                                    ? 'Try again! 😔'
-                                    : 'Tekrar dene! 😔'),
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect ? Colors.green : Colors.red,
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                          child: Text(
+                            isEnglish
+                                ? 'Drag the objects to the correct group!'
+                                : 'Nesneleri doğru gruba sürükle!',
+                            style: const TextStyle(
+                              fontSize: 23,
                               fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
+                            textAlign: TextAlign.center,
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 15),
+                        Expanded(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: GridView.builder(
+                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      childAspectRatio: 1.0,
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 10,
+                                    ),
+                                    itemCount: items.length,
+                                    itemBuilder: (context, index) {
+                                      final item = items[index];
+                                      if (!item['isPlaced']) {
+                                        return Draggable<Map<String, dynamic>>(
+                                          data: item,
+                                          feedback: Image.asset(
+                                            item['image'],
+                                            width: 80,
+                                            height: 80,
+                                          ),
+                                          childWhenDragging: Container(),
+                                          child: Image.asset(
+                                            item['image'],
+                                            width: 80,
+                                            height: 80,
+                                          ),
+                                        );
+                                      }
+                                      return const SizedBox.shrink();
+                                    },
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                flex: 3,
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                      child: DragTarget<Map<String, dynamic>>(
+                                        builder:
+                                            (context, candidateItems, rejectedItems) {
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.purple.shade100.withOpacity(0.8),
+                                              borderRadius: BorderRadius.circular(20),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black.withOpacity(0.1),
+                                                  blurRadius: 6,
+                                                  offset: const Offset(0, 3),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  width: double.infinity,
+                                                  padding: const EdgeInsets.all(16),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.purple.shade200,
+                                                    borderRadius: const BorderRadius.only(
+                                                      topLeft: Radius.circular(20),
+                                                      topRight: Radius.circular(20),
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    isEnglish ? 'Long Objects' : 'Uzun Nesneler',
+                                                    style: const TextStyle(
+                                                      fontSize: 24,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.black,
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: ListView.builder(
+                                                    scrollDirection: Axis.horizontal,
+                                                    padding: const EdgeInsets.all(8),
+                                                    itemCount: longGroup.length,
+                                                    itemBuilder: (context, index) {
+                                                      return Container(
+                                                        width: 80,
+                                                        height: 80,
+                                                        margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                                                        child: Image.asset(
+                                                          longGroup[index]['image'],
+                                                          fit: BoxFit.contain,
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                        onWillAccept: (item) => true,
+                                        onAccept: (item) => _handleDrag(item!, true),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Expanded(
+                                      child: DragTarget<Map<String, dynamic>>(
+                                        builder:
+                                            (context, candidateItems, rejectedItems) {
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue.shade100.withOpacity(0.8),
+                                              borderRadius: BorderRadius.circular(20),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black.withOpacity(0.1),
+                                                  blurRadius: 6,
+                                                  offset: const Offset(0, 3),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  width: double.infinity,
+                                                  padding: const EdgeInsets.all(16),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.blue.shade200,
+                                                    borderRadius: const BorderRadius.only(
+                                                      topLeft: Radius.circular(20),
+                                                      topRight: Radius.circular(20),
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    isEnglish ? 'Short Objects' : 'Kısa Nesneler',
+                                                    style: const TextStyle(
+                                                      fontSize: 24,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.black,
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: ListView.builder(
+                                                    scrollDirection: Axis.horizontal,
+                                                    padding: const EdgeInsets.all(8),
+                                                    itemCount: shortGroup.length,
+                                                    itemBuilder: (context, index) {
+                                                      return Container(
+                                                        width: 80,
+                                                        height: 80,
+                                                        margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                                                        child: Image.asset(
+                                                          shortGroup[index]['image'],
+                                                          fit: BoxFit.contain,
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                        onWillAccept: (item) => true,
+                                        onAccept: (item) => _handleDrag(item!, false),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                const SizedBox(height: 20),
-              ],
-            ),
+                ),
+              ),
+              Container(
+                height: 80,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: showFeedback
+                    ? ScaleTransition(
+                  scale: CurvedAnimation(
+                    parent: _feedbackController,
+                    curve: Curves.elasticOut,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isCorrect ? Icons.check_circle : Icons.cancel,
+                        color: isCorrect ? Colors.green : Colors.red,
+                        size: 28,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        isCorrect
+                            ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                            : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: isCorrect ? Colors.green : Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+                    : const SizedBox.shrink(),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
