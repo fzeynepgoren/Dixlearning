@@ -16,7 +16,9 @@ class _Disgrafi1State extends State<Disgrafi1> {
   final player = AudioPlayer();
   int _currentQuestionIndex = 0;
   bool _isPlaying = false;
-  bool _showCorrectAnswer = false;
+  bool _showFeedback = false;
+  bool _isCorrect = false;
+
   final List<Map<String, dynamic>> _questions = [
     {
       'audio': 'ses1.mp3',
@@ -61,9 +63,7 @@ class _Disgrafi1State extends State<Disgrafi1> {
 
       await player.stop();
       await player.play(AssetSource(path));
-      print('Playing audio: $path');
     } catch (e) {
-      print('Error playing audio: $e');
       setState(() {
         _isPlaying = false;
       });
@@ -84,58 +84,20 @@ class _Disgrafi1State extends State<Disgrafi1> {
       }
     }
 
-    if (allCorrect) {
-      if (_currentQuestionIndex < _questions.length - 1) {
-        setState(() {
-          _currentQuestionIndex++;
-          _showCorrectAnswer = false;
-        });
-      } else {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => AlertDialog(
-            title: const Text('Tebrikler!',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            content: const Text('Tüm soruları başarıyla tamamladınız.',
-                style: TextStyle(fontSize: 18)),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  // Etkinlik tamamlandı
+    setState(() {
+      _showFeedback = true;
+      _isCorrect = allCorrect;
+    });
 
-                  ActivityTracker.completeActivity();
-
-                  
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Disgrafi2()),
-                  );
-                },
-                child: const Text('Devam Et', style: TextStyle(fontSize: 18)),
-              )
-            ],
-          ),
-        );
-      }
-    } else {
-      setState(() {
-        _showCorrectAnswer = true;
-      });
-
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) {
-          setState(() {
-            _showCorrectAnswer = false;
-            if (_currentQuestionIndex < _questions.length - 1) {
-              _currentQuestionIndex++;
-            }
-          });
-        }
-      });
-    }
+    // 3 saniye bekle → Disgrafi2'ye geç
+    Future.delayed(const Duration(seconds: 3), () {
+      if (!mounted) return;
+      ActivityTracker.completeActivity();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Disgrafi2()),
+      );
+    });
   }
 
   @override
@@ -158,26 +120,7 @@ class _Disgrafi1State extends State<Disgrafi1> {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.yellow[100],
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Text(
-                isEnglish ? 'Listen and write the missing words!' : 'Cümleyi dinle ve eksik kelimeleri yaz!',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: _isPlaying ? null : () => _playAudio(current['audio']),
               icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow, size: 32),
@@ -191,95 +134,94 @@ class _Disgrafi1State extends State<Disgrafi1> {
                 backgroundColor: Colors.deepPurple.shade200,
                 foregroundColor: Colors.white,
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
             ),
             const SizedBox(height: 40),
+
+            // 🔹 Cümle + boşluklar
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: List.generate(current['sentence'].length, (index) {
-                  final word = current['sentence'][index];
-                  if (word == '') {
-                    final controller = current['controllers'][index ~/ 2];
-                    return Container(
-                      width: 100,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      child: TextField(
-                        controller: controller,
-                        style: const TextStyle(fontSize: 18),
-                        decoration: InputDecoration(
-                          hintText: isEnglish ? 'Word' : 'Kelime',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                children: () {
+                  int blankCounter = 0;
+                  return current['sentence'].map<Widget>((word) {
+                    if (word == '') {
+                      final controller = current['controllers'][blankCounter];
+                      blankCounter++;
+                      return Container(
+                        width: 100,
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        child: TextField(
+                          controller: controller,
+                          style: const TextStyle(fontSize: 18),
+                          decoration: InputDecoration(
+                            hintText: isEnglish ? 'Word' : 'Kelime',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
                           ),
-                          filled: true,
-                          fillColor: Colors.white,
                         ),
-                      ),
-                    );
-                  } else {
-                    String displayWord = word
-                        .replaceAll('ğ', 'g')
-                        .replaceAll('ş', 's')
-                        .replaceAll('ü', 'u');
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Text(
-                        displayWord,
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                    );
-                  }
-                }),
+                      );
+                    } else {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Text(
+                          word,
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      );
+                    }
+                  }).toList();
+                }(),
               ),
             ),
-            if (_showCorrectAnswer) ...[
-              const SizedBox(height: 30),
+
+            const SizedBox(height: 30),
+
+            // 🔹 Feedback Alanı
+            if (_showFeedback)
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade100,
+                  color: _isCorrect ? Colors.green.shade100 : Colors.red.shade100,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Column(
-                  children: [
-                    Text(
-                      isEnglish ? 'Correct Answer:' : 'Dogru Cevap:',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${current['sentence'][0].replaceAll('ğ', 'g').replaceAll('ş', 's').replaceAll('ü', 'u')} ${current['answers'][0]} ${current['sentence'][2].replaceAll('ğ', 'g').replaceAll('ş', 's').replaceAll('ü', 'u')} ${current['answers'][1]}',
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  ],
+                child: Text(
+                  _isCorrect
+                      ? (isEnglish ? 'Well done! 🎉' : 'Aferin 🎉')
+                      : (isEnglish
+                      ? 'Correct Answer: ${current['sentence'][0]} ${current['answers'][0]} ${current['sentence'][2]} ${current['answers'][1]}'
+                      : 'Doğru Cevap: ${current['sentence'][0]} ${current['answers'][0]} ${current['sentence'][2]} ${current['answers'][1]}'),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  textAlign: TextAlign.center,
                 ),
               ),
-            ],
+
             const Spacer(),
-            ElevatedButton(
-              onPressed: _checkAnswers,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple.shade200,
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+            if (!_showFeedback)
+              ElevatedButton(
+                onPressed: _checkAnswers,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple.shade200,
+                  foregroundColor: Colors.white,
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: Text(
+                  isEnglish ? 'Confirm' : 'Onayla',
+                  style: const TextStyle(fontSize: 20),
                 ),
               ),
-              child: Text(
-                isEnglish ? 'Confirm' : 'Onayla',
-                style: const TextStyle(fontSize: 20),
-              ),
-            ),
             const SizedBox(height: 20),
           ],
         ),

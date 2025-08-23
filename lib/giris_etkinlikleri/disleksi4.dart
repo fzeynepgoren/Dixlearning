@@ -44,7 +44,7 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
     _initializeGame();
     _slideController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 1000),
     );
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
