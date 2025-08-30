@@ -344,7 +344,7 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
   Widget _buildItemBox(String id) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
-      width: 90,
+      width: 85,
       height: 70,
       decoration: BoxDecoration(
         color: Colors.white,
