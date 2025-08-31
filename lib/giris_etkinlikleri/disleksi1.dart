@@ -84,7 +84,7 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
     });
     _feedbackController.forward(from: 0);
 
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         if (currentQuestionIndex == questions.length - 1) {
           Navigator.pushReplacement(
@@ -100,15 +100,18 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
         }
       }
     });
+
   }
 
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final question = questions[currentQuestionIndex];
-    final displayedWord = showFeedback && isCorrect
+    final displayedWord = showFeedback
+    // Feedback sırasında her zaman doğru kelimeyi göster
         ? question.incompleteWord.replaceFirst('_', question.correctLetter)
-        : question.incompleteWord.replaceFirst('_', selectedLetter ?? '_');
+        : question.incompleteWord;
+
 
     final screenSize = MediaQuery.of(context).size;
     final iconSize = screenSize.width * 0.065;
@@ -251,45 +254,43 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                 ),
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
                   child: showFeedback
                       ? ScaleTransition(
                     scale: CurvedAnimation(
                       parent: _feedbackController,
                       curve: Curves.elasticOut,
                     ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: isCorrect ? Colors.green : Colors.red,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          isCorrect
+                              ? Icons.check_circle
+                              : Icons.cancel,
+                          color:
+                          isCorrect ? Colors.green : Colors.red,
+                          size: 28,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          isCorrect
+                              ? (isEnglish
+                              ? 'Well done! 🎉'
+                              : 'Aferin! 🎉')
+                              : (isEnglish
+                              ? "Here's the right one! 🧐"
+                              : 'İşte doğrusu! 🧐'),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: isCorrect
+                                ? Colors.green
+                                : Colors.red,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: Colors.white,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   )
                       : const SizedBox.shrink(),

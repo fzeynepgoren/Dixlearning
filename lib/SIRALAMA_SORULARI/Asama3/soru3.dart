@@ -111,16 +111,16 @@ class _Asama3Soru3State extends State<Asama3Soru3>
       onWillPop: () async => false,
       child: Scaffold(
         body: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration( // 'const' kaldırıldı
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Colors.grey,
-                Colors.grey,
-                Color(0xffffffff),
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
               ],
-              stops: [0.0, 0.5, 1.0],
+              stops: const [0.0, 0.5, 1.0], // Buraya `const` eklendi
             ),
           ),
           child: SafeArea(
