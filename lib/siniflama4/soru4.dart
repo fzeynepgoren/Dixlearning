@@ -283,36 +283,36 @@ class _AtikSiniflaState extends State<AtikSinifla>
                       horizontal: horizontalPadding, vertical: verticalPadding),
                   child: showFeedback
                       ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: screenSize.width * 0.07,
-                        ),
-                        SizedBox(width: screenSize.width * 0.025),
-                        Text(
-                          isCorrect
-                              ? (isEnglish
-                              ? 'Well done! 🎉'
-                              : 'Aferin! 🎉')
-                              : (isEnglish
-                              ? 'Try again! 😔'
-                              : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: screenSize.width * 0.045,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
                           ),
-                        ),
-                      ],
-                    ),
-                  )
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                isCorrect ? Icons.check_circle : Icons.cancel,
+                                color: isCorrect ? Colors.green : Colors.red,
+                                size: screenSize.width * 0.07,
+                              ),
+                              SizedBox(width: screenSize.width * 0.025),
+                              Text(
+                                isCorrect
+                                    ? (isEnglish
+                                        ? 'Well done! 🎉'
+                                        : 'Aferin! 🎉')
+                                    : (isEnglish
+                                        ? 'Try again! 😔'
+                                        : 'Tekrar dene! 😔'),
+                                style: TextStyle(
+                                  fontSize: screenSize.width * 0.045,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
                       : const SizedBox.shrink(),
                 ),
               ],
@@ -324,12 +324,12 @@ class _AtikSiniflaState extends State<AtikSinifla>
   }
 
   Widget _buildGroup(
-      String title,
-      List<Map<String, dynamic>> group,
-      String type,
-      Color boxColor,
-      Color borderColor,
-      ) {
+    String title,
+    List<Map<String, dynamic>> group,
+    String type,
+    Color boxColor,
+    Color borderColor,
+  ) {
     final screenSize = MediaQuery.of(context).size;
     final titleSize = screenSize.width * 0.05;
     final emojiSize = screenSize.width * 0.1;
@@ -371,10 +371,10 @@ class _AtikSiniflaState extends State<AtikSinifla>
                   children: group
                       .map(
                         (item) => Text(
-                      item['emoji'],
-                      style: TextStyle(fontSize: emojiSize),
-                    ),
-                  )
+                          item['emoji'],
+                          style: TextStyle(fontSize: emojiSize),
+                        ),
+                      )
                       .toList(),
                 ),
               ],

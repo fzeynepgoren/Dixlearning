@@ -13,12 +13,13 @@ class SettingsScreen extends StatefulWidget {
   final ThemeMode? themeMode;
   final void Function(bool isEnglish)? onLanguageChanged;
   final bool? isEnglish;
-  const SettingsScreen(
-      {super.key,
-      this.onThemeChanged,
-      this.themeMode,
-      this.onLanguageChanged,
-      this.isEnglish});
+  const SettingsScreen({
+    super.key,
+    this.onThemeChanged,
+    this.themeMode,
+    this.onLanguageChanged,
+    this.isEnglish,
+  });
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -55,36 +56,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               Text(
                 isEnglish ? 'Edit Profile' : 'Profili Düzenle',
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 18),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: avatars
-                    .map((avatar) => GestureDetector(
-                          onTap: () {
-                            tempAvatar = avatar;
-                            // Modal rebuild
-                            (context as Element).markNeedsBuild();
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 6),
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: tempAvatar == avatar
-                                    ? const Color(0xFF6C63FF)
-                                    : Colors.transparent,
-                                width: 3,
+                children:
+                    avatars
+                        .map(
+                          (avatar) => GestureDetector(
+                            onTap: () {
+                              tempAvatar = avatar;
+                              // Modal rebuild
+                              (context as Element).markNeedsBuild();
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 6),
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color:
+                                      tempAvatar == avatar
+                                          ? const Color(0xFF6C63FF)
+                                          : Colors.transparent,
+                                  width: 3,
+                                ),
+                              ),
+                              child: Text(
+                                avatar,
+                                style: const TextStyle(fontSize: 36),
                               ),
                             ),
-                            child: Text(avatar,
-                                style: const TextStyle(fontSize: 36)),
                           ),
-                        ))
-                    .toList(),
+                        )
+                        .toList(),
               ),
               const SizedBox(height: 8),
               TextField(
@@ -153,7 +162,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           elevation: 0,
           backgroundColor: Colors.transparent,
           flexibleSpace: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -162,8 +171,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             child: SafeArea(
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 6,
+                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -173,26 +184,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         shape: BoxShape.circle,
                       ),
                       padding: const EdgeInsets.all(8),
-                      child: const Icon(FluentIcons.settings_24_regular,
-                          size: 32, color: Colors.white),
+                      child: const Icon(
+                        FluentIcons.settings_24_regular,
+                        size: 32,
+                        color: Colors.white,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(isEnglish ? 'Settings' : 'Ayarlar',
-                            style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white)),
+                        Text(
+                          isEnglish ? 'Settings' : 'Ayarlar',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                         const SizedBox(height: 2),
                         Text(
-                            isEnglish
-                                ? 'Personalize your app'
-                                : 'Uygulamanı kişiselleştir',
-                            style: const TextStyle(
-                                fontSize: 13, color: Colors.white70)),
+                          isEnglish
+                              ? 'Personalize your app'
+                              : 'Uygulamanı kişiselleştir',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.white70,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -209,7 +229,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             end: Alignment.bottomRight,
             colors: [
               mainColor.withOpacity(0.08),
-              accentColor.withOpacity(0.08)
+              accentColor.withOpacity(0.08),
             ],
           ),
         ),
@@ -241,30 +261,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     CircleAvatar(
                       radius: 32,
                       backgroundColor: accentColor.withOpacity(0.15),
-                      child:
-                          Text(_avatar, style: const TextStyle(fontSize: 36)),
+                      child: Text(
+                        _avatar,
+                        style: const TextStyle(fontSize: 36),
+                      ),
                     ),
                     const SizedBox(width: 18),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(_userName,
-                              style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
+                          Text(
+                            _userName,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           const SizedBox(height: 4),
                           Text(
                             (isEnglish ? 'Age: ' : 'Yaş: ') +
                                 _userAge.toString(),
                             style: TextStyle(
-                                fontSize: 15, color: Colors.grey[700]),
+                              fontSize: 15,
+                              color: Colors.grey[700],
+                            ),
                           ),
                         ],
                       ),
                     ),
                     ElevatedButton.icon(
-                      onPressed: () =>
-                          _showEditProfileModal(context, isEnglish),
+                      onPressed:
+                          () => _showEditProfileModal(context, isEnglish),
                       icon: const Icon(Icons.edit, size: 18),
                       label: Text(isEnglish ? 'Edit' : 'Düzenle'),
                       style: ElevatedButton.styleFrom(
@@ -274,7 +302,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 10),
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
                         textStyle: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -303,13 +333,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(FluentIcons.alert_24_regular,
-                            color: Colors.teal, size: 28),
+                        const Icon(
+                          FluentIcons.alert_24_regular,
+                          color: Colors.teal,
+                          size: 28,
+                        ),
                         const SizedBox(width: 10),
                         Text(
                           isEnglish ? 'Notifications' : 'Bildirimler',
                           style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -360,8 +395,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(FluentIcons.globe_24_regular,
-                            color: Colors.teal, size: 28),
+                        const Icon(
+                          FluentIcons.globe_24_regular,
+                          color: Colors.teal,
+                          size: 28,
+                        ),
                         const SizedBox(width: 10),
                         Text(
                           isEnglish ? 'Language' : 'Dil',
@@ -408,9 +446,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           inactiveTextFontWeight: FontWeight.w700,
                           showOnOff: true,
                           onToggle: (val) async {
-                            await Provider.of<LanguageProvider>(context,
-                                    listen: false)
-                                .setLanguage(val);
+                            await Provider.of<LanguageProvider>(
+                              context,
+                              listen: false,
+                            ).setLanguage(val);
                           },
                         ),
                       ],
@@ -440,8 +479,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(FluentIcons.weather_sunny_24_regular,
-                            color: Colors.amber[700], size: 28),
+                        Icon(
+                          FluentIcons.weather_sunny_24_regular,
+                          color: Colors.amber[700],
+                          size: 28,
+                        ),
                         const SizedBox(width: 10),
                         Text(
                           isEnglish ? 'Theme' : 'Tema',
@@ -474,7 +516,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           onChanged: (val) {
                             if (widget.onThemeChanged != null) {
                               widget.onThemeChanged!(
-                                  val ? ThemeMode.dark : ThemeMode.light);
+                                val ? ThemeMode.dark : ThemeMode.light,
+                              );
                             }
                           },
                         ),
@@ -512,8 +555,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(FluentIcons.shield_24_regular,
-                        color: Colors.blue, size: 28),
+                    const Icon(
+                      FluentIcons.shield_24_regular,
+                      color: Colors.blue,
+                      size: 28,
+                    ),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(
@@ -524,7 +570,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ? 'Privacy & Security'
                                 : 'Gizlilik & Güvenlik',
                             style: const TextStyle(
-                                fontSize: 17, fontWeight: FontWeight.bold),
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -532,7 +580,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ? 'Your information is always safe!'
                                 : 'Bilgilerin güvende!',
                             style: TextStyle(
-                                fontSize: 13, color: Colors.grey[600]),
+                              fontSize: 13,
+                              color: Colors.grey[600],
+                            ),
                           ),
                         ],
                       ),
@@ -547,9 +597,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ? 'Always safe and fun! 🎉🔒'
                       : 'Her zaman güvenli ve eğlenceli! 🎉🔒',
                   style: const TextStyle(
-                      fontSize: 18,
-                      color: Color(0xFF6C63FF),
-                      fontWeight: FontWeight.w600),
+                    fontSize: 18,
+                    color: Color(0xFF6C63FF),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -579,9 +630,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           } else if (index == 1) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
-              ),
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
             );
           }
         },

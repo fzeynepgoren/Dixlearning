@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
-import 'diskalkuli3.dart';
+import 'diskalkuli2.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -15,30 +15,30 @@ class _Diskalkuli1State extends State<Diskalkuli1> {
   final List<List<List<String>>> questions = [
     [
       ['🐟', '🐟'],
-      ['🐟', '🐟', '🐟', '🐟', '🐟']
+      ['🐟', '🐟', '🐟', '🐟', '🐟'],
     ],
     [
       ['🍎', '🍎', '🍎'],
-      ['🍎', '🍎']
+      ['🍎', '🍎'],
     ],
     [
       ['🦋', '🦋', '🦋', '🦋'],
-      ['🦋', '🦋', '🦋']
+      ['🦋', '🦋', '🦋'],
     ],
     [
       ['🚗', '🚗', '🚗', '🚗', '🚗'],
-      ['🚗', '🚗']
+      ['🚗', '🚗'],
     ],
     [
-      ['🌼', '🌼', '🌼', '🌼'],
-      ['🌼', '🌼', '🌼', '🌼', '🌼', '🌼']
+      ['🌼', '🌼', '🌼', '🌼'], // 4 çiçek
+      ['🌼', '🌼', '🌼', '🌼', '🌼', '🌼', '🌼'], // 7 çiçek
     ],
   ];
 
   int currentIndex = 0;
   List<TextEditingController> controllers = [
     TextEditingController(),
-    TextEditingController()
+    TextEditingController(),
   ];
   List<bool?> isCorrect = [null, null];
   bool showFeedback = false;
@@ -77,11 +77,9 @@ class _Diskalkuli1State extends State<Diskalkuli1> {
 
           ActivityTracker.completeActivity();
 
-          
-
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const Diskalkuli3()),
+            MaterialPageRoute(builder: (context) => const Diskalkuli2()),
           );
         }
       }
@@ -94,52 +92,39 @@ class _Diskalkuli1State extends State<Diskalkuli1> {
     final current = questions[currentIndex];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F7FA),
-      appBar: AppBar(
-        title: Text(isEnglish ? 'Counting Activity' : 'Sayma Etkinliği'),
-        backgroundColor: const Color(0xFF00BCD4),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 16),
-              Text(
-                isEnglish
-                    ? 'Question ${currentIndex + 1}/${questions.length}'
-                    : 'Soru ${currentIndex + 1}/${questions.length}',
-                style: const TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF00796B),
-                ),
-              ),
-              const SizedBox(height: 32),
-              _buildEmojiGroup(current[0], 0),
-              const SizedBox(height: 32),
-              _buildEmojiGroup(current[1], 1),
-              const SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: showFeedback ? null : checkAnswers,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+      backgroundColor: const Color(0xFFE1F5FE),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Soru sayısı ve ilerleme göstergesi kaldırıldı
+                const SizedBox(height: 32),
+                _buildEmojiGroup(current[0], 0),
+                const SizedBox(height: 32),
+                _buildEmojiGroup(current[1], 1),
+                const SizedBox(height: 40),
+                ElevatedButton(
+                  onPressed: showFeedback ? null : checkAnswers,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 18,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                  child: Text(
+                    isEnglish ? 'Check' : 'Kontrol Et',
+                    style: const TextStyle(fontSize: 24, color: Colors.white),
                   ),
                 ),
-                child: Text(
-                  isEnglish ? 'Check' : 'Kontrol Et',
-                  style: const TextStyle(fontSize: 24, color: Colors.white),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -149,51 +134,88 @@ class _Diskalkuli1State extends State<Diskalkuli1> {
   Widget _buildEmojiGroup(List<String> emojis, int index) {
     return Column(
       children: [
-        Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 8,
-          runSpacing: 8,
-          children: emojis
-              .map((e) => Text(e, style: const TextStyle(fontSize: 40)))
-              .toList(),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color:
+                  isCorrect[index] == null
+                      ? Colors.blueAccent.withOpacity(0.5)
+                      : isCorrect[index]!
+                      ? Colors.green
+                      : Colors.red,
+              width: 3,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.blue.withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children:
+                emojis
+                    .map(
+                      (e) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        child: Text(
+                          e,
+                          style: const TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+          ),
         ),
         const SizedBox(height: 16),
-        SizedBox(
-          width: 80,
-          child: TextField(
-            controller: controllers[index],
-            enabled: !showFeedback,
-            keyboardType: TextInputType.number,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            decoration: InputDecoration(
-              hintText: '?',
-              filled: true,
-              fillColor: Colors.white,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(
-                  color: isCorrect[index] == null
-                      ? Colors.grey
-                      : isCorrect[index]!
-                          ? Colors.green
-                          : Colors.red,
-                  width: 3,
+        Center(
+          child: SizedBox(
+            width: 80,
+            child: TextField(
+              controller: controllers[index],
+              enabled: !showFeedback,
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              decoration: InputDecoration(
+                hintText: '?',
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
                 ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(
-                  color: isCorrect[index] == null
-                      ? Colors.blue
-                      : isCorrect[index]!
-                          ? Colors.green
-                          : Colors.red,
-                  width: 3,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(
+                    color:
+                        isCorrect[index] == null
+                            ? Colors.blueAccent.withOpacity(0.5)
+                            : isCorrect[index]!
+                            ? Colors.green
+                            : Colors.red,
+                    width: 3,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(
+                    color:
+                        isCorrect[index] == null
+                            ? Colors.blueAccent
+                            : isCorrect[index]!
+                            ? Colors.green
+                            : Colors.red,
+                    width: 3,
+                  ),
                 ),
               ),
             ),

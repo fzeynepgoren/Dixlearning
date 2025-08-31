@@ -145,7 +145,7 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
                           MaterialPageRoute(
                             builder: (context) => const HomeScreen(),
                           ),
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                     ),
@@ -197,10 +197,10 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
                                     children: kategoriler
                                         .map(
                                           (kategori) => Expanded(
-                                        child: _buildGroupContainer(
-                                            kategori, isEnglish),
-                                      ),
-                                    )
+                                            child: _buildGroupContainer(
+                                                kategori, isEnglish),
+                                          ),
+                                        )
                                         .toList(),
                                   ),
                                 ),
@@ -210,8 +210,8 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: emojiler
-                                        .where(
-                                            (emoji) => !eslesenler.contains(emoji))
+                                        .where((emoji) =>
+                                            !eslesenler.contains(emoji))
                                         .map((emoji) {
                                       return Draggable<String>(
                                         data: emoji,
@@ -220,7 +220,7 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
                                           child: _buildItemBox(emoji),
                                         ),
                                         childWhenDragging:
-                                        const SizedBox.shrink(),
+                                            const SizedBox.shrink(),
                                         child: _buildItemBox(emoji),
                                       );
                                     }).toList(),
@@ -236,38 +236,54 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
                 ),
                 Container(
                   height: 80,
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
                   child: showFeedback
                       ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                              : (isEnglish
-                              ? 'Try again! 😔'
-                              : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
                           ),
-                        ),
-                      ],
-                    ),
-                  )
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect
+                                      ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                                      : (isEnglish
+                                          ? 'Try again! 😔'
+                                          : 'Tekrar dene! 😔'),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: isCorrect ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
                       : const SizedBox.shrink(),
                 ),
               ],
@@ -280,9 +296,9 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
 
   Widget _buildGroupContainer(String kategori, bool isEnglish) {
     Color boxColor =
-    kategori == 'Meyve' ? const Color(0xFFE0F7FA) : Colors.green.shade100;
+        kategori == 'Meyve' ? const Color(0xFFE0F7FA) : Colors.green.shade100;
     Color borderColor =
-    kategori == 'Meyve' ? Colors.blue.shade400 : Colors.green.shade400;
+        kategori == 'Meyve' ? Colors.blue.shade400 : Colors.green.shade400;
 
     return DragTarget<String>(
       onWillAccept: (data) => !eslesenler.contains(data!),
@@ -320,10 +336,10 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
                     .where((e) => dogruEslesmeler[e] == kategori)
                     .map(
                       (e) => Text(
-                    e,
-                    style: const TextStyle(fontSize: 60),
-                  ),
-                )
+                        e,
+                        style: const TextStyle(fontSize: 60),
+                      ),
+                    )
                     .toList(),
               ),
             ],
@@ -341,12 +357,8 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Center(
