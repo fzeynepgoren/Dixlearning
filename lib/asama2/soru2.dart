@@ -13,9 +13,19 @@ class Soru2 extends StatefulWidget {
 }
 
 class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
-  final List<String> items = ['🐸', '👖', '7️⃣'];
-  late List<String> shuffledLeftItems;
-  late List<String> shuffledRightItems;
+  final List<String> renkliAssets = [
+    'assets/asama2/soru2/kurbagarenkli.png',
+    'assets/asama2/soru2/pantalonrenkli.png',
+    'assets/asama2/soru2/yedirenkli.png',
+  ];
+  final List<String> golgeAssets = [
+    'assets/asama2/soru2/kurbagagolge.png',
+    'assets/asama2/soru2/golgepantalon.png',
+    'assets/asama2/soru2/yedigolge.png',
+  ];
+
+  late List<String> shuffledLeftAssets;
+  late List<String> shuffledRightAssets;
   int? selectedLeftIndex;
   int? selectedRightIndex;
   List<bool> matchedLeft = [false, false, false];
@@ -24,17 +34,20 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
   bool isCorrect = false;
   late AnimationController _feedbackController;
 
-  final Map<String, String> itemToName = {
-    '🐸': '🐸',
-    '👖': '👖',
-    '7️⃣': '7️⃣',
+  // Eşleşme için renkli ve gölge assetlerin indexleri aynı olmalı
+  final Map<String, String> renkliToGolge = {
+    'assets/asama2/soru2/kurbagarenkli.png':
+        'assets/asama2/soru2/kurbagagolge.png',
+    'assets/asama2/soru2/pantalonrenkli.png':
+        'assets/asama2/soru2/golgepantalon.png',
+    'aassets/asama2/soru2/yedirenkli.png': 'assets/asama2/soru2/yedigolge.png',
   };
 
   @override
   void initState() {
     super.initState();
-    shuffledLeftItems = List.from(items)..shuffle();
-    shuffledRightItems = List.from(items)..shuffle();
+    shuffledLeftAssets = List.from(renkliAssets)..shuffle();
+    shuffledRightAssets = List.from(golgeAssets)..shuffle();
     _feedbackController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -65,10 +78,10 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
 
   void _checkMatch() {
     if (selectedLeftIndex != null && selectedRightIndex != null) {
-      String left = shuffledLeftItems[selectedLeftIndex!];
-      String right = shuffledRightItems[selectedRightIndex!];
+      String left = shuffledLeftAssets[selectedLeftIndex!];
+      String right = shuffledRightAssets[selectedRightIndex!];
       setState(() {
-        isCorrect = itemToName[left] == right;
+        isCorrect = renkliToGolge[left] == right;
         showFeedback = true;
       });
       _feedbackController.forward(from: 0);
@@ -79,16 +92,12 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
         });
 
         if (matchedLeft.every((element) => element)) {
-          // Etkinlik tamamlandı
           ActivityTracker.completeActivity();
-          
           Future.delayed(const Duration(seconds: 1), () {
             if (mounted) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const HarfEsle(),
-                ),
+                MaterialPageRoute(builder: (context) => const HarfEsle()),
               );
             }
           });
@@ -139,8 +148,8 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
               const SizedBox(height: 12),
               Text(
                 isEnglish
-                    ? 'Match the shadows with their emojis!'
-                    : 'Gölgeleri emojilerle eşleştir!',
+                    ? 'Match the shadows with their images!'
+                    : 'Gölgeleri resimlerle eşleştir!',
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -156,7 +165,7 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
-                          items.length,
+                          renkliAssets.length,
                           (index) => Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             child: GestureDetector(
@@ -165,15 +174,16 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
                                 width: 120,
                                 height: 120,
                                 decoration: BoxDecoration(
-                                  color: matchedLeft[index]
-                                      ? Colors.green.shade300
-                                      : (showFeedback &&
+                                  color:
+                                      matchedLeft[index]
+                                          ? Colors.green.shade300
+                                          : (showFeedback &&
                                               !isCorrect &&
                                               selectedLeftIndex == index)
                                           ? Colors.red.shade200
                                           : selectedLeftIndex == index
-                                              ? Colors.blue.shade200
-                                              : Colors.white,
+                                          ? Colors.blue.shade200
+                                          : Colors.white,
                                   borderRadius: BorderRadius.circular(20),
                                   boxShadow: [
                                     BoxShadow(
@@ -183,12 +193,11 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
                                     ),
                                   ],
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    shuffledLeftItems[index],
-                                    style: const TextStyle(
-                                      fontSize: 42,
-                                    ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Image.asset(
+                                    shuffledLeftAssets[index],
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
                               ),
@@ -210,7 +219,7 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
-                          items.length,
+                          golgeAssets.length,
                           (index) => Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             child: GestureDetector(
@@ -219,15 +228,16 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
                                 width: 120,
                                 height: 120,
                                 decoration: BoxDecoration(
-                                  color: matchedRight[index]
-                                      ? Colors.green.shade300
-                                      : (showFeedback &&
+                                  color:
+                                      matchedRight[index]
+                                          ? Colors.green.shade300
+                                          : (showFeedback &&
                                               !isCorrect &&
                                               selectedRightIndex == index)
                                           ? Colors.red.shade200
                                           : selectedRightIndex == index
-                                              ? Colors.blue.shade200
-                                              : Colors.white,
+                                          ? Colors.blue.shade200
+                                          : Colors.white,
                                   borderRadius: BorderRadius.circular(20),
                                   boxShadow: [
                                     BoxShadow(
@@ -237,12 +247,11 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
                                     ),
                                   ],
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    shuffledRightItems[index],
-                                    style: const TextStyle(
-                                      fontSize: 42,
-                                    ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Image.asset(
+                                    shuffledRightAssets[index],
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
                               ),
@@ -263,7 +272,9 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
                   ),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
+                      vertical: 10,
+                      horizontal: 20,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.transparent,
                       borderRadius: BorderRadius.circular(16),
