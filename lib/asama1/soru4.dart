@@ -58,9 +58,7 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
           matchedRight[selectedRightIndex!] = true;
 
           if (matchedLeft.every((element) => element)) {
-            // Etkinlik tamamlandı
             ActivityTracker.completeActivity();
-            
             Future.delayed(const Duration(seconds: 1), () {
               if (mounted) {
                 Navigator.pushReplacement(
@@ -94,33 +92,41 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         width: 120,
         height: 120,
-        margin: const EdgeInsets.symmetric(vertical: 8),
+        margin: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isMatched
-              ? Colors.green.shade300
-              : (showFeedback && !isCorrect && isSelected)
-                  ? Colors.red.shade200
+          color:
+              isMatched
+                  ? Colors.green.shade100
+                  : (showFeedback && !isCorrect && isSelected)
+                  ? Colors.red.shade100
                   : isSelected
-                      ? Colors.blue.shade200
-                      : Colors.white,
-          borderRadius: BorderRadius.circular(20),
+                  ? Colors.blue.shade100
+                  : Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color:
+                isMatched
+                    ? Colors.green
+                    : (showFeedback && !isCorrect && isSelected)
+                    ? Colors.red
+                    : isSelected
+                    ? Colors.blue
+                    : Colors.grey.shade300,
+            width: 3,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: Center(
-          child: Text(
-            emoji,
-            style: const TextStyle(fontSize: 42),
-          ),
-        ),
+        child: Center(child: Text(emoji, style: const TextStyle(fontSize: 54))),
       ),
     );
   }
@@ -129,118 +135,143 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE1F5FE),
-      appBar: AppBar(
-        title: const Text(
-          'Okul Malzemelerini Eşleştir',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const SizedBox(height: 12),
-            const Text(
-              'Doğru okul malzemelerini eşleştirin!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        leftItems.length,
-                        (index) => buildItem(
-                          emoji: leftItems[index],
-                          isSelected: selectedLeftIndex == index,
-                          isMatched: matchedLeft[index],
-                          onTap: () => _handleTap(index, true),
-                          index: index,
-                        ),
-                      ),
-                    ),
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+            child: Column(
+              children: [
+                // Soru kutusu
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 32, top: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 22,
                   ),
-                  Container(
-                    width: 4,
-                    height: MediaQuery.of(context).size.height * 0.5,
-                    margin: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurple,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        rightItems.length,
-                        (index) => buildItem(
-                          emoji: rightItems[index],
-                          isSelected: selectedRightIndex == index,
-                          isMatched: matchedRight[index],
-                          onTap: () => _handleTap(index, false),
-                          index: index,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            if (showFeedback)
-              ScaleTransition(
-                scale: CurvedAnimation(
-                  parent: _feedbackController,
-                  curve: Curves.elasticOut,
-                ),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        isCorrect ? Icons.check_circle : Icons.cancel,
-                        color: isCorrect ? Colors.green : Colors.red,
-                        size: 28,
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(22),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blue.withOpacity(0.10),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
                       ),
-                      const SizedBox(width: 10),
-                      Text(
-                        isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          fontWeight: FontWeight.bold,
+                    ],
+                  ),
+                  child: const Text(
+                    'Doğru okul malzemelerini eşleştir!',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0288D1),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            leftItems.length,
+                            (index) => buildItem(
+                              emoji: leftItems[index],
+                              isSelected: selectedLeftIndex == index,
+                              isMatched: matchedLeft[index],
+                              onTap: () => _handleTap(index, true),
+                              index: index,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 12,
+                        height: 340,
+                        margin: const EdgeInsets.symmetric(horizontal: 18),
+                        decoration: BoxDecoration(
+                          color: Colors.blueAccent,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            rightItems.length,
+                            (index) => buildItem(
+                              emoji: rightItems[index],
+                              isSelected: selectedRightIndex == index,
+                              isMatched: matchedRight[index],
+                              onTap: () => _handleTap(index, false),
+                              index: index,
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            const SizedBox(height: 20),
-          ],
+                const SizedBox(height: 32),
+                if (showFeedback)
+                  ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 32,
+                      ),
+                      decoration: BoxDecoration(
+                        color:
+                            isCorrect
+                                ? Colors.green.shade50
+                                : Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: isCorrect ? Colors.green : Colors.red,
+                          width: 2.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (isCorrect ? Colors.green : Colors.red)
+                                .withOpacity(0.08),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isCorrect ? Icons.check_circle : Icons.cancel,
+                            color: isCorrect ? Colors.green : Colors.red,
+                            size: 32,
+                          ),
+                          const SizedBox(width: 14),
+                          Text(
+                            isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: isCorrect ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
         ),
       ),
     );
