@@ -90,7 +90,7 @@ class _Disleksi2State extends State<Disleksi2>
   void getNextWord({bool isFirst = false}) {
     setState(() {
       if (remainingWords.isEmpty) {
-        isAnswered = true;
+        // Son kelime ise ve cevaplanmışsa navigasyon Disleksi4'e yönlendirilir
         return;
       }
       int randomIndex = Random().nextInt(remainingWords.length);
@@ -113,14 +113,11 @@ class _Disleksi2State extends State<Disleksi2>
       selectedOption = option;
       isAnswered = true;
       isCorrect = option == currentWordData["word"]![0];
-      if (isCorrect) {
-        _feedbackController.forward().then((_) => _feedbackController.reverse());
-      } else {
-        _feedbackController.forward().then((_) => _feedbackController.reverse());
-      }
     });
 
-    Future.delayed(const Duration(seconds: 2), () {
+    _feedbackController.forward(from: 0);
+
+    Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         if (remainingWords.isNotEmpty) {
           getNextWord();
@@ -299,38 +296,26 @@ class _Disleksi2State extends State<Disleksi2>
                     parent: _feedbackController,
                     curve: Curves.elasticOut,
                   ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: isCorrect ? Colors.green : Colors.red,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isCorrect ? Icons.check_circle : Icons.cancel,
+                        color: isCorrect ? Colors.green : Colors.red,
+                        size: 28,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        isCorrect
+                            ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                            : (isEnglish ? "Here's the right one! 🧐" : 'İşte doğrusu! 🧐'),
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: isCorrect ? Colors.green : Colors.red,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: Colors.white,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 )
                     : const SizedBox.shrink(),

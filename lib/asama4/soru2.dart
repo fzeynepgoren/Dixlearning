@@ -247,7 +247,7 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
                                               child: Center(
                                                 child: Text(
                                                   leftOrgans[index],
-                                                  style: const TextStyle(fontSize: 80),
+                                                  style: const TextStyle(fontSize: 60),
                                                 ),
                                               ),
                                             ),
@@ -259,7 +259,7 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
                                 ),
                                 Container(
                                   width: 4,
-                                  height: screenSize.height * 0.58,
+                                  height: screenSize.height * 0.55,
                                   margin: const EdgeInsets.symmetric(horizontal: 12),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
@@ -294,7 +294,7 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
                                                     selectedRightIndex == index)
                                                     ? Colors.red.shade500
                                                     : selectedRightIndex == index
-                                                    ? Colors.yellow.shade500
+                                                    ? Colors.blue.shade200
                                                     : Colors.white,
                                                 borderRadius: BorderRadius.circular(16),
                                                 boxShadow: [
@@ -309,7 +309,7 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
                                                 child: Text(
                                                   shuffledSenses[index],
                                                   style: const TextStyle(
-                                                    fontSize: 28,
+                                                    fontSize: 22,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
