@@ -25,6 +25,8 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
   bool isCorrect = false;
   bool _dialogShown = false;
   late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
@@ -33,11 +35,23 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
@@ -73,23 +87,11 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
 
   void _checkCompletion() {
     if (foodGroup.length + drinkGroup.length == items.length) {
-      bool isCorrect = true;
-      for (var item in foodGroup) {
-        if (!item['isFood']) {
-          isCorrect = false;
-          break;
-        }
-      }
-      for (var item in drinkGroup) {
-        if (item['isFood']) {
-          isCorrect = false;
-          break;
-        }
-      }
+      bool allCorrect = foodGroup.every((item) => item['isFood']) &&
+          drinkGroup.every((item) => !item['isFood']);
 
-      if (isCorrect && !_dialogShown) {
+      if (allCorrect && !_dialogShown) {
         _dialogShown = true;
-
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
             Navigator.push(
@@ -145,104 +147,94 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                   ],
                 ),
                 Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.95),
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 1,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           ),
-                          child: Text(
-                            isEnglish
-                                ? 'Drag the items to the correct group!'
-                                : 'Nesneleri doğru gruba sürükle!',
-                            style: const TextStyle(
-                              fontSize: 23,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                flex: 3,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    _buildGroup(
-                                      isEnglish ? 'Food' : 'Yiyecek',
-                                      foodGroup,
-                                      true,
-                                      const Color(0xFFE8F5E8),
-                                      Colors.green,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    _buildGroup(
-                                      isEnglish ? 'Drinks' : 'İçecek',
-                                      drinkGroup,
-                                      false,
-                                      const Color(0xFFD6ECFF),
-                                      Colors.lightBlue,
-                                    ),
-                                  ],
-                                ),
+                            child: Text(
+                              isEnglish
+                                  ? 'Drag the items to the correct group!'
+                                  : 'Nesneleri doğru gruba sürükle!',
+                              style: const TextStyle(
+                                fontSize: 23,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
                               ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                flex: 2,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children:
-                                      items
-                                          .where((item) => !item['isPlaced'])
-                                          .map((item) {
-                                            return Draggable<
-                                              Map<String, dynamic>
-                                            >(
-                                              data: item,
-                                              feedback: Material(
-                                                color: Colors.transparent,
-                                                child: _buildDraggableItem(
-                                                  item,
-                                                  dragging: true,
-                                                ),
-                                              ),
-                                              childWhenDragging: Opacity(
-                                                opacity: 0.3,
-                                                child: _buildDraggableItem(
-                                                  item,
-                                                ),
-                                              ),
-                                              child: _buildDraggableItem(item),
-                                            );
-                                          })
-                                          .toList(),
-                                ),
-                              ),
-                            ],
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                        child: _buildGroupContainer(
+                                          foodGroup,
+                                          true,
+                                          isEnglish,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Expanded(
+                                        child: _buildGroupContainer(
+                                          drinkGroup,
+                                          false,
+                                          isEnglish,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: items
+                                        .where((item) => !item['isPlaced'])
+                                        .map((item) {
+                                      return Draggable<Map<String, dynamic>>(
+                                        data: item,
+                                        feedback: Material(
+                                          color: Colors.transparent,
+                                          child: _buildItemBox(item),
+                                        ),
+                                        childWhenDragging: const SizedBox.shrink(),
+                                        child: _buildItemBox(item),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -252,62 +244,57 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                     horizontal: 20,
                     vertical: 10,
                   ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
+                  child: showFeedback
+                      ? ScaleTransition(
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
                             ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? (isEnglish
-                                            ? 'Well done! 🎉'
-                                            : 'Aferin! 🎉')
-                                        : (isEnglish
-                                            ? 'Try again! 😔'
-                                            : 'Tekrar dene! 😔'),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color:
-                                          isCorrect ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
                             ),
-                          )
-                          : const SizedBox.shrink(),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect
+                                      ? (isEnglish
+                                          ? 'Well done! 🎉'
+                                          : 'Aferin! 🎉')
+                                      : (isEnglish
+                                          ? 'Try again! 😔'
+                                          : 'Tekrar dene! 😔'),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: isCorrect ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 ),
               ],
             ),
@@ -317,16 +304,17 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
     );
   }
 
-  Widget _buildGroup(
-    String title,
-    List<Map<String, dynamic>> group,
-    bool isFood,
-    Color boxColor,
-    Color borderColor,
-  ) {
+  Widget _buildGroupContainer(
+      List<Map<String, dynamic>> group,
+      bool isFood,
+      bool isEnglish,
+      ) {
+    Color boxColor = isFood ? const Color(0xFFE8F5E8) : const Color(0xFFD6ECFF);
+    Color borderColor = isFood ? Colors.green : Colors.lightBlue;
+
     return DragTarget<Map<String, dynamic>>(
-      onWillAcceptWithDetails: (data) => true,
-      onAcceptWithDetails: (data) => _handleDrag(data.data, isFood),
+      onWillAccept: (item) => true,
+      onAccept: (item) => _handleDrag(item!, isFood),
       builder: (context, candidateData, rejectedData) {
         return Container(
           width: double.infinity,
@@ -334,37 +322,35 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           decoration: BoxDecoration(
             color: boxColor,
-            border: Border.all(color: borderColor, width: 2),
+            border: Border.all(
+              color: borderColor,
+              width: 2,
+            ),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+              Text(
+                isFood
+                    ? (isEnglish ? 'Food' : 'Yiyecek')
+                    : (isEnglish ? 'Drinks' : 'İçecek'),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
               ),
-              Expanded(
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 8,
-                  runSpacing: 4,
-                  children:
-                      group
-                          .map(
-                            (item) => Text(
-                              item['emoji'],
-                              style: const TextStyle(fontSize: 36),
-                            ),
-                          )
-                          .toList(),
-                ),
+              const SizedBox(height: 8),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                children: group
+                    .map((item) => Text(
+                  item['emoji'],
+                  style: const TextStyle(fontSize: 36),
+                ))
+                    .toList(),
               ),
             ],
           ),
@@ -373,13 +359,28 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
     );
   }
 
-  Widget _buildDraggableItem(
-    Map<String, dynamic> item, {
-    bool dragging = false,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Text(item['emoji'], style: const TextStyle(fontSize: 38)),
+  Widget _buildItemBox(Map<String, dynamic> item) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Text(
+          item['emoji'],
+          style: const TextStyle(fontSize: 48),
+        ),
+      ),
     );
   }
 }

@@ -34,6 +34,12 @@ flutter:
     - assets/asama3/soru1/block_tower.png
     - assets/asama3/soru1/finger_painting.png
     - assets/asama3/soru1/kicking_ball.png
+    - assets/asama2/soru2/kurbagarenkli.png
+    - assets/asama2/soru2/kurbagagolge.png
+    - assets/asama2/soru2/golgepantalon.png
+    - assets/asama2/soru2/pantalonrenkli.png
+    - assets/asama2/soru2/yedigolge.png
+    - assets/asama2/soru2/yedirenkli.png
     - assets/erkek_maskot.png
     - assets/kiz_maskot.png
     - assets/konusma_balonu.png
@@ -61,4 +67,8 @@ flutter:
     - assets/SIRALAMA_RESIMLERI/Asama3/soru5/yasli.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru5/cocuk.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru5/bebek.png
+    - assets/siniflama1/
+    - assets/siniflama2/
+    - assets/kalin_ince_asa1/
+
     

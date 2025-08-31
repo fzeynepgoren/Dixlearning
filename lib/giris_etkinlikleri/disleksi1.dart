@@ -83,7 +83,7 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
     });
     _feedbackController.forward(from: 0);
 
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         if (currentQuestionIndex == questions.length - 1) {
           Navigator.pushReplacement(
@@ -105,10 +105,10 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final question = questions[currentQuestionIndex];
-    final displayedWord =
-        showFeedback && isCorrect
-            ? question.incompleteWord.replaceFirst('_', question.correctLetter)
-            : question.incompleteWord.replaceFirst('_', selectedLetter ?? '_');
+    // Conflict çözüldü: Geri bildirim sırasında her zaman doğru kelime gösterilir.
+    final displayedWord = showFeedback
+        ? question.incompleteWord.replaceFirst('_', question.correctLetter)
+        : question.incompleteWord;
 
     final screenSize = MediaQuery.of(context).size;
     final iconSize = screenSize.width * 0.065;
@@ -230,48 +230,48 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children:
                                   question.options.map((option) {
-                                    Color getButtonColor() {
-                                      if (!showFeedback) {
-                                        return Colors.blue.shade200;
-                                      }
-                                      if (option == question.correctLetter) {
-                                        return Colors.green.shade500;
-                                      }
-                                      if (selectedLetter == option &&
-                                          option != question.correctLetter) {
-                                        return Colors.red.shade500;
-                                      }
-                                      return Colors.blue.shade200;
-                                    }
+                                Color getButtonColor() {
+                                  if (!showFeedback) {
+                                    return Colors.blue.shade200;
+                                  }
+                                  if (option == question.correctLetter) {
+                                    return Colors.green.shade500;
+                                  }
+                                  if (selectedLetter == option &&
+                                      option != question.correctLetter) {
+                                    return Colors.red.shade500;
+                                  }
+                                  return Colors.blue.shade200;
+                                }
 
-                                    return ElevatedButton(
-                                      onPressed:
-                                          showFeedback
-                                              ? null
-                                              : () => checkAnswer(option),
-                                      style: ElevatedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 40,
-                                          vertical: 24,
-                                        ),
-                                        backgroundColor: getButtonColor(),
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            24,
-                                          ),
-                                        ),
+                                return ElevatedButton(
+                                  onPressed:
+                                      showFeedback
+                                          ? null
+                                          : () => checkAnswer(option),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 40,
+                                      vertical: 24,
+                                    ),
+                                    backgroundColor: getButtonColor(),
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        24,
                                       ),
-                                      child: Text(
-                                        option,
-                                        style: const TextStyle(
-                                          fontSize: 36,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    option,
+                                    style: const TextStyle(
+                                      fontSize: 36,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
                             ),
                           ],
                         ),
@@ -282,58 +282,45 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                 Container(
                   height: 80,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
+                      horizontal: 20, vertical: 10),
+                  child: showFeedback
+                      ? ScaleTransition(
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                isCorrect
+                                    ? Icons.check_circle
+                                    : Icons.cancel,
+                                color:
+                                isCorrect ? Colors.green : Colors.red,
+                                size: 28,
                               ),
-                              decoration: BoxDecoration(
-                                color: isCorrect ? Colors.green : Colors.red,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
+                              const SizedBox(width: 10),
+                              Text(
+                                isCorrect
+                                    ? (isEnglish
+                                        ? 'Well done! 🎉'
+                                        : 'Aferin! 🎉')
+                                    : (isEnglish
+                                        ? "Here's the right one! 🧐"
+                                        : 'İşte doğrusu! 🧐'),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: isCorrect
+                                      ? Colors.green
+                                      : Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color: Colors.white,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? 'Aferin! 🎉'
-                                        : 'Tekrar dene! 😔',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                          : const SizedBox.shrink(),
+                            ],
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 ),
               ],
             ),
