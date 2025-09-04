@@ -225,7 +225,7 @@ class _Disleksi2State extends State<Disleksi2>
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.95),
                       borderRadius: BorderRadius.circular(24),
-                      box boxShadow: [
+                       boxShadow:[
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
                           blurRadius: 20,
