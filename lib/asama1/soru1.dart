@@ -17,6 +17,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
     ['🍓', '🍇', '🍒'],
     ['🍎', '🍊', '🍐']
   ];
+
   late List<List<String>> rightFruits;
   int? selectedLeftIndex;
   int? selectedRightIndex;
@@ -33,6 +34,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
     rightFruits = List.generate(2, (pageIndex) {
       List<String> fruits = List.from(pageFruits[pageIndex]);
       do {
@@ -40,17 +42,21 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
       } while (_listsAreEqual(pageFruits[pageIndex], fruits));
       return fruits;
     });
+
     matchedLeft = List.generate(2, (_) => List.filled(3, false));
     matchedRight = List.generate(2, (_) => List.filled(3, false));
     matchedPairs = [0, 0];
+
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 500),
     );
+
     _slideController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
+
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
@@ -58,6 +64,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
       parent: _slideController,
       curve: Curves.easeOutCubic,
     ));
+
     _slideController.forward();
   }
 
@@ -102,29 +109,26 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
       _feedbackController.forward(from: 0);
 
       if (isCorrect) {
-        setState(() {
-          matchedLeft[currentPage][selectedLeftIndex!] = true;
-          matchedRight[currentPage][selectedRightIndex!] = true;
-          matchedPairs[currentPage]++;
-        });
+        matchedLeft[currentPage][selectedLeftIndex!] = true;
+        matchedRight[currentPage][selectedRightIndex!] = true;
+        matchedPairs[currentPage]++;
 
         if (matchedPairs[currentPage] == pageFruits[currentPage].length) {
           Future.delayed(const Duration(seconds: 1), () {
-            if (mounted) {
-              if (currentPage == 0) {
-                setState(() {
-                  currentPage = 1;
-                  selectedLeftIndex = null;
-                  selectedRightIndex = null;
-                  showFeedback = false;
-                });
-              } else {
-                ActivityTracker.completeActivity();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const GDisgrafi1()),
-                );
-              }
+            if (!mounted) return;
+            if (currentPage == 0) {
+              setState(() {
+                currentPage = 1;
+                selectedLeftIndex = null;
+                selectedRightIndex = null;
+                showFeedback = false;
+              });
+            } else {
+              ActivityTracker.completeActivity();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const GDisgrafi1()),
+              );
             }
           });
         }
@@ -135,9 +139,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
           setState(() {
             selectedLeftIndex = null;
             selectedRightIndex = null;
-            if (!isCorrect) {
-              showFeedback = false;
-            }
+            if (!isCorrect) showFeedback = false;
           });
         }
       });
@@ -148,13 +150,14 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final screenSize = MediaQuery.of(context).size;
-    final screenWidth = screenSize.width;
-    final iconSize = screenWidth * 0.065;
+    final iconSize = screenSize.width * 0.065;
 
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
         body: Container(
+          width: double.infinity,
+          height: double.infinity,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -193,134 +196,122 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(width: 48), // Denge için
+                    SizedBox(width: iconSize),
                   ],
                 ),
-                const SizedBox(height: 15),
-                // Expanded yerine, yüksekliği 'Az Olanı İşaretle' sorusuna uygun sabit bir değerle (450) kullandım.
-                SizedBox(
-                  height: 450,
+                const SizedBox(height: 10),
+                Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
                     child: Container(
+                      width: double.infinity,
                       margin: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(32),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.white.withOpacity(0.1),
-                            blurRadius: 20,
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 24,
                             offset: const Offset(0, 10),
                           ),
                         ],
                       ),
-                      child: Column(
+                      child: Row(
                         children: [
                           Expanded(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: List.generate(
-                                      3,
-                                      (index) => Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 8),
-                                        child: GestureDetector(
-                                          onTap: () => _handleLeftTap(index),
-                                          child: Container(
-                                            width: 90,
-                                            height: 90,
-                                            decoration: BoxDecoration(
-                                              color: matchedLeft[currentPage][index]
-                                                  ? Colors.green.shade300
-                                                  : (showFeedback &&
-                                                          !isCorrect &&
-                                                          selectedLeftIndex == index)
-                                                      ? Colors.red.shade200
-                                                      : selectedLeftIndex == index
-                                                          ? Colors.blue.shade200
-                                                          : Colors.white,
-                                              borderRadius: BorderRadius.circular(20),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black.withOpacity(0.1),
-                                                  blurRadius: 10,
-                                                  offset: const Offset(0, 5),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                pageFruits[currentPage][index],
-                                                style: const TextStyle(
-                                                  fontSize: 42,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: List.generate(
+                                3,
+                                (index) => GestureDetector(
+                                  onTap: () => _handleLeftTap(index),
+                                  child: Container(
+                                    width: 120,
+                                    height: 120,
+                                    margin: const EdgeInsets.symmetric(vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: matchedLeft[currentPage][index]
+                                          ? Colors.green.shade300
+                                          : (showFeedback &&
+                                                  !isCorrect &&
+                                                  selectedLeftIndex == index)
+                                              ? Colors.red.shade200
+                                              : selectedLeftIndex == index
+                                                  ? Colors.blue.shade200
+                                                  : Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.2),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        pageFruits[currentPage][index],
+                                        style: const TextStyle(
+                                          fontSize: 48,
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                                Container(
-                                  width: 4,
-                                  height: screenSize.height * 0.5,
-                                  margin: const EdgeInsets.symmetric(horizontal: 12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.deepPurple,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: List.generate(
-                                      3,
-                                      (index) => Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 8),
-                                        child: GestureDetector(
-                                          onTap: () => _handleRightTap(index),
-                                          child: Container(
-                                            width: 90,
-                                            height: 90,
-                                            decoration: BoxDecoration(
-                                              color: matchedRight[currentPage][index]
-                                                  ? Colors.green.shade300
-                                                  : (showFeedback &&
-                                                          !isCorrect &&
-                                                          selectedRightIndex == index)
-                                                      ? Colors.red.shade200
-                                                      : selectedRightIndex == index
-                                                          ? Colors.blue.shade200
-                                                          : Colors.white,
-                                              borderRadius: BorderRadius.circular(20),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black.withOpacity(0.1),
-                                                  blurRadius: 10,
-                                                  offset: const Offset(0, 5),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                rightFruits[currentPage][index],
-                                                style: const TextStyle(
-                                                  fontSize: 42,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 4,
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.deepPurple,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: List.generate(
+                                3,
+                                (index) => GestureDetector(
+                                  onTap: () => _handleRightTap(index),
+                                  child: Container(
+                                    width: 120,
+                                    height: 120,
+                                    margin: const EdgeInsets.symmetric(vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: matchedRight[currentPage][index]
+                                          ? Colors.green.shade300
+                                          : (showFeedback &&
+                                                  !isCorrect &&
+                                                  selectedRightIndex == index)
+                                              ? Colors.red.shade200
+                                              : selectedRightIndex == index
+                                                  ? Colors.blue.shade200
+                                                  : Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.2),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        rightFruits[currentPage][index],
+                                        style: const TextStyle(
+                                          fontSize: 48,
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
                           ),
                         ],
@@ -332,14 +323,16 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                 if (showFeedback)
                   Container(
                     height: 80,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
                     child: ScaleTransition(
                       scale: CurvedAnimation(
                         parent: _feedbackController,
                         curve: Curves.elasticOut,
                       ),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 20),
                         decoration: BoxDecoration(
                           color: Colors.transparent,
                           borderRadius: BorderRadius.circular(16),
@@ -357,7 +350,9 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                             Text(
                               isCorrect
                                   ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                  : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
+                                  : (isEnglish
+                                      ? 'Try again! 😔'
+                                      : 'Tekrar dene! 😔'),
                               style: TextStyle(
                                 fontSize: 18,
                                 color: isCorrect ? Colors.green : Colors.red,
@@ -369,7 +364,6 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                // `Spacer` artık gerekmiyor, çünkü sabit yükseklik kullandık.
               ],
             ),
           ),

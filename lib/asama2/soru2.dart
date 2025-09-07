@@ -81,13 +81,13 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
         if (matchedLeft.every((element) => element)) {
           // Etkinlik tamamlandı
           ActivityTracker.completeActivity();
-          
+
           Future.delayed(const Duration(seconds: 1), () {
             if (mounted) {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const HarfEsle(),
+                  builder: (context) => const HarfEsleSoru3(), // ✅ Düzelttim
                 ),
               );
             }
