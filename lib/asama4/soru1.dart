@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'package:dixlearning/asama4/soru2.dart';
 import '../screens/home_screen.dart';
+import 'package:dixlearning/asama2/soru2.dart';
 
 class DuyguYuzEsle extends StatefulWidget {
   const DuyguYuzEsle({super.key});

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'dart:async';
-import 'package:dixlearning/asama4/soru3.dart';
-import 'package:provider/provider.dart';
-import '../providers/language_provider.dart';
 import '../screens/home_screen.dart';
+import 'soru3.dart'; // sonraki ekran varsa burayı doğru dosyayla değiştir
 
 class DuyuOrganEsle extends StatefulWidget {
   const DuyuOrganEsle({super.key});
@@ -15,29 +13,34 @@ class DuyuOrganEsle extends StatefulWidget {
 
 class _DuyuOrganEsleState extends State<DuyuOrganEsle>
     with TickerProviderStateMixin {
-  final List<String> leftOrgans = ['👅', '👃', '👁️', '👂'];
-  final List<String> rightSenses = ['Tat alma', 'Koklama', 'Görme', 'İşitme'];
-  final List<String> rightSensesEnglish = ['Taste', 'Smell', 'Sight', 'Hearing'];
+  final List<String> leftOrgans = ['👁️', '👂', '👅', '👃', '🤲'];
+  final List<String> rightSenses = [
+    'Görme',
+    'Duyma',
+    'Tatma',
+    'Koklama',
+    'Dokunma'
+  ];
 
   late List<String> shuffledSenses;
   int? selectedLeftIndex;
   int? selectedRightIndex;
-  List<bool> matchedLeft = [false, false, false, false];
-  List<bool> matchedRight = [false, false, false, false];
+
+  List<bool> matchedLeft = [false, false, false, false, false];
+  List<bool> matchedRight = [false, false, false, false, false];
+
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _dialogShown = false;
+
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
-  bool _dialogShown = false;
 
   @override
   void initState() {
     super.initState();
-    final isEnglish =
-        Provider.of<LanguageProvider>(context, listen: false).isEnglish;
-    shuffledSenses =
-        List.from(isEnglish ? rightSensesEnglish : rightSenses)..shuffle();
+    shuffledSenses = List.from(rightSenses)..shuffle();
 
     _feedbackController =
         AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
@@ -72,18 +75,18 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
       }
 
       if (selectedLeftIndex != null && selectedRightIndex != null) {
-        final isEnglish =
-            Provider.of<LanguageProvider>(context, listen: false).isEnglish;
-        final rightSensesList = isEnglish ? rightSensesEnglish : rightSenses;
-
-        isCorrect = (leftOrgans[selectedLeftIndex!] == '👅' &&
-                shuffledSenses[selectedRightIndex!] == rightSensesList[0]) ||
-            (leftOrgans[selectedLeftIndex!] == '👃' &&
-                shuffledSenses[selectedRightIndex!] == rightSensesList[1]) ||
+        // doğru eşleşme kontrolü
+        isCorrect =
             (leftOrgans[selectedLeftIndex!] == '👁️' &&
-                shuffledSenses[selectedRightIndex!] == rightSensesList[2]) ||
+                shuffledSenses[selectedRightIndex!] == 'Görme') ||
             (leftOrgans[selectedLeftIndex!] == '👂' &&
-                shuffledSenses[selectedRightIndex!] == rightSensesList[3]);
+                shuffledSenses[selectedRightIndex!] == 'Duyma') ||
+            (leftOrgans[selectedLeftIndex!] == '👅' &&
+                shuffledSenses[selectedRightIndex!] == 'Tatma') ||
+            (leftOrgans[selectedLeftIndex!] == '👃' &&
+                shuffledSenses[selectedRightIndex!] == 'Koklama') ||
+            (leftOrgans[selectedLeftIndex!] == '🤲' &&
+                shuffledSenses[selectedRightIndex!] == 'Dokunma');
 
         showFeedback = true;
         _feedbackController.forward(from: 0);
@@ -92,14 +95,14 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
           matchedLeft[selectedLeftIndex!] = true;
           matchedRight[selectedRightIndex!] = true;
 
-          bool allMatched = matchedLeft.every((e) => e);
-          if (allMatched && !_dialogShown) {
+          if (matchedLeft.every((e) => e) && !_dialogShown) {
             _dialogShown = true;
             ActivityTracker.completeActivity();
 
-            Future.delayed(const Duration(seconds: 2), () {
+            Future.delayed(const Duration(milliseconds: 500), () {
               if (mounted) {
-                Navigator.of(context).pushReplacement(
+                Navigator.pushReplacement(
+                  context,
                   MaterialPageRoute(builder: (context) => const Soru3()),
                 );
               }
@@ -107,7 +110,7 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
           }
         }
 
-        Future.delayed(const Duration(seconds: 2), () {
+        Future.delayed(const Duration(seconds: 1), () {
           if (mounted) {
             setState(() {
               showFeedback = false;
@@ -122,7 +125,6 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
 
   @override
   Widget build(BuildContext context) {
-    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final screenSize = MediaQuery.of(context).size;
     final iconSize = screenSize.width * 0.065;
 
@@ -132,40 +134,40 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
         body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
               colors: [
                 Colors.blue.shade200,
                 Colors.blue.shade200,
                 const Color(0xffffffff),
               ],
               stops: const [0.0, 0.5, 1.0],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
           ),
           child: SafeArea(
             child: Column(
               children: [
+                // geri oku
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: iconSize),
+                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                              builder: (context) => const HomeScreen()),
+                          MaterialPageRoute(builder: (context) => const HomeScreen()),
                           (route) => false,
                         );
                       },
                     ),
                   ],
                 ),
+
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
                     child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      margin: const EdgeInsets.symmetric(horizontal: 6),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.95),
@@ -180,100 +182,61 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
                       ),
                       child: Column(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 1),
-                            child: Text(
-                              isEnglish
-                                  ? 'Match the organs with their senses.'
-                                  : 'Organları ilgili duyu ile eşleştir',
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              textAlign: TextAlign.center,
+                          const Text(
+                            'Duyu organlarını duyularla eşleştir',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
+                            textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 12),
+
+                          // içerik
                           Expanded(
                             child: Row(
                               children: [
-                                // Sol organlar
+                                // sol emojiler
                                 Expanded(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: List.generate(
                                       leftOrgans.length,
-<<<<<<< HEAD
-                                          (index) => Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 8),
-                                          child: GestureDetector(
-                                            onTap: () => _handleTap(index, true),
-                                            child: Container(
-                                              margin: const EdgeInsets.all(4),
-                                              decoration: BoxDecoration(
-                                                color: matchedLeft[index]
-                                                    ? Colors.green.shade500
-                                                    : (showFeedback &&
-                                                    !isCorrect &&
-                                                    selectedLeftIndex == index)
-                                                    ? Colors.red.shade500
-                                                    : selectedLeftIndex == index
-                                                    ? Colors.blue.shade200
-                                                    : Colors.white,
-                                                borderRadius: BorderRadius.circular(16),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black.withOpacity(0.1),
-                                                    blurRadius: 10,
-                                                    offset: const Offset(0, 5),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  leftOrgans[index],
-                                                  style: const TextStyle(fontSize: 60),
-=======
                                       (index) => Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 4),
+                                        padding: const EdgeInsets.symmetric(vertical: 6),
                                         child: GestureDetector(
                                           onTap: () => _handleTap(index, true),
                                           child: AnimatedContainer(
-                                            duration:
-                                                const Duration(milliseconds: 300),
+                                            duration: const Duration(milliseconds: 300),
                                             width: 80,
                                             height: 80,
                                             decoration: BoxDecoration(
                                               color: matchedLeft[index]
-                                                  ? Colors.green
+                                                  ? Colors.green.shade200
                                                   : (showFeedback &&
                                                           !isCorrect &&
-                                                          selectedLeftIndex ==
-                                                              index)
-                                                      ? Colors.red
+                                                          selectedLeftIndex == index)
+                                                      ? Colors.red.shade200
                                                       : selectedLeftIndex == index
                                                           ? Colors.blue.shade200
                                                           : Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
+                                              borderRadius: BorderRadius.circular(16),
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.1),
+                                                  color: Colors.black.withOpacity(0.12),
                                                   blurRadius: 8,
                                                   offset: const Offset(0, 4),
->>>>>>> esma_eslemesoruları_temaguncelleme
                                                 ),
                                               ],
+                                              border: selectedLeftIndex == index && !matchedLeft[index]
+                                                  ? Border.all(color: Colors.lightGreen.shade400, width: 3)
+                                                  : null,
                                             ),
                                             child: Center(
                                               child: Text(
                                                 leftOrgans[index],
-                                                style: const TextStyle(
-                                                    fontSize: 32),
+                                                style: const TextStyle(fontSize: 32),
                                               ),
                                             ),
                                           ),
@@ -282,10 +245,11 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
                                     ),
                                   ),
                                 ),
-                                // Orta çizgi
+
+                                // orta çizgi
                                 Container(
                                   width: 4,
-                                  height: screenSize.height * 0.55,
+                                  height: screenSize.height * 0.58,
                                   margin: const EdgeInsets.symmetric(horizontal: 12),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
@@ -300,77 +264,42 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                 ),
-                                // Sağ duyular
+
+                                // sağ kutular
                                 Expanded(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: List.generate(
                                       shuffledSenses.length,
-<<<<<<< HEAD
-                                          (index) => Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 8),
-                                          child: GestureDetector(
-                                            onTap: () => _handleTap(index, false),
-                                            child: Container(
-                                              margin: const EdgeInsets.all(4),
-                                              decoration: BoxDecoration(
-                                                color: matchedRight[index]
-                                                    ? Colors.green.shade500
-                                                    : (showFeedback &&
-                                                    !isCorrect &&
-                                                    selectedRightIndex == index)
-                                                    ? Colors.red.shade500
-                                                    : selectedRightIndex == index
-                                                    ? Colors.blue.shade200
-                                                    : Colors.white,
-                                                borderRadius: BorderRadius.circular(16),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black.withOpacity(0.1),
-                                                    blurRadius: 10,
-                                                    offset: const Offset(0, 5),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  shuffledSenses[index],
-                                                  style: const TextStyle(
-                                                    fontSize: 22,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-=======
                                       (index) => Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 4),
+                                        padding: const EdgeInsets.symmetric(vertical: 6),
                                         child: GestureDetector(
                                           onTap: () => _handleTap(index, false),
                                           child: AnimatedContainer(
-                                            duration:
-                                                const Duration(milliseconds: 300),
+                                            duration: const Duration(milliseconds: 300),
                                             width: 80,
                                             height: 80,
                                             decoration: BoxDecoration(
                                               color: matchedRight[index]
-                                                  ? Colors.green
+                                                  ? Colors.green.shade200
                                                   : (showFeedback &&
                                                           !isCorrect &&
-                                                          selectedRightIndex ==
-                                                              index)
-                                                      ? Colors.red
+                                                          selectedRightIndex == index)
+                                                      ? Colors.red.shade200
                                                       : selectedRightIndex == index
                                                           ? Colors.yellow.shade200
                                                           : Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
+                                              borderRadius: BorderRadius.circular(16),
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.1),
+                                                  color: Colors.black.withOpacity(0.12),
                                                   blurRadius: 8,
                                                   offset: const Offset(0, 4),
                                                 ),
                                               ],
+                                              border: selectedRightIndex == index && !matchedRight[index]
+                                                  ? Border.all(color: Colors.lightGreen.shade400, width: 3)
+                                                  : null,
                                             ),
                                             child: Center(
                                               child: Text(
@@ -378,9 +307,9 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold,
-                                                  color: Colors.black, // 🔹 siyah yapıldı
->>>>>>> esma_eslemesoruları_temaguncelleme
+                                                  color: Colors.black,
                                                 ),
+                                                textAlign: TextAlign.center,
                                               ),
                                             ),
                                           ),
@@ -397,45 +326,47 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
                     ),
                   ),
                 ),
-                // Feedback alanı
+
+                // feedback
                 Container(
                   height: 70,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: showFeedback
                       ? ScaleTransition(
-                          scale: CurvedAnimation(
-                            parent: _feedbackController,
-                            curve: Curves.elasticOut,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                isCorrect ? Icons.check_circle : Icons.cancel,
-                                color: isCorrect ? Colors.green : Colors.red,
-                                size: 24,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                isCorrect
-                                    ? (isEnglish
-                                        ? 'Well done! 🎉'
-                                        : 'Aferin! 🎉')
-                                    : (isEnglish
-                                        ? 'Try again! 😔'
-                                        : 'Tekrar dene! 😔'),
-                                style: TextStyle(
-                                  fontSize: 18,
+                          scale: CurvedAnimation(parent: _feedbackController, curve: Curves.elasticOut),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(color: Colors.black12, blurRadius: 10, offset: const Offset(0, 5)),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
                                   color: isCorrect ? Colors.green : Colors.red,
-                                  fontWeight: FontWeight.bold,
+                                  size: 26,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 8),
+                                Text(
+                                  isCorrect ? "Aferin! 🎉" : "Tekrar dene! 😔",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: isCorrect ? Colors.green : Colors.red,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         )
                       : const SizedBox.shrink(),
                 ),
+                const SizedBox(height: 8),
               ],
             ),
           ),
