@@ -111,7 +111,7 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
             if (mounted) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const HarfEsle()),
+                MaterialPageRoute(builder: (context) => const HarfEsleSoru3()),
               );
             }
           });
