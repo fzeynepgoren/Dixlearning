@@ -31,10 +31,9 @@ class _BuyukKucukSoru8State extends State<BuyukKucukSoru8>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -105,8 +104,11 @@ class _BuyukKucukSoru8State extends State<BuyukKucukSoru8>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -120,9 +122,13 @@ class _BuyukKucukSoru8State extends State<BuyukKucukSoru8>
                     child: Center(
                       child: Container(
                         margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 6),
+                          vertical: 8,
+                          horizontal: 6,
+                        ),
                         padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 6),
+                          vertical: 8,
+                          horizontal: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(32),
@@ -159,7 +165,8 @@ class _BuyukKucukSoru8State extends State<BuyukKucukSoru8>
                                   width: double.infinity,
                                   height: imageHeight,
                                   margin: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.02),
+                                    horizontal: screenWidth * 0.02,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(24),
@@ -174,7 +181,7 @@ class _BuyukKucukSoru8State extends State<BuyukKucukSoru8>
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(24),
                                     child: Image.asset(
-                                      'assets/buyuk_kucuk/soru8/resim8.png',
+                                      'assets/buyuk_kucuk/soru8/Resim8.png',
                                       fit: BoxFit.cover,
                                       width: double.infinity,
                                       height: double.infinity,
@@ -184,7 +191,8 @@ class _BuyukKucukSoru8State extends State<BuyukKucukSoru8>
                                 const SizedBox(height: 20),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.13),
+                                    horizontal: screenWidth * 0.13,
+                                  ),
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -228,43 +236,48 @@ class _BuyukKucukSoru8State extends State<BuyukKucukSoru8>
                                 Container(
                                   height: 60,
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 8),
-                                  child: showFeedback
-                                      ? ScaleTransition(
-                                          scale: CurvedAnimation(
-                                            parent: _feedbackController,
-                                            curve: Curves.elasticOut,
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                isCorrect == true
-                                                    ? Icons.check_circle
-                                                    : Icons.cancel,
-                                                color: isCorrect == true
-                                                    ? Colors.green
-                                                    : Colors.red,
-                                                size: 28,
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Text(
-                                                isCorrect == true
-                                                    ? 'Aferin! 🎉'
-                                                    : 'Tekrar dene! 😔',
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  color: isCorrect == true
-                                                      ? Colors.green
-                                                      : Colors.red,
-                                                  fontWeight: FontWeight.bold,
+                                    horizontal: 20,
+                                    vertical: 8,
+                                  ),
+                                  child:
+                                      showFeedback
+                                          ? ScaleTransition(
+                                            scale: CurvedAnimation(
+                                              parent: _feedbackController,
+                                              curve: Curves.elasticOut,
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  isCorrect == true
+                                                      ? Icons.check_circle
+                                                      : Icons.cancel,
+                                                  color:
+                                                      isCorrect == true
+                                                          ? Colors.green
+                                                          : Colors.red,
+                                                  size: 28,
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      : const SizedBox.shrink(),
+                                                const SizedBox(width: 10),
+                                                Text(
+                                                  isCorrect == true
+                                                      ? 'Aferin! 🎉'
+                                                      : 'Tekrar dene! 😔',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color:
+                                                        isCorrect == true
+                                                            ? Colors.green
+                                                            : Colors.red,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                          : const SizedBox.shrink(),
                                 ),
                               ],
                             ),
