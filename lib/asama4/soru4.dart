@@ -100,7 +100,6 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
 
             Future.delayed(const Duration(milliseconds: 500), () {
               if (mounted) {
-                // Burada örnekteki sonraki ekrana gider (sizin projede bu sınıfın olduğu dosyayı import edin)
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => const EmojiAnimalMatching()),
@@ -131,7 +130,6 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        // Arka plan: DuyuOrganEsle örneğindeki mavi gradyana göre ayarlandı
         body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -155,7 +153,6 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
                     IconButton(
                       icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
                       onPressed: () {
-                        // Ana menüye geri dön - örnekteki davranışla aynı
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(builder: (context) => const HomeScreen()),
                           (route) => false,
@@ -192,7 +189,7 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black, // siyah yazı
+                                color: Colors.black,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -226,7 +223,7 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
                                                       ? Colors.red.shade200
                                                       : selectedLeftIndex == index
                                                           ? Colors.blue.shade200
-                                                          : Colors.white, // beyaz kutu
+                                                          : Colors.white,
                                               borderRadius: BorderRadius.circular(16),
                                               boxShadow: [
                                                 BoxShadow(
@@ -242,7 +239,9 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
                                             child: Center(
                                               child: Text(
                                                 leftSeasons[index],
-                                                style: const TextStyle(fontSize: 32),
+                                                style: const TextStyle(
+                                                  fontSize: 48, // EMOJİLER DAHA BÜYÜK!
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -294,7 +293,7 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
                                                       ? Colors.red.shade200
                                                       : selectedRightIndex == index
                                                           ? Colors.yellow.shade200
-                                                          : Colors.white, // beyaz kutu
+                                                          : Colors.white,
                                               borderRadius: BorderRadius.circular(16),
                                               boxShadow: [
                                                 BoxShadow(
@@ -313,7 +312,7 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold,
-                                                  color: Colors.black, // siyah yazı
+                                                  color: Colors.black,
                                                 ),
                                                 textAlign: TextAlign.center,
                                               ),
@@ -373,6 +372,6 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
           ),
         ),
       ),
-    );
+    );   
+   }
   }
-}
