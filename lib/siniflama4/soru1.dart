@@ -256,32 +256,32 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
                   padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
                   child: showFeedback
                       ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: screenSize.width * 0.07,
-                        ),
-                        SizedBox(width: screenSize.width * 0.025),
-                        Text(
-                          isCorrect
-                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                              : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: screenSize.width * 0.045,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
                           ),
-                        ),
-                      ],
-                    ),
-                  )
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                isCorrect ? Icons.check_circle : Icons.cancel,
+                                color: isCorrect ? Colors.green : Colors.red,
+                                size: screenSize.width * 0.07,
+                              ),
+                              SizedBox(width: screenSize.width * 0.025),
+                              Text(
+                                isCorrect
+                                    ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                                    : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
+                                style: TextStyle(
+                                  fontSize: screenSize.width * 0.045,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
                       : const SizedBox.shrink(),
                 ),
               ],
@@ -362,11 +362,7 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Center(

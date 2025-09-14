@@ -31,10 +31,9 @@ class _BuyukKucukSoru9State extends State<BuyukKucukSoru9>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -106,8 +105,11 @@ class _BuyukKucukSoru9State extends State<BuyukKucukSoru9>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -121,9 +123,13 @@ class _BuyukKucukSoru9State extends State<BuyukKucukSoru9>
                     child: Center(
                       child: Container(
                         margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 6),
+                          vertical: 8,
+                          horizontal: 6,
+                        ),
                         padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 6),
+                          vertical: 8,
+                          horizontal: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(32),
@@ -145,7 +151,9 @@ class _BuyukKucukSoru9State extends State<BuyukKucukSoru9>
                               children: [
                                 const Padding(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
                                   child: Text(
                                     'Küçük olanı işaretle.',
                                     style: TextStyle(
@@ -162,7 +170,8 @@ class _BuyukKucukSoru9State extends State<BuyukKucukSoru9>
                                   width: double.infinity,
                                   height: imageHeight,
                                   margin: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.04),
+                                    horizontal: screenWidth * 0.04,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(24),
@@ -177,7 +186,7 @@ class _BuyukKucukSoru9State extends State<BuyukKucukSoru9>
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(24),
                                     child: Image.asset(
-                                      'assets/buyuk_kucuk/soru9/resim9.png',
+                                      'assets/buyuk_kucuk/soru9/Resim9.png',
                                       fit: BoxFit.cover,
                                       width: double.infinity,
                                       height: double.infinity,
@@ -188,7 +197,8 @@ class _BuyukKucukSoru9State extends State<BuyukKucukSoru9>
                                 // Butonlar
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.13),
+                                    horizontal: screenWidth * 0.13,
+                                  ),
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -233,43 +243,48 @@ class _BuyukKucukSoru9State extends State<BuyukKucukSoru9>
                                 Container(
                                   height: 60,
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 8),
-                                  child: showFeedback
-                                      ? ScaleTransition(
-                                          scale: CurvedAnimation(
-                                            parent: _feedbackController,
-                                            curve: Curves.elasticOut,
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                isCorrect == true
-                                                    ? Icons.check_circle
-                                                    : Icons.cancel,
-                                                color: isCorrect == true
-                                                    ? Colors.green
-                                                    : Colors.red,
-                                                size: 28,
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Text(
-                                                isCorrect == true
-                                                    ? 'Aferin! 🎉'
-                                                    : 'Tekrar dene! 😔',
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  color: isCorrect == true
-                                                      ? Colors.green
-                                                      : Colors.red,
-                                                  fontWeight: FontWeight.bold,
+                                    horizontal: 20,
+                                    vertical: 8,
+                                  ),
+                                  child:
+                                      showFeedback
+                                          ? ScaleTransition(
+                                            scale: CurvedAnimation(
+                                              parent: _feedbackController,
+                                              curve: Curves.elasticOut,
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  isCorrect == true
+                                                      ? Icons.check_circle
+                                                      : Icons.cancel,
+                                                  color:
+                                                      isCorrect == true
+                                                          ? Colors.green
+                                                          : Colors.red,
+                                                  size: 28,
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      : const SizedBox.shrink(),
+                                                const SizedBox(width: 10),
+                                                Text(
+                                                  isCorrect == true
+                                                      ? 'Aferin! 🎉'
+                                                      : 'Tekrar dene! 😔',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color:
+                                                        isCorrect == true
+                                                            ? Colors.green
+                                                            : Colors.red,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                          : const SizedBox.shrink(),
                                 ),
                               ],
                             ),

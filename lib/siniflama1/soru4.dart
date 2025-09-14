@@ -87,23 +87,11 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
 
   void _checkCompletion() {
     if (foodGroup.length + drinkGroup.length == items.length) {
-      bool isCorrect = true;
-      for (var item in foodGroup) {
-        if (!item['isFood']) {
-          isCorrect = false;
-          break;
-        }
-      }
-      for (var item in drinkGroup) {
-        if (item['isFood']) {
-          isCorrect = false;
-          break;
-        }
-      }
+      bool allCorrect = foodGroup.every((item) => item['isFood']) &&
+          drinkGroup.every((item) => !item['isFood']);
 
-      if (isCorrect && !_dialogShown) {
+      if (allCorrect && !_dialogShown) {
         _dialogShown = true;
-
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
             Navigator.push(
@@ -230,9 +218,7 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                                     children: items
                                         .where((item) => !item['isPlaced'])
                                         .map((item) {
-                                      return Draggable<
-                                          Map<String, dynamic>
-                                      >(
+                                      return Draggable<Map<String, dynamic>>(
                                         data: item,
                                         feedback: Material(
                                           color: Colors.transparent,
@@ -241,8 +227,7 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                                         childWhenDragging: const SizedBox.shrink(),
                                         child: _buildItemBox(item),
                                       );
-                                    })
-                                        .toList(),
+                                    }).toList(),
                                   ),
                                 ),
                               ],
@@ -259,40 +244,56 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                     horizontal: 20,
                     vertical: 10,
                   ),
-                  child:
-                  showFeedback
+                  child: showFeedback
                       ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? (isEnglish
-                              ? 'Well done! 🎉'
-                              : 'Aferin! 🎉')
-                              : (isEnglish
-                              ? 'Try again! 😔'
-                              : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color:
-                            isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
                           ),
-                        ),
-                      ],
-                    ),
-                  )
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect
+                                      ? (isEnglish
+                                          ? 'Well done! 🎉'
+                                          : 'Aferin! 🎉')
+                                      : (isEnglish
+                                          ? 'Try again! 😔'
+                                          : 'Tekrar dene! 😔'),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: isCorrect ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
                       : const SizedBox.shrink(),
                 ),
               ],
@@ -366,11 +367,11 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 4,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),

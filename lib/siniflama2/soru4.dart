@@ -194,10 +194,10 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
                                     children: kategoriler
                                         .map(
                                           (kategori) => Expanded(
-                                        child: _buildGroupContainer(
-                                            kategori, isEnglish),
-                                      ),
-                                    )
+                                            child: _buildGroupContainer(
+                                                kategori, isEnglish),
+                                          ),
+                                        )
                                         .toList(),
                                   ),
                                 ),
@@ -207,7 +207,8 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: emojiler
-                                        .where((emoji) => !eslesenler.contains(emoji))
+                                        .where((emoji) =>
+                                            !eslesenler.contains(emoji))
                                         .map((emoji) {
                                       return Draggable<String>(
                                         data: emoji,
@@ -215,7 +216,8 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
                                           color: Colors.transparent,
                                           child: _buildItemBox(emoji),
                                         ),
-                                        childWhenDragging: const SizedBox.shrink(),
+                                        childWhenDragging:
+                                            const SizedBox.shrink(),
                                         child: _buildItemBox(emoji),
                                       );
                                     }).toList(),
@@ -231,35 +233,56 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
                 ),
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child: showFeedback
                       ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                              : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
                           ),
-                        ),
-                      ],
-                    ),
-                  )
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect
+                                      ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                                      : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: isCorrect ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
                       : const SizedBox.shrink(),
                 ),
               ],
@@ -272,9 +295,9 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
 
   Widget _buildGroupContainer(String kategori, bool isEnglish) {
     Color boxColor =
-    kategori == 'Teknolojik' ? Colors.green.shade100 : const Color(0xFFE0F7FA);
+        kategori == 'Teknolojik' ? Colors.green.shade100 : const Color(0xFFE0F7FA);
     Color borderColor =
-    kategori == 'Teknolojik' ? Colors.green.shade400 : Colors.blue.shade400;
+        kategori == 'Teknolojik' ? Colors.green.shade400 : Colors.blue.shade400;
 
     return DragTarget<String>(
       onWillAccept: (data) => !eslesenler.contains(data!),
@@ -296,7 +319,7 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
             children: [
               Text(
                 isEnglish
-                    ? (kategori == 'Teknolojik' ? 'Teknolojik' : 'Geleneksel')
+                    ? (kategori == 'Teknolojik' ? 'Technological' : 'Traditional')
                     : kategori,
                 style: const TextStyle(
                   fontSize: 22,
@@ -312,10 +335,10 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
                     .where((e) => dogruEslesmeler[e] == kategori)
                     .map(
                       (e) => Text(
-                    e,
-                    style: const TextStyle(fontSize: 60),
-                  ),
-                )
+                        e,
+                        style: const TextStyle(fontSize: 60),
+                      ),
+                    )
                     .toList(),
               ),
             ],
@@ -333,12 +356,8 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Center(
