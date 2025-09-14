@@ -14,6 +14,7 @@ class Disleksi4 extends StatefulWidget {
   State<Disleksi4> createState() => _Disleksi4State();
 }
 
+
 class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
   final List<Color> colors = [
     Colors.red,
