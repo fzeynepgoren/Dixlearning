@@ -1,55 +1,58 @@
 import 'package:flutter/material.dart';
-import 'soru4.dart';
 import '../screens/home_screen.dart';
-import '../utils/activity_tracker.dart';
+import 'soru4.dart'; // Sonraki soruya geçiş için
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
-class HarfEsle extends StatefulWidget {
-  const HarfEsle({super.key});
+class HarfEsleSoru3 extends StatefulWidget {
+  const HarfEsleSoru3({super.key});
 
   @override
-  State<HarfEsle> createState() => _HarfEsleState();
+  State<HarfEsleSoru3> createState() => _HarfEsleSoru3State();
 }
 
-class _HarfEsleState extends State<HarfEsle> with TickerProviderStateMixin {
+class _HarfEsleSoru3State extends State<HarfEsleSoru3>
+    with TickerProviderStateMixin {
   final List<String> leftLetters = ['b', 'd', 't'];
-  late List<String> rightLetters;
+  final List<String> rightLetters = ['d', 'b', 't'];
+  late List<String> shuffledRight;
   int? selectedLeftIndex;
   int? selectedRightIndex;
-  List<bool> matchedLeft = List.filled(3, false);
-  List<bool> matchedRight = List.filled(3, false);
-  int matchedPairs = 0;
+  List<bool> matchedLeft = [false, false, false];
+  List<bool> matchedRight = [false, false, false];
   bool showFeedback = false;
   bool isCorrect = false;
   late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
-    rightLetters = List.from(leftLetters);
-    rightLetters.shuffle();
-    while (_listsAreEqual(leftLetters, rightLetters)) {
-      rightLetters.shuffle();
-    }
+    shuffledRight = List.from(rightLetters)..shuffle();
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 600),
     );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
-  }
-
-  bool _listsAreEqual(List<String> a, List<String> b) {
-    if (a.length != b.length) return false;
-    for (int i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) return false;
-    }
-    return true;
   }
 
   void _handleLeftTap(int index) {
@@ -71,8 +74,8 @@ class _HarfEsleState extends State<HarfEsle> with TickerProviderStateMixin {
   void _checkMatch() {
     if (selectedLeftIndex != null && selectedRightIndex != null) {
       setState(() {
-        isCorrect = leftLetters[selectedLeftIndex!] ==
-            rightLetters[selectedRightIndex!];
+        isCorrect =
+            leftLetters[selectedLeftIndex!] == shuffledRight[selectedRightIndex!];
         showFeedback = true;
       });
       _feedbackController.forward(from: 0);
@@ -81,20 +84,15 @@ class _HarfEsleState extends State<HarfEsle> with TickerProviderStateMixin {
         setState(() {
           matchedLeft[selectedLeftIndex!] = true;
           matchedRight[selectedRightIndex!] = true;
-          matchedPairs++;
         });
 
-        if (matchedPairs == leftLetters.length) {
-          // Etkinlik tamamlandı
-          ActivityTracker.completeActivity();
-          
+        // tüm eşleşmeler tamamlandı mı?
+        if (matchedLeft.every((e) => e)) {
           Future.delayed(const Duration(seconds: 1), () {
             if (mounted) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const Soru4(),
-                ),
+                MaterialPageRoute(builder: (context) => const Soru4()),
               );
             }
           });
@@ -113,198 +111,249 @@ class _HarfEsleState extends State<HarfEsle> with TickerProviderStateMixin {
     }
   }
 
+  Widget _buildCard({
+    required int index,
+    required bool isLeft,
+    required String text,
+  }) {
+    final bool isSelected =
+        isLeft ? selectedLeftIndex == index : selectedRightIndex == index;
+    final bool isMatched =
+        isLeft ? matchedLeft[index] : matchedRight[index];
+    final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
+
+    Color cardColor = Colors.white;
+    if (isMatched) {
+      cardColor = Colors.green.shade200;
+    } else if (isWrongSelection) {
+      cardColor = Colors.red.shade200;
+    } else if (isSelected) {
+      cardColor = Colors.blue.shade200;
+    }
+
+    return GestureDetector(
+      onTap: isMatched
+          ? null
+          : () => isLeft ? _handleLeftTap(index) : _handleRightTap(index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        width: 120,
+        height: 120,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 42,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        backgroundColor: const Color(0xFFE1F5FE),
-        appBar: AppBar(
-          title: Text(isEnglish ? 'Letter Matching' : 'Harf Eşleştirme',
-              style:
-                  const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-          centerTitle: true,
-          backgroundColor: Colors.deepPurple,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
           ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-              Text(
-                isEnglish ? 'Match the Letters' : 'Harfleri Eşleştir',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
+          child: SafeArea(
+            child: Column(
+              children: [
+                // üst bar
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back,
+                          color: Colors.black, size: iconSize),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (context) => const HomeScreen()),
+                          (route) => false,
+                        );
+                      },
+                    ),
+                  ],
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: Center(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(
-                            leftLetters.length,
-                            (index) => Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: GestureDetector(
-                                onTap: () => _handleLeftTap(index),
-                                child: Container(
-                                  width: 120,
-                                  height: 120,
-                                  decoration: BoxDecoration(
-                                    color: matchedLeft[index]
-                                        ? Colors.green.shade300
-                                        : (showFeedback &&
-                                                !isCorrect &&
-                                                selectedLeftIndex == index)
-                                            ? Colors.red.shade200
-                                            : selectedLeftIndex == index
-                                                ? Colors.blue.shade200
-                                                : Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      leftLetters[index],
-                                      style: const TextStyle(
-                                        fontSize: 42,
-                                        fontWeight: FontWeight.w300,
-                                        color: Color.fromRGBO(0, 0, 0, 0.22),
-                                        letterSpacing: 2,
+                Expanded(
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 1),
+                            child: Text(
+                              isEnglish
+                                  ? 'Match the letters!'
+                                  : 'Harfleri eşleştir!',
+                              style: const TextStyle(
+                                fontSize: 23,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: List.generate(
+                                      leftLetters.length,
+                                      (index) => _buildCard(
+                                        index: index,
+                                        isLeft: true,
+                                        text: leftLetters[index],
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 4,
-                        height: MediaQuery.of(context).size.height * 0.5,
-                        margin: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.deepPurple,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(
-                            rightLetters.length,
-                            (index) => Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: GestureDetector(
-                                onTap: () => _handleRightTap(index),
-                                child: Container(
-                                  width: 120,
-                                  height: 120,
+                                Container(
+                                  width: 4,
+                                  height: screenSize.height * 0.45,
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 12),
                                   decoration: BoxDecoration(
-                                    color: matchedRight[index]
-                                        ? Colors.green.shade300
-                                        : (showFeedback &&
-                                                !isCorrect &&
-                                                selectedRightIndex == index)
-                                            ? Colors.red.shade200
-                                            : selectedRightIndex == index
-                                                ? Colors.blue.shade200
-                                                : Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 3),
-                                      ),
-                                    ],
+                                    color: Colors.grey.shade400,
+                                    borderRadius: BorderRadius.circular(4),
                                   ),
-                                  child: Center(
-                                    child: Text(
-                                      rightLetters[index],
-                                      style: const TextStyle(
-                                        fontSize: 42,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                        letterSpacing: 2,
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: List.generate(
+                                      shuffledRight.length,
+                                      (index) => _buildCard(
+                                        index: index,
+                                        isLeft: false,
+                                        text: shuffledRight[index],
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-              if (showFeedback)
-                ScaleTransition(
-                  scale: CurvedAnimation(
-                    parent: _feedbackController,
-                    curve: Curves.elasticOut,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
+                // feedback alanı
+                Container(
+                  height: 80,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: showFeedback
+                      ? ScaleTransition(
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  isCorrect
+                                      ? Icons.check_circle
+                                      : Icons.cancel,
+                                  color: isCorrect
+                                      ? Colors.green
+                                      : Colors.red,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect
+                                      ? (isEnglish
+                                          ? 'Well done! 🎉'
+                                          : 'Aferin! 🎉')
+                                      : (isEnglish
+                                          ? 'Try again! 😔'
+                                          : 'Tekrar dene! 😔'),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: isCorrect
+                                        ? Colors.green
+                                        : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 ),
-              const SizedBox(height: 20),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -14,14 +14,14 @@ class Soru2 extends StatefulWidget {
 
 class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
   final List<String> renkliAssets = [
-    'assets/asama2/soru2/kurbagarenkli.png',
-    'assets/asama2/soru2/pantalonrenkli.png',
-    'assets/asama2/soru2/yedirenkli.png',
+    'assets/asama2_soru2/kurbagarenkli.png',
+    'assets/asama2_soru2/pantalonrenkli.png',
+    'assets/asama2_soru2/yedirenkli.png',
   ];
   final List<String> golgeAssets = [
-    'assets/asama2/soru2/kurbagagolge.png',
-    'assets/asama2/soru2/golgepantalon.png',
-    'assets/asama2/soru2/yedigolge.png',
+    'assets/asama2_soru2/kurbagagolge.png',
+    'assets/asama2_soru2/golgepantalon.png',
+    'assets/asama2_soru2/yedigolge.png',
   ];
 
   late List<String> shuffledLeftAssets;
@@ -33,14 +33,16 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
   bool showFeedback = false;
   bool isCorrect = false;
   late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   // Eşleşme için renkli ve gölge assetlerin indexleri aynı olmalı
   final Map<String, String> renkliToGolge = {
-    'assets/asama2/soru2/kurbagarenkli.png':
-        'assets/asama2/soru2/kurbagagolge.png',
-    'assets/asama2/soru2/pantalonrenkli.png':
-        'assets/asama2/soru2/golgepantalon.png',
-    'aassets/asama2/soru2/yedirenkli.png': 'assets/asama2/soru2/yedigolge.png',
+    'assets/asama2_soru2/kurbagarenkli.png':
+        'assets/asama2_soru2/kurbagagolge.png',
+    'assets/asama2_soru2/pantalonrenkli.png':
+        'assets/asama2_soru2/golgepantalon.png',
+    'assets/asama2_soru2/yedirenkli.png': 'assets/asama2_soru2/yedigolge.png',
   };
 
   @override
@@ -50,13 +52,25 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
     shuffledRightAssets = List.from(golgeAssets)..shuffle();
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 600),
     );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
@@ -97,7 +111,7 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
             if (mounted) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const HarfEsle()),
+                MaterialPageRoute(builder: (context) => const HarfEsleSoru3()),
               );
             }
           });
@@ -119,191 +133,242 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+
+    Color _cardColor({
+      required bool matched,
+      required bool isSelected,
+      required bool isWrong,
+    }) {
+      if (matched) return Colors.green.shade500;
+      if (isWrong) return Colors.red.shade500;
+      if (isSelected) return Colors.blue.shade200;
+      return Colors.white;
+    }
+
+    Widget _imageCard({
+      required int index,
+      required bool isLeft,
+      required String asset,
+    }) {
+      final bool isSelected =
+          isLeft ? selectedLeftIndex == index : selectedRightIndex == index;
+      final bool matched = isLeft ? matchedLeft[index] : matchedRight[index];
+      final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
+
+      return GestureDetector(
+        onTap:
+            matched
+                ? null
+                : () => isLeft ? _handleLeftTap(index) : _handleRightTap(index),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          width: 120,
+          height: 120,
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: _cardColor(
+              matched: matched,
+              isSelected: isSelected,
+              isWrong: isWrongSelection,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(51),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Image.asset(asset, fit: BoxFit.contain),
+          ),
+        ),
+      );
+    }
+
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        backgroundColor: const Color(0xFFE1F5FE),
-        appBar: AppBar(
-          title: Text(
-            isEnglish ? 'Shadow Matching' : 'Gölge Eşleştirme',
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
           ),
-          centerTitle: true,
-          backgroundColor: Colors.deepPurple,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
-          ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-              Text(
-                isEnglish
-                    ? 'Match the shadows with their images!'
-                    : 'Gölgeleri resimlerle eşleştir!',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: Row(
+          child: SafeArea(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          renkliAssets.length,
-                          (index) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: GestureDetector(
-                              onTap: () => _handleLeftTap(index),
-                              child: Container(
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  color:
-                                      matchedLeft[index]
-                                          ? Colors.green.shade300
-                                          : (showFeedback &&
-                                              !isCorrect &&
-                                              selectedLeftIndex == index)
-                                          ? Colors.red.shade200
-                                          : selectedLeftIndex == index
-                                          ? Colors.blue.shade200
-                                          : Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Image.asset(
-                                    shuffledLeftAssets[index],
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                              ),
-                            ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
                           ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 4,
-                      height: MediaQuery.of(context).size.height * 0.5,
-                      margin: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurple,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          golgeAssets.length,
-                          (index) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: GestureDetector(
-                              onTap: () => _handleRightTap(index),
-                              child: Container(
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  color:
-                                      matchedRight[index]
-                                          ? Colors.green.shade300
-                                          : (showFeedback &&
-                                              !isCorrect &&
-                                              selectedRightIndex == index)
-                                          ? Colors.red.shade200
-                                          : selectedRightIndex == index
-                                          ? Colors.blue.shade200
-                                          : Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Image.asset(
-                                    shuffledRightAssets[index],
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                          (route) => false,
+                        );
+                      },
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 20),
-              if (showFeedback)
-                ScaleTransition(
-                  scale: CurvedAnimation(
-                    parent: _feedbackController,
-                    curve: Curves.elasticOut,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 20,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? 'Aferin! 🎉'
-                              : 'Üzgünüm, yanlış eşleştirme! 😔',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
+                Expanded(
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(242),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(26),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
+                            child: Text(
+                              isEnglish
+                                  ? 'Match the shadows with their images!'
+                                  : 'Gölgeleri resimlerle eşleştir!',
+                              style: const TextStyle(
+                                fontSize: 23,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: List.generate(
+                                      shuffledLeftAssets.length,
+                                      (index) => _imageCard(
+                                        index: index,
+                                        isLeft: true,
+                                        asset: shuffledLeftAssets[index],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 4,
+                                  height: screenSize.height * 0.55,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.blue.shade400,
+                                        Colors.blue.shade200,
+                                        Colors.blue.shade100,
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: List.generate(
+                                      shuffledRightAssets.length,
+                                      (index) => _imageCard(
+                                        index: index,
+                                        isLeft: false,
+                                        asset: shuffledRightAssets[index],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              const SizedBox(height: 20),
-            ],
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect
+                                      ? (isEnglish
+                                          ? 'Well done! 🎉'
+                                          : 'Aferin! 🎉')
+                                      : (isEnglish
+                                          ? 'Try again! 😔'
+                                          : 'Tekrar dene! 😔'),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                          : const SizedBox.shrink(),
+                ),
+              ],
+            ),
           ),
         ),
       ),

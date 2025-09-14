@@ -26,7 +26,11 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
 
   Set<String> eslesenler = {};
   bool showFeedback = false;
-  bool isCorrect = false;
+  String feedbackText = 'Sürükle bırak ile eşleştir!';
+  Color feedbackColor = Colors.yellow.shade800;
+  IconData feedbackIcon = Icons.lightbulb_outline;
+  
+  Map<String, Color> kategoriRenkleri = {};
 
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -47,11 +51,15 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
+    
+    kategoriRenkleri = {
+      'Kız': const Color(0xFFFFDDEE),
+      'Erkek': const Color(0xFFD6ECFF),
+    };
   }
 
   @override
@@ -66,44 +74,58 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
     tumEmojiler.shuffle(Random());
     emojiler = tumEmojiler;
   }
-
-  void _handleDrag(String draggedEmoji, String targetCategory) {
-    bool isCorrectMatch = dogruEslesmeler[draggedEmoji] == targetCategory;
-
+  
+  void gosterGeriBildirim(String text, Color color, IconData icon) {
     setState(() {
-      isCorrect = isCorrectMatch;
+      feedbackText = text;
+      feedbackColor = color;
+      feedbackIcon = icon;
       showFeedback = true;
     });
 
-    _feedbackController.forward(from: 0);
-
-    if (isCorrectMatch) {
-      setState(() {
-        eslesenler.add(draggedEmoji);
+    _feedbackController.forward(from: 0).then((_) {
+      if (eslesenler.length == emojiler.length) {
+        kontrolVeIlerle(context);
+      }
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted && eslesenler.length != emojiler.length) {
+          setState(() {
+            feedbackText = 'Sürükle bırak ile eşleştir!';
+            feedbackColor = Colors.yellow.shade800;
+            feedbackIcon = Icons.lightbulb_outline;
+            showFeedback = false;
+          });
+        }
       });
-      _checkCompletion();
-    }
+    });
+  }
 
-    Future.delayed(const Duration(seconds: 1), () {
+  void kontrolVeIlerle(BuildContext context) {
+    Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted) {
-        setState(() {
-          showFeedback = false;
-        });
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const UzunKisaSinifla()),
+        );
       }
     });
   }
 
-  void _checkCompletion() {
-    if (eslesenler.length == emojiler.length) {
-      Future.delayed(const Duration(milliseconds: 1500), () {
-        if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const UzunKisaSinifla()),
-          );
-        }
-      });
-    }
+  void kutuyuRenklendir(String kategori, Color renk) {
+    setState(() {
+      kategoriRenkleri[kategori] = renk;
+    });
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        setState(() {
+          if (kategori == 'Kız') {
+            kategoriRenkleri[kategori] = const Color(0xFFFFDDEE);
+          } else {
+            kategoriRenkleri[kategori] = const Color(0xFFD6ECFF);
+          }
+        });
+      }
+    });
   }
 
   @override
@@ -145,7 +167,7 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
                           MaterialPageRoute(
                             builder: (context) => const HomeScreen(),
                           ),
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                     ),
@@ -172,7 +194,9 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 1),
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Drag and drop the children to the correct box.'
@@ -194,16 +218,104 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
                                 Expanded(
                                   flex: 3,
                                   child: Column(
-                                    children: kategoriler
-                                        .map(
-                                          (kategori) => Expanded(
-                                        child: _buildGroupContainer(
-                                          kategori,
-                                          isEnglish,
-                                        ),
-                                      ),
-                                    )
-                                        .toList(),
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: kategoriler.map((kategori) {
+                                      Color boxColor =
+                                          kategoriRenkleri[kategori] ??
+                                              Colors.transparent;
+                                      Color borderColor = kategori == 'Kız'
+                                          ? Colors.pinkAccent
+                                          : Colors.lightBlue;
+
+                                      return DragTarget<String>(
+                                        onWillAccept: (data) =>
+                                            !eslesenler.contains(data),
+                                        onAcceptWithDetails: (data) {
+                                          if (dogruEslesmeler[data.data] ==
+                                              kategori) {
+                                            setState(() {
+                                              eslesenler.add(data.data);
+                                            });
+                                            gosterGeriBildirim(
+                                              isEnglish
+                                                  ? 'Well done! 🎉'
+                                                  : 'Aferin! 🎉',
+                                              Colors.green,
+                                              Icons.check_circle,
+                                            );
+                                            kutuyuRenklendir(
+                                              kategori,
+                                              Colors.green.shade200,
+                                            );
+                                          } else {
+                                            gosterGeriBildirim(
+                                              isEnglish
+                                                  ? 'Try again! 😔'
+                                                  : 'Tekrar dene! 😔',
+                                              Colors.red,
+                                              Icons.cancel,
+                                            );
+                                            kutuyuRenklendir(
+                                              kategori,
+                                              Colors.red.shade200,
+                                            );
+                                          }
+                                        },
+                                        builder: (context, _, __) {
+                                          return Container(
+                                            width: double.infinity,
+                                            height: 140,
+                                            margin: const EdgeInsets.symmetric(
+                                                vertical: 8, horizontal: 16),
+                                            decoration: BoxDecoration(
+                                              color: boxColor,
+                                              border: Border.all(
+                                                color: borderColor,
+                                                width: 2,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  isEnglish
+                                                      ? (kategori == 'Kız'
+                                                          ? 'Girl'
+                                                          : 'Boy')
+                                                      : kategori,
+                                                  style: const TextStyle(
+                                                    fontSize: 22,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Wrap(
+                                                  alignment:
+                                                      WrapAlignment.center,
+                                                  spacing: 8,
+                                                  children: eslesenler
+                                                      .where((e) =>
+                                                          dogruEslesmeler[e] ==
+                                                          kategori)
+                                                      .map(
+                                                        (e) => Text(
+                                                          e,
+                                                          style: const TextStyle(
+                                                              fontSize: 36),
+                                                        ),
+                                                      )
+                                                      .toList(),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    }).toList(),
                                   ),
                                 ),
                                 const SizedBox(width: 16),
@@ -212,7 +324,8 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: emojiler
-                                        .where((emoji) => !eslesenler.contains(emoji))
+                                        .where((emoji) =>
+                                            !eslesenler.contains(emoji))
                                         .map((emoji) {
                                       return Draggable<String>(
                                         data: emoji,
@@ -220,7 +333,10 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
                                           color: Colors.transparent,
                                           child: _buildItemBox(emoji),
                                         ),
-                                        childWhenDragging: const SizedBox.shrink(),
+                                        childWhenDragging: Opacity(
+                                          opacity: 0.3,
+                                          child: _buildItemBox(emoji),
+                                        ),
                                         child: _buildItemBox(emoji),
                                       );
                                     }).toList(),
@@ -236,38 +352,52 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
                 ),
                 Container(
                   height: 80,
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
                   child: showFeedback
                       ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                              : (isEnglish
-                              ? 'Try again! 😔'
-                              : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
                           ),
-                        ),
-                      ],
-                    ),
-                  )
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  feedbackIcon,
+                                  color: feedbackColor,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  feedbackText,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: feedbackColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
                       : const SizedBox.shrink(),
                 ),
               ],
@@ -275,61 +405,6 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildGroupContainer(String kategori, bool isEnglish) {
-    Color boxColor =
-    kategori == 'Kız' ? const Color(0xFFFFDDEE) : const Color(0xFFD6ECFF);
-    Color borderColor =
-    kategori == 'Kız' ? Colors.pinkAccent : Colors.lightBlue;
-
-    return DragTarget<String>(
-      onWillAccept: (data) => !eslesenler.contains(data!),
-      onAccept: (data) => _handleDrag(data!, kategori),
-      builder: (context, candidateData, rejectedData) {
-        return Container(
-          width: double.infinity,
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          decoration: BoxDecoration(
-            color: boxColor,
-            border: Border.all(
-              color: borderColor,
-              width: 2,
-            ),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                isEnglish
-                    ? (kategori == 'Kız' ? 'Girl' : 'Boy')
-                    : kategori,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 8,
-                children: eslesenler
-                    .where((e) => dogruEslesmeler[e] == kategori)
-                    .map(
-                      (e) => Text(
-                    e,
-                    style: const TextStyle(fontSize: 60),
-                  ),
-                )
-                    .toList(),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 
@@ -341,11 +416,11 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 4,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
