@@ -14,15 +14,14 @@ class Disleksi4 extends StatefulWidget {
   State<Disleksi4> createState() => _Disleksi4State();
 }
 
-
 class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
   final List<Color> colors = [
-    Colors.red,
-    Colors.yellow,
-    Colors.blue,
-    Colors.purple,
-    Colors.green,
-    Colors.orange
+    Colors.red.shade200,
+    Colors.yellow.shade200,
+    Colors.blue.shade200,
+    Colors.purple.shade100,
+    Colors.green.shade200,
+    Colors.orange.shade200
   ];
   final List<String> letters = ['d', 'b', 'm', 'n', 'u', 'ö'];
   final Map<String, Color> letterToColorMap = {};
@@ -89,6 +88,10 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
     final screenSize = MediaQuery.of(context).size;
     final iconSize = screenSize.width * 0.065;
 
+    // 🔹 Dinamik boyutlar
+    final bubbleSize = screenSize.width * 0.15; // harflerin boyutu
+    final gridSpacing = screenSize.width * 0.04; // grid aralığı
+
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
@@ -98,8 +101,8 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Colors.deepPurple.shade200,
-                Colors.deepPurple.shade100,
+                Colors.blue.shade200,
+                Colors.blue.shade200,
                 const Color(0xffffffff),
               ],
               stops: const [0.0, 0.5, 1.0],
@@ -128,8 +131,8 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                   child: SlideTransition(
                     position: _slideAnimation,
                     child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      padding: const EdgeInsets.all(16),
+                      margin: EdgeInsets.symmetric(horizontal: screenSize.width*0.03),
+                      padding: EdgeInsets.all(screenSize.width*0.04),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.95),
                         borderRadius: BorderRadius.circular(24),
@@ -144,47 +147,53 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                       child: Column(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 12),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: screenSize.width*0.05, vertical: 12),
                             child: Text(
                               isEnglish
                                   ? 'Drag the colored letters above to the correct gray circles below!'
                                   : 'Üstteki harfi aşağıdaki aynı harfe sürükle!',
-                              style: const TextStyle(
-                                fontSize: 22,
+                              style: TextStyle(
+                                fontSize: screenSize.width * 0.055,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                               textAlign: TextAlign.center,
                             ),
                           ),
-                          const SizedBox(height: 20),
-                          Wrap(
-                            alignment: WrapAlignment.center,
-                            spacing: 16,
-                            runSpacing: 16,
+                          SizedBox(height: 20),
+
+                          // 🔹 Üstteki draggable harfler
+                          GridView.count(
+                            crossAxisCount: 3,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            mainAxisSpacing: gridSpacing,
+                            crossAxisSpacing: gridSpacing,
                             children: letters.map((letter) {
                               return Draggable<String>(
                                 data: letter,
                                 feedback: Material(
                                   color: Colors.transparent,
                                   child: _buildLetterBubble(letter,
-                                      dragging: true),
+                                      size: bubbleSize, dragging: true),
                                 ),
                                 childWhenDragging: Opacity(
                                   opacity: correctMatches[letter]! ? 0.0 : 0.4,
-                                  child: _buildLetterBubble(letter),
+                                  child: _buildLetterBubble(letter, size: bubbleSize),
                                 ),
                                 child: correctMatches[letter]!
                                     ? Opacity(
                                   opacity: 0.0,
-                                  child: _buildLetterBubble(letter),
+                                  child: _buildLetterBubble(letter, size: bubbleSize),
                                 )
-                                    : _buildLetterBubble(letter),
+                                    : _buildLetterBubble(letter, size: bubbleSize),
                               );
                             }).toList(),
                           ),
-                          const SizedBox(height: 30),
+                          SizedBox(height: 30),
+
+                          // 🔹 Alt target grid
                           Expanded(
                             child: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 500),
@@ -192,23 +201,18 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                                   (Widget child, Animation<double> animation) {
                                 return FadeTransition(
                                   opacity: animation,
-                                  child: SlideTransition(
-                                    position: Tween<Offset>(
-                                      begin: const Offset(1, 0),
-                                      end: Offset.zero,
-                                    ).animate(animation),
-                                    child: child,
-                                  ),
+                                  child: child,
                                 );
                               },
                               child: GridView.count(
                                 key: ValueKey<int>(correctCount),
                                 crossAxisCount: 3,
-                                mainAxisSpacing: 24,
-                                crossAxisSpacing: 24,
-                                padding: const EdgeInsets.all(20),
+                                mainAxisSpacing: gridSpacing,
+                                crossAxisSpacing: gridSpacing,
+                                padding: EdgeInsets.all(gridSpacing),
                                 children: shuffledLetters.map((letter) {
-                                  final isLastIncorrect = letter == lastIncorrect;
+                                  final isLastIncorrect =
+                                      letter == lastIncorrect;
                                   return DragTarget<String>(
                                     onWillAcceptWithDetails: (receivedLetter) =>
                                     !correctMatches[letter]!,
@@ -230,7 +234,8 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                                         showFeedback = true;
                                         _feedbackController.forward(from: 0);
 
-                                        Future.delayed(const Duration(seconds: 2), () {
+                                        Future.delayed(
+                                            const Duration(seconds: 2), () {
                                           if (mounted) {
                                             setState(() {
                                               showFeedback = false;
@@ -259,8 +264,7 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                                                         const begin =
                                                         Offset(1.0, 0.0);
                                                         const end = Offset.zero;
-                                                        const curve =
-                                                            Curves.ease;
+                                                        const curve = Curves.ease;
                                                         var tween = Tween(
                                                             begin: begin,
                                                             end: end)
@@ -303,7 +307,7 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                                         child: Text(
                                           letter,
                                           style: TextStyle(
-                                            fontSize: 28,
+                                            fontSize: bubbleSize * 0.6,
                                             fontWeight: FontWeight.bold,
                                             color: correctMatches[letter]!
                                                 ? Colors.white
@@ -332,7 +336,8 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                 ),
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding:
+                  EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: showFeedback
                       ? ScaleTransition(
                     scale: CurvedAnimation(
@@ -350,12 +355,8 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                         const SizedBox(width: 10),
                         Text(
                           isCorrect
-                              ? (isEnglish
-                              ? 'Well done! 🎉'
-                              : 'Aferin! 🎉')
-                              : (isEnglish
-                              ? 'Try again! 😔'
-                              : 'Tekrar dene! 😔'),
+                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                              : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
                           style: TextStyle(
                             fontSize: 20,
                             color: isCorrect ? Colors.green : Colors.red,
@@ -375,10 +376,10 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildLetterBubble(String letter, {bool dragging = false}) {
+  Widget _buildLetterBubble(String letter, {bool dragging = false, double size = 60}) {
     return Container(
-      width: 60,
-      height: 60,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         color: colors[letters.indexOf(letter)],
         shape: BoxShape.circle,
@@ -394,8 +395,8 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
       child: Center(
         child: Text(
           letter,
-          style: const TextStyle(
-              color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Colors.black, fontSize: size * 0.55, fontWeight: FontWeight.bold),
         ),
       ),
     );
