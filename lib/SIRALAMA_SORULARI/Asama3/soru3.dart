@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
 import 'package:dixlearning/SIRALAMA_SORULARI/Asama3/soru4.dart';
+import 'package:dixlearning/screens/sorting_activities_screen.dart';
 
 class Asama3Soru3 extends StatefulWidget {
   const Asama3Soru3({super.key});
@@ -103,7 +104,7 @@ class _Asama3Soru3State extends State<Asama3Soru3>
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
-    final imageSize = MediaQuery.of(context).size.width * 0.3;
+    final imageSize = MediaQuery.of(context).size.width * 0.26;
     final dropSize = screenWidth * 0.28;
     final gap = screenWidth * 0.04;
 
@@ -136,8 +137,9 @@ class _Asama3Soru3State extends State<Asama3Soru3>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                              builder: (context) => const Asama3Soru4()),
-                          (route) => false,
+                            builder: (context) => const SortingActivitiesScreen(),
+                          ),
+                              (route) => false,
                         );
                       },
                     ),
