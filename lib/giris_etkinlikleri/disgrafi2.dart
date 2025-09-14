@@ -14,8 +14,10 @@ class Disgrafi2 extends StatefulWidget {
 
 class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
   final _controller = TextEditingController();
+  final String correctSentence = 'Ailemle birlikte tiyatroya gittik.';
   bool _isCorrect = false;
   bool _showFeedback = false;
+  bool _isAnswered = false;
 
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -52,32 +54,24 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
   }
 
   void _checkPoem() {
-    const correct = 'Ailemle birlikte tiyatroya gittik.';
-    final isAnswerCorrect = _controller.text.trim() == correct;
+    final isAnswerCorrect = _controller.text.trim() == correctSentence;
 
     setState(() {
       _isCorrect = isAnswerCorrect;
       _showFeedback = true;
+      _isAnswered = true;
     });
 
     _feedbackController.forward(from: 0);
 
-    if (isAnswerCorrect) {
-      Future.delayed(const Duration(seconds: 2), () {
-        if (!mounted) return;
-        ActivityTracker.completeActivity();
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HeceDoldurma()),
-        );
-      });
-    } else {
-      // İstersen feedback’in ekranda kalma süresini kısaca sınırlayabilirsin:
-      // Future.delayed(const Duration(seconds: 2), () {
-      //   if (!mounted) return;
-      //   setState(() => _showFeedback = false);
-      // });
-    }
+    Future.delayed(const Duration(seconds: 3), () {
+      if (!mounted) return;
+      ActivityTracker.completeActivity();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HeceDoldurma()),
+      );
+    });
   }
 
   @override
@@ -105,7 +99,6 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
           child: SafeArea(
             child: Column(
               children: [
-                // 🔙 Geri tuşu
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -123,7 +116,6 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
                   ],
                 ),
 
-                // 📦 İçerik kutusu
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
@@ -156,11 +148,10 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
                           ),
                           const SizedBox(height: 16),
 
-                          // 📜 Gösterilen cümle
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.lightBlue[50],
+                              color: Colors.blue.shade50,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -176,7 +167,6 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
                           ),
                           const SizedBox(height: 16),
 
-                          // 📝 Cevap yazma alanı
                           TextField(
                             controller: _controller,
                             maxLines: 2,
@@ -193,21 +183,20 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
                           ),
                           const SizedBox(height: 20),
 
-                          // ✔️ Buton
                           ElevatedButton(
-                            onPressed: _checkPoem,
+                            onPressed: _isAnswered ? null : _checkPoem,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue.shade200,
-                              foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 48, vertical: 16),
+                              backgroundColor: Colors.blue.shade200,
+                              foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
                             ),
                             child: Text(
                               isEnglish ? 'Check' : 'Kontrol Et',
-                              style: const TextStyle(fontSize: 20),
+                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -231,28 +220,20 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          _isCorrect
-                              ? Icons.check_circle
-                              : Icons.cancel,
-                          color: _isCorrect
-                              ? Colors.green
-                              : Colors.red,
+                          _isCorrect ? Icons.check_circle : Icons.cancel,
+                          color: _isCorrect ? Colors.green : Colors.red,
                           size: 28,
                         ),
                         const SizedBox(width: 10),
                         Text(
                           _isCorrect
-                              ? (isEnglish
-                              ? 'Well done! 🎉'
-                              : 'Aferin! 🎉')
+                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
                               : (isEnglish
-                              ? 'Try again! 😔'
-                              : 'Tekrar dene! 😔'),
+                              ? "Here's the right one! 🧐"
+                              : 'İşte doğrusu! 🧐'),
                           style: TextStyle(
                             fontSize: 18,
-                            color: _isCorrect
-                                ? Colors.green
-                                : Colors.red,
+                            color: _isCorrect ? Colors.green : Colors.red,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

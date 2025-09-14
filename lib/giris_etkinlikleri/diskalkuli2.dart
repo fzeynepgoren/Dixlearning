@@ -145,11 +145,11 @@ class _Diskalkuli2State extends State<Diskalkuli2> {
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color:
-                                    isShowFeedback
-                                        ? (isAnswerCorrect
-                                            ? Colors.green
-                                            : Colors.red)
-                                        : Colors.blueAccent.withOpacity(0.4),
+                                isShowFeedback
+                                    ? (isAnswerCorrect
+                                    ? Colors.green
+                                    : Colors.red)
+                                    : Colors.blueAccent.withOpacity(0.4),
                                 width: 2.2,
                               ),
                               boxShadow: [
@@ -162,55 +162,55 @@ class _Diskalkuli2State extends State<Diskalkuli2> {
                             ),
                             child: Center(
                               child:
-                                  isFixed
-                                      ? Text(
-                                        floor.toString(),
-                                        style: const TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF0288D1),
-                                        ),
-                                      )
-                                      : SizedBox(
-                                        width: 38,
-                                        child: TextField(
-                                          controller: controllers[floor],
-                                          enabled: !showFeedback,
-                                          keyboardType: TextInputType.number,
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF0288D1),
-                                          ),
-                                          decoration: const InputDecoration(
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                  vertical: 2,
-                                                ),
-                                            filled: true,
-                                            fillColor: Colors.white,
-                                            border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(8),
-                                              ),
-                                              borderSide: BorderSide.none,
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(8),
-                                              ),
-                                              borderSide: BorderSide.none,
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(8),
-                                              ),
-                                              borderSide: BorderSide.none,
-                                            ),
-                                          ),
-                                        ),
+                              isFixed
+                                  ? Text(
+                                floor.toString(),
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF0288D1),
+                                ),
+                              )
+                                  : SizedBox(
+                                width: 38,
+                                child: TextField(
+                                  controller: controllers[floor],
+                                  enabled: !showFeedback,
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF0288D1),
+                                  ),
+                                  decoration: const InputDecoration(
+                                    contentPadding:
+                                    EdgeInsets.symmetric(
+                                      vertical: 2,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(8),
                                       ),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(8),
+                                      ),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(8),
+                                      ),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                           if (isShowFeedback)
@@ -221,7 +221,7 @@ class _Diskalkuli2State extends State<Diskalkuli2> {
                                     ? Icons.check_circle
                                     : Icons.cancel,
                                 color:
-                                    isAnswerCorrect ? Colors.green : Colors.red,
+                                isAnswerCorrect ? Colors.green : Colors.red,
                                 size: 22,
                               ),
                             ),
