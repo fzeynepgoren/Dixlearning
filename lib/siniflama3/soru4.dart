@@ -10,7 +10,8 @@ class TasitSinifla extends StatefulWidget {
   State<TasitSinifla> createState() => _TasitSiniflaState();
 }
 
-class _TasitSiniflaState extends State<TasitSinifla> with TickerProviderStateMixin {
+class _TasitSiniflaState extends State<TasitSinifla>
+    with TickerProviderStateMixin {
   final List<Map<String, dynamic>> items = [
     {'emoji': '🚗', 'id': 'araba', 'type': 'kara', 'isPlaced': false},
     {'emoji': '🚌', 'id': 'otobus', 'type': 'kara', 'isPlaced': false},
@@ -29,6 +30,7 @@ class _TasitSiniflaState extends State<TasitSinifla> with TickerProviderStateMix
   bool showFeedback = false;
   bool isCorrect = false;
   bool _dialogShown = false;
+  String? _lastAcceptedType;
 
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -72,6 +74,7 @@ class _TasitSiniflaState extends State<TasitSinifla> with TickerProviderStateMix
     setState(() {
       isCorrect = correct;
       showFeedback = true;
+      _lastAcceptedType = correct ? targetType : null;
 
       if (correct && !item['isPlaced']) {
         typeGroups[targetType]?.add(item);
@@ -85,6 +88,7 @@ class _TasitSiniflaState extends State<TasitSinifla> with TickerProviderStateMix
       if (mounted) {
         setState(() {
           showFeedback = false;
+          _lastAcceptedType = null;
         });
       }
     });
@@ -107,6 +111,13 @@ class _TasitSiniflaState extends State<TasitSinifla> with TickerProviderStateMix
         }
       });
     }
+  }
+
+  Color _getBorderColorForType(String type, Color defaultColor) {
+    if (showFeedback && _lastAcceptedType == type) {
+      return isCorrect ? Colors.green : Colors.red;
+    }
+    return defaultColor;
   }
 
   @override
@@ -138,7 +149,11 @@ class _TasitSiniflaState extends State<TasitSinifla> with TickerProviderStateMix
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
@@ -163,7 +178,10 @@ class _TasitSiniflaState extends State<TasitSinifla> with TickerProviderStateMix
                       child: Column(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Drag the vehicles to the correct group!'
@@ -184,7 +202,8 @@ class _TasitSiniflaState extends State<TasitSinifla> with TickerProviderStateMix
                                 Expanded(
                                   flex: 3,
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
                                       _buildGroup(
                                         isEnglish ? 'Land' : 'Kara',
@@ -215,22 +234,36 @@ class _TasitSiniflaState extends State<TasitSinifla> with TickerProviderStateMix
                                   flex: 2,
                                   child: SingleChildScrollView(
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: items
-                                          .where((item) => !item['isPlaced'])
-                                          .map((item) => Draggable<Map<String, dynamic>>(
-                                        data: item,
-                                        feedback: Material(
-                                          color: Colors.transparent,
-                                          child: _buildDraggableItem(item),
-                                        ),
-                                        childWhenDragging: Opacity(
-                                          opacity: 0.3,
-                                          child: _buildDraggableItem(item),
-                                        ),
-                                        child: _buildDraggableItem(item),
-                                      ))
-                                          .toList(),
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children:
+                                          items
+                                              .where(
+                                                (item) => !item['isPlaced'],
+                                              )
+                                              .map(
+                                                (item) => Draggable<
+                                                  Map<String, dynamic>
+                                                >(
+                                                  data: item,
+                                                  feedback: Material(
+                                                    color: Colors.transparent,
+                                                    child: _buildDraggableItem(
+                                                      item,
+                                                    ),
+                                                  ),
+                                                  childWhenDragging: Opacity(
+                                                    opacity: 0.3,
+                                                    child: _buildDraggableItem(
+                                                      item,
+                                                    ),
+                                                  ),
+                                                  child: _buildDraggableItem(
+                                                    item,
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
                                     ),
                                   ),
                                 ),
@@ -244,37 +277,46 @@ class _TasitSiniflaState extends State<TasitSinifla> with TickerProviderStateMix
                 ),
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                              : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect
+                                      ? (isEnglish
+                                          ? 'Well done! 🎉'
+                                          : 'Aferin! 🎉')
+                                      : (isEnglish
+                                          ? 'Try again! 😔'
+                                          : 'Tekrar dene! 😔'),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
@@ -284,20 +326,30 @@ class _TasitSiniflaState extends State<TasitSinifla> with TickerProviderStateMix
     );
   }
 
-  Widget _buildGroup(String title, List<Map<String, dynamic>> group, String type,
-      Color boxColor, Color borderColor) {
+  Widget _buildGroup(
+    String title,
+    List<Map<String, dynamic>> group,
+    String type,
+    Color boxColor,
+    Color borderColor,
+  ) {
     return DragTarget<Map<String, dynamic>>(
       onWillAccept: (data) => data?['type'] == type,
       onAccept: (data) => _handleDrag(data, type),
       builder: (context, candidateData, rejectedData) {
-        return Container(
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
           width: double.infinity,
           height: 145,
           margin: const EdgeInsets.symmetric(vertical: 7),
           padding: const EdgeInsets.all(7),
           decoration: BoxDecoration(
             color: boxColor,
-            border: Border.all(color: borderColor, width: 2),
+            border: Border.all(
+              color: _getBorderColorForType(type, borderColor),
+              width: 4,
+            ),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -319,12 +371,18 @@ class _TasitSiniflaState extends State<TasitSinifla> with TickerProviderStateMix
                     alignment: WrapAlignment.center,
                     spacing: 10,
                     runSpacing: 4,
-                    children: group
-                        .map((item) => Text(
-                      item['emoji'],
-                      style: const TextStyle(fontSize: 50, color: Colors.black),
-                    ))
-                        .toList(),
+                    children:
+                        group
+                            .map(
+                              (item) => Text(
+                                item['emoji'],
+                                style: const TextStyle(
+                                  fontSize: 50,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            )
+                            .toList(),
                   ),
                 ),
               ),
@@ -344,7 +402,7 @@ class _TasitSiniflaState extends State<TasitSinifla> with TickerProviderStateMix
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Center(

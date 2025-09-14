@@ -104,8 +104,8 @@ class _Diskalkuli1State extends State<Diskalkuli1>
       showFeedback = false;
     });
 
-    // Animasyonun tamamlanması için kısa bir gecikme ekle
-    Future.delayed(const Duration(milliseconds: 300), () {
+    
+    Future.delayed(const Duration(milliseconds: 800), () {
       if (!mounted) return;
 
       if (currentIndex < questions.length - 1) {

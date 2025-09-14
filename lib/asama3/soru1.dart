@@ -37,14 +37,17 @@ class _ActivityMatchingState extends State<ActivityMatching>
     with TickerProviderStateMixin {
   final List<Activity> leftActivities = [
     Activity(
-        image: 'assets/asama3/soru1/block_tower.png',
-        description: 'Bloklarla kule yapıyor'),
+      image: 'assets/asama3/soru1/block_tower.png',
+      description: 'Bloklarla kule yapıyor',
+    ),
     Activity(
-        image: 'assets/asama3/soru1/finger_painting.png',
-        description: 'Parmak boyasıyla resim yapıyor'),
+      image: 'assets/asama3/soru1/finger_painting.png',
+      description: 'Parmak boyasıyla resim yapıyor',
+    ),
     Activity(
-        image: 'assets/asama3/soru1/kicking_ball.png',
-        description: 'Topa vuruyor'),
+      image: 'assets/asama3/soru1/kicking_ball.png',
+      description: 'Topa vuruyor',
+    ),
   ];
 
   late List<String> shuffledDescriptions;
@@ -66,8 +69,8 @@ class _ActivityMatchingState extends State<ActivityMatching>
   void initState() {
     super.initState();
     shuffledDescriptions = List.from(
-        leftActivities.map((e) => e.description).toList())
-      ..shuffle();
+      leftActivities.map((e) => e.description).toList(),
+    )..shuffle();
     _feedbackController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -79,10 +82,9 @@ class _ActivityMatchingState extends State<ActivityMatching>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -113,7 +115,8 @@ class _ActivityMatchingState extends State<ActivityMatching>
 
   void _checkMatch() {
     setState(() {
-      isCorrect = leftActivities[selectedLeftIndex!].description ==
+      isCorrect =
+          leftActivities[selectedLeftIndex!].description ==
           shuffledDescriptions[selectedRightIndex!];
       showFeedback = true;
     });
@@ -156,11 +159,12 @@ class _ActivityMatchingState extends State<ActivityMatching>
     final bool isMatched = matchedLeft[index];
     final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
 
-    Color cardColor = isMatched
-        ? Colors.green.shade200
-        : isWrongSelection
-        ? Colors.red.shade200
-        : Colors.white;
+    Color cardColor =
+        isMatched
+            ? Colors.green.shade200
+            : isWrongSelection
+            ? Colors.red.shade200
+            : Colors.white;
 
     return GestureDetector(
       onTap: isMatched ? null : () => _handleTap(index, true),
@@ -173,7 +177,10 @@ class _ActivityMatchingState extends State<ActivityMatching>
         decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(20),
-          border: isSelected && !isMatched ? Border.all(color: Colors.lightGreen.shade400, width: 4) : null,
+          border:
+              isSelected && !isMatched
+                  ? Border.all(color: Colors.lightGreen.shade400, width: 4)
+                  : null,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
@@ -186,10 +193,7 @@ class _ActivityMatchingState extends State<ActivityMatching>
           padding: const EdgeInsets.all(8),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.asset(
-              activity.image,
-              fit: BoxFit.contain,
-            ),
+            child: Image.asset(activity.image, fit: BoxFit.contain),
           ),
         ),
       ),
@@ -202,11 +206,12 @@ class _ActivityMatchingState extends State<ActivityMatching>
     final bool isMatched = matchedRight[index];
     final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
 
-    Color cardColor = isMatched
-        ? Colors.green.shade200
-        : isWrongSelection
-        ? Colors.red.shade200
-        : Colors.white;
+    Color cardColor =
+        isMatched
+            ? Colors.green.shade200
+            : isWrongSelection
+            ? Colors.red.shade200
+            : Colors.white;
 
     return GestureDetector(
       onTap: isMatched ? null : () => _handleTap(index, false),
@@ -219,7 +224,10 @@ class _ActivityMatchingState extends State<ActivityMatching>
         decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(20),
-          border: isSelected && !isMatched ? Border.all(color: Colors.lightGreen.shade400, width: 4) : null,
+          border:
+              isSelected && !isMatched
+                  ? Border.all(color: Colors.lightGreen.shade400, width: 4)
+                  : null,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
@@ -275,11 +283,17 @@ class _ActivityMatchingState extends State<ActivityMatching>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
-                              (route) => false,
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
+                          ),
+                          (route) => false,
                         );
                       },
                     ),
@@ -305,7 +319,10 @@ class _ActivityMatchingState extends State<ActivityMatching>
                       child: Column(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Tap the picture and its matching description!'
@@ -324,16 +341,19 @@ class _ActivityMatchingState extends State<ActivityMatching>
                               children: [
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: List.generate(
                                       leftActivities.length,
-                                          (index) => _buildLeftCard(index),
+                                      (index) => _buildLeftCard(index),
                                     ),
                                   ),
                                 ),
                                 Container(
                                   width: 4,
-                                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.grey.shade400,
                                     borderRadius: BorderRadius.circular(2),
@@ -341,10 +361,11 @@ class _ActivityMatchingState extends State<ActivityMatching>
                                 ),
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: List.generate(
                                       shuffledDescriptions.length,
-                                          (index) => _buildRightCard(index),
+                                      (index) => _buildRightCard(index),
                                     ),
                                   ),
                                 ),
@@ -358,48 +379,61 @@ class _ActivityMatchingState extends State<ActivityMatching>
                 ),
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? 'Aferin! 🎉'
+                                        : 'Tekrar dene! 😔',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),

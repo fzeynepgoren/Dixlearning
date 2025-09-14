@@ -40,10 +40,9 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -76,7 +75,8 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
 
   void _checkMatch() {
     setState(() {
-      isCorrect = leftNumbers[selectedLeftIndex!] == rightNumbers[selectedRightIndex!];
+      isCorrect =
+          leftNumbers[selectedLeftIndex!] == rightNumbers[selectedRightIndex!];
       showFeedback = true;
     });
 
@@ -94,9 +94,7 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
           if (mounted) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
-                builder: (context) => const SeninWidget(),
-              ),
+              MaterialPageRoute(builder: (context) => const SeninWidget()),
             );
           }
         });
@@ -127,7 +125,8 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
     required String text,
     required TextStyle style,
   }) {
-    final bool isSelected = isLeft ? selectedLeftIndex == index : selectedRightIndex == index;
+    final bool isSelected =
+        isLeft ? selectedLeftIndex == index : selectedRightIndex == index;
     final bool isMatched = isLeft ? matchedLeft[index] : matchedRight[index];
     final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
 
@@ -160,11 +159,7 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
           ],
         ),
         child: Center(
-          child: Text(
-            text,
-            style: style,
-            textAlign: TextAlign.center,
-          ),
+          child: Text(text, style: style, textAlign: TextAlign.center),
         ),
       ),
     );
@@ -199,11 +194,17 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
-                              (route) => false,
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
+                          ),
+                          (route) => false,
                         );
                       },
                     ),
@@ -229,9 +230,14 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
                       child: Column(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
-                              isEnglish ? 'Count and match the candies!' : 'Şekerleri say ve eşleştir!',
+                              isEnglish
+                                  ? 'Count and match the candies!'
+                                  : 'Şekerleri say ve eşleştir!',
                               style: const TextStyle(
                                 fontSize: 23,
                                 fontWeight: FontWeight.bold,
@@ -246,10 +252,11 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: List.generate(
                                       leftNumbers.length,
-                                          (index) => _buildCard(
+                                      (index) => _buildCard(
                                         index: index,
                                         isLeft: true,
                                         text: leftNumbers[index].toString(),
@@ -265,7 +272,9 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
                                 Container(
                                   width: 4,
                                   height: screenSize.height * 0.45,
-                                  margin: const EdgeInsets.symmetric(horizontal: 12),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.grey.shade400,
                                     borderRadius: BorderRadius.circular(4),
@@ -273,10 +282,11 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
                                 ),
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: List.generate(
                                       rightNumbers.length,
-                                          (index) => _buildCard(
+                                      (index) => _buildCard(
                                         index: index,
                                         isLeft: false,
                                         text: _getCandies(rightNumbers[index]),
@@ -299,48 +309,61 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
                 ),
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? 'Aferin! 🎉'
+                                        : 'Tekrar dene! 😔',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),

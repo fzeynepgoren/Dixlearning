@@ -62,10 +62,9 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -100,18 +99,16 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
         }
       }
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final question = questions[currentQuestionIndex];
+    // Conflict çözüldü: Geri bildirim sırasında her zaman doğru kelime gösterilir.
     final displayedWord = showFeedback
-    // Feedback sırasında her zaman doğru kelimeyi göster
         ? question.incompleteWord.replaceFirst('_', question.correctLetter)
         : question.incompleteWord;
-
 
     final screenSize = MediaQuery.of(context).size;
     final iconSize = screenSize.width * 0.065;
@@ -139,11 +136,17 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
-                              (route) => false,
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
+                          ),
+                          (route) => false,
                         );
                       },
                     ),
@@ -168,7 +171,10 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                       ),
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 500),
-                        transitionBuilder: (Widget child, Animation<double> animation) {
+                        transitionBuilder: (
+                          Widget child,
+                          Animation<double> animation,
+                        ) {
                           return FadeTransition(
                             opacity: animation,
                             child: SlideTransition(
@@ -185,7 +191,9 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
                               child: Text(
                                 question.emoji,
                                 style: const TextStyle(fontSize: 80),
@@ -193,12 +201,17 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                             ),
                             const SizedBox(height: 12),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
                               child: Text(
                                 isEnglish
                                     ? 'Select the correct letter for the blank below!'
                                     : 'Aşağıdaki boşluğa doğru harfi seçin!',
-                                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -215,24 +228,38 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                             const SizedBox(height: 36),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: question.options.map((option) {
+                              children:
+                                  question.options.map((option) {
                                 Color getButtonColor() {
-                                  if (!showFeedback) return Colors.blue.shade200;
-                                  if (option == question.correctLetter) return Colors.green.shade500;
-                                  if (selectedLetter == option && option != question.correctLetter) {
+                                  if (!showFeedback) {
+                                    return Colors.blue.shade200;
+                                  }
+                                  if (option == question.correctLetter) {
+                                    return Colors.green.shade500;
+                                  }
+                                  if (selectedLetter == option &&
+                                      option != question.correctLetter) {
                                     return Colors.red.shade500;
                                   }
                                   return Colors.blue.shade200;
                                 }
 
                                 return ElevatedButton(
-                                  onPressed: showFeedback ? null : () => checkAnswer(option),
+                                  onPressed:
+                                      showFeedback
+                                          ? null
+                                          : () => checkAnswer(option),
                                   style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 40,
+                                      vertical: 24,
+                                    ),
                                     backgroundColor: getButtonColor(),
                                     foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(24),
+                                      borderRadius: BorderRadius.circular(
+                                        24,
+                                      ),
                                     ),
                                   ),
                                   child: Text(
@@ -258,41 +285,41 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                       horizontal: 20, vertical: 10),
                   child: showFeedback
                       ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect
-                              ? Icons.check_circle
-                              : Icons.cancel,
-                          color:
-                          isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? (isEnglish
-                              ? 'Well done! 🎉'
-                              : 'Aferin! 🎉')
-                              : (isEnglish
-                              ? "Here's the right one! 🧐"
-                              : 'İşte doğrusu! 🧐'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect
-                                ? Colors.green
-                                : Colors.red,
-                            fontWeight: FontWeight.bold,
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
                           ),
-                        ),
-                      ],
-                    ),
-                  )
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                isCorrect
+                                    ? Icons.check_circle
+                                    : Icons.cancel,
+                                color:
+                                isCorrect ? Colors.green : Colors.red,
+                                size: 28,
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                isCorrect
+                                    ? (isEnglish
+                                        ? 'Well done! 🎉'
+                                        : 'Aferin! 🎉')
+                                    : (isEnglish
+                                        ? "Here's the right one! 🧐"
+                                        : 'İşte doğrusu! 🧐'),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: isCorrect
+                                      ? Colors.green
+                                      : Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
                       : const SizedBox.shrink(),
                 ),
               ],

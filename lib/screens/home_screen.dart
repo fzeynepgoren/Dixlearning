@@ -7,17 +7,6 @@ import 'matching_questions_screen.dart';
 import 'classification_questions_screen.dart';
 import 'karsilastirma_sorulari_screen.dart';
 import 'login_screen.dart';
-import '../giris_etkinlikleri/disleksi1.dart';
-import '../giris_etkinlikleri/disleksi2.dart';
-import '../giris_etkinlikleri/disleksi4.dart';
-import '../giris_etkinlikleri/disgrafi2.dart';
-import '../giris_etkinlikleri/diskalkuli3.dart';
-import '../giris_etkinlikleri/disgrafi3.dart';
-import '../giris_etkinlikleri/diskalkuli1.dart';
-import '../asama1/soru1.dart';
-import '../asama2/soru1.dart';
-import '../asama3/soru1.dart';
-import '../asama4/soru1.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
@@ -29,12 +18,13 @@ class HomeScreen extends StatefulWidget {
   final ThemeMode? themeMode;
   final bool? isEnglish;
   final void Function(bool isEnglish)? onLanguageChanged;
-  const HomeScreen(
-      {super.key,
-      this.onThemeChanged,
-      this.themeMode,
-      this.isEnglish,
-      this.onLanguageChanged});
+  const HomeScreen({
+    super.key,
+    this.onThemeChanged,
+    this.themeMode,
+    this.isEnglish,
+    this.onLanguageChanged,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -70,31 +60,33 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     try {
       final prefs = await SharedPreferences.getInstance();
       final String? currentUserJson = prefs.getString('current_user');
-      
+
       if (currentUserJson != null) {
-        final currentUser = Map<String, dynamic>.from(json.decode(currentUserJson));
+        final currentUser = Map<String, dynamic>.from(
+          json.decode(currentUserJson),
+        );
         _currentUserEmail = currentUser['email'] ?? '';
-        
+
         // Bugünün tarihini al
         final today = DateTime.now();
         final todayKey = '${today.year}-${today.month}-${today.day}';
         final userActivityKey = '${_currentUserEmail}_activities_$todayKey';
         final lastDateKey = '${_currentUserEmail}_last_activity_date';
-        
+
         // Son etkinlik tarihini kontrol et
         final lastDate = prefs.getString(lastDateKey);
-        
+
         if (lastDate != null && lastDate != todayKey) {
           // Farklı bir gün, sayacı sıfırla
           await prefs.setInt(userActivityKey, 0);
         }
-        
+
         // Son etkinlik tarihini güncelle
         await prefs.setString(lastDateKey, todayKey);
-        
+
         // Bugünkü etkinlik sayısını al
         final todayActivities = prefs.getInt(userActivityKey) ?? 0;
-        
+
         setState(() {
           _completedToday = todayActivities;
         });
@@ -103,8 +95,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       print('Error loading today activities: $e');
     }
   }
-
-
 
   void _onItemTapped(int index) {
     if (index == _selectedIndex) return;
@@ -120,12 +110,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SettingsScreen(
-            onThemeChanged: widget.onThemeChanged,
-            themeMode: widget.themeMode,
-            isEnglish: widget.isEnglish,
-            onLanguageChanged: widget.onLanguageChanged,
-          ),
+          builder:
+              (context) => SettingsScreen(
+                onThemeChanged: widget.onThemeChanged,
+                themeMode: widget.themeMode,
+                isEnglish: widget.isEnglish,
+                onLanguageChanged: widget.onLanguageChanged,
+              ),
         ),
       );
     }
@@ -136,17 +127,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('is_logged_in', false);
       await prefs.remove('current_user');
-      
+
       if (mounted) {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (context) => LoginScreen(
-              onThemeChanged: widget.onThemeChanged,
-              themeMode: widget.themeMode,
-              isEnglish: widget.isEnglish,
-              onLanguageChanged: widget.onLanguageChanged,
-            ),
+            builder:
+                (context) => LoginScreen(
+                  onThemeChanged: widget.onThemeChanged,
+                  themeMode: widget.themeMode,
+                  isEnglish: widget.isEnglish,
+                  onLanguageChanged: widget.onLanguageChanged,
+                ),
           ),
           (route) => false,
         );
@@ -158,10 +150,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _navigateToActivity(Widget screen) {
     // Etkinliğe git
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => screen),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
   }
 
   @override
@@ -176,22 +165,26 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       {
         'emoji': '🎲',
         'title': isEnglish ? 'Entry Activities' : 'Giriş Etkinlikleri',
-        'desc': isEnglish
-            ? 'Warm-up games and fun!'
-            : 'Isınma oyunları ve eğlence!',
+        'desc':
+            isEnglish
+                ? 'Warm-up games and fun!'
+                : 'Isınma oyunları ve eğlence!',
         'onTap': () {
-          _navigateToActivity(GirisEtkinlikleriScreen(
-            isEnglish: isEnglish,
-            onLanguageChanged: widget.onLanguageChanged,
-          ));
+          _navigateToActivity(
+            GirisEtkinlikleriScreen(
+              isEnglish: isEnglish,
+              onLanguageChanged: widget.onLanguageChanged,
+            ),
+          );
         },
       },
       {
         'emoji': '🎯',
         'title': isEnglish ? 'Matching Questions' : 'Eşleme Soruları',
-        'desc': isEnglish
-            ? 'Test your matching skills!'
-            : 'Eşleştirme becerilerini test et!',
+        'desc':
+            isEnglish
+                ? 'Test your matching skills!'
+                : 'Eşleştirme becerilerini test et!',
         'onTap': () {
           _navigateToActivity(const MatchingQuestionsScreen());
         },
@@ -199,9 +192,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       {
         'emoji': '📋',
         'title': isEnglish ? 'Classification Questions' : 'Sınıflama Soruları',
-        'desc': isEnglish
-            ? 'Test your classification skills!'
-            : 'Sınıflandırma becerilerini test et!',
+        'desc':
+            isEnglish
+                ? 'Test your classification skills!'
+                : 'Sınıflandırma becerilerini test et!',
         'onTap': () {
           _navigateToActivity(const ClassificationQuestionsScreen());
         },
@@ -210,9 +204,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         'emoji': '⚖️',
         'title':
             isEnglish ? 'Comparison Activities' : 'Karşılaştırma Etkinlikleri',
-        'desc': isEnglish
-            ? 'Learn comparison concepts!'
-            : 'Karşılaştırma kavramlarını öğren!',
+        'desc':
+            isEnglish
+                ? 'Learn comparison concepts!'
+                : 'Karşılaştırma kavramlarını öğren!',
         'onTap': () {
           _navigateToActivity(const KarsilastirmaSorulariScreen());
         },
@@ -220,9 +215,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       {
         'emoji': '🔢',
         'title': isEnglish ? 'Sorting Activities' : 'Sıralama Etkinlikleri',
-        'desc': isEnglish
-            ? 'Test your sorting skills!'
-            : 'Sıralama becerilerini test et!',
+        'desc':
+            isEnglish
+                ? 'Test your sorting skills!'
+                : 'Sıralama becerilerini test et!',
         'onTap': () {
           _navigateToActivity(const SortingActivitiesScreen());
         },
@@ -245,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             backgroundColor: Colors.transparent,
             automaticallyImplyLeading: false,
             flexibleSpace: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -254,8 +250,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
               child: SafeArea(
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -265,8 +263,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           shape: BoxShape.circle,
                         ),
                         padding: const EdgeInsets.all(12),
-                        child: const Icon(Icons.home,
-                            size: 40, color: Colors.white),
+                        child: const Icon(
+                          Icons.home,
+                          size: 40,
+                          color: Colors.white,
+                        ),
                       ),
                       const SizedBox(width: 18),
                       Expanded(
@@ -277,9 +278,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             Text(
                               isEnglish ? 'Home' : 'Ana Sayfa',
                               style: const TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -287,7 +289,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   ? 'Start activities!'
                                   : 'Etkinliklere başla!',
                               style: const TextStyle(
-                                  fontSize: 16, color: Colors.white70),
+                                fontSize: 16,
+                                color: Colors.white70,
+                              ),
                             ),
                           ],
                         ),
@@ -301,16 +305,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                               return AlertDialog(
                                 title: Text(
                                   isEnglish ? 'Logout' : 'Çıkış Yap',
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 content: Text(
-                                  isEnglish 
+                                  isEnglish
                                       ? 'Are you sure you want to logout?'
                                       : 'Çıkış yapmak istediğinizden emin misiniz?',
                                 ),
                                 actions: [
                                   TextButton(
-                                    onPressed: () => Navigator.of(context).pop(),
+                                    onPressed:
+                                        () => Navigator.of(context).pop(),
                                     child: Text(
                                       isEnglish ? 'Cancel' : 'İptal',
                                       style: TextStyle(color: Colors.grey[600]),
@@ -353,7 +360,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               end: Alignment.bottomCenter,
               colors: [
                 mainColor.withOpacity(0.10),
-                accentColor.withOpacity(0.10)
+                accentColor.withOpacity(0.10),
               ],
             ),
           ),
@@ -411,21 +418,27 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   Card(
                     elevation: 3,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18)),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     color: accentColor.withOpacity(0.85),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 20),
+                        vertical: 16,
+                        horizontal: 20,
+                      ),
                       child: Row(
                         children: [
-                          const Icon(Icons.emoji_events,
-                              color: Colors.white, size: 32),
+                          const Icon(
+                            Icons.emoji_events,
+                            color: Colors.white,
+                            size: 32,
+                          ),
                           const SizedBox(width: 14),
                           Expanded(
                             child: Text(
-                                                          isEnglish
-                                ? 'You completed $_completedToday activities today!'
-                                : 'Bugün $_completedToday etkinlik tamamladın!',
+                              isEnglish
+                                  ? 'You completed $_completedToday activities today!'
+                                  : 'Bugün $_completedToday etkinlik tamamladın!',
                               style: const TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w600,
@@ -439,14 +452,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 32),
                   // Activities
-                  ...activities.map((activity) => _AnimatedActivityCard(
-                        emoji: activity['emoji'] as String,
-                        title: activity['title'] as String,
-                        desc: activity['desc'] as String,
-                        onTap: activity['onTap'] as VoidCallback,
-                        mainColor: mainColor,
-                        accentColor: accentColor,
-                      )),
+                  ...activities.map(
+                    (activity) => _AnimatedActivityCard(
+                      emoji: activity['emoji'] as String,
+                      title: activity['title'] as String,
+                      desc: activity['desc'] as String,
+                      onTap: activity['onTap'] as VoidCallback,
+                      mainColor: mainColor,
+                      accentColor: accentColor,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -502,8 +517,9 @@ class _AnimatedActivityCardState extends State<_AnimatedActivityCard>
         curve: Curves.easeInOut,
         child: Card(
           elevation: 5,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
           margin: const EdgeInsets.only(bottom: 22),
           color: widget.mainColor,
           child: Padding(
@@ -535,8 +551,11 @@ class _AnimatedActivityCardState extends State<_AnimatedActivityCard>
                     ],
                   ),
                 ),
-                const Icon(Icons.arrow_forward_ios,
-                    color: Colors.white, size: 22),
+                const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white,
+                  size: 22,
+                ),
               ],
             ),
           ),
