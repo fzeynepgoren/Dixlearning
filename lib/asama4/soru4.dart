@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
-import 'dart:async';
-import 'soru5.dart'; // Eğer sonraki ekran burada ise bırakıldı
 import '../screens/home_screen.dart';
+import 'soru5.dart';
 
 class MevsimHavaEsle extends StatefulWidget {
   const MevsimHavaEsle({super.key});
@@ -17,6 +16,7 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
   final List<String> rightWeather = ['Yaz', 'Kış', 'İlkbahar', 'Sonbahar'];
 
   late List<String> shuffledWeather;
+
   int? selectedLeftIndex;
   int? selectedRightIndex;
 
@@ -31,32 +31,51 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
 
+  /// Emoji -> Doğru mevsim adı
+  final Map<String, String> itemToName = const {
+    '🌞': 'Yaz',
+    '❄️': 'Kış',
+    '🌸': 'İlkbahar',
+    '🍂': 'Sonbahar',
+  };
+
   @override
   void initState() {
     super.initState();
-    shuffledWeather = List.from(rightWeather)..shuffle();
 
-    _feedbackController =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
+    // Sağ listeyi hizalı doğru eşleşme olmayacak şekilde karıştır
+    shuffledWeather = List.from(rightWeather);
+    do {
+      shuffledWeather.shuffle();
+    } while (_hasAnyAlignedCorrectPair(leftSeasons, shuffledWeather));
 
-    _slide_controllerInit();
-  }
+    _feedbackController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
 
-  void _slide_controllerInit() {
-    _slide_controllerInit_impl();
-  }
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
 
-  void _slide_controllerInit_impl() {
-    _slideController =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
+
     _slideController.forward();
+  }
+
+  /// Aynı indekslerde doğru eşleşme var mı? (Başlangıç shuffle kontrolü için)
+  bool _hasAnyAlignedCorrectPair(List<String> left, List<String> right) {
+    if (left.length != right.length) return false;
+    for (int i = 0; i < left.length; i++) {
+      if (itemToName[left[i]] == right[i]) return true;
+    }
+    return false;
   }
 
   @override
@@ -66,108 +85,126 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
     super.dispose();
   }
 
-  void _handleTap(int index, bool isLeft) {
+  void _handleLeftTap(int index) {
+    if (matchedLeft[index]) return;
+    setState(() => selectedLeftIndex = index);
+    _checkMatch();
+  }
+
+  void _handleRightTap(int index) {
+    if (matchedRight[index]) return;
+    setState(() => selectedRightIndex = index);
+    _checkMatch();
+  }
+
+  void _checkMatch() {
+    if (selectedLeftIndex == null || selectedRightIndex == null) return;
+
+    final String left = leftSeasons[selectedLeftIndex!];
+    final String right = shuffledWeather[selectedRightIndex!];
+
     setState(() {
-      if (isLeft) {
-        if (matchedLeft[index]) return;
-        selectedLeftIndex = index;
-      } else {
-        if (matchedRight[index]) return;
-        selectedRightIndex = index;
-      }
+      isCorrect = itemToName[left] == right;
+      showFeedback = true;
+    });
 
-      if (selectedLeftIndex != null && selectedRightIndex != null) {
-        // doğru eşleşme kontrolü
-        isCorrect = (leftSeasons[selectedLeftIndex!] == '🌞' &&
-                shuffledWeather[selectedRightIndex!] == 'Yaz') ||
-            (leftSeasons[selectedLeftIndex!] == '❄️' &&
-                shuffledWeather[selectedRightIndex!] == 'Kış') ||
-            (leftSeasons[selectedLeftIndex!] == '🌸' &&
-                shuffledWeather[selectedRightIndex!] == 'İlkbahar') ||
-            (leftSeasons[selectedLeftIndex!] == '🍂' &&
-                shuffledWeather[selectedRightIndex!] == 'Sonbahar');
+    _feedbackController.forward(from: 0);
 
-        showFeedback = true;
-        _feedbackController.forward(from: 0);
+    if (isCorrect) {
+      setState(() {
+        matchedLeft[selectedLeftIndex!] = true;
+        matchedRight[selectedRightIndex!] = true;
+      });
 
-        if (isCorrect) {
-          matchedLeft[selectedLeftIndex!] = true;
-          matchedRight[selectedRightIndex!] = true;
+      // Tüm eşleşmeler tamamlandıysa sıradaki ekrana geç
+      if (matchedLeft.every((e) => e) && !_dialogShown) {
+        _dialogShown = true;
 
-          if (matchedLeft.every((e) => e) && !_dialogShown) {
-            _dialogShown = true;
-            ActivityTracker.completeActivity();
+        // Etkinlik tamamlandı
+        ActivityTracker.completeActivity();
 
-            Future.delayed(const Duration(milliseconds: 500), () {
-              if (mounted) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const EmojiAnimalMatching()),
-                );
-              }
-            });
-          }
-        }
-
-        Future.delayed(const Duration(seconds: 1), () {
-          if (mounted) {
-            setState(() {
-              showFeedback = false;
-              selectedLeftIndex = null;
-              selectedRightIndex = null;
-            });
-          }
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const EmojiAnimalMatching(),
+            ),
+          );
         });
       }
+    } else {
+      // Yanlış eşleşmede state kilidi yok; yalnızca geri bildirim gösteriliyor
+      setState(() {
+        matchedLeft[selectedLeftIndex!] = false;
+        matchedRight[selectedRightIndex!] = false;
+      });
+    }
+
+    // 1 sn sonra seçimleri sıfırla
+    Future.delayed(const Duration(seconds: 1), () {
+      if (!mounted) return;
+      setState(() {
+        showFeedback = false;
+        selectedLeftIndex = null;
+        selectedRightIndex = null;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final iconSize = screenSize.width * 0.065;
-
     return WillPopScope(
-      onWillPop: () async => false,
+      // Sistem geri tuşu: HomeScreen’e dön ve stack’i temizle
+      onWillPop: () async {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
+        );
+        return false;
+      },
       child: Scaffold(
         body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
               colors: [
                 Colors.blue.shade200,
                 Colors.blue.shade200,
                 const Color(0xffffffff),
               ],
               stops: const [0.0, 0.5, 1.0],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
             ),
           ),
           child: SafeArea(
             child: Column(
               children: [
-                // Üstte geri oku (back)
+                // Üst geri düğmesi
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
-                          (route) => false,
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
+                          ),
+                              (route) => false,
                         );
                       },
                     ),
                   ],
                 ),
 
+                // İçerik kartı
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
                     child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 6),
-                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.95),
                         borderRadius: BorderRadius.circular(24),
@@ -181,67 +218,76 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
                       ),
                       child: Column(
                         children: [
-                          // Başlık
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: const Text(
-                              'Mevsimleri hava durumlarıyla eşleştir',
+                              'Mevsimleri hava durumlarıyla eşleştir!',
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: 23,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                               textAlign: TextAlign.center,
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 15),
 
-                          // İçerik: sol emojiler — orta çizgi — sağ metin kutuları
                           Expanded(
                             child: Row(
                               children: [
-                                // sol emojiler (beyaz kutulu)
+                                // SOL SÜTUN: Emojiler
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                     children: List.generate(
                                       leftSeasons.length,
-                                      (index) => Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 6),
-                                        child: GestureDetector(
-                                          onTap: () => _handleTap(index, true),
-                                          child: AnimatedContainer(
-                                            duration: const Duration(milliseconds: 300),
-                                            width: 80,
-                                            height: 80,
-                                            decoration: BoxDecoration(
-                                              color: matchedLeft[index]
-                                                  ? Colors.green.shade200
-                                                  : (showFeedback &&
-                                                          !isCorrect &&
-                                                          selectedLeftIndex == index)
-                                                      ? Colors.red.shade200
-                                                      : selectedLeftIndex == index
-                                                          ? Colors.blue.shade200
-                                                          : Colors.white,
-                                              borderRadius: BorderRadius.circular(16),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black.withOpacity(0.12),
-                                                  blurRadius: 8,
-                                                  offset: const Offset(0, 4),
-                                                ),
-                                              ],
-                                              border: selectedLeftIndex == index && !matchedLeft[index]
-                                                  ? Border.all(color: Colors.lightGreen.shade400, width: 3)
-                                                  : null,
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                leftSeasons[index],
-                                                style: const TextStyle(
-                                                  fontSize: 48, // EMOJİLER DAHA BÜYÜK!
-                                                ),
+                                          (index) => GestureDetector(
+                                        onTap: () => _handleLeftTap(index),
+                                        child: AnimatedContainer(
+                                          duration: const Duration(
+                                              milliseconds: 300),
+                                          curve: Curves.easeInOut,
+                                          width: 120,
+                                          height: 120,
+                                          margin: const EdgeInsets.symmetric(
+                                              vertical: 8),
+                                          decoration: BoxDecoration(
+                                            // 1) matched -> yeşil
+                                            // 2) geri bildirim var ve yanlış seçili -> kırmızı
+                                            // 3) geri bildirim yok ve seçili -> mavi
+                                            // 4) diğer -> beyaz
+                                            color: matchedLeft[index]
+                                                ? Colors.green.shade400
+                                                : (showFeedback
+                                                ? ((selectedLeftIndex ==
+                                                index &&
+                                                !isCorrect)
+                                                ? Colors.red.shade400
+                                                : Colors.white)
+                                                : (selectedLeftIndex ==
+                                                index
+                                                ? Colors.blue.shade200
+                                                : Colors.white)),
+                                            borderRadius:
+                                            BorderRadius.circular(20),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.2),
+                                                blurRadius: 6,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              leftSeasons[index],
+                                              style: const TextStyle(
+                                                fontSize: 48,
                                               ),
                                             ),
                                           ),
@@ -251,71 +297,75 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
                                   ),
                                 ),
 
-                                // orta çizgi (mavi gradient)
+                                // AYIRICI: mavi gradient çizgi
                                 Container(
                                   width: 4,
-                                  height: screenSize.height * 0.58,
-                                  margin: const EdgeInsets.symmetric(horizontal: 12),
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 10),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
                                       colors: [
                                         Colors.blue.shade400,
                                         Colors.blue.shade200,
                                         Colors.blue.shade100,
                                       ],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
                                     ),
-                                    borderRadius: BorderRadius.circular(4),
+                                    borderRadius: BorderRadius.circular(2),
                                   ),
                                 ),
 
-                                // sağ mevsim isimleri (beyaz kutulu)
+                                // SAĞ SÜTUN: Mevsim adları
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                     children: List.generate(
                                       shuffledWeather.length,
-                                      (index) => Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 6),
-                                        child: GestureDetector(
-                                          onTap: () => _handleTap(index, false),
-                                          child: AnimatedContainer(
-                                            duration: const Duration(milliseconds: 300),
-                                            width: 80,
-                                            height: 80,
-                                            decoration: BoxDecoration(
-                                              color: matchedRight[index]
-                                                  ? Colors.green.shade200
-                                                  : (showFeedback &&
-                                                          !isCorrect &&
-                                                          selectedRightIndex == index)
-                                                      ? Colors.red.shade200
-                                                      : selectedRightIndex == index
-                                                          ? Colors.yellow.shade200
-                                                          : Colors.white,
-                                              borderRadius: BorderRadius.circular(16),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black.withOpacity(0.12),
-                                                  blurRadius: 8,
-                                                  offset: const Offset(0, 4),
-                                                ),
-                                              ],
-                                              border: selectedRightIndex == index && !matchedRight[index]
-                                                  ? Border.all(color: Colors.lightGreen.shade400, width: 3)
-                                                  : null,
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                shuffledWeather[index],
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black,
-                                                ),
-                                                textAlign: TextAlign.center,
+                                          (index) => GestureDetector(
+                                        onTap: () => _handleRightTap(index),
+                                        child: AnimatedContainer(
+                                          duration: const Duration(
+                                              milliseconds: 300),
+                                          curve: Curves.easeInOut,
+                                          width: 120,
+                                          height: 120,
+                                          margin: const EdgeInsets.symmetric(
+                                              vertical: 8),
+                                          decoration: BoxDecoration(
+                                            color: matchedRight[index]
+                                                ? Colors.green.shade400
+                                                : (showFeedback
+                                                ? ((selectedRightIndex ==
+                                                index &&
+                                                !isCorrect)
+                                                ? Colors.red.shade400
+                                                : Colors.white)
+                                                : (selectedRightIndex ==
+                                                index
+                                                ? Colors.blue.shade200
+                                                : Colors.white)),
+                                            borderRadius:
+                                            BorderRadius.circular(20),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.2),
+                                                blurRadius: 6,
+                                                offset: const Offset(0, 3),
                                               ),
+                                            ],
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              shuffledWeather[index],
+                                              style: const TextStyle(
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                              textAlign: TextAlign.center,
                                             ),
                                           ),
                                         ),
@@ -332,46 +382,71 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
                   ),
                 ),
 
-                // feedback alanı (animasyonlu)
+                // ALT GERİ BİLDİRİM BANDI
                 Container(
-                  height: 70,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child: showFeedback
                       ? ScaleTransition(
-                          scale: CurvedAnimation(parent: _feedbackController, curve: Curves.elasticOut),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: const Offset(0, 5))],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(isCorrect ? Icons.check_circle : Icons.cancel,
-                                    color: isCorrect ? Colors.green : Colors.red, size: 26),
-                                const SizedBox(width: 8),
-                                Text(
-                                  isCorrect ? "Aferin! 🎉" : "Tekrar dene! 😔",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: isCorrect ? Colors.green : Colors.red,
-                                  ),
-                                ),
-                              ],
+                    scale: CurvedAnimation(
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isCorrect
+                                ? Icons.check_circle
+                                : Icons.cancel,
+                            color: isCorrect
+                                ? Colors.green
+                                : Colors.red,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            isCorrect
+                                ? 'Aferin! 🎉'
+                                : 'Tekrar dene! 😔',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: isCorrect
+                                  ? Colors.green
+                                  : Colors.red,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        )
+                        ],
+                      ),
+                    ),
+                  )
                       : const SizedBox.shrink(),
                 ),
-                const SizedBox(height: 8),
               ],
             ),
           ),
         ),
       ),
-    );   
-   }
+    );
   }
+}

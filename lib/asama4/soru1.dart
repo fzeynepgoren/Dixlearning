@@ -233,40 +233,33 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
                                           margin: const EdgeInsets.symmetric(
                                             vertical: 8,
                                           ),
+                                          // SOL SÜTUN: AnimatedContainer > decoration
                                           decoration: BoxDecoration(
-                                            color:
-                                                matchedLeft[index]
-                                                    ? Colors.green.shade200
-                                                    : (showFeedback &&
-                                                        !isCorrect &&
-                                                        selectedLeftIndex ==
-                                                            index)
-                                                    ? Colors.red.shade200
-                                                    : Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            border:
-                                                (selectedLeftIndex == index &&
-                                                        !matchedLeft[index])
-                                                    ? Border.all(
-                                                      color:
-                                                          Colors
-                                                              .lightGreen
-                                                              .shade400,
-                                                      width: 4,
-                                                    )
-                                                    : null,
+                                            // RENK MANTIĞI:
+                                            // 1) Doğru eşleşmişse (matched): yeşil
+                                            // 2) Geri bildirim anında yanlış seçilmişse: kırmızı
+                                            // 3) Geri bildirim yokken sadece seçiliyse: mavi
+                                            // 4) Diğer durumlarda: beyaz
+                                            color: matchedLeft[index]
+                                                ? Colors.green.shade400
+                                                : (showFeedback
+                                                ? ((selectedLeftIndex == index && !isCorrect)
+                                                ? Colors.red.shade400
+                                                : Colors.white)
+                                                : (selectedLeftIndex == index
+                                                ? Colors.blue.shade200
+                                                : Colors.white)),
+                                            borderRadius: BorderRadius.circular(20),
+                                            // ÖNCEKİ YEŞİL BORDER'I KALDIRDIK -> border: null
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.2,
-                                                ),
+                                                color: Colors.black.withOpacity(0.2),
                                                 blurRadius: 6,
                                                 offset: const Offset(0, 3),
                                               ),
                                             ],
                                           ),
+
                                           child: Center(
                                             child: Text(
                                               leftItems[index],
@@ -282,14 +275,21 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
                                 ),
                                 Container(
                                   width: 4,
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                  ),
+                                  margin: const EdgeInsets.symmetric(horizontal: 10),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.shade400,
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.blue.shade400,
+                                        Colors.blue.shade200,
+                                        Colors.blue.shade100,
+                                      ],
+                                    ),
                                     borderRadius: BorderRadius.circular(2),
                                   ),
                                 ),
+
                                 Expanded(
                                   child: Column(
                                     mainAxisAlignment:
@@ -309,46 +309,37 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
                                             vertical: 8,
                                           ),
                                           decoration: BoxDecoration(
-                                            color:
-                                                matchedRight[index]
-                                                    ? Colors.green.shade200
-                                                    : (showFeedback &&
-                                                        !isCorrect &&
-                                                        selectedRightIndex ==
-                                                            index)
-                                                    ? Colors.red.shade200
-                                                    : Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            border:
-                                                (selectedRightIndex == index &&
-                                                        !matchedRight[index])
-                                                    ? Border.all(
-                                                      color:
-                                                          Colors
-                                                              .lightGreen
-                                                              .shade400,
-                                                      width: 4,
-                                                    )
-                                                    : null,
+                                            // 1) Doğru eşleşmişse yeşil
+                                            // 2) Yanlış eşleşmede kırmızı
+                                            // 3) Seçiliyse mavi
+                                            // 4) Diğer durumlarda beyaz
+                                            color: matchedRight[index]
+                                                ? Colors.green.shade400
+                                                : (showFeedback
+                                                ? ((selectedRightIndex == index && !isCorrect)
+                                                ? Colors.red.shade400
+                                                : Colors.white)
+                                                : (selectedRightIndex == index
+                                                ? Colors.blue.shade200
+                                                : Colors.white)),
+                                            borderRadius: BorderRadius.circular(20),
+                                            // border’ı tamamen kaldırıyoruz
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.2,
-                                                ),
+                                                color: Colors.black.withOpacity(0.2),
                                                 blurRadius: 6,
                                                 offset: const Offset(0, 3),
                                               ),
                                             ],
                                           ),
+
                                           child: Center(
                                             child: Text(
                                               shuffledRightItems[index],
                                               style: const TextStyle(
                                                 fontSize: 24,
                                                 fontWeight: FontWeight.bold,
-                                                color: Colors.deepPurple,
+                                                color: Colors.black,
                                               ),
                                             ),
                                           ),
