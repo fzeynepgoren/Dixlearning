@@ -308,36 +308,54 @@ class _ParaSiniflaState extends State<ParaSinifla>
                 ),
                 Container(
                   height: 80,
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child: showFeedback
                       ? ScaleTransition(
                     scale: CurvedAnimation(
                       parent: _feedbackController,
                       curve: Curves.elasticOut,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                              : (isEnglish
-                              ? 'Try again! 😔'
-                              : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            isCorrect ? Icons.check_circle : Icons.cancel,
+                            color: isCorrect ? Colors.green : Colors.red,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            isCorrect
+                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                                : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: isCorrect ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   )
                       : const SizedBox.shrink(),
@@ -352,9 +370,9 @@ class _ParaSiniflaState extends State<ParaSinifla>
 
   Widget _buildGroupContainer(String kategori, bool isEnglish) {
     Color boxColor =
-    kategori == 'Paper Money' ? const Color(0xFFD6ECFF) : const Color(0xFFFFDDEE);
+    kategori == 'Paper Money' ? Colors.deepPurple.shade100 : Colors.blue.shade100;
     Color borderColor =
-    kategori == 'Paper Money' ? Colors.lightBlue : Colors.pinkAccent;
+    kategori == 'Paper Money' ? Colors.deepPurple.shade300 : Colors.blue.shade400;
     return DragTarget<String>(
       onWillAccept: (data) => !eslesenler.contains(data!),
       onAccept: (data) => _handleDrag(data!, kategori),
