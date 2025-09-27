@@ -39,7 +39,7 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
     emojileriKaristir();
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 800),
     );
     _slideController = AnimationController(
       vsync: this,
@@ -295,10 +295,10 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
   }
 
   Widget _buildGroupContainer(String kategori, bool isEnglish) {
-    Color boxColor =
-        kategori == 'Meyve' ? const Color(0xFFE0F7FA) : Colors.green.shade100;
+    Color? boxColor =
+        kategori == 'Meyve' ? Colors.deepPurple[100] : Colors.blue.shade100;
     Color borderColor =
-        kategori == 'Meyve' ? Colors.blue.shade400 : Colors.green.shade400;
+        kategori == 'Meyve' ? Colors.deepPurple.shade300 : Colors.blue.shade400;
 
     return DragTarget<String>(
       onWillAccept: (data) => !eslesenler.contains(data!),

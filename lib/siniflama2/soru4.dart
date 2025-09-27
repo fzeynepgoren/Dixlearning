@@ -15,8 +15,8 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
   final Map<String, String> dogruEslesmeler = {
     '📱': 'Teknolojik',
     '📚': 'Geleneksel',
-    '🔳': 'Teknolojik',
-    '✏️': 'Geleneksel',
+    '💻': 'Teknolojik',
+    '🕯': 'Geleneksel',
   };
 
   late List<String> emojiler;
@@ -295,9 +295,9 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
 
   Widget _buildGroupContainer(String kategori, bool isEnglish) {
     Color boxColor =
-        kategori == 'Teknolojik' ? Colors.green.shade100 : const Color(0xFFE0F7FA);
+        kategori == 'Teknolojik' ? Colors.deepPurple.shade100 : Colors.blue.shade100;
     Color borderColor =
-        kategori == 'Teknolojik' ? Colors.green.shade400 : Colors.blue.shade400;
+        kategori == 'Teknolojik' ? Colors.deepPurple.shade300 : Colors.blue.shade400;
 
     return DragTarget<String>(
       onWillAccept: (data) => !eslesenler.contains(data!),

@@ -37,6 +37,7 @@ class _MyAppState extends State<MyApp> {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'DixLearning',
       theme: ThemeData(
         primarySwatch: Colors.blue,

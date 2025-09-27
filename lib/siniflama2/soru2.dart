@@ -245,35 +245,51 @@ class _CanliCansizSiniflaState extends State<CanliCansizSinifla>
               Container(
                 height: 80,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
+                    horizontal: 20, vertical: 10),
                 child: showFeedback
                     ? ScaleTransition(
                   scale: CurvedAnimation(
                     parent: _feedbackController,
                     curve: Curves.elasticOut,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        isCorrect ? Icons.check_circle : Icons.cancel,
-                        color: isCorrect ? Colors.green : Colors.red,
-                        size: 28,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        isCorrect
-                            ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                            : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          fontWeight: FontWeight.bold,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          isCorrect ? Icons.check_circle : Icons.cancel,
+                          color: isCorrect ? Colors.green : Colors.red,
+                          size: 28,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          isCorrect
+                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                              : (isEnglish
+                              ? 'Try again! 😔'
+                              : 'Tekrar dene! 😔'),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: isCorrect ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 )
                     : const SizedBox.shrink(),
@@ -314,8 +330,8 @@ class _CanliCansizSiniflaState extends State<CanliCansizSinifla>
       String category,
       bool isEnglish,
       ) {
-    Color boxColor = category == 'living' ? Colors.purple.shade100 : const Color(0xFFE0F7FA);
-    Color borderColor = category == 'living' ? Colors.purple.shade400 : Colors.blue.shade400;
+    Color boxColor = category == 'living' ? Colors.blue.shade100 : Colors.deepPurple.shade100;
+    Color borderColor = category == 'living' ? Colors.blue.shade400 : Colors.deepPurple.shade300;
     List<String> group = category == 'living' ? livingGroup : nonLivingGroup;
 
     return DragTarget<String>(
