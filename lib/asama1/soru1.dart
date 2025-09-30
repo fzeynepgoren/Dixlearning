@@ -15,7 +15,7 @@ class MeyveEsle extends StatefulWidget {
 class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
   final List<List<String>> pageFruits = [
     ['🍓', '🍇', '🍒'],
-    ['🍎', '🍊', '🍐']
+    ['🍎', '🍊', '🍐'],
   ];
 
   late List<List<String>> rightFruits;

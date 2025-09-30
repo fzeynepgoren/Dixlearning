@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../screens/home_screen.dart';
 import '../utils/activity_tracker.dart';
-import '../providers/language_provider.dart';
 import 'soru3.dart'; // GeometricMatching burada tanımlı
 
 class GDisgrafi1 extends StatefulWidget {
