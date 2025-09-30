@@ -25,19 +25,33 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
   bool isCorrect = false;
   bool _dialogShown = false;
   late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 600),
     );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
@@ -114,12 +128,15 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.emoji_events,
-                          size: 80, color: Colors.amber),
+                      const Icon(
+                        Icons.emoji_events,
+                        size: 80,
+                        color: Colors.amber,
+                      ),
                       const SizedBox(height: 20),
                       Text(
                         Provider.of<LanguageProvider>(context, listen: false)
-                                .isEnglish
+                            .isEnglish
                             ? 'Congratulations! 🎉'
                             : 'Tebrikler! 🎉',
                         style: const TextStyle(
@@ -131,7 +148,7 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                       const SizedBox(height: 10),
                       Text(
                         Provider.of<LanguageProvider>(context, listen: false)
-                                .isEnglish
+                            .isEnglish
                             ? 'You have completed stage 5!'
                             : '5. aşamayı tamamladınız!',
                         textAlign: TextAlign.center,
@@ -154,18 +171,22 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.deepPurple,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 40, vertical: 15),
+                            horizontal: 40,
+                            vertical: 15,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
                         ),
                         child: Text(
                           Provider.of<LanguageProvider>(context, listen: false)
-                                  .isEnglish
+                              .isEnglish
                               ? 'Back to Menu'
                               : 'Ana Menüye Dön',
                           style: const TextStyle(
-                              fontSize: 18, color: Colors.white),
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ],
@@ -182,234 +203,254 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    return Scaffold(
-      backgroundColor: const Color(0xFFE1F5FE),
-      appBar: AppBar(
-        title: Text(
-          isEnglish
-              ? 'Classify Animals by Legs'
-              : 'Hayvanları Bacaklarına Göre Sınıfla',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.deepPurple.shade100,
-                  Colors.deepPurple.shade50,
-                  Colors.white,
-                ],
-              ),
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(24.0),
+          child: SafeArea(
             child: Column(
               children: [
-                const SizedBox(height: 12),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
                       ),
-                    ],
-                  ),
-                  child: Text(
-                    isEnglish
-                        ? 'Drag the animals to the correct group!'
-                        : 'Hayvanları doğru gruba sürükle!',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.deepPurple,
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 32),
                 Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: _buildGroup(
-                          isEnglish ? 'Four Legs' : 'Dört Bacaklı',
-                          fourLegsGroup,
-                          true,
-                          Colors.green.shade100,
-                          Colors.green,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildGroup(
-                          isEnglish ? 'Two Legs' : 'İki Bacaklı',
-                          twoLegsGroup,
-                          false,
-                          Colors.blue.shade100,
-                          Colors.blue,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.all(16),
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      if (!item['isPlaced']) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Draggable<Map<String, dynamic>>(
-                            data: item,
-                            feedback: Text(item['emoji'],
-                                style: const TextStyle(fontSize: 48)),
-                            childWhenDragging:
-                                const SizedBox(width: 60, height: 60),
-                            child: Text(item['emoji'],
-                                style: const TextStyle(fontSize: 48)),
-                          ),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20),
-                if (showFeedback)
-                  ScaleTransition(
-                    scale: CurvedAnimation(
-                        parent: _feedbackController, curve: Curves.elasticOut),
+                  child: SlideTransition(
+                    position: _slideAnimation,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 28,
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                : (isEnglish
-                                    ? 'Try again! 😔'
-                                    : 'Tekrar dene! 😔'),
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
+                            child: Text(
+                              isEnglish
+                                  ? 'Drag the animals to the correct group!'
+                                  : 'Hayvanları doğru gruba sürükle!',
+                              style: const TextStyle(
+                                fontSize: 23,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                        child: _buildGroupContainer(
+                                          fourLegsGroup,
+                                          true,
+                                          isEnglish,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Expanded(
+                                        child: _buildGroupContainer(
+                                          twoLegsGroup,
+                                          false,
+                                          isEnglish,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: items
+                                        .where((item) => !item['isPlaced'])
+                                        .map((item) {
+                                      return Draggable<Map<String, dynamic>>(
+                                        data: item,
+                                        feedback: Material(
+                                          color: Colors.transparent,
+                                          child: _buildItemBox(item),
+                                        ),
+                                        childWhenDragging: const SizedBox.shrink(),
+                                        child: _buildItemBox(item),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                const SizedBox(height: 20),
+                ),
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child: showFeedback
+                      ? ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          isCorrect ? Icons.check_circle : Icons.cancel,
+                          color: isCorrect ? Colors.green : Colors.red,
+                          size: 28,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          isCorrect
+                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                              : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: isCorrect ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                      : const SizedBox.shrink(),
+                ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildGroup(String title, List<Map<String, dynamic>> group,
-      bool isFourLegs, Color bgColor, Color textColor) {
+  Widget _buildGroupContainer(
+      List<Map<String, dynamic>> group,
+      bool isFourLegs,
+      bool isEnglish,
+      ) {
+    Color boxColor = isFourLegs ? const Color(0xFFE8F5E8) : const Color(0xFFD6ECFF);
+    Color borderColor = isFourLegs ? Colors.green : Colors.lightBlue;
+
     return DragTarget<Map<String, dynamic>>(
-      onWillAcceptWithDetails: (data) => true,
-      onAcceptWithDetails: (data) => _handleDrag(data.data, isFourLegs),
+      onWillAccept: (item) => true,
+      onAccept: (item) => _handleDrag(item!, isFourLegs),
       builder: (context, candidateData, rejectedData) {
         return Container(
+          width: double.infinity,
+          height: 140,
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
+            color: boxColor,
+            border: Border.all(
+              color: borderColor,
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: bgColor.withOpacity(0.7),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                ),
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
+              Text(
+                isFourLegs
+                    ? (isEnglish ? 'Four Legs' : 'Dört Bacaklı')
+                    : (isEnglish ? 'Two Legs' : 'İki Bacaklı'),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
               ),
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: group.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text(
-                        group[index]['emoji'],
-                        style: const TextStyle(fontSize: 48),
-                        textAlign: TextAlign.center,
-                      ),
-                    );
-                  },
-                ),
+              const SizedBox(height: 8),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                children: group
+                    .map((item) => Text(
+                  item['emoji'],
+                  style: const TextStyle(fontSize: 36),
+                ))
+                    .toList(),
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _buildItemBox(Map<String, dynamic> item) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Text(
+          item['emoji'],
+          style: const TextStyle(fontSize: 48),
+        ),
+      ),
     );
   }
 }

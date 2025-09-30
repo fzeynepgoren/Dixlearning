@@ -24,6 +24,7 @@ class _Diskalkuli3State extends State<Diskalkuli3>
   int _currentProblemIndex = 0;
   bool _showCongrats = false;
   bool _isWrong = false;
+  String? _feedbackText;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
   late AnimationController _congratsController;
@@ -64,60 +65,60 @@ class _Diskalkuli3State extends State<Diskalkuli3>
   }
 
   void _onDrop(int value) async {
-    setState(() {
-      _problems[_currentProblemIndex]['userAnswer'] = value;
-    });
+    final problem = _problems[_currentProblemIndex];
     final isLast = _currentProblemIndex == _problems.length - 1;
-    final isCorrect = value == _problems[_currentProblemIndex]['answer'];
+    final isCorrect = value == problem['answer'];
+
+    setState(() {
+      problem['userAnswer'] = value;
+    });
+
     if (isCorrect) {
-      setState(() {
-        _showCongrats = true;
-      });
-      _congratsController.forward(from: 0);
-      await Future.delayed(const Duration(milliseconds: 900));
-      setState(() {
-        _showCongrats = false;
-      });
-    } else {
-      setState(() {
-        _isWrong = true;
-      });
-      HapticFeedback.vibrate();
-      _shakeController.forward(from: 0);
-      await Future.delayed(const Duration(milliseconds: 400));
-      setState(() {
-        _isWrong = false;
-      });
-    }
-    // Her durumda bir sonraki soruya geç
-    if (!isLast) {
-      _fadeController.reverse().then((_) {
-        setState(() {
-          _currentProblemIndex++;
-          _problems[_currentProblemIndex]['userAnswer'] = null;
-        });
-        _fadeController.forward();
-      });
-    } else {
-      await Future.delayed(const Duration(milliseconds: 700));
-      if (mounted) {
-        print('Diskalkuli3 tamamlandı, bir sonraki aktiviteye geçiliyor');
-        // Etkinlik tamamlandı
+  setState(() {
+    _showCongrats = true;
+    _feedbackText = "Aferin! 🎉"; // emojili
+  });
+  _congratsController.forward(from: 0);
+  await Future.delayed(const Duration(milliseconds: 900));
+  setState(() {
+    _showCongrats = false;
+  });
+} else {
+  setState(() {
+    _isWrong = true;
+    _feedbackText = "Tekrar dene! 😔"; // emojili
+  });
+  HapticFeedback.vibrate();
+  _shakeController.forward(from: 0);
+  await Future.delayed(const Duration(seconds: 2));
+  setState(() {
+    _feedbackText = null; // sadece feedback'i kaldır
+  });
+}
 
-        ActivityTracker.completeActivity();
-
-        
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Disgrafi1()),
-        );
-      }
-    }
+// Sonraki soruya geç
+if (!isLast) {
+  _fadeController.reverse().then((_) {
+    setState(() {
+      _currentProblemIndex++;
+      _problems[_currentProblemIndex]['userAnswer'] = null;
+      _isWrong = false; // yeni soruya geçerken sıfırlıyoruz
+    });
+    _fadeController.forward();
+  });
+} else {
+  await Future.delayed(const Duration(milliseconds: 700));
+  if (mounted) {
+    ActivityTracker.completeActivity();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const Disgrafi1()),
+    );
+  }
+}
   }
 
   List<int> _getNumberOptions() {
-    // Cevap ve rastgele 4 sayı (toplam 5 kutu)
     final answer = _problems[_currentProblemIndex]['answer'] as int;
     final rand = Random();
     final options = <int>{answer};
@@ -132,83 +133,68 @@ class _Diskalkuli3State extends State<Diskalkuli3>
 
   @override
   Widget build(BuildContext context) {
-    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final problem = _problems[_currentProblemIndex];
     final isCorrect = problem['userAnswer'] == problem['answer'];
     final hasAnswer = problem['userAnswer'] != null;
     final numberOptions = _getNumberOptions();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFB2EBF2),
-      appBar: AppBar(
-        title: Text(isEnglish ? 'Addition Game' : 'Toplama Oyunu'),
-        backgroundColor: const Color(0xFF00BCD4),
-        elevation: 0,
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 24.0, bottom: 8.0),
-              child: Center(
-                child: Text(
-                  isEnglish
-                      ? 'Question ${_currentProblemIndex + 1}/${_problems.length}'
-                      : 'Soru ${_currentProblemIndex + 1}/${_problems.length}',
-                  style: const TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF00796B),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: Center(
-                child: Text(
-                  problem['problem'],
-                  style: const TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF6D4C41),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Center(
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue.shade200,
+              Colors.blue.shade200,
+              const Color(0xffffffff),
+            ],
+            stops: const [0.0, 0.5, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Expanded(
+                child: Center(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    child: Container(
+                      key: ValueKey<int>(_currentProblemIndex),
+                      margin: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Ev görseli (shake animasyonlu)
-                          AnimatedBuilder(
-                            animation: _shakeController,
-                            builder: (context, child) {
-                              double offset =
-                                  _isWrong ? _shakeAnimation.value : 0;
-                              return Transform.translate(
-                                offset: Offset(
-                                    offset * (Random().nextBool() ? 1 : -1), 0),
-                                child: child,
-                              );
-                            },
-                            child: buildHouse(
-                              hasAnswer: hasAnswer,
-                              isCorrect: isCorrect,
-                              answer: hasAnswer ? problem['userAnswer'] : null,
-                              onDrop: _onDrop,
+                          Text(
+                            problem['problem'],
+                            style: const TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF37474F),
                             ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 30),
+                          buildHouse(
+                            hasAnswer: hasAnswer,
+                            isCorrect: isCorrect,
+                            answer: hasAnswer ? problem['userAnswer'] : null,
+                            onDrop: _onDrop,
                           ),
                           const SizedBox(height: 36),
-                          // Drag numbers
                           Wrap(
                             alignment: WrapAlignment.center,
                             spacing: 18,
@@ -229,52 +215,58 @@ class _Diskalkuli3State extends State<Diskalkuli3>
                           ),
                         ],
                       ),
-                      // Doğru cevapta "Aferin!" animasyonu çatının üstünde
-                      if (_showCongrats)
-                        Positioned(
-                          top: 80,
-                          child: ScaleTransition(
-                            scale: Tween<double>(begin: 0.7, end: 1.2)
-                                .chain(CurveTween(curve: Curves.elasticOut))
-                                .animate(_congratsController),
-                            child: Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: Colors.greenAccent.shade100,
-                                borderRadius: BorderRadius.circular(30),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.green.withOpacity(0.2),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.emoji_events,
-                                      color: Colors.orange, size: 60),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    isEnglish ? 'Well done!' : 'Aferin!',
-                                    style: const TextStyle(
-                                      fontSize: 36,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+              Container(
+                height: 80,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: _feedbackText != null
+                    ? AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 400),
+                        child: Container(
+                          key: ValueKey<String>(_feedbackText!),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          decoration: BoxDecoration(
+                            color: _isWrong ? Colors.red : Colors.green,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 10,
+                                offset: Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _isWrong ? Icons.cancel : Icons.check_circle,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                _isWrong
+                                    ? "İşte doğrusu"
+                                    : "Aferin! 🎉",
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -315,13 +307,14 @@ class _Diskalkuli3State extends State<Diskalkuli3>
     required int? answer,
     required void Function(int) onDrop,
   }) {
+    final problem = _problems[_currentProblemIndex];
+
     return SizedBox(
       width: 220,
       height: 260,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Çatı (daha büyük ve oranlı)
           Positioned(
             top: 0,
             child: Container(
@@ -376,9 +369,11 @@ class _Diskalkuli3State extends State<Diskalkuli3>
                         ],
                       ),
                       child: Center(
-                        child: hasAnswer && answer != null
+                        child: hasAnswer
                             ? Text(
-                                answer.toString(),
+                                _isWrong
+                                    ? problem['answer'].toString()
+                                    : answer.toString(),
                                 style: TextStyle(
                                   fontSize: 36,
                                   fontWeight: FontWeight.bold,
@@ -401,7 +396,6 @@ class _Diskalkuli3State extends State<Diskalkuli3>
               ),
             ),
           ),
-          // Gövde (daha büyük ve oranlı)
           Positioned(
             top: 90,
             child: Container(
@@ -420,7 +414,6 @@ class _Diskalkuli3State extends State<Diskalkuli3>
               ),
               child: Stack(
                 children: [
-                  // Kapı
                   Positioned(
                     bottom: 16,
                     left: 75,
@@ -433,7 +426,6 @@ class _Diskalkuli3State extends State<Diskalkuli3>
                       ),
                     ),
                   ),
-                  // Sol pencere
                   Positioned(
                     top: 32,
                     left: 28,
@@ -447,7 +439,6 @@ class _Diskalkuli3State extends State<Diskalkuli3>
                       ),
                     ),
                   ),
-                  // Sağ pencere
                   Positioned(
                     top: 32,
                     right: 28,

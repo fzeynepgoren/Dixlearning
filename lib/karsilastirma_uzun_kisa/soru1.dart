@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../screens/home_screen.dart';
 import 'soru2.dart';
 
 class UzunKisaAgacSorusu extends StatefulWidget {
@@ -32,10 +31,9 @@ class _UzunKisaAgacSorusuState extends State<UzunKisaAgacSorusu>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -107,8 +105,11 @@ class _UzunKisaAgacSorusuState extends State<UzunKisaAgacSorusu>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -122,9 +123,13 @@ class _UzunKisaAgacSorusuState extends State<UzunKisaAgacSorusu>
                     child: Center(
                       child: Container(
                         margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 6),
+                          vertical: 8,
+                          horizontal: 6,
+                        ),
                         padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 6),
+                          vertical: 8,
+                          horizontal: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(32),
@@ -164,7 +169,8 @@ class _UzunKisaAgacSorusuState extends State<UzunKisaAgacSorusu>
                                   width: double.infinity,
                                   height: imageHeight,
                                   margin: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.04),
+                                    horizontal: screenWidth * 0.04,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(24),
@@ -209,8 +215,9 @@ class _UzunKisaAgacSorusuState extends State<UzunKisaAgacSorusu>
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: btnColor,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                           ),
                                         ),
                                         child: const Text(
@@ -231,43 +238,48 @@ class _UzunKisaAgacSorusuState extends State<UzunKisaAgacSorusu>
                                 Container(
                                   height: 60,
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 8),
-                                  child: showFeedback
-                                      ? ScaleTransition(
-                                          scale: CurvedAnimation(
-                                            parent: _feedbackController,
-                                            curve: Curves.elasticOut,
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                isCorrect == true
-                                                    ? Icons.check_circle
-                                                    : Icons.cancel,
-                                                color: isCorrect == true
-                                                    ? Colors.green
-                                                    : Colors.red,
-                                                size: 28,
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Text(
-                                                isCorrect == true
-                                                    ? 'Aferin! 🎉'
-                                                    : 'Tekrar dene! 😔',
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  color: isCorrect == true
-                                                      ? Colors.green
-                                                      : Colors.red,
-                                                  fontWeight: FontWeight.bold,
+                                    horizontal: 20,
+                                    vertical: 8,
+                                  ),
+                                  child:
+                                      showFeedback
+                                          ? ScaleTransition(
+                                            scale: CurvedAnimation(
+                                              parent: _feedbackController,
+                                              curve: Curves.elasticOut,
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  isCorrect == true
+                                                      ? Icons.check_circle
+                                                      : Icons.cancel,
+                                                  color:
+                                                      isCorrect == true
+                                                          ? Colors.green
+                                                          : Colors.red,
+                                                  size: 28,
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      : const SizedBox.shrink(),
+                                                const SizedBox(width: 10),
+                                                Text(
+                                                  isCorrect == true
+                                                      ? 'Aferin! 🎉'
+                                                      : 'Tekrar dene! 😔',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color:
+                                                        isCorrect == true
+                                                            ? Colors.green
+                                                            : Colors.red,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                          : const SizedBox.shrink(),
                                 ),
                               ],
                             ),

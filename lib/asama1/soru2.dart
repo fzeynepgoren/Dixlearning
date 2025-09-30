@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../screens/home_screen.dart';
 import '../utils/activity_tracker.dart';
+import '../providers/language_provider.dart';
 import 'soru3.dart'; // GeometricMatching burada tanımlı
 
 class GDisgrafi1 extends StatefulWidget {
@@ -83,8 +85,7 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
   void _checkMatch() {
     if (selectedLeftIndex != null && selectedRightIndex != null) {
       setState(() {
-        isCorrect =
-            leftToys[selectedLeftIndex!] == rightToys[selectedRightIndex!];
+        isCorrect = leftToys[selectedLeftIndex!] == rightToys[selectedRightIndex!];
         showFeedback = true;
       });
       _feedbackController.forward(from: 0);
@@ -103,9 +104,7 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
               ActivityTracker.completeActivity();
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const GeometricMatching(),
-                ),
+                MaterialPageRoute(builder: (context) => const GeometricMatching()),
               );
             }
           });
@@ -153,16 +152,10 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
+                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
-                          ),
+                          MaterialPageRoute(builder: (context) => const HomeScreen()),
                           (route) => false,
                         );
                       },
@@ -204,52 +197,35 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                                 // Sol oyuncaklar
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: List.generate(leftToys.length, (
-                                      index,
-                                    ) {
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: List.generate(leftToys.length, (index) {
                                       return GestureDetector(
                                         onTap: () => _handleLeftTap(index),
                                         child: AnimatedContainer(
-                                          duration: const Duration(
-                                            milliseconds: 300,
-                                          ),
+                                          duration: const Duration(milliseconds: 300),
                                           curve: Curves.easeInOut,
                                           width: 90,
                                           height: 90,
-                                          margin: const EdgeInsets.symmetric(
-                                            vertical: 6,
-                                          ),
+                                          margin: const EdgeInsets.symmetric(vertical: 6),
                                           decoration: BoxDecoration(
-                                            color:
-                                                matchedLeft[index]
-                                                    ? Colors.green.shade200
-                                                    : (showFeedback &&
+                                            color: matchedLeft[index]
+                                                ? Colors.green.shade200
+                                                : (showFeedback &&
                                                         !isCorrect &&
-                                                        selectedLeftIndex ==
-                                                            index)
+                                                        selectedLeftIndex == index)
                                                     ? Colors.red.shade200
                                                     : Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            border:
-                                                (selectedLeftIndex == index &&
-                                                        !matchedLeft[index])
-                                                    ? Border.all(
-                                                      color:
-                                                          Colors
-                                                              .lightGreen
-                                                              .shade400,
-                                                      width: 3,
-                                                    )
-                                                    : null,
+                                            borderRadius: BorderRadius.circular(20),
+                                            border: (selectedLeftIndex == index &&
+                                                    !matchedLeft[index])
+                                                ? Border.all(
+                                                    color: Colors.lightGreen.shade400,
+                                                    width: 3,
+                                                  )
+                                                : null,
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.2,
-                                                ),
+                                                color: Colors.black.withOpacity(0.2),
                                                 blurRadius: 6,
                                                 offset: const Offset(0, 3),
                                               ),
@@ -258,9 +234,7 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                                           child: Center(
                                             child: Text(
                                               leftToys[index],
-                                              style: const TextStyle(
-                                                fontSize: 38,
-                                              ),
+                                              style: const TextStyle(fontSize: 38),
                                             ),
                                           ),
                                         ),
@@ -271,9 +245,7 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                                 // Orta çizgi
                                 Container(
                                   width: 4,
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                  ),
+                                  margin: const EdgeInsets.symmetric(horizontal: 10),
                                   decoration: BoxDecoration(
                                     color: Colors.grey.shade400,
                                     borderRadius: BorderRadius.circular(2),
@@ -282,52 +254,35 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                                 // Sağ oyuncaklar
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: List.generate(rightToys.length, (
-                                      index,
-                                    ) {
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: List.generate(rightToys.length, (index) {
                                       return GestureDetector(
                                         onTap: () => _handleRightTap(index),
                                         child: AnimatedContainer(
-                                          duration: const Duration(
-                                            milliseconds: 300,
-                                          ),
+                                          duration: const Duration(milliseconds: 300),
                                           curve: Curves.easeInOut,
                                           width: 90,
                                           height: 90,
-                                          margin: const EdgeInsets.symmetric(
-                                            vertical: 6,
-                                          ),
+                                          margin: const EdgeInsets.symmetric(vertical: 6),
                                           decoration: BoxDecoration(
-                                            color:
-                                                matchedRight[index]
-                                                    ? Colors.green.shade200
-                                                    : (showFeedback &&
+                                            color: matchedRight[index]
+                                                ? Colors.green.shade200
+                                                : (showFeedback &&
                                                         !isCorrect &&
-                                                        selectedRightIndex ==
-                                                            index)
+                                                        selectedRightIndex == index)
                                                     ? Colors.red.shade200
                                                     : Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            border:
-                                                (selectedRightIndex == index &&
-                                                        !matchedRight[index])
-                                                    ? Border.all(
-                                                      color:
-                                                          Colors
-                                                              .lightGreen
-                                                              .shade400,
-                                                      width: 3,
-                                                    )
-                                                    : null,
+                                            borderRadius: BorderRadius.circular(20),
+                                            border: (selectedRightIndex == index &&
+                                                    !matchedRight[index])
+                                                ? Border.all(
+                                                    color: Colors.lightGreen.shade400,
+                                                    width: 3,
+                                                  )
+                                                : null,
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.2,
-                                                ),
+                                                color: Colors.black.withOpacity(0.2),
                                                 blurRadius: 6,
                                                 offset: const Offset(0, 3),
                                               ),
@@ -358,61 +313,48 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                 // Feedback alanı
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: showFeedback
+                      ? ScaleTransition(
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
                             ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect ? "Aferin! 🎉" : "Tekrar dene! 😔",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: isCorrect ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? "Aferin! 🎉"
-                                        : "Tekrar dene! 😔",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color:
-                                          isCorrect ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          )
-                          : const SizedBox.shrink(),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 ),
               ],
             ),

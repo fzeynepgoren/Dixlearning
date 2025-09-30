@@ -15,7 +15,7 @@ class MeyveEsle extends StatefulWidget {
 class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
   final List<List<String>> pageFruits = [
     ['🍓', '🍇', '🍒'],
-    ['🍎', '🍊', '🍐'],
+    ['🍎', '🍊', '🍐']
   ];
 
   late List<List<String>> rightFruits;
@@ -60,9 +60,10 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-    );
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
 
     _slideController.forward();
   }
@@ -101,8 +102,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
   void _checkMatch() {
     if (selectedLeftIndex != null && selectedRightIndex != null) {
       setState(() {
-        isCorrect =
-            pageFruits[currentPage][selectedLeftIndex!] ==
+        isCorrect = pageFruits[currentPage][selectedLeftIndex!] ==
             rightFruits[currentPage][selectedRightIndex!];
         showFeedback = true;
       });
@@ -177,16 +177,12 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
+                      icon: Icon(Icons.arrow_back,
+                          color: Colors.black, size: iconSize),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
-                          ),
+                              builder: (context) => const HomeScreen()),
                           (route) => false,
                         );
                       },
@@ -234,20 +230,17 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                                   child: Container(
                                     width: 120,
                                     height: 120,
-                                    margin: const EdgeInsets.symmetric(
-                                      vertical: 8,
-                                    ),
+                                    margin: const EdgeInsets.symmetric(vertical: 8),
                                     decoration: BoxDecoration(
-                                      color:
-                                          matchedLeft[currentPage][index]
-                                              ? Colors.green.shade300
-                                              : (showFeedback &&
+                                      color: matchedLeft[currentPage][index]
+                                          ? Colors.green.shade300
+                                          : (showFeedback &&
                                                   !isCorrect &&
                                                   selectedLeftIndex == index)
                                               ? Colors.red.shade200
                                               : selectedLeftIndex == index
-                                              ? Colors.blue.shade200
-                                              : Colors.white,
+                                                  ? Colors.blue.shade200
+                                                  : Colors.white,
                                       borderRadius: BorderRadius.circular(20),
                                       boxShadow: [
                                         BoxShadow(
@@ -260,7 +253,9 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                                     child: Center(
                                       child: Text(
                                         pageFruits[currentPage][index],
-                                        style: const TextStyle(fontSize: 48),
+                                        style: const TextStyle(
+                                          fontSize: 48,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -286,20 +281,17 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                                   child: Container(
                                     width: 120,
                                     height: 120,
-                                    margin: const EdgeInsets.symmetric(
-                                      vertical: 8,
-                                    ),
+                                    margin: const EdgeInsets.symmetric(vertical: 8),
                                     decoration: BoxDecoration(
-                                      color:
-                                          matchedRight[currentPage][index]
-                                              ? Colors.green.shade300
-                                              : (showFeedback &&
+                                      color: matchedRight[currentPage][index]
+                                          ? Colors.green.shade300
+                                          : (showFeedback &&
                                                   !isCorrect &&
                                                   selectedRightIndex == index)
                                               ? Colors.red.shade200
                                               : selectedRightIndex == index
-                                              ? Colors.blue.shade200
-                                              : Colors.white,
+                                                  ? Colors.blue.shade200
+                                                  : Colors.white,
                                       borderRadius: BorderRadius.circular(20),
                                       boxShadow: [
                                         BoxShadow(
@@ -312,7 +304,9 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                                     child: Center(
                                       child: Text(
                                         rightFruits[currentPage][index],
-                                        style: const TextStyle(fontSize: 48),
+                                        style: const TextStyle(
+                                          fontSize: 48,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -330,9 +324,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                   Container(
                     height: 80,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
-                    ),
+                        horizontal: 20, vertical: 10),
                     child: ScaleTransition(
                       scale: CurvedAnimation(
                         parent: _feedbackController,
@@ -340,9 +332,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                       ),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 20,
-                        ),
+                            vertical: 10, horizontal: 20),
                         decoration: BoxDecoration(
                           color: Colors.transparent,
                           borderRadius: BorderRadius.circular(16),

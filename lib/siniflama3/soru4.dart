@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import 'soru5.dart';
+import 'soru5.dart'; // HayvanYasamSinifla sınıfının bulunduğu dosya
 
 class TasitSinifla extends StatefulWidget {
   const TasitSinifla({super.key});
@@ -21,343 +21,368 @@ class _TasitSiniflaState extends State<TasitSinifla>
     {'emoji': '🚁', 'id': 'helikopter', 'type': 'hava', 'isPlaced': false},
   ];
 
-  final List<Map<String, dynamic>> landGroup = [];
-  final List<Map<String, dynamic>> seaGroup = [];
-  final List<Map<String, dynamic>> airGroup = [];
+  final Map<String, List<Map<String, dynamic>>> typeGroups = {
+    'kara': [],
+    'deniz': [],
+    'hava': [],
+  };
+
   bool showFeedback = false;
   bool isCorrect = false;
   bool _dialogShown = false;
+  String? _lastAcceptedType;
+
   late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
+    items.shuffle();
+
     _feedbackController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
+
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
+
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
-  void _handleDrag(Map<String, dynamic> item, String type) {
-    setState(() {
-      isCorrect = item['type'] == type;
-      showFeedback = true;
-    });
-    _feedbackController.forward(from: 0);
+  void _handleDrag(Map<String, dynamic> item, String targetType) {
+    bool correct = item['type'] == targetType;
 
-    if (isCorrect) {
-      setState(() {
-        if (!item['isPlaced']) {
-          if (type == 'kara') {
-            landGroup.add(item);
-          } else if (type == 'deniz') {
-            seaGroup.add(item);
-          } else if (type == 'hava') {
-            airGroup.add(item);
-          }
-          item['isPlaced'] = true;
-        }
-      });
-      _checkCompletion();
-    }
+    setState(() {
+      isCorrect = correct;
+      showFeedback = true;
+      _lastAcceptedType = correct ? targetType : null;
+
+      if (correct && !item['isPlaced']) {
+        typeGroups[targetType]?.add(item);
+        item['isPlaced'] = true;
+      }
+    });
+
+    _feedbackController.forward(from: 0);
 
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
           showFeedback = false;
+          _lastAcceptedType = null;
         });
       }
     });
+
+    if (correct) {
+      _checkCompletion();
+    }
   }
 
   void _checkCompletion() {
-    if (landGroup.length + seaGroup.length + airGroup.length == items.length) {
-      bool isCorrect = true;
-      for (var item in landGroup) {
-        if (item['type'] != 'kara') {
-          isCorrect = false;
-          break;
+    final allPlaced = items.every((e) => e['isPlaced'] == true);
+    if (allPlaced && !_dialogShown) {
+      _dialogShown = true;
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HayvanYasamSinifla()),
+          );
         }
-      }
-      for (var item in seaGroup) {
-        if (item['type'] != 'deniz') {
-          isCorrect = false;
-          break;
-        }
-      }
-      for (var item in airGroup) {
-        if (item['type'] != 'hava') {
-          isCorrect = false;
-          break;
-        }
-      }
-      if (isCorrect && !_dialogShown) {
-        _dialogShown = true;
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const HayvanYasamSinifla(),
-              ),
-            );
-          }
-        });
-      }
+      });
     }
+  }
+
+  Color _getBorderColorForType(String type, Color defaultColor) {
+    if (showFeedback && _lastAcceptedType == type) {
+      return isCorrect ? Colors.green : Colors.red;
+    }
+    return defaultColor;
   }
 
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    return Scaffold(
-      backgroundColor: const Color(0xFFE1F5FE),
-      appBar: AppBar(
-        title: Text(
-          isEnglish
-              ? 'Classify Vehicles by Type'
-              : 'Taşıt Türü ve Alanı Sınıflama',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.deepPurple.shade100,
-                  Colors.deepPurple.shade50,
-                  Colors.white,
-                ],
-              ),
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                Colors.white,
+              ],
+              stops: const [0.0, 0.5, 1.0],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(24.0),
+          child: SafeArea(
             child: Column(
               children: [
-                const SizedBox(height: 12),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
                       ),
-                    ],
-                  ),
-                  child: Text(
-                    isEnglish
-                        ? 'Drag the vehicles to the correct group!'
-                        : 'Taşıtları doğru gruba sürükle!',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.deepPurple,
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 32),
                 Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: _buildGroup(
-                          isEnglish ? 'Land' : 'Kara',
-                          landGroup,
-                          'kara',
-                          Colors.green.shade200,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildGroup(
-                          isEnglish ? 'Sea' : 'Deniz',
-                          seaGroup,
-                          'deniz',
-                          Colors.blue.shade200,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildGroup(
-                          isEnglish ? 'Air' : 'Hava',
-                          airGroup,
-                          'hava',
-                          Colors.purple.shade200,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      if (!item['isPlaced']) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Draggable<Map<String, dynamic>>(
-                            data: item,
-                            feedback: _buildDraggableItem(item),
-                            childWhenDragging: Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: _buildDraggableItem(item),
-                          ),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20),
-                if (showFeedback)
-                  ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
+                  child: SlideTransition(
+                    position: _slideAnimation,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 20,
-                      ),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 28,
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                : (isEnglish
-                                    ? 'Try again! 😔'
-                                    : 'Tekrar dene! 😔'),
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
+                            child: Text(
+                              isEnglish
+                                  ? 'Drag the vehicles to the correct group!'
+                                  : 'Taşıtları doğru gruba sürükle!',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      _buildGroup(
+                                        isEnglish ? 'Land' : 'Kara',
+                                        typeGroups['kara']!,
+                                        'kara',
+                                        Colors.green.shade50,
+                                        Colors.green,
+                                      ),
+                                      _buildGroup(
+                                        isEnglish ? 'Sea' : 'Deniz',
+                                        typeGroups['deniz']!,
+                                        'deniz',
+                                        Colors.blue.shade50,
+                                        Colors.lightBlue,
+                                      ),
+                                      _buildGroup(
+                                        isEnglish ? 'Air' : 'Hava',
+                                        typeGroups['hava']!,
+                                        'hava',
+                                        Colors.purple.shade50,
+                                        Colors.deepPurpleAccent,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  flex: 2,
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children:
+                                          items
+                                              .where(
+                                                (item) => !item['isPlaced'],
+                                              )
+                                              .map(
+                                                (item) => Draggable<
+                                                  Map<String, dynamic>
+                                                >(
+                                                  data: item,
+                                                  feedback: Material(
+                                                    color: Colors.transparent,
+                                                    child: _buildDraggableItem(
+                                                      item,
+                                                    ),
+                                                  ),
+                                                  childWhenDragging: Opacity(
+                                                    opacity: 0.3,
+                                                    child: _buildDraggableItem(
+                                                      item,
+                                                    ),
+                                                  ),
+                                                  child: _buildDraggableItem(
+                                                    item,
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                const SizedBox(height: 20),
+                ),
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect
+                                      ? (isEnglish
+                                          ? 'Well done! 🎉'
+                                          : 'Aferin! 🎉')
+                                      : (isEnglish
+                                          ? 'Try again! 😔'
+                                          : 'Tekrar dene! 😔'),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                          : const SizedBox.shrink(),
+                ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildGroup(String title, List<Map<String, dynamic>> group,
-      String type, Color color) {
+  Widget _buildGroup(
+    String title,
+    List<Map<String, dynamic>> group,
+    String type,
+    Color boxColor,
+    Color borderColor,
+  ) {
     return DragTarget<Map<String, dynamic>>(
-      onWillAcceptWithDetails: (data) => true,
-      onAcceptWithDetails: (data) => _handleDrag(data.data, type),
+      onWillAccept: (data) => data?['type'] == type,
+      onAccept: (data) => _handleDrag(data, type),
       builder: (context, candidateData, rejectedData) {
-        return Container(
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          width: double.infinity,
+          height: 145,
+          margin: const EdgeInsets.symmetric(vertical: 7),
+          padding: const EdgeInsets.all(7),
           decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
+            color: boxColor,
+            border: Border.all(
+              color: _getBorderColorForType(type, borderColor),
+              width: 4,
+            ),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    topRight: Radius.circular(15),
-                  ),
-                ),
-                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
                   title,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ),
               Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: group
-                        .map((item) => Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 12.0),
-                              child: Text(
+                child: SingleChildScrollView(
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 10,
+                    runSpacing: 4,
+                    children:
+                        group
+                            .map(
+                              (item) => Text(
                                 item['emoji'],
-                                style: const TextStyle(fontSize: 48),
-                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 50,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ))
-                        .toList(),
+                            )
+                            .toList(),
                   ),
                 ),
               ),
@@ -370,23 +395,20 @@ class _TasitSiniflaState extends State<TasitSinifla>
 
   Widget _buildDraggableItem(Map<String, dynamic> item) {
     return Container(
-      width: 80,
-      height: 80,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      width: 90,
+      height: 70,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Center(
         child: Text(
           item['emoji'],
-          style: const TextStyle(fontSize: 40),
+          style: const TextStyle(fontSize: 50, color: Colors.black),
         ),
       ),
     );
