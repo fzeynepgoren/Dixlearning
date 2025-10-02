@@ -109,7 +109,7 @@ class _GeometricMatchingState extends State<GeometricMatching>
     ),
     Shape(
       shape: 'Daire',
-      color: const Color(0xFF81C784),
+      color: const Color.fromARGB(255, 170, 111, 199),
       icon: Icons.circle_outlined,
     ),
     Shape(
@@ -161,7 +161,6 @@ class _GeometricMatchingState extends State<GeometricMatching>
     setState(() {
       isCorrect = leftShape == rightShape;
       showFeedback = true;
-      selectedLeftShape = null; // Seçimi sıfırla
     });
 
     _feedbackController.forward(from: 0);
@@ -171,7 +170,7 @@ class _GeometricMatchingState extends State<GeometricMatching>
         matches[leftShape] = rightShape;
       });
       if (matches.length == leftShapes.length) {
-        Future.delayed(const Duration(seconds: 1), () {
+        Future.delayed(const Duration(seconds: 2), () {
           if (mounted) {
             Navigator.pushReplacement(
               context,
@@ -180,19 +179,23 @@ class _GeometricMatchingState extends State<GeometricMatching>
           }
         });
       } else {
-        Future.delayed(const Duration(seconds: 1), () {
+        // Feedback'i 2 saniye sonra gizle
+        Future.delayed(const Duration(seconds: 2), () {
           if (mounted) {
             setState(() {
               showFeedback = false;
+              selectedLeftShape = null; // Seçimi temizle
             });
           }
         });
       }
     } else {
-      Future.delayed(const Duration(seconds: 1), () {
+      // Yanlış cevap için feedback'i 2 saniye sonra gizle
+      Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           setState(() {
             showFeedback = false;
+            selectedLeftShape = null; // Seçimi temizle
           });
         }
       });
@@ -206,21 +209,24 @@ class _GeometricMatchingState extends State<GeometricMatching>
     bool isShadow = false,
     bool isSelected = false,
   }) {
-    Color cardColor =
-        isMatched
-            ? shape.color
-            : isShadow
-            ? Colors.grey.shade200
-            : shape.color;
+    Color cardColor;
+    Color iconColor;
 
-    Color iconColor =
-        isShadow && !isMatched ? Colors.grey.shade600 : Colors.white;
-
-    Border? border =
-        isSelected ? Border.all(color: Colors.green.shade400, width: 4) : null;
+    if (isMatched) {
+      cardColor = Colors.green.shade400;
+      iconColor = Colors.white;
+    } else if (isShadow) {
+      cardColor = Colors.grey.shade200;
+      iconColor = Colors.grey.shade600;
+    } else {
+      // Sol taraf için orijinal renkli arka plan
+      cardColor = shape.color;
+      iconColor = Colors.white;
+    }
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration:
+          showFeedback ? Duration.zero : const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
       width: 120,
       height: 120,
@@ -228,12 +234,15 @@ class _GeometricMatchingState extends State<GeometricMatching>
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(20),
-        border: border,
+        border:
+            isSelected && !isMatched && !isShadow
+                ? Border.all(color: Colors.white, width: 3)
+                : null,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
             blurRadius: 6,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -247,7 +256,7 @@ class _GeometricMatchingState extends State<GeometricMatching>
                     painter: TrianglePainter(color: iconColor),
                   ),
                 )
-                : Icon(shape.icon, size: 50, color: iconColor),
+                : Icon(shape.icon, size: 48, color: iconColor),
       ),
     );
   }
@@ -341,7 +350,7 @@ class _GeometricMatchingState extends State<GeometricMatching>
 
                                       return GestureDetector(
                                         onTap:
-                                            isMatched
+                                            isMatched || showFeedback
                                                 ? null
                                                 : () {
                                                   setState(() {
@@ -359,19 +368,20 @@ class _GeometricMatchingState extends State<GeometricMatching>
                               ),
                               Container(
                                 width: 4,
-                                height: screenSize.height * 0.45,
                                 margin: const EdgeInsets.symmetric(
-                                  horizontal: 12,
+                                  horizontal: 10,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(4),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 5,
-                                    ),
-                                  ],
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.blue.shade400,
+                                      Colors.blue.shade200,
+                                      Colors.blue.shade100,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(2),
                                 ),
                               ),
                               Expanded(
@@ -386,7 +396,8 @@ class _GeometricMatchingState extends State<GeometricMatching>
                                       return GestureDetector(
                                         onTap:
                                             isMatched ||
-                                                    selectedLeftShape == null
+                                                    selectedLeftShape == null ||
+                                                    showFeedback
                                                 ? null
                                                 : () {
                                                   if (selectedLeftShape !=
