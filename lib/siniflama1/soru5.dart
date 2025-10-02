@@ -48,156 +48,187 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
     _slideController.forward();
   }
 
+  void _checkCompletion() {
+    if (fourLegsGroup.length == 2 && twoLegsGroup.length == 2) {
+      setState(() {
+        isCorrect = true;
+        showFeedback = true;
+      });
+      _feedbackController.forward();
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            (route) => false,
+          );
+        }
+      });
+    }
+  }
+
+  void _showFeedback(String message, bool correct) {
+    setState(() {
+      showFeedback = true;
+      isCorrect = correct;
+    });
+    _feedbackController.forward();
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) {
+        setState(() {
+          showFeedback = false;
+        });
+        _feedbackController.reset();
+      }
+    });
+  }
+
+  Widget _buildItem(Map<String, dynamic> item) {
+    return Draggable<Map<String, dynamic>>(
+      data: item,
+      feedback: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(item['emoji'], style: const TextStyle(fontSize: 50)),
+          ),
+        ),
+      ),
+      childWhenDragging: Opacity(
+        opacity: 0.3,
+        child: Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(item['emoji'], style: const TextStyle(fontSize: 50)),
+          ),
+        ),
+      ),
+      child: Container(
+        width: 80,
+        height: 80,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(item['emoji'], style: const TextStyle(fontSize: 50)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGroup(
+    String title,
+    List<Map<String, dynamic>> items,
+    bool isFourLegs,
+  ) {
+    return DragTarget<Map<String, dynamic>>(
+      onWillAcceptWithDetails: (data) {
+        return !data.data['isPlaced'] && data.data['isFourLegs'] == isFourLegs;
+      },
+      onAcceptWithDetails: (data) {
+        setState(() {
+          data.data['isPlaced'] = true;
+          if (isFourLegs) {
+            fourLegsGroup.add(data.data);
+          } else {
+            twoLegsGroup.add(data.data);
+          }
+        });
+        _checkCompletion();
+      },
+      builder: (context, candidateData, rejectedData) {
+        return Container(
+          width: double.infinity,
+          height: 200,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isFourLegs ? Colors.green : Colors.purple,
+              width: 2,
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isFourLegs ? Colors.green : Colors.purple,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children:
+                        items.map((item) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Text(
+                              item['emoji'],
+                              style: const TextStyle(fontSize: 50),
+                            ),
+                          );
+                        }).toList(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _feedbackController.dispose();
     _slideController.dispose();
     super.dispose();
-  }
-
-  void _handleDrag(Map<String, dynamic> item, bool isFourLegs) {
-    setState(() {
-      isCorrect = item['isFourLegs'] == isFourLegs;
-      showFeedback = true;
-    });
-    _feedbackController.forward(from: 0);
-
-    if (isCorrect) {
-      setState(() {
-        if (!item['isPlaced']) {
-          if (isFourLegs) {
-            fourLegsGroup.add(item);
-          } else {
-            twoLegsGroup.add(item);
-          }
-          item['isPlaced'] = true;
-        }
-      });
-      _checkCompletion();
-    }
-
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          showFeedback = false;
-        });
-      }
-    });
-  }
-
-  void _checkCompletion() {
-    if (fourLegsGroup.length + twoLegsGroup.length == items.length) {
-      bool isCorrect = true;
-      for (var item in fourLegsGroup) {
-        if (!item['isFourLegs']) {
-          isCorrect = false;
-          break;
-        }
-      }
-      for (var item in twoLegsGroup) {
-        if (item['isFourLegs']) {
-          isCorrect = false;
-          break;
-        }
-      }
-
-      if (isCorrect && !_dialogShown) {
-        _dialogShown = true;
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) => Dialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.deepPurple.shade100,
-                        Colors.deepPurple.shade50,
-                      ],
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.emoji_events,
-                        size: 80,
-                        color: Colors.amber,
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        Provider.of<LanguageProvider>(context, listen: false)
-                            .isEnglish
-                            ? 'Congratulations! 🎉'
-                            : 'Tebrikler! 🎉',
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        Provider.of<LanguageProvider>(context, listen: false)
-                            .isEnglish
-                            ? 'You have completed stage 5!'
-                            : '5. aşamayı tamamladınız!',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.deepPurple,
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HomeScreen(),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 40,
-                            vertical: 15,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                        ),
-                        child: Text(
-                          Provider.of<LanguageProvider>(context, listen: false)
-                              .isEnglish
-                              ? 'Back to Menu'
-                              : 'Ana Menüye Dön',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }
-        });
-      }
-    }
   }
 
   @override
@@ -206,8 +237,8 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
     final screenSize = MediaQuery.of(context).size;
     final iconSize = screenSize.width * 0.065;
 
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
       child: Scaffold(
         body: Container(
           decoration: BoxDecoration(
@@ -226,7 +257,7 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
             child: Column(
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     IconButton(
                       icon: Icon(
@@ -234,92 +265,89 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                         color: Colors.black,
                         size: iconSize,
                       ),
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => const YiyecekIcecekSinifla(),
+                          ),
+                          (route) => false,
+                        );
+                      },
+                    ),
+                    SizedBox(width: iconSize),
+                    Text(
+                      isEnglish
+                          ? 'Animal Leg Classification'
+                          : 'Hayvan Bacak Sınıflandırma',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                   ],
                 ),
+                const SizedBox(height: 10),
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
                     child: Container(
-                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(24),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
                           ),
                         ],
                       ),
                       child: Column(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 1,
+                          Text(
+                            isEnglish
+                                ? 'Drag the animals to the correct group!'
+                                : 'Hayvanları doğru gruba sürükle!',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
-                            child: Text(
-                              isEnglish
-                                  ? 'Drag the animals to the correct group!'
-                                  : 'Hayvanları doğru gruba sürükle!',
-                              style: const TextStyle(
-                                fontSize: 23,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 15),
+                          const SizedBox(height: 20),
                           Expanded(
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Expanded(
-                                  flex: 3,
                                   child: Column(
                                     children: [
-                                      Expanded(
-                                        child: _buildGroupContainer(
-                                          fourLegsGroup,
-                                          true,
-                                          isEnglish,
-                                        ),
+                                      _buildGroup(
+                                        isEnglish ? '4 Legs' : '4 Bacak',
+                                        fourLegsGroup,
+                                        true,
                                       ),
                                       const SizedBox(height: 16),
-                                      Expanded(
-                                        child: _buildGroupContainer(
-                                          twoLegsGroup,
-                                          false,
-                                          isEnglish,
-                                        ),
+                                      _buildGroup(
+                                        isEnglish ? '2 Legs' : '2 Bacak',
+                                        twoLegsGroup,
+                                        false,
                                       ),
                                     ],
                                   ),
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
-                                  flex: 2,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    children: items
-                                        .where((item) => !item['isPlaced'])
-                                        .map((item) {
-                                      return Draggable<Map<String, dynamic>>(
-                                        data: item,
-                                        feedback: Material(
-                                          color: Colors.transparent,
-                                          child: _buildItemBox(item),
-                                        ),
-                                        childWhenDragging: const SizedBox.shrink(),
-                                        child: _buildItemBox(item),
-                                      );
-                                    }).toList(),
+                                    children:
+                                        items
+                                            .where((item) => !item['isPlaced'])
+                                            .map((item) => _buildItem(item))
+                                            .toList(),
                                   ),
                                 ),
                               ],
@@ -336,119 +364,66 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                     horizontal: 20,
                     vertical: 10,
                   ),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                              : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGroupContainer(
-      List<Map<String, dynamic>> group,
-      bool isFourLegs,
-      bool isEnglish,
-      ) {
-    Color boxColor = isFourLegs ? const Color(0xFFE8F5E8) : const Color(0xFFD6ECFF);
-    Color borderColor = isFourLegs ? Colors.green : Colors.lightBlue;
-
-    return DragTarget<Map<String, dynamic>>(
-      onWillAccept: (item) => true,
-      onAccept: (item) => _handleDrag(item!, isFourLegs),
-      builder: (context, candidateData, rejectedData) {
-        return Container(
-          width: double.infinity,
-          height: 140,
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          decoration: BoxDecoration(
-            color: boxColor,
-            border: Border.all(
-              color: borderColor,
-              width: 2,
-            ),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                isFourLegs
-                    ? (isEnglish ? 'Four Legs' : 'Dört Bacaklı')
-                    : (isEnglish ? 'Two Legs' : 'İki Bacaklı'),
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 8,
-                children: group
-                    .map((item) => Text(
-                  item['emoji'],
-                  style: const TextStyle(fontSize: 36),
-                ))
-                    .toList(),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildItemBox(Map<String, dynamic> item) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          item['emoji'],
-          style: const TextStyle(fontSize: 48),
         ),
       ),
     );
