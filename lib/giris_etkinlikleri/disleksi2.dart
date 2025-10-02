@@ -20,37 +20,37 @@ class _Disleksi2State extends State<Disleksi2>
     {
       "word": "balık",
       "emoji": "🐟",
-      "options": ["b", "p"]
+      "options": ["b", "p"],
     },
     {
       "word": "pasta",
       "emoji": "🎂",
-      "options": ["p", "b"]
+      "options": ["p", "b"],
     },
     {
       "word": "şemsiye",
       "emoji": "☂️",
-      "options": ["ş", "s"]
+      "options": ["ş", "s"],
     },
     {
       "word": "şeker",
       "emoji": "🍬",
-      "options": ["ş", "s"]
+      "options": ["ş", "s"],
     },
     {
       "word": "uçak",
       "emoji": "✈️",
-      "options": ["u", "ü"]
+      "options": ["u", "ü"],
     },
     {
       "word": "tavşan",
       "emoji": "🐰",
-      "options": ["t", "f"]
+      "options": ["t", "f"],
     },
     {
       "word": "ceket",
       "emoji": "🧥",
-      "options": ["c", "ç"]
+      "options": ["c", "ç"],
     },
   ];
 
@@ -90,7 +90,7 @@ class _Disleksi2State extends State<Disleksi2>
   void getNextWord({bool isFirst = false}) {
     setState(() {
       if (remainingWords.isEmpty) {
-        isAnswered = true;
+        // Son kelime ise ve cevaplanmışsa navigasyon Disleksi4'e yönlendirilir
         return;
       }
       int randomIndex = Random().nextInt(remainingWords.length);
@@ -113,14 +113,11 @@ class _Disleksi2State extends State<Disleksi2>
       selectedOption = option;
       isAnswered = true;
       isCorrect = option == currentWordData["word"]![0];
-      if (isCorrect) {
-        _feedbackController.forward().then((_) => _feedbackController.reverse());
-      } else {
-        _feedbackController.forward().then((_) => _feedbackController.reverse());
-      }
     });
 
-    Future.delayed(const Duration(seconds: 2), () {
+    _feedbackController.forward(from: 0);
+
+    Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         if (remainingWords.isNotEmpty) {
           getNextWord();
@@ -128,13 +125,21 @@ class _Disleksi2State extends State<Disleksi2>
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-              const Disleksi4(),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              pageBuilder:
+                  (context, animation, secondaryAnimation) => const Disleksi4(),
+              transitionsBuilder: (
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+              ) {
                 const begin = Offset(1.0, 0.0);
                 const end = Offset.zero;
                 const curve = Curves.ease;
-                var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                var tween = Tween(
+                  begin: begin,
+                  end: end,
+                ).chain(CurveTween(curve: curve));
                 return SlideTransition(
                   position: animation.drive(tween),
                   child: child,
@@ -150,9 +155,10 @@ class _Disleksi2State extends State<Disleksi2>
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    final displayedWord = isAnswered
-        ? currentWordData["word"]!
-        : "_${currentWordData["word"]!.substring(1)}";
+    final displayedWord =
+        isAnswered
+            ? currentWordData["word"]!
+            : "_${currentWordData["word"]!.substring(1)}";
 
     final screenSize = MediaQuery.of(context).size;
     final iconSize = screenSize.width * 0.065;
@@ -178,11 +184,17 @@ class _Disleksi2State extends State<Disleksi2>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: Colors.black,
+                      size: iconSize,
+                    ),
                     onPressed: () {
                       Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (context) => const HomeScreen()),
-                            (route) => false,
+                        MaterialPageRoute(
+                          builder: (context) => const HomeScreen(),
+                        ),
+                        (route) => false,
                       );
                     },
                   ),
@@ -191,7 +203,10 @@ class _Disleksi2State extends State<Disleksi2>
               Expanded(
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 500),
-                  transitionBuilder: (Widget child, Animation<double> animation) {
+                  transitionBuilder: (
+                    Widget child,
+                    Animation<double> animation,
+                  ) {
                     return FadeTransition(
                       opacity: animation,
                       child: SlideTransition(
@@ -210,7 +225,7 @@ class _Disleksi2State extends State<Disleksi2>
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.95),
                       borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
+                       boxShadow:[
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
                           blurRadius: 20,
@@ -235,7 +250,10 @@ class _Disleksi2State extends State<Disleksi2>
                             isEnglish
                                 ? 'Select the correct letter for the blank below!'
                                 : 'Aşağıdaki boşluğa doğru harfi seçin!',
-                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -252,22 +270,30 @@ class _Disleksi2State extends State<Disleksi2>
                         const SizedBox(height: 36),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: currentWordData["options"].map<Widget>((option) {
+                          children:
+                              currentWordData["options"].map<Widget>((option) {
                             Color getButtonColor() {
                               if (!isAnswered) return Colors.blue.shade200;
                               if (option == currentWordData["word"]![0]) {
                                 return Colors.green.shade500;
                               }
-                              if (selectedOption == option && option != currentWordData["word"]![0]) {
+                              if (selectedOption == option &&
+                                  option != currentWordData["word"]![0]) {
                                 return Colors.red.shade500;
                               }
                               return Colors.blue.shade200;
                             }
 
                             return ElevatedButton(
-                              onPressed: isAnswered ? null : () => checkAnswer(option),
+                              onPressed:
+                                  isAnswered
+                                      ? null
+                                      : () => checkAnswer(option),
                               style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 40,
+                                  vertical: 24,
+                                ),
                                 backgroundColor: getButtonColor(),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
@@ -292,47 +318,55 @@ class _Disleksi2State extends State<Disleksi2>
               ),
               Container(
                 height: 80,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
                 child: isAnswered
                     ? ScaleTransition(
-                  scale: CurvedAnimation(
-                    parent: _feedbackController,
-                    curve: Curves.elasticOut,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: isCorrect ? Colors.green : Colors.red,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
+                        scale: CurvedAnimation(
+                          parent: _feedbackController,
+                          curve: Curves.elasticOut,
                         ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: Colors.white,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 20,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isCorrect ? Colors.green : Colors.red,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 10,
+                                offset: Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isCorrect ? Icons.check_circle : Icons.cancel,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                isCorrect
+                                    ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                                    : (isEnglish ? "Try again! 😔" : 'Tekrar dene! 😔'),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                )
+                      )
                     : const SizedBox.shrink(),
               ),
             ],
