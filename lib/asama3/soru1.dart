@@ -65,12 +65,16 @@ class _ActivityMatchingState extends State<ActivityMatching>
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
 
-  @override
-  void initState() {
-    super.initState();
+  void _shuffleDescriptions() {
     shuffledDescriptions = List.from(
       leftActivities.map((e) => e.description).toList(),
     )..shuffle();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _shuffleDescriptions();
     _feedbackController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -133,6 +137,8 @@ class _ActivityMatchingState extends State<ActivityMatching>
         allMatched = true;
         Future.delayed(const Duration(seconds: 1), () {
           if (mounted) {
+            // Yeni oyun için karıştır
+            _shuffleDescriptions();
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const HarfHayvanEsle()),
@@ -179,7 +185,7 @@ class _ActivityMatchingState extends State<ActivityMatching>
           borderRadius: BorderRadius.circular(20),
           border:
               isSelected && !isMatched
-                  ? Border.all(color: Colors.lightGreen.shade400, width: 4)
+                  ? Border.all(color: Colors.blue.shade400, width: 4)
                   : null,
           boxShadow: [
             BoxShadow(
@@ -226,7 +232,7 @@ class _ActivityMatchingState extends State<ActivityMatching>
           borderRadius: BorderRadius.circular(20),
           border:
               isSelected && !isMatched
-                  ? Border.all(color: Colors.lightGreen.shade400, width: 4)
+                  ? Border.all(color: Colors.blue.shade400, width: 4)
                   : null,
           boxShadow: [
             BoxShadow(
@@ -351,11 +357,20 @@ class _ActivityMatchingState extends State<ActivityMatching>
                                 ),
                                 Container(
                                   width: 4,
+                                  height: 425,
                                   margin: const EdgeInsets.symmetric(
                                     horizontal: 10,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.shade400,
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.blue.shade400,
+                                        Colors.blue.shade200,
+                                        Colors.blue.shade100,
+                                      ],
+                                    ),
                                     borderRadius: BorderRadius.circular(2),
                                   ),
                                 ),

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'soru3.dart';
+import '../screens/home_screen.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 
 class HarfHayvanEsle extends StatefulWidget {
   const HarfHayvanEsle({super.key});
@@ -12,7 +15,7 @@ class HarfHayvanEsle extends StatefulWidget {
 class _HarfHayvanEsleState extends State<HarfHayvanEsle>
     with TickerProviderStateMixin {
   final List<String> leftAnimals = ['🦒', '🐘', '🐰'];
-  final List<String> rightLetters = ['Z', 'F', 'T'];
+  final List<String> rightLetters = ['F', 'Z', 'T'];
   late List<String> shuffledLetters;
   int? selectedLeftIndex;
   int? selectedRightIndex;
@@ -21,7 +24,8 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
   bool showFeedback = false;
   bool isCorrect = false;
   late AnimationController _feedbackController;
-  bool _dialogShown = false;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
   int? wrongLeftIndex;
   int? wrongRightIndex;
 
@@ -31,19 +35,35 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
     '🐰': 'T',
   };
 
+  void _shuffleLetters() {
+    shuffledLetters = List.from(rightLetters)..shuffle();
+  }
+
   @override
   void initState() {
     super.initState();
-    shuffledLetters = List.from(rightLetters)..shuffle();
+    _shuffleLetters();
     _feedbackController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
@@ -74,10 +94,10 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
             Future.delayed(const Duration(seconds: 1), () {
               if (mounted) {
                 // Etkinlik tamamlandı
-
                 ActivityTracker.completeActivity();
-
                 
+                // Yeni oyun için karıştır
+                _shuffleLetters();
 
                 Navigator.pushReplacement(
                   context,
@@ -106,204 +126,292 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
     });
   }
 
+  Widget _buildLeftCard(int index) {
+    final animal = leftAnimals[index];
+    final bool isSelected = selectedLeftIndex == index;
+    final bool isMatched = matchedLeft[index];
+    final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
+
+    Color cardColor =
+        isMatched
+            ? Colors.green.shade200
+            : isWrongSelection
+            ? Colors.red.shade200
+            : Colors.white;
+
+    return GestureDetector(
+      onTap: isMatched ? null : () => _handleTap(index, true),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        width: 120,
+        height: 120,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(20),
+          border:
+              isSelected && !isMatched
+                  ? Border.all(color: Colors.blue.shade400, width: 4)
+                  : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            animal,
+            style: const TextStyle(fontSize: 42),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRightCard(int index) {
+    final letter = shuffledLetters[index];
+    final bool isSelected = selectedRightIndex == index;
+    final bool isMatched = matchedRight[index];
+    final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
+
+    Color cardColor =
+        isMatched
+            ? Colors.green.shade200
+            : isWrongSelection
+            ? Colors.red.shade200
+            : Colors.white;
+
+    return GestureDetector(
+      onTap: isMatched ? null : () => _handleTap(index, false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        width: 120,
+        height: 120,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(20),
+          border:
+              isSelected && !isMatched
+                  ? Border.all(color: Colors.blue.shade400, width: 4)
+                  : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            letter,
+            style: const TextStyle(
+              fontSize: 42,
+              fontWeight: FontWeight.bold,
+              color: Colors.deepPurple,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool allMatched = matchedLeft.every((e) => e);
-    if (allMatched && !_dialogShown) {
-      _dialogShown = true;
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          // Etkinlik tamamlandı
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
 
-          ActivityTracker.completeActivity();
-
-          
-
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const Soru3()),
-          );
-        }
-      });
-    }
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        backgroundColor: const Color(0xFFE1F5FE),
-        appBar: AppBar(
-          title: const Text('Harf-Hayvan Eşleştirme',
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          centerTitle: true,
-          backgroundColor: Colors.deepPurple,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-        ),
-        body: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Resimdeki hayvanları baş harfi ile eşleştir!',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(
-                              leftAnimals.length,
-                              (index) => Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                child: GestureDetector(
-                                  onTap: () => _handleTap(index, true),
-                                  child: Container(
-                                    width: 120,
-                                    height: 120,
-                                    decoration: BoxDecoration(
-                                      color: matchedLeft[index]
-                                          ? Colors.green.shade300
-                                          : (wrongLeftIndex == index &&
-                                                  showFeedback &&
-                                                  !isCorrect)
-                                              ? Colors.red.shade200
-                                              : selectedLeftIndex == index
-                                                  ? Colors.blue.shade200
-                                                  : Colors.white,
-                                      borderRadius: BorderRadius.circular(20),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.2),
-                                          blurRadius: 6,
-                                          offset: const Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        leftAnimals[index],
-                                        style: const TextStyle(fontSize: 42),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 4,
-                          height: MediaQuery.of(context).size.height * 0.5,
-                          margin: const EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.deepPurple,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(
-                              shuffledLetters.length,
-                              (index) => Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                child: GestureDetector(
-                                  onTap: () => _handleTap(index, false),
-                                  child: Container(
-                                    width: 120,
-                                    height: 120,
-                                    decoration: BoxDecoration(
-                                      color: matchedRight[index]
-                                          ? Colors.green.shade300
-                                          : (wrongRightIndex == index &&
-                                                  showFeedback &&
-                                                  !isCorrect)
-                                              ? Colors.red.shade200
-                                              : selectedRightIndex == index
-                                                  ? Colors.blue.shade200
-                                                  : Colors.white,
-                                      borderRadius: BorderRadius.circular(20),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.2),
-                                          blurRadius: 6,
-                                          offset: const Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        shuffledLetters[index],
-                                        style: const TextStyle(
-                                          fontSize: 42,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.deepPurple,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  if (showFeedback)
-                    ScaleTransition(
-                      scale: CurvedAnimation(
-                        parent: _feedbackController,
-                        curve: Curves.elasticOut,
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 20,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isCorrect ? Icons.check_circle : Icons.cancel,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              size: 28,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: isCorrect ? Colors.green : Colors.red,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  const SizedBox(height: 20),
-                ],
-              ),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
             ),
-          ],
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
+                            child: const Text(
+                              'Resimdeki hayvanları baş harfi ile eşleştir!',
+                              style: TextStyle(
+                                fontSize: 23,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: List.generate(
+                                      leftAnimals.length,
+                                      (index) => _buildLeftCard(index),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 4,
+                                  height: 425,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.blue.shade400,
+                                        Colors.blue.shade200,
+                                        Colors.blue.shade100,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: List.generate(
+                                      shuffledLetters.length,
+                                      (index) => _buildRightCard(index),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? 'Aferin! 🎉'
+                                        : 'Tekrar dene! 😔',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
