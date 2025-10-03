@@ -59,7 +59,7 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
 
           if (matchedLeft.every((element) => element)) {
             ActivityTracker.completeActivity();
-            Future.delayed(const Duration(seconds: 1), () {
+            Future.delayed(const Duration(seconds: 2), () {
               if (mounted) {
                 Navigator.pushReplacement(
                   context,
@@ -67,183 +67,279 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
                 );
               }
             });
-          }
-        }
-
-        Future.delayed(const Duration(seconds: 1), () {
-          if (mounted) {
-            setState(() {
-              showFeedback = false;
-              selectedLeftIndex = null;
-              selectedRightIndex = null;
+          } else {
+            // Feedback'i 2 saniye sonra gizle
+            Future.delayed(const Duration(seconds: 2), () {
+              if (mounted) {
+                setState(() {
+                  showFeedback = false;
+                  selectedLeftIndex = null;
+                  selectedRightIndex = null;
+                });
+              }
             });
           }
-        });
+        } else {
+          // Yanlış cevap için feedback'i 2 saniye sonra gizle
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) {
+              setState(() {
+                showFeedback = false;
+                selectedLeftIndex = null;
+                selectedRightIndex = null;
+              });
+            }
+          });
+        }
       }
     });
   }
 
-  Widget buildItem({
-    required String emoji,
-    required bool isSelected,
-    required bool isMatched,
-    required VoidCallback onTap,
-    required int index,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 120,
-        height: 120,
-        margin: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          color:
-              isMatched
-                  ? Colors.green.shade100
-                  : (showFeedback && !isCorrect && isSelected)
-                  ? Colors.red.shade100
-                  : isSelected
-                  ? Colors.blue.shade100
-                  : Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color:
-                isMatched
-                    ? Colors.green
-                    : (showFeedback && !isCorrect && isSelected)
-                    ? Colors.red
-                    : isSelected
-                    ? Colors.blue
-                    : Colors.grey.shade300,
-            width: 3,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Center(child: Text(emoji, style: const TextStyle(fontSize: 54))),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFE1F5FE),
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
+          ),
+          child: SafeArea(
             child: Column(
               children: [
-                // Soru kutusu
-                Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.only(bottom: 32, top: 8),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 22,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(22),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.blue.withOpacity(0.10),
-                        blurRadius: 18,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: const Text(
-                    'Doğru okul malzemelerini eşleştir!',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0288D1),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.black),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                     ),
-                    textAlign: TextAlign.center,
-                  ),
+                  ],
                 ),
                 Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(
-                            leftItems.length,
-                            (index) => buildItem(
-                              emoji: leftItems[index],
-                              isSelected: selectedLeftIndex == index,
-                              isMatched: matchedLeft[index],
-                              onTap: () => _handleTap(index, true),
-                              index: index,
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.95),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 1,
+                          ),
+                          child: const Text(
+                            'Doğru okul malzemelerini eşleştir!',
+                            style: TextStyle(
+                              fontSize: 23,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
-                      ),
-                      Container(
-                        width: 12,
-                        height: 340,
-                        margin: const EdgeInsets.symmetric(horizontal: 18),
-                        decoration: BoxDecoration(
-                          color: Colors.blueAccent,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(
-                            rightItems.length,
-                            (index) => buildItem(
-                              emoji: rightItems[index],
-                              isSelected: selectedRightIndex == index,
-                              isMatched: matchedRight[index],
-                              onTap: () => _handleTap(index, false),
-                              index: index,
-                            ),
+                        const SizedBox(height: 15),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceEvenly,
+                                  children: List.generate(
+                                    leftItems.length,
+                                        (index) => GestureDetector(
+                                      onTap: () => _handleTap(index, true),
+                                      child: AnimatedContainer(
+                                        duration:
+                                        showFeedback
+                                            ? Duration.zero
+                                            : const Duration(
+                                          milliseconds: 300,
+                                        ),
+                                        curve: Curves.easeInOut,
+                                        width: 120,
+                                        height: 120,
+                                        margin: const EdgeInsets.symmetric(
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color:
+                                          matchedLeft[index]
+                                              ? Colors.green.shade400
+                                              : (showFeedback &&
+                                              !isCorrect &&
+                                              selectedLeftIndex ==
+                                                  index)
+                                              ? Colors.red.shade400
+                                              : (selectedLeftIndex == index)
+                                              ? Colors.blue.shade200
+                                              : Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.2,
+                                              ),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            leftItems[index],
+                                            style: const TextStyle(
+                                              fontSize: 48,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              // BAŞLANGIÇ: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ (425.0 Yüksekliğe Ayarlandı)
+                              SizedBox(
+                                height: 425.0, // Çizginin uzunluğu (yüksekliği)
+                                child: Container(
+                                  width: 4,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.blue.shade400,
+                                        Colors.blue.shade200,
+                                        Colors.blue.shade100,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                              ),
+                              // SON: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ
+
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceEvenly,
+                                  children: List.generate(
+                                    rightItems.length,
+                                        (index) => GestureDetector(
+                                      onTap: () => _handleTap(index, false),
+                                      child: AnimatedContainer(
+                                        duration:
+                                        showFeedback
+                                            ? Duration.zero
+                                            : const Duration(
+                                          milliseconds: 300,
+                                        ),
+                                        curve: Curves.easeInOut,
+                                        width: 120,
+                                        height: 120,
+                                        margin: const EdgeInsets.symmetric(
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color:
+                                          matchedRight[index]
+                                              ? Colors.green.shade400
+                                              : (showFeedback &&
+                                              !isCorrect &&
+                                              selectedRightIndex ==
+                                                  index)
+                                              ? Colors.red.shade400
+                                              : (selectedRightIndex ==
+                                              index)
+                                              ? Colors.blue.shade200
+                                              : Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.2,
+                                              ),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            rightItems[index],
+                                            style: const TextStyle(
+                                              fontSize: 48,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 32),
-                if (showFeedback)
-                  ScaleTransition(
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                  showFeedback
+                      ? ScaleTransition(
                     scale: CurvedAnimation(
                       parent: _feedbackController,
                       curve: Curves.elasticOut,
                     ),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        vertical: 16,
-                        horizontal: 32,
+                        vertical: 10,
+                        horizontal: 20,
                       ),
                       decoration: BoxDecoration(
-                        color:
-                            isCorrect
-                                ? Colors.green.shade50
-                                : Colors.red.shade50,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: isCorrect ? Colors.green : Colors.red,
-                          width: 2.5,
-                        ),
-                        boxShadow: [
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
                           BoxShadow(
-                            color: (isCorrect ? Colors.green : Colors.red)
-                                .withOpacity(0.08),
+                            color: Colors.black12,
                             blurRadius: 10,
-                            offset: const Offset(0, 2),
+                            offset: Offset(0, 5),
                           ),
                         ],
                       ),
@@ -251,24 +347,31 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 32,
+                            isCorrect
+                                ? Icons.check_circle
+                                : Icons.cancel,
+                            color:
+                            isCorrect ? Colors.green : Colors.red,
+                            size: 28,
                           ),
-                          const SizedBox(width: 14),
+                          const SizedBox(width: 10),
                           Text(
-                            isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
+                            isCorrect
+                                ? 'Aferin! 🎉'
+                                : 'Tekrar dene! 😔',
                             style: TextStyle(
-                              fontSize: 20,
-                              color: isCorrect ? Colors.green : Colors.red,
+                              fontSize: 18,
+                              color:
+                              isCorrect ? Colors.green : Colors.red,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                const SizedBox(height: 24),
+                  )
+                      : const SizedBox.shrink(),
+                ),
               ],
             ),
           ),
