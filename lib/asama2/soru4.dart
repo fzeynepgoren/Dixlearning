@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'soru5.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -202,7 +202,8 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
                           ),
                           (route) => false,
                         );

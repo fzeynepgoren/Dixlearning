@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import 'soru4.dart'; // Sonraki soruya geçiş için
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
@@ -204,7 +204,8 @@ class _HarfEsleSoru3State extends State<HarfEsleSoru3>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
                           ),
                           (route) => false,
                         );

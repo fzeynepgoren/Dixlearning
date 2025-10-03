@@ -5,6 +5,7 @@ import '../asama1/soru1.dart';
 import '../asama2/soru1.dart';
 import '../asama3/soru1.dart';
 import '../asama4/soru1.dart';
+import 'home_screen.dart';
 
 class MatchingQuestionsScreen extends StatelessWidget {
   const MatchingQuestionsScreen({super.key});
@@ -81,7 +82,12 @@ class MatchingQuestionsScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
+            );
+          },
         ),
       ),
       body: ListView.builder(
