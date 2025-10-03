@@ -109,7 +109,7 @@ class _GeometricMatchingState extends State<GeometricMatching>
     ),
     Shape(
       shape: 'Daire',
-      color: const Color(0xFF81C784),
+      color: const Color.fromARGB(255, 170, 111, 199),
       icon: Icons.circle_outlined,
     ),
     Shape(
@@ -161,7 +161,6 @@ class _GeometricMatchingState extends State<GeometricMatching>
     setState(() {
       isCorrect = leftShape == rightShape;
       showFeedback = true;
-      selectedLeftShape = null; // Seçimi sıfırla
     });
 
     _feedbackController.forward(from: 0);
@@ -171,7 +170,7 @@ class _GeometricMatchingState extends State<GeometricMatching>
         matches[leftShape] = rightShape;
       });
       if (matches.length == leftShapes.length) {
-        Future.delayed(const Duration(seconds: 1), () {
+        Future.delayed(const Duration(seconds: 2), () {
           if (mounted) {
             Navigator.pushReplacement(
               context,
@@ -180,19 +179,23 @@ class _GeometricMatchingState extends State<GeometricMatching>
           }
         });
       } else {
-        Future.delayed(const Duration(seconds: 1), () {
+        // Feedback'i 2 saniye sonra gizle
+        Future.delayed(const Duration(seconds: 2), () {
           if (mounted) {
             setState(() {
               showFeedback = false;
+              selectedLeftShape = null; // Seçimi temizle
             });
           }
         });
       }
     } else {
-      Future.delayed(const Duration(seconds: 1), () {
+      // Yanlış cevap için feedback'i 2 saniye sonra gizle
+      Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           setState(() {
             showFeedback = false;
+            selectedLeftShape = null; // Seçimi temizle
           });
         }
       });
@@ -201,26 +204,29 @@ class _GeometricMatchingState extends State<GeometricMatching>
 
   // Şekil kartlarının modern tasarımı
   Widget buildShapeCard(
-    Shape shape, {
-    bool isMatched = false,
-    bool isShadow = false,
-    bool isSelected = false,
-  }) {
-    Color cardColor =
-        isMatched
-            ? shape.color
-            : isShadow
-            ? Colors.grey.shade200
-            : shape.color;
+      Shape shape, {
+        bool isMatched = false,
+        bool isShadow = false,
+        bool isSelected = false,
+      }) {
+    Color cardColor;
+    Color iconColor;
 
-    Color iconColor =
-        isShadow && !isMatched ? Colors.grey.shade600 : Colors.white;
-
-    Border? border =
-        isSelected ? Border.all(color: Colors.green.shade400, width: 4) : null;
+    if (isMatched) {
+      cardColor = Colors.green.shade400;
+      iconColor = Colors.white;
+    } else if (isShadow) {
+      cardColor = Colors.grey.shade200;
+      iconColor = Colors.grey.shade600;
+    } else {
+      // Sol taraf için orijinal renkli arka plan
+      cardColor = shape.color;
+      iconColor = Colors.white;
+    }
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration:
+      showFeedback ? Duration.zero : const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
       width: 120,
       height: 120,
@@ -228,26 +234,29 @@ class _GeometricMatchingState extends State<GeometricMatching>
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(20),
-        border: border,
+        border:
+        isSelected && !isMatched && !isShadow
+            ? Border.all(color: Colors.white, width: 3)
+            : null,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
             blurRadius: 6,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Center(
         child:
-            shape.shape == 'Üçgen'
-                ? SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: CustomPaint(
-                    painter: TrianglePainter(color: iconColor),
-                  ),
-                )
-                : Icon(shape.icon, size: 50, color: iconColor),
+        shape.shape == 'Üçgen'
+            ? SizedBox(
+          width: 50,
+          height: 50,
+          child: CustomPaint(
+            painter: TrianglePainter(color: iconColor),
+          ),
+        )
+            : Icon(shape.icon, size: 48, color: iconColor),
       ),
     );
   }
@@ -341,13 +350,13 @@ class _GeometricMatchingState extends State<GeometricMatching>
 
                                       return GestureDetector(
                                         onTap:
-                                            isMatched
-                                                ? null
-                                                : () {
-                                                  setState(() {
-                                                    selectedLeftShape = shape;
-                                                  });
-                                                },
+                                        isMatched || showFeedback
+                                            ? null
+                                            : () {
+                                          setState(() {
+                                            selectedLeftShape = shape;
+                                          });
+                                        },
                                         child: buildShapeCard(
                                           shape,
                                           isSelected: isSelected,
@@ -357,27 +366,35 @@ class _GeometricMatchingState extends State<GeometricMatching>
                                   ],
                                 ),
                               ),
-                              Container(
-                                width: 4,
-                                height: screenSize.height * 0.45,
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(4),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 5,
+
+                              // BAŞLANGIÇ: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ (425.0 Yüksekliğe Ayarlandı)
+                              SizedBox(
+                                height: 425.0, // Çizginin uzunluğu burada ayarlandı
+                                child: Container(
+                                  width: 4, // Çizginin kalınlığı
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.blue.shade400,
+                                        Colors.blue.shade200,
+                                        Colors.blue.shade100,
+                                      ],
                                     ),
-                                  ],
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
                                 ),
                               ),
+                              // SON: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ
+
                               Expanded(
                                 child: Column(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
+                                  MainAxisAlignment.spaceAround,
                                   children: [
                                     ...rightShapes.map((shape) {
                                       final isMatched = matches.containsValue(
@@ -385,18 +402,19 @@ class _GeometricMatchingState extends State<GeometricMatching>
                                       );
                                       return GestureDetector(
                                         onTap:
-                                            isMatched ||
-                                                    selectedLeftShape == null
-                                                ? null
-                                                : () {
-                                                  if (selectedLeftShape !=
-                                                      null) {
-                                                    checkMatch(
-                                                      selectedLeftShape!.shape,
-                                                      shape.shape,
-                                                    );
-                                                  }
-                                                },
+                                        isMatched ||
+                                            selectedLeftShape == null ||
+                                            showFeedback
+                                            ? null
+                                            : () {
+                                          if (selectedLeftShape !=
+                                              null) {
+                                            checkMatch(
+                                              selectedLeftShape!.shape,
+                                              shape.shape,
+                                            );
+                                          }
+                                        },
                                         child: buildShapeCard(
                                           shape,
                                           isShadow: !isMatched,
@@ -422,51 +440,51 @@ class _GeometricMatchingState extends State<GeometricMatching>
                   vertical: 10,
                 ),
                 child:
-                    showFeedback
-                        ? ScaleTransition(
-                          scale: CurvedAnimation(
-                            parent: _feedbackController,
-                            curve: Curves.elasticOut,
+                showFeedback
+                    ? ScaleTransition(
+                  scale: CurvedAnimation(
+                    parent: _feedbackController,
+                    curve: Curves.elasticOut,
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isCorrect ? Icons.check_circle : Icons.cancel,
+                          color: isCorrect ? Colors.green : Colors.red,
+                          size: 28,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color:
+                            isCorrect ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.bold,
                           ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 20,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  isCorrect ? Icons.check_circle : Icons.cancel,
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                        : const SizedBox.shrink(),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                    : const SizedBox.shrink(),
               ),
             ],
           ),
@@ -492,9 +510,9 @@ class TrianglePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint =
-        Paint()
-          ..color = color
-          ..style = PaintingStyle.fill;
+    Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
 
     final path = Path();
     path.moveTo(size.width / 2, 0);

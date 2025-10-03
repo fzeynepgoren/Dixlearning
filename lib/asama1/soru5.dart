@@ -47,8 +47,9 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
       }
 
       if (selectedLeftIndex != null && selectedRightIndex != null) {
-        isCorrect = leftAnimals[selectedLeftIndex!] ==
-            rightAnimals[selectedRightIndex!];
+        isCorrect =
+            leftAnimals[selectedLeftIndex!] ==
+                rightAnimals[selectedRightIndex!];
         showFeedback = true;
         _feedbackController.forward(from: 0);
 
@@ -57,98 +58,111 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
           matchedRight[selectedRightIndex!] = true;
 
           if (matchedLeft.every((element) => element)) {
-            Future.delayed(const Duration(seconds: 1), () {
+            Future.delayed(const Duration(seconds: 2), () {
               if (mounted) {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
-                  builder: (context) => Dialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.purple.shade100,
-                            Colors.pink.shade50,
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+                  builder:
+                      (context) => Dialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.blue.shade100,
+                                Colors.blue.shade50,
+                              ],
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.emoji_events,
+                                size: 80,
+                                color: Colors.amber,
+                              ),
+                              const SizedBox(height: 20),
+                              const Text(
+                                'Tebrikler! 🎉',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              const Text(
+                                '1. aşamayı tamamladınız!',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              const SizedBox(height: 30),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const HomeScreen(),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue.shade200,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 40,
+                                    vertical: 15,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Ana Menüye Dön',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.emoji_events,
-                            size: 80,
-                            color: Colors.amber,
-                          ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            'Tebrikler! 🎉', // Başlık güncellendi
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.deepPurple,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            '1. aşamayı tamamladınız!',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.deepPurple,
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-                          ElevatedButton(
-                            onPressed: () {
-                              // Buton işlevi güncellendi: Ana menüye dön
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const HomeScreen()), // Ana menü
-                                (route) => false,
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepPurple,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 40, vertical: 15),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                            child: const Text(
-                              'Ana Menüye Dön', // Buton metni güncellendi
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
                 );
               }
             });
-          }
-        }
-
-        Future.delayed(const Duration(seconds: 1), () {
-          if (mounted) {
-            setState(() {
-              showFeedback = false;
-              selectedLeftIndex = null;
-              selectedRightIndex = null;
+          } else {
+            // Feedback'i 2 saniye sonra gizle
+            Future.delayed(const Duration(seconds: 2), () {
+              if (mounted) {
+                setState(() {
+                  showFeedback = false;
+                  selectedLeftIndex = null;
+                  selectedRightIndex = null;
+                });
+              }
             });
           }
-        });
+        } else {
+          // Yanlış cevap için feedback'i 2 saniye sonra gizle
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) {
+              setState(() {
+                showFeedback = false;
+                selectedLeftIndex = null;
+                selectedRightIndex = null;
+              });
+            }
+          });
+        }
       }
     });
   }
@@ -161,18 +175,21 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration:
+            showFeedback ? Duration.zero : const Duration(milliseconds: 300),
         width: 120,
         height: 120,
         margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isMatched
-              ? Colors.green.shade300
-              : (showFeedback && !isCorrect && isSelected)
-                  ? Colors.red.shade200
+          color:
+              isMatched
+                  ? Colors.green.shade400
+                  : (showFeedback && !isCorrect && isSelected)
+                  ? Colors.red.shade400
                   : isSelected
-                      ? Colors.blue.shade200
-                      : Colors.white,
+                  ? Colors.blue.shade200
+                  : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -182,133 +199,296 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
             ),
           ],
         ),
-        child: Center(
-          child: Text(
-            emoji,
-            style: const TextStyle(fontSize: 42),
-          ),
-        ),
+        child: Center(child: Text(emoji, style: const TextStyle(fontSize: 48))),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFE1F5FE),
-      appBar: AppBar(
-        title: const Text(
-          'Hayvan Eşleştirme',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (route) => false,
-            );
-          },
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const SizedBox(height: 12),
-            const Text(
-              'Sevimli hayvanları eşleştirin!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
-              ),
-              textAlign: TextAlign.center,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
             ),
-            const SizedBox(height: 24),
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        leftAnimals.length,
-                        (index) => buildItem(
-                          emoji: leftAnimals[index],
-                          isSelected: selectedLeftIndex == index,
-                          isMatched: matchedLeft[index],
-                          onTap: () => _handleTap(index, true),
-                        ),
-                      ),
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.black),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      },
                     ),
-                  ),
-                  Container(
-                    width: 4,
-                    height: MediaQuery.of(context).size.height * 0.5,
-                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                  ],
+                ),
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.deepPurple,
-                      borderRadius: BorderRadius.circular(4),
+                      color: Colors.white.withOpacity(0.95),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
                     ),
-                  ),
-                  Expanded(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        rightAnimals.length,
-                        (index) => buildItem(
-                          emoji: rightAnimals[index],
-                          isSelected: selectedRightIndex == index,
-                          isMatched: matchedRight[index],
-                          onTap: () => _handleTap(index, false),
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 1,
+                          ),
+                          child: const Text(
+                            'Sevimli hayvanları eşleştirin!',
+                            style: TextStyle(
+                              fontSize: 23,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 15),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: List.generate(
+                                    leftAnimals.length,
+                                    (index) => GestureDetector(
+                                      onTap: () => _handleTap(index, true),
+                                      child: AnimatedContainer(
+                                        duration:
+                                            showFeedback
+                                                ? Duration.zero
+                                                : const Duration(
+                                                  milliseconds: 300,
+                                                ),
+                                        curve: Curves.easeInOut,
+                                        width: 120,
+                                        height: 120,
+                                        margin: const EdgeInsets.symmetric(
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color:
+                                              matchedLeft[index]
+                                                  ? Colors.green.shade400
+                                                  : (showFeedback &&
+                                                      selectedLeftIndex ==
+                                                          index &&
+                                                      !isCorrect)
+                                                  ? Colors.red.shade400
+                                                  : (selectedLeftIndex == index)
+                                                  ? Colors.blue.shade200
+                                                  : Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.2,
+                                              ),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            leftAnimals[index],
+                                            style: const TextStyle(
+                                              fontSize: 48,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              // BAŞLANGIÇ: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ (425.0 Yüksekliğe Ayarlandı)
+                              SizedBox(
+                                height: 425.0, // Çizginin uzunluğu (yüksekliği)
+                                child: Container(
+                                  width: 4,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.blue.shade400,
+                                        Colors.blue.shade200,
+                                        Colors.blue.shade100,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                              ),
+                              // SON: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ
+
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceEvenly,
+                                  children: List.generate(
+                                    rightAnimals.length,
+                                        (index) => GestureDetector(
+                                      onTap: () => _handleTap(index, false),
+                                      child: AnimatedContainer(
+                                        duration:
+                                        showFeedback
+                                            ? Duration.zero
+                                            : const Duration(
+                                          milliseconds: 300,
+                                        ),
+                                        curve: Curves.easeInOut,
+                                        width: 120,
+                                        height: 120,
+                                        margin: const EdgeInsets.symmetric(
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color:
+                                          matchedRight[index]
+                                              ? Colors.green.shade400
+                                              : (showFeedback &&
+                                              selectedRightIndex ==
+                                                  index &&
+                                              !isCorrect)
+                                              ? Colors.red.shade400
+                                              : (selectedRightIndex ==
+                                              index)
+                                              ? Colors.blue.shade200
+                                              : Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.2,
+                                              ),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            rightAnimals[index],
+                                            style: const TextStyle(
+                                              fontSize: 48,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                  showFeedback
+                      ? ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isCorrect
+                                ? Icons.check_circle
+                                : Icons.cancel,
+                            color:
+                            isCorrect ? Colors.green : Colors.red,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            isCorrect
+                                ? 'Aferin! 🎉'
+                                : 'Tekrar dene! 😔',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color:
+                              isCorrect ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                      : const SizedBox.shrink(),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            if (showFeedback)
-              ScaleTransition(
-                scale: CurvedAnimation(
-                  parent: _feedbackController,
-                  curve: Curves.elasticOut,
-                ),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        isCorrect ? Icons.check_circle : Icons.cancel,
-                        color: isCorrect ? Colors.green : Colors.red,
-                        size: 28,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            const SizedBox(height: 20),
-          ],
+          ),
         ),
       ),
     );

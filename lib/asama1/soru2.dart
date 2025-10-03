@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../screens/home_screen.dart';
 import '../utils/activity_tracker.dart';
-import '../providers/language_provider.dart';
 import 'soru3.dart'; // GeometricMatching burada tanımlı
 
 class GDisgrafi1 extends StatefulWidget {
@@ -85,7 +83,8 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
   void _checkMatch() {
     if (selectedLeftIndex != null && selectedRightIndex != null) {
       setState(() {
-        isCorrect = leftToys[selectedLeftIndex!] == rightToys[selectedRightIndex!];
+        isCorrect =
+            leftToys[selectedLeftIndex!] == rightToys[selectedRightIndex!];
         showFeedback = true;
       });
       _feedbackController.forward(from: 0);
@@ -99,27 +98,41 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
         bool allMatched = matchedLeft.every((e) => e);
         if (allMatched && !_dialogShown) {
           _dialogShown = true;
-          Future.delayed(const Duration(milliseconds: 500), () {
+          Future.delayed(const Duration(seconds: 2), () {
             if (mounted) {
               ActivityTracker.completeActivity();
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const GeometricMatching()),
+                MaterialPageRoute(
+                  builder: (context) => const GeometricMatching(),
+                ),
               );
             }
           });
-        }
-      }
-
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) {
-          setState(() {
-            showFeedback = false;
-            selectedLeftIndex = null;
-            selectedRightIndex = null;
+        } else {
+          // Feedback'i 2 saniye sonra gizle
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) {
+              setState(() {
+                showFeedback = false;
+                selectedLeftIndex = null;
+                selectedRightIndex = null;
+              });
+            }
           });
         }
-      });
+      } else {
+        // Yanlış cevap için feedback'i 2 saniye sonra gizle
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) {
+            setState(() {
+              showFeedback = false;
+              selectedLeftIndex = null;
+              selectedRightIndex = null;
+            });
+          }
+        });
+      }
     }
   }
 
@@ -152,11 +165,17 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
-                          (route) => false,
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
+                          ),
+                              (route) => false,
                         );
                       },
                     ),
@@ -197,35 +216,47 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                                 // Sol oyuncaklar
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: List.generate(leftToys.length, (index) {
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                    children: List.generate(leftToys.length, (
+                                        index,
+                                        ) {
                                       return GestureDetector(
                                         onTap: () => _handleLeftTap(index),
                                         child: AnimatedContainer(
-                                          duration: const Duration(milliseconds: 300),
+                                          duration:
+                                          showFeedback
+                                              ? Duration.zero
+                                              : const Duration(
+                                            milliseconds: 300,
+                                          ),
                                           curve: Curves.easeInOut,
-                                          width: 90,
-                                          height: 90,
-                                          margin: const EdgeInsets.symmetric(vertical: 6),
+                                          width: 120,
+                                          height: 120,
+                                          margin: const EdgeInsets.symmetric(
+                                            vertical: 8,
+                                          ),
                                           decoration: BoxDecoration(
-                                            color: matchedLeft[index]
-                                                ? Colors.green.shade200
+                                            color:
+                                            matchedLeft[index]
+                                                ? Colors.green.shade400
                                                 : (showFeedback &&
-                                                        !isCorrect &&
-                                                        selectedLeftIndex == index)
-                                                    ? Colors.red.shade200
-                                                    : Colors.white,
-                                            borderRadius: BorderRadius.circular(20),
-                                            border: (selectedLeftIndex == index &&
-                                                    !matchedLeft[index])
-                                                ? Border.all(
-                                                    color: Colors.lightGreen.shade400,
-                                                    width: 3,
-                                                  )
-                                                : null,
+                                                !isCorrect &&
+                                                selectedLeftIndex ==
+                                                    index)
+                                                ? Colors.red.shade400
+                                                : (selectedLeftIndex ==
+                                                index)
+                                                ? Colors.blue.shade200
+                                                : Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black.withOpacity(0.2),
+                                                color: Colors.black.withOpacity(
+                                                  0.2,
+                                                ),
                                                 blurRadius: 6,
                                                 offset: const Offset(0, 3),
                                               ),
@@ -234,7 +265,9 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                                           child: Center(
                                             child: Text(
                                               leftToys[index],
-                                              style: const TextStyle(fontSize: 38),
+                                              style: const TextStyle(
+                                                fontSize: 48,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -242,47 +275,76 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                                     }),
                                   ),
                                 ),
-                                // Orta çizgi
-                                Container(
-                                  width: 4,
-                                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade400,
-                                    borderRadius: BorderRadius.circular(2),
+
+                                // BAŞLANGIÇ: ORTA ÇİZGİ BÖLÜMÜ (425.0 Yüksekliğe Ayarlandı)
+                                SizedBox(
+                                  // Uzunluk (yükseklik) burada 425.0 olarak ayarlandı.
+                                  height: 425.0,
+                                  child: Container(
+                                    width: 4, // Kalınlık
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.blue.shade400,
+                                          Colors.blue.shade200,
+                                          Colors.blue.shade100,
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
                                   ),
                                 ),
+                                // SON: ORTA ÇİZGİ BÖLÜMÜ
+
                                 // Sağ oyuncaklar
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: List.generate(rightToys.length, (index) {
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                    children: List.generate(rightToys.length, (
+                                        index,
+                                        ) {
                                       return GestureDetector(
                                         onTap: () => _handleRightTap(index),
                                         child: AnimatedContainer(
-                                          duration: const Duration(milliseconds: 300),
+                                          duration:
+                                          showFeedback
+                                              ? Duration.zero
+                                              : const Duration(
+                                            milliseconds: 300,
+                                          ),
                                           curve: Curves.easeInOut,
-                                          width: 90,
-                                          height: 90,
-                                          margin: const EdgeInsets.symmetric(vertical: 6),
+                                          width: 120,
+                                          height: 120,
+                                          margin: const EdgeInsets.symmetric(
+                                            vertical: 8,
+                                          ),
                                           decoration: BoxDecoration(
-                                            color: matchedRight[index]
-                                                ? Colors.green.shade200
+                                            color:
+                                            matchedRight[index]
+                                                ? Colors.green.shade400
                                                 : (showFeedback &&
-                                                        !isCorrect &&
-                                                        selectedRightIndex == index)
-                                                    ? Colors.red.shade200
-                                                    : Colors.white,
-                                            borderRadius: BorderRadius.circular(20),
-                                            border: (selectedRightIndex == index &&
-                                                    !matchedRight[index])
-                                                ? Border.all(
-                                                    color: Colors.lightGreen.shade400,
-                                                    width: 3,
-                                                  )
-                                                : null,
+                                                !isCorrect &&
+                                                selectedRightIndex ==
+                                                    index)
+                                                ? Colors.red.shade400
+                                                : (selectedRightIndex ==
+                                                index)
+                                                ? Colors.blue.shade200
+                                                : Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black.withOpacity(0.2),
+                                                color: Colors.black.withOpacity(
+                                                  0.2,
+                                                ),
                                                 blurRadius: 6,
                                                 offset: const Offset(0, 3),
                                               ),
@@ -292,7 +354,7 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                                             child: Text(
                                               rightToys[index],
                                               style: const TextStyle(
-                                                fontSize: 38,
+                                                fontSize: 48,
                                               ),
                                               textAlign: TextAlign.center,
                                             ),
@@ -313,47 +375,60 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                 // Feedback alanı
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                  showFeedback
                       ? ScaleTransition(
-                          scale: CurvedAnimation(
-                            parent: _feedbackController,
-                            curve: Curves.elasticOut,
+                    scale: CurvedAnimation(
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
                           ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  isCorrect ? Icons.check_circle : Icons.cancel,
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  isCorrect ? "Aferin! 🎉" : "Tekrar dene! 😔",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: isCorrect ? Colors.green : Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isCorrect
+                                ? Icons.check_circle
+                                : Icons.cancel,
+                            color:
+                            isCorrect ? Colors.green : Colors.red,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            isCorrect
+                                ? "Aferin! 🎉"
+                                : "Tekrar dene! 😔",
+                            style: TextStyle(
+                              fontSize: 18,
+                              color:
+                              isCorrect ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        )
+                        ],
+                      ),
+                    ),
+                  )
                       : const SizedBox.shrink(),
                 ),
               ],
