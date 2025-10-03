@@ -271,12 +271,20 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
                                 ),
                                 Container(
                                   width: 4,
-                                  height: screenSize.height * 0.45,
+                                  height: 425,
                                   margin: const EdgeInsets.symmetric(
                                     horizontal: 12,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.shade400,
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.blue.shade400,
+                                        Colors.blue.shade200,
+                                        Colors.blue.shade100,
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                 ),

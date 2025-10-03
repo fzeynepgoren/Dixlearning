@@ -41,10 +41,9 @@ class _HarfEsleSoru3State extends State<HarfEsleSoru3>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -75,7 +74,8 @@ class _HarfEsleSoru3State extends State<HarfEsleSoru3>
     if (selectedLeftIndex != null && selectedRightIndex != null) {
       setState(() {
         isCorrect =
-            leftLetters[selectedLeftIndex!] == shuffledRight[selectedRightIndex!];
+            leftLetters[selectedLeftIndex!] ==
+            shuffledRight[selectedRightIndex!];
         showFeedback = true;
       });
       _feedbackController.forward(from: 0);
@@ -118,8 +118,7 @@ class _HarfEsleSoru3State extends State<HarfEsleSoru3>
   }) {
     final bool isSelected =
         isLeft ? selectedLeftIndex == index : selectedRightIndex == index;
-    final bool isMatched =
-        isLeft ? matchedLeft[index] : matchedRight[index];
+    final bool isMatched = isLeft ? matchedLeft[index] : matchedRight[index];
     final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
 
     Color cardColor = Colors.white;
@@ -132,9 +131,10 @@ class _HarfEsleSoru3State extends State<HarfEsleSoru3>
     }
 
     return GestureDetector(
-      onTap: isMatched
-          ? null
-          : () => isLeft ? _handleLeftTap(index) : _handleRightTap(index),
+      onTap:
+          isMatched
+              ? null
+              : () => isLeft ? _handleLeftTap(index) : _handleRightTap(index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -196,12 +196,16 @@ class _HarfEsleSoru3State extends State<HarfEsleSoru3>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                              builder: (context) => const HomeScreen()),
+                            builder: (context) => const HomeScreen(),
+                          ),
                           (route) => false,
                         );
                       },
@@ -229,7 +233,9 @@ class _HarfEsleSoru3State extends State<HarfEsleSoru3>
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 1),
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Match the letters!'
@@ -262,11 +268,20 @@ class _HarfEsleSoru3State extends State<HarfEsleSoru3>
                                 ),
                                 Container(
                                   width: 4,
-                                  height: screenSize.height * 0.45,
+                                  height: 425,
                                   margin: const EdgeInsets.symmetric(
-                                      horizontal: 12),
+                                    horizontal: 12,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.shade400,
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.blue.shade400,
+                                        Colors.blue.shade200,
+                                        Colors.blue.shade100,
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                 ),
@@ -295,62 +310,65 @@ class _HarfEsleSoru3State extends State<HarfEsleSoru3>
                 // feedback alanı
                 Container(
                   height: 80,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                          scale: CurvedAnimation(
-                            parent: _feedbackController,
-                            curve: Curves.elasticOut,
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  isCorrect
-                                      ? Icons.check_circle
-                                      : Icons.cancel,
-                                  color: isCorrect
-                                      ? Colors.green
-                                      : Colors.red,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  isCorrect
-                                      ? (isEnglish
-                                          ? 'Well done! 🎉'
-                                          : 'Aferin! 🎉')
-                                      : (isEnglish
-                                          ? 'Try again! 😔'
-                                          : 'Tekrar dene! 😔'),
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: isCorrect
-                                        ? Colors.green
-                                        : Colors.red,
-                                    fontWeight: FontWeight.bold,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 5),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
