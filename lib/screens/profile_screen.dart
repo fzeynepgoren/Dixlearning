@@ -12,8 +12,8 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    const Color mainColor = Color(0xFF6C63FF);
-    const Color accentColor = Color(0xFF00C9A7);
+    const Color mainColor = Color(0xFFB3E5FC); // Açık gök mavisi
+    const Color accentColor = Color(0xFF81D4FA); // Daha koyu açık mavi
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -88,8 +88,8 @@ class ProfileScreen extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              mainColor.withOpacity(0.08),
-              accentColor.withOpacity(0.08),
+              mainColor,
+              accentColor,
             ],
           ),
         ),

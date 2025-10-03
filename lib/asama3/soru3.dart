@@ -36,10 +36,7 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    shuffledRightItems = List.from(rightItems);
-    do {
-      shuffledRightItems.shuffle();
-    } while (_listsAreEqual(leftItems, shuffledRightItems));
+    shuffledRightItems = List.from(rightItems)..shuffle();
 
     _feedbackController = AnimationController(
       vsync: this,
@@ -56,14 +53,6 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
       CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
     );
     _slideController.forward();
-  }
-
-  bool _listsAreEqual(List<String> a, List<String> b) {
-    if (a.length != b.length) return false;
-    for (int i = 0; i < a.length; i++) {
-      if (itemToName[a[i]] == b[i]) return true;
-    }
-    return false;
   }
 
   @override
@@ -120,11 +109,6 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
             }
           });
         }
-      } else {
-        setState(() {
-          matchedLeft[selectedLeftIndex!] = false;
-          matchedRight[selectedRightIndex!] = false;
-        });
       }
 
       Future.delayed(const Duration(seconds: 1), () {
@@ -261,7 +245,7 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                                                     ? Border.all(
                                                       color:
                                                           Colors
-                                                              .lightGreen
+                                                              .blue
                                                               .shade400,
                                                       width: 4,
                                                     )
@@ -291,11 +275,20 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                                 ),
                                 Container(
                                   width: 4,
+                                  height: 425,
                                   margin: const EdgeInsets.symmetric(
                                     horizontal: 10,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.shade400,
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.blue.shade400,
+                                        Colors.blue.shade200,
+                                        Colors.blue.shade100,
+                                      ],
+                                    ),
                                     borderRadius: BorderRadius.circular(2),
                                   ),
                                 ),
@@ -336,7 +329,7 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                                                     ? Border.all(
                                                       color:
                                                           Colors
-                                                              .lightGreen
+                                                              .blue
                                                               .shade400,
                                                       width: 4,
                                                     )

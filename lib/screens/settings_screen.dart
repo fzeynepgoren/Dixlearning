@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'profile_screen.dart';
+import 'login_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
@@ -142,8 +143,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    const Color mainColor = Color(0xFF6C63FF);
-    const Color accentColor = Color(0xFF00C9A7);
+    const Color mainColor = Color(0xFFB3E5FC); // Açık gök mavisi
+    const Color accentColor = Color(0xFF81D4FA); // Daha koyu açık mavi
     final Color cardBg = Theme.of(context).cardColor;
     final Color cardText = Theme.of(context).textTheme.bodyLarge!.color!;
     final Color cardSubText = Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey[600]!;
@@ -213,8 +214,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              mainColor.withOpacity(0.08),
-              accentColor.withOpacity(0.08),
+              mainColor,
+              accentColor,
             ],
           ),
         ),
@@ -529,6 +530,95 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                   ],
+                ),
+              ),
+
+              // ÇIKIŞ YAP
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                margin: const EdgeInsets.only(bottom: 18),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  color: cardBg,
+                  boxShadow: [
+                    BoxShadow(
+                      color: cardShadow,
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: InkWell(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text(
+                            isEnglish ? 'Logout' : 'Çıkış Yap',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          content: Text(
+                            isEnglish
+                                ? 'Are you sure you want to logout?'
+                                : 'Çıkış yapmak istediğinizden emin misiniz?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: Text(
+                                isEnglish ? 'Cancel' : 'İptal',
+                                style: TextStyle(color: Colors.grey[600]),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const LoginScreen(),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                              ),
+                              child: Text(isEnglish ? 'Logout' : 'Çıkış'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(FluentIcons.sign_out_24_regular, color: Colors.red, size: 28),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isEnglish ? 'Logout' : 'Çıkış Yap',
+                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: cardText),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              isEnglish ? 'Sign out of your account' : 'Hesabınızdan çıkış yapın',
+                              style: TextStyle(fontSize: 13, color: cardSubText),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
+                    ],
+                  ),
                 ),
               ),
 
