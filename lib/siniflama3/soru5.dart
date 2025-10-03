@@ -104,84 +104,97 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
           showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (context) => Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.deepPurple.shade100,
-                      Colors.deepPurple.shade50,
-                    ],
+            builder:
+                (context) => Dialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.deepPurple.shade100,
+                          Colors.deepPurple.shade50,
+                        ],
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.emoji_events,
+                          size: 80,
+                          color: Colors.amber,
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          Provider.of<LanguageProvider>(
+                                context,
+                                listen: false,
+                              ).isEnglish
+                              ? 'Congratulations! 🎉'
+                              : 'Tebrikler! 🎉',
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          Provider.of<LanguageProvider>(
+                                context,
+                                listen: false,
+                              ).isEnglish
+                              ? 'You have completed the activity!'
+                              : 'Etkinliği tamamladınız!',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (context) => const HomeScreen(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 15,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                          child: Text(
+                            Provider.of<LanguageProvider>(
+                                  context,
+                                  listen: false,
+                                ).isEnglish
+                                ? 'Back to Menu'
+                                : 'Ana Menüye Dön',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.emoji_events,
-                      size: 80,
-                      color: Colors.amber,
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      Provider.of<LanguageProvider>(context, listen: false).isEnglish
-                          ? 'Congratulations! 🎉'
-                          : 'Tebrikler! 🎉',
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      Provider.of<LanguageProvider>(context, listen: false).isEnglish
-                          ? 'You have completed the activity!'
-                          : 'Etkinliği tamamladınız!',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      child: Text(
-                        Provider.of<LanguageProvider>(context, listen: false).isEnglish
-                            ? 'Back to Menu'
-                            : 'Ana Menüye Dön',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           );
         }
       });
@@ -217,7 +230,11 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
@@ -242,7 +259,10 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
                       child: Column(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Drag the animals to their habitats!'
@@ -263,27 +283,28 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
                                 Expanded(
                                   flex: 3,
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
                                       _buildGroup(
                                         'water',
                                         isEnglish ? 'Water' : 'Su',
-                                        Colors.blue.shade50,
-                                        Colors.blue,
+                                        Colors.purple.shade100,
+                                        Colors.purple.shade300,
                                         habitatGroups['water']!,
                                       ),
                                       _buildGroup(
                                         'air',
                                         isEnglish ? 'Air' : 'Hava',
-                                        Colors.green.shade50,
-                                        Colors.green,
+                                        Colors.blue.shade100,
+                                        Colors.blue.shade400,
                                         habitatGroups['air']!,
                                       ),
                                       _buildGroup(
                                         'land',
                                         isEnglish ? 'Land' : 'Kara',
-                                        Colors.orange.shade50,
-                                        Colors.orange,
+                                        Colors.yellow.shade100,
+                                        Colors.yellow.shade600,
                                         habitatGroups['land']!,
                                       ),
                                     ],
@@ -294,22 +315,36 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
                                   flex: 2,
                                   child: SingleChildScrollView(
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: items
-                                          .where((item) => !item['isPlaced'])
-                                          .map((item) => Draggable<Map<String, dynamic>>(
-                                        data: item,
-                                        feedback: Material(
-                                          color: Colors.transparent,
-                                          child: _buildDraggableItem(item),
-                                        ),
-                                        childWhenDragging: Opacity(
-                                          opacity: 0.3,
-                                          child: _buildDraggableItem(item),
-                                        ),
-                                        child: _buildDraggableItem(item),
-                                      ))
-                                          .toList(),
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children:
+                                          items
+                                              .where(
+                                                (item) => !item['isPlaced'],
+                                              )
+                                              .map(
+                                                (item) => Draggable<
+                                                  Map<String, dynamic>
+                                                >(
+                                                  data: item,
+                                                  feedback: Material(
+                                                    color: Colors.transparent,
+                                                    child: _buildDraggableItem(
+                                                      item,
+                                                    ),
+                                                  ),
+                                                  childWhenDragging: Opacity(
+                                                    opacity: 0.3,
+                                                    child: _buildDraggableItem(
+                                                      item,
+                                                    ),
+                                                  ),
+                                                  child: _buildDraggableItem(
+                                                    item,
+                                                  ),
+                                                ),
+                                              )
+                                              .toList(),
                                     ),
                                   ),
                                 ),
@@ -323,37 +358,66 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
                 ),
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                              : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
@@ -363,7 +427,13 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
     );
   }
 
-  Widget _buildGroup(String key, String title, Color boxColor, Color borderColor, List<Map<String, dynamic>> group) {
+  Widget _buildGroup(
+    String key,
+    String title,
+    Color boxColor,
+    Color borderColor,
+    List<Map<String, dynamic>> group,
+  ) {
     return Container(
       width: double.infinity,
       height: 145,
@@ -397,12 +467,18 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
                     alignment: WrapAlignment.center,
                     spacing: 10,
                     runSpacing: 4,
-                    children: group
-                        .map((item) => Text(
-                      item['emoji'],
-                      style: const TextStyle(fontSize: 50, color: Colors.black),
-                    ))
-                        .toList(),
+                    children:
+                        group
+                            .map(
+                              (item) => Text(
+                                item['emoji'],
+                                style: const TextStyle(
+                                  fontSize: 50,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            )
+                            .toList(),
                   ),
                 ),
               ),
@@ -415,20 +491,20 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
 
   Widget _buildDraggableItem(Map<String, dynamic> item) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      width: 90,
-      height: 75,
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      width: 70,
+      height: 60,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
+          BoxShadow(color: Colors.black12, blurRadius: 3, offset: Offset(0, 1)),
         ],
       ),
       child: Center(
         child: Text(
           item['emoji'],
-          style: const TextStyle(fontSize: 55, color: Colors.black),
+          style: const TextStyle(fontSize: 40, color: Colors.black),
         ),
       ),
     );
