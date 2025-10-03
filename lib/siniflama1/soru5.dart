@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import '../screens/home_screen.dart';
+import '../screens/classification_questions_screen.dart';
 
 class HayvanBacakSinifla extends StatefulWidget {
   const HayvanBacakSinifla({super.key});
@@ -268,7 +269,9 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const YiyecekIcecekSinifla(),
+                            builder:
+                                (context) =>
+                                    const ClassificationQuestionsScreen(),
                           ),
                           (route) => false,
                         );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import 'soru1.dart';
 import 'soru4.dart';
 
 // DİKKAT: YiyecekIcecekSinifla sınıfı burada tanımlı DEĞİLDİR.
@@ -51,7 +52,6 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
   Color feedbackColor = Colors.yellow.shade800;
   IconData feedbackIcon = Icons.lightbulb_outline;
   bool isCorrect = false;
-  bool _dialogShown = false;
 
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -95,22 +95,6 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
         }
       });
     }
-  }
-
-  void _showFeedback(String message, bool correct) {
-    setState(() {
-      showFeedback = true;
-      isCorrect = correct;
-    });
-    _feedbackController.forward();
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        setState(() {
-          showFeedback = false;
-        });
-        _feedbackController.reset();
-      }
-    });
   }
 
   Widget _buildItem(Map<String, dynamic> item) {
