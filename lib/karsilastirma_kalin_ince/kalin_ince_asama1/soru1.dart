@@ -49,14 +49,19 @@ class _KalinInceSoru1State extends State<KalinInceSoru1>
   }
 
   void checkAnswer(bool isInce) {
+    // Soru: 'Kalın olanı işaretle.'
+    // Resim 1 ince (isInce = true), Resim 2 kalın (isInce = false).
+    // Doğru cevap kalın olan, yani isInce = false olan butondur.
+    final bool correctAnswer = !isInce;
+
     setState(() {
       selectedAnswer = isInce;
-      isCorrect = isInce;
+      isCorrect = correctAnswer;
       showFeedback = true;
     });
     _feedbackController.forward(from: 0);
 
-    if (isInce) {
+    if (isCorrect) {
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushReplacement(
@@ -117,7 +122,7 @@ class _KalinInceSoru1State extends State<KalinInceSoru1>
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
                               builder: (context) => const HomeScreen()),
-                          (route) => false,
+                              (route) => false,
                         );
                       },
                     ),
@@ -129,7 +134,7 @@ class _KalinInceSoru1State extends State<KalinInceSoru1>
                     position: _slideAnimation,
                     child: Container(
                       margin: const EdgeInsets.fromLTRB(
-                          4, 0, 4, 0), // Sağdan ve soldan daha geniş
+                          4, 0, 4, 0),
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.95),
@@ -186,28 +191,28 @@ class _KalinInceSoru1State extends State<KalinInceSoru1>
 
                           const SizedBox(height: 8),
 
-                          // First Button
+                          // First Button - İnce çizgiye ait (isInce = true)
                           SizedBox(
                             width: double.infinity,
                             height: 40,
                             child: ElevatedButton(
-                              onPressed: () => checkAnswer(true),
+                              onPressed: () => checkAnswer(false),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: selectedAnswer == true
-                                    ? (isCorrect
-                                        ? Colors.green.shade500
-                                        : Colors.red.shade500)
-                                    : const Color(0xfff5e62d),
+                                backgroundColor: selectedAnswer == false
+                                    ? (!isCorrect
+                                    ? Colors.red.shade500
+                                    : Colors.green.shade500)
+                                    : const Color(0xff2dd7f5),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                elevation: selectedAnswer == true ? 8 : 4,
-                                shadowColor: selectedAnswer == true
-                                    ? (isCorrect
-                                        ? Colors.green.shade300
-                                        : Colors.red.shade300)
-                                    : const Color(0xfff5e62d),
+                                elevation: selectedAnswer == false ? 8 : 4,
+                                shadowColor: selectedAnswer == false
+                                    ? (!isCorrect
+                                    ? Colors.red.shade300
+                                    : Colors.green.shade300)
+                                    : const Color(0xff2dd7f5),
                               ),
                               child: const Text(
                                 'Seç',
@@ -245,28 +250,28 @@ class _KalinInceSoru1State extends State<KalinInceSoru1>
 
                           const SizedBox(height: 8),
 
-                          // Second Button
+                          // Second Button - Kalın çizgiye ait (isInce = false) - Bu doğru cevaptır.
                           SizedBox(
                             width: double.infinity,
                             height: 40,
                             child: ElevatedButton(
-                              onPressed: () => checkAnswer(false),
+                              onPressed: () => checkAnswer(true),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: selectedAnswer == false
+                                backgroundColor: selectedAnswer == true
                                     ? (isCorrect
-                                        ? Colors.green.shade500
-                                        : Colors.red.shade500)
-                                    : const Color(0xfff5e62d),
+                                    ? Colors.green.shade500
+                                    : Colors.red.shade500)
+                                    : const Color(0xff2dd7f5),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                elevation: selectedAnswer == false ? 8 : 4,
-                                shadowColor: selectedAnswer == false
+                                elevation: selectedAnswer == true ? 8 : 4,
+                                shadowColor: selectedAnswer == true
                                     ? (isCorrect
-                                        ? Colors.green.shade300
-                                        : Colors.red.shade300)
-                                    : const Color(0xfff5e62d),
+                                    ? Colors.green.shade300
+                                    : Colors.red.shade300)
+                                    : const Color(0xff2dd7f5),
                               ),
                               child: const Text(
                                 'Seç',
@@ -288,49 +293,52 @@ class _KalinInceSoru1State extends State<KalinInceSoru1>
                 Container(
                   height: 80, // Sabit yükseklik
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: showFeedback
                       ? ScaleTransition(
-                          scale: CurvedAnimation(
-                            parent: _feedbackController,
-                            curve: Curves.elasticOut,
+                    scale: CurvedAnimation(
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      // === GERİBİLDİRİM: ÇERÇEVE VE GÖLGE KALDIRILDI ===
+                      decoration: BoxDecoration(
+                        color: Colors.white, // Arka plan rengi
+                        borderRadius: BorderRadius.circular(16),
+                        // Border ve BoxShadow tamamen kaldırıldı.
+                      ),
+                      // =================================================
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            isCorrect ? Icons.check_circle : Icons.cancel,
+                            color: isCorrect ? Colors.green : Colors.red,
+                            size: 28,
                           ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  isCorrect ? Icons.check_circle : Icons.cancel,
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  isCorrect
-                                      ? (isEnglish
-                                          ? 'Well done! 🎉'
-                                          : 'Aferin! 🎉')
-                                      : (isEnglish
-                                          ? 'Try again! 😔'
-                                          : 'Tekrar dene! 😔'),
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
+                          const SizedBox(width: 10),
+                          Text(
+                            isCorrect
+                                ? (isEnglish
+                                ? 'Well done! 🎉'
+                                : 'Aferin! 🎉')
+                                : (isEnglish
+                                ? 'Try again! 😔'
+                                : 'Tekrar dene! 😔'),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color:
+                              isCorrect ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        )
+                        ],
+                      ),
+                    ),
+                  )
                       : const SizedBox.shrink(), // Boş alan
                 ),
               ],
