@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+
 import 'soru5.dart'; // HayvanBacakSinifla sınıfı için
 import '../../screens/home_screen.dart'; // Geri tuşu için eklendi
+
 
 class YiyecekIcecekSinifla extends StatefulWidget {
   const YiyecekIcecekSinifla({super.key});
