@@ -1,3 +1,4 @@
+import 'package:dixlearning/karsilastirma_uzun_kisa/soru4.dart';
 import 'package:flutter/material.dart';
 import 'asama_gecis_ekrani.dart';
 
@@ -57,7 +58,7 @@ class _KisaUzunYolSorusuState extends State<KisaUzunYolSorusu>
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-              builder: (context) => const UzunKisaAsamaGecisEkrani()),
+              builder: (context) => const KisaUzunCocukSorusu()),
         );
       });
     } else {
