@@ -19,6 +19,7 @@ dependencies:
   google_fonts: ^6.2.1
   shared_preferences: ^2.2.2
   cupertino_icons: ^1.0.8
+  flutter_tts: ^3.7.0 # <-- TTS paketi eklendi
 
 dev_dependencies:
   flutter_test:
@@ -78,5 +79,3 @@ flutter:
     - assets/siniflama1/
     - assets/siniflama2/
     - assets/kalin_ince_asa1/
-
-    
