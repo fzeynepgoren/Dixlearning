@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/home_screen.dart';
 import '../utils/activity_tracker.dart';
 import 'dart:math';
 import 'disgrafi1.dart';
@@ -115,7 +116,7 @@ class _HeceDoldurmaState extends State<HeceDoldurma>
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const Disgrafi1(),
+            builder: (context) => const HomeScreen(),
           ),
         );
       }

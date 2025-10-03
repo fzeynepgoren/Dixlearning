@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import 'soru1.dart';
 import 'soru4.dart';
 import '../../screens/home_screen.dart';
 
@@ -42,9 +43,10 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
 
   final List<Map<String, dynamic>> longGroup = [];
   final List<Map<String, dynamic>> shortGroup = [];
+
   bool showFeedback = false;
   bool isCorrect = false;
-  bool _dialogShown = false;
+
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -54,7 +56,7 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
     super.initState();
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 800),
     );
     _slideController = AnimationController(
       vsync: this,
@@ -76,60 +78,207 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
     super.dispose();
   }
 
-  void _handleDrag(Map<String, dynamic> item, bool isLong) {
-    setState(() {
-      isCorrect = item['isLong'] == isLong;
-      showFeedback = true;
-    });
-    _feedbackController.forward(from: 0);
-
-    if (isCorrect) {
-      setState(() {
-        if (!item['isPlaced']) {
-          if (isLong) {
-            longGroup.add(item);
-          } else {
-            shortGroup.add(item);
-          }
-          item['isPlaced'] = true;
+  void _checkCompletion() {
+    if (longGroup.length == 2 && shortGroup.length == 2) {
+      _showFeedback(true);
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const YiyecekIcecekSinifla(),
+            ),
+          );
         }
       });
-      _checkCompletion();
     }
+  }
 
+  void _showFeedback(bool correct) {
+    // Eğer zaten doğru geri bildirim gösteriliyorsa, yanlış geri bildirimi engelle
+    if (showFeedback && isCorrect && !correct) return;
+
+    setState(() {
+      showFeedback = true;
+      isCorrect = correct;
+    });
+    _feedbackController.forward(from: 0);
     Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) setState(() => showFeedback = false);
+      if (mounted) {
+        setState(() {
+          showFeedback = false;
+        });
+        _feedbackController.reset();
+      }
     });
   }
 
-  void _checkCompletion() {
-    if (longGroup.length + shortGroup.length == items.length) {
-      bool allCorrect = longGroup.every((e) => e['isLong']) &&
-          shortGroup.every((e) => !e['isLong']);
-      if (allCorrect && !_dialogShown) {
-        _dialogShown = true;
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const YiyecekIcecekSinifla(),
+  // ÖRNEK TASARIM: Sürüklenen Öğenin Kutusu
+  Widget _buildItem(Map<String, dynamic> item) {
+    bool isLong = item['isLong'];
+    double boxWidth = isLong ? 90 : 75;
+    double boxHeight = isLong ? 100 : 85;
+    double imgSize = isLong ? 70 : 55;
+
+    return Draggable<Map<String, dynamic>>(
+      data: item,
+      feedback: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: boxWidth,
+          height: boxHeight,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
               ),
-            );
+            ],
+          ),
+          child: Center(
+            child: Image.asset(
+              item['image'],
+              width: imgSize,
+              height: imgSize,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+      ),
+      childWhenDragging: const SizedBox.shrink(),
+      child: Container(
+        width: boxWidth,
+        height: boxHeight,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Image.asset(
+            item['image'],
+            width: imgSize,
+            height: imgSize,
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ÖRNEK TASARIM: Grup Kutusu (DragTarget) yapısı
+  Widget _buildGroup(
+      String title,
+      List<Map<String, dynamic>> items,
+      bool isLong,
+      ) {
+    Color boxColor = isLong ? Colors.lightBlue.shade100 : Colors.deepPurple.shade100;
+    Color borderColor = isLong ? Colors.lightBlue.shade400 : Colors.deepPurple.shade300;
+    double placedImgSize = isLong ? 90 : 75;
+
+    return DragTarget<Map<String, dynamic>>(
+      onWillAcceptWithDetails: (data) {
+        // Sadece doğru kutu için true döndürülür.
+        return !data.data['isPlaced'] && data.data['isLong'] == isLong;
+      },
+      onAcceptWithDetails: (data) {
+        // Doğru kutuya bırakıldı.
+        setState(() {
+          data.data['isPlaced'] = true;
+          if (isLong) {
+            longGroup.add(data.data);
+          } else {
+            shortGroup.add(data.data);
           }
         });
-      }
-    }
+        _showFeedback(true); // Aferin!
+        _checkCompletion();
+      },
+      // onDidLeave kaldırıldı.
+      builder: (context, candidateData, rejectedData) {
+        // Nesne yanlış kutuya bırakılırsa (onWillAcceptDetails false döndürürse)
+        // rejectedData boş olmayacaktır.
+        if (rejectedData.isNotEmpty) {
+          // Geri bildirimin hemen sonra görünmesi için microtask kullanıldı
+          Future.microtask(() => _showFeedback(false));
+        }
+
+        return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          decoration: BoxDecoration(
+            color: boxColor,
+            border: Border.all(
+              color: borderColor,
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Flexible(
+                fit: FlexFit.loose,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: items.isEmpty
+                        ? MainAxisAlignment.center
+                        : MainAxisAlignment.start,
+                    children: items.map((item) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Image.asset(
+                          item['image'],
+                          width: placedImgSize,
+                          height: placedImgSize,
+                          fit: BoxFit.contain,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    final screenSize = MediaQuery.of(context).size;
-    final iconSize = screenSize.width * 0.065;
+    final iconSize = MediaQuery.of(context).size.width * 0.065;
 
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
       child: Scaffold(
         body: Container(
           decoration: BoxDecoration(
@@ -148,7 +297,7 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
             child: Column(
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     IconButton(
                       icon: Icon(
@@ -156,10 +305,18 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                         color: Colors.black,
                         size: iconSize,
                       ),
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
+                          ),
+                              (route) => false,
+                        );
+                      },
                     ),
                   ],
                 ),
+                const SizedBox(height: 10),
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
@@ -205,40 +362,18 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                                   child: Column(
                                     children: [
                                       Expanded(
-                                        child: DragTarget<Map<String, dynamic>>(
-                                          builder: (
-                                              context,
-                                              candidateItems,
-                                              rejectedItems,
-                                              ) {
-                                            return _buildGroupContainer(
-                                              longGroup,
-                                              true,
-                                              isEnglish,
-                                            );
-                                          },
-                                          onWillAccept: (item) => true,
-                                          onAccept: (item) =>
-                                              _handleDrag(item!, true),
+                                        child: _buildGroup(
+                                          isEnglish ? 'Long' : 'Uzun',
+                                          longGroup,
+                                          true,
                                         ),
                                       ),
                                       const SizedBox(height: 16),
                                       Expanded(
-                                        child: DragTarget<Map<String, dynamic>>(
-                                          builder: (
-                                              context,
-                                              candidateItems,
-                                              rejectedItems,
-                                              ) {
-                                            return _buildGroupContainer(
-                                              shortGroup,
-                                              false,
-                                              isEnglish,
-                                            );
-                                          },
-                                          onWillAccept: (item) => true,
-                                          onAccept: (item) =>
-                                              _handleDrag(item!, false),
+                                        child: _buildGroup(
+                                          isEnglish ? 'Short' : 'Kısa',
+                                          shortGroup,
+                                          false,
                                         ),
                                       ),
                                     ],
@@ -247,21 +382,14 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                                 const SizedBox(width: 16),
                                 Expanded(
                                   flex: 2,
+                                  // Sağ tarafta ayrı bir DragTarget kullanmaya gerek yok
+                                  // çünkü yanlış bırakma kontrolü _buildGroup içinde yapılıyor.
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: items
                                         .where((item) => !item['isPlaced'])
-                                        .map((item) {
-                                      return Draggable<Map<String, dynamic>>(
-                                        data: item,
-                                        feedback: Material(
-                                          color: Colors.transparent,
-                                          child: _buildItemBox(item),
-                                        ),
-                                        childWhenDragging: const SizedBox.shrink(),
-                                        child: _buildItemBox(item),
-                                      );
-                                    }).toList(),
+                                        .map((item) => _buildItem(item))
+                                        .toList(),
                                   ),
                                 ),
                               ],
@@ -272,38 +400,55 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                     ),
                   ),
                 ),
+                // Geri Bildirim Kutusu
                 Container(
                   height: 80,
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
                   child: showFeedback
                       ? ScaleTransition(
                     scale: CurvedAnimation(
                       parent: _feedbackController,
                       curve: Curves.elasticOut,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                              : (isEnglish
-                              ? 'Try again! 😔'
-                              : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            isCorrect ? Icons.check_circle : Icons.cancel,
+                            color: isCorrect ? Colors.green : Colors.red,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            isCorrect
+                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                                : (isEnglish
+                                ? 'Try again! 😔'
+                                : 'Tekrar dene! 😔'),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: isCorrect ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   )
                       : const SizedBox.shrink(),
@@ -311,96 +456,6 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGroupContainer(
-      List<Map<String, dynamic>> group,
-      bool isLong,
-      bool isEnglish,
-      ) {
-    Color boxColor =
-    isLong ? const Color(0xFFD6ECFF) : const Color(0xFFFFDDEE);
-    Color borderColor = isLong ? Colors.lightBlue : Colors.pinkAccent;
-
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      decoration: BoxDecoration(
-        color: boxColor,
-        border: Border.all(
-          color: borderColor,
-          width: 2,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            isLong
-                ? (isEnglish ? 'Long' : 'Uzun')
-                : (isEnglish ? 'Short' : 'Kısa'),
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: group
-                    .map(
-                      (item) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: SizedBox(
-                      width: item['isLong'] ? 80 : 60,
-                      height: item['isLong'] ? 120 : 60,
-                      child: Image.asset(
-                        item['image'],
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                )
-                    .toList(),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildItemBox(Map<String, dynamic> item) {
-    final bool isLongItem = item['isLong'] == true;
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Image.asset(
-          item['image'],
-          fit: BoxFit.contain,
-          width: isLongItem ? 80 : 60,
-          height: isLongItem ? 100 : 60,
         ),
       ),
     );

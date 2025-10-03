@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'home_screen.dart';
 import 'register_screen.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 
 class MascotDialog extends StatelessWidget {
   final String message;
@@ -279,18 +281,7 @@ class _MascotBottomSheetState extends State<MascotBottomSheet>
 }
 
 class LoginScreen extends StatefulWidget {
-  final void Function(ThemeMode)? onThemeChanged;
-  final ThemeMode? themeMode;
-  final bool? isEnglish;
-  final void Function(bool isEnglish)? onLanguageChanged;
-
-  const LoginScreen({
-    super.key,
-    this.onThemeChanged,
-    this.themeMode,
-    this.isEnglish,
-    this.onLanguageChanged,
-  });
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -315,9 +306,7 @@ class _LoginScreenState extends State<LoginScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _showMascot = true;
-        _mascotMessage = widget.isEnglish == true
-            ? 'Hello my friend, I am Dixy.\nWelcome!'
-            : 'Merhaba dostum, ben Dixy.\nHoş geldin!';
+        _mascotMessage = 'Merhaba dostum, ben Dixy.\nHoş geldin!';
       });
     });
   }
@@ -333,12 +322,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomeScreen(
-              onThemeChanged: widget.onThemeChanged,
-              themeMode: widget.themeMode,
-              isEnglish: widget.isEnglish,
-              onLanguageChanged: widget.onLanguageChanged,
-            ),
+            builder: (context) => const HomeScreen(),
           ),
         );
       }
@@ -372,9 +356,7 @@ class _LoginScreenState extends State<LoginScreen> {
         
         if (usersJson == null) {
           setState(() {
-            _errorMessage = widget.isEnglish == true
-                ? "No registered users found. Please register first."
-                : "Kayıtlı kullanıcı bulunamadı. Lütfen önce kayıt olun.";
+            _errorMessage = "Kayıtlı kullanıcı bulunamadı. Lütfen önce kayıt olun.";
             _isLoading = false;
           });
           return;
@@ -390,9 +372,7 @@ class _LoginScreenState extends State<LoginScreen> {
         
         if (user.isEmpty) {
           setState(() {
-            _errorMessage = widget.isEnglish == true
-                ? "Invalid email or password"
-                : "Geçersiz e-posta veya şifre";
+            _errorMessage = "Geçersiz e-posta veya şifre";
             _isLoading = false;
           });
           return;
@@ -407,21 +387,14 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => HomeScreen(
-                onThemeChanged: widget.onThemeChanged,
-                themeMode: widget.themeMode,
-                isEnglish: widget.isEnglish,
-                onLanguageChanged: widget.onLanguageChanged,
-              ),
+              builder: (context) => const HomeScreen(),
             ),
           );
         }
         
       } catch (e) {
         setState(() {
-          _errorMessage = widget.isEnglish == true
-              ? "An error occurred. Please try again."
-              : "Bir hata oluştu. Lütfen tekrar deneyin.";
+          _errorMessage = "Bir hata oluştu. Lütfen tekrar deneyin.";
         });
       }
       
@@ -433,9 +406,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if ((_emailController.text.isEmpty || _passwordController.text.isEmpty)) {
         setState(() {
           _showMascot = true;
-          _mascotMessage = widget.isEnglish == true
-              ? "I see you haven't registered yet. You can register using the button below before logging in."
-              : "Henüz kayıt olmadığını görüyorum. Kayıt ol butonundan kayıt olduktan sonra giriş yapabilirsin.";
+          _mascotMessage = "Henüz kayıt olmadığını görüyorum. Kayıt ol butonundan kayıt olduktan sonra giriş yapabilirsin.";
         });
       }
     }
@@ -449,7 +420,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isEnglish = widget.isEnglish == true;
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     return Scaffold(
       body: Stack(
         children: [

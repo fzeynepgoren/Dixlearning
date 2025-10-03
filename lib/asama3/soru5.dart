@@ -132,11 +132,9 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
 
     Color cardColor = Colors.white;
     if (isMatched) {
-      cardColor = Colors.green.shade300;
+      cardColor = Colors.green.shade200;
     } else if (isWrong) {
-      cardColor = Colors.red.shade300;
-    } else if (isSelected) {
-      cardColor = isLeft ? Colors.blue.shade200 : Colors.yellow.shade200;
+      cardColor = Colors.red.shade200;
     }
 
     return GestureDetector(
@@ -149,6 +147,10 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
         decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(20),
+          border:
+              isSelected && !isMatched
+                  ? Border.all(color: Colors.blue.shade400, width: 4)
+                  : null,
           boxShadow: [
             BoxShadow(
                 color: Colors.black.withOpacity(0.13),
@@ -264,10 +266,18 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
                                   // Ortadaki çizgi
                                   Container(
                                     width: 4,
-                                    height: screenSize.height * 0.38,
+                                    height: 425,
                                     margin: const EdgeInsets.symmetric(horizontal: 14),
                                     decoration: BoxDecoration(
-                                      color: Colors.grey.shade400,
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.blue.shade400,
+                                          Colors.blue.shade200,
+                                          Colors.blue.shade100,
+                                        ],
+                                      ),
                                       borderRadius: BorderRadius.circular(2),
                                     ),
                                   ),

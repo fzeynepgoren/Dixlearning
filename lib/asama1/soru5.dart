@@ -58,7 +58,7 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
           matchedRight[selectedRightIndex!] = true;
 
           if (matchedLeft.every((element) => element)) {
-            Future.delayed(const Duration(seconds: 1), () {
+            Future.delayed(const Duration(seconds: 2), () {
               if (mounted) {
                 showDialog(
                   context: context,
@@ -139,18 +139,30 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
                 );
               }
             });
-          }
-        }
-
-        Future.delayed(const Duration(seconds: 1), () {
-          if (mounted) {
-            setState(() {
-              showFeedback = false;
-              selectedLeftIndex = null;
-              selectedRightIndex = null;
+          } else {
+            // Feedback'i 2 saniye sonra gizle
+            Future.delayed(const Duration(seconds: 2), () {
+              if (mounted) {
+                setState(() {
+                  showFeedback = false;
+                  selectedLeftIndex = null;
+                  selectedRightIndex = null;
+                });
+              }
             });
           }
-        });
+        } else {
+          // Yanlış cevap için feedback'i 2 saniye sonra gizle
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) {
+              setState(() {
+                showFeedback = false;
+                selectedLeftIndex = null;
+                selectedRightIndex = null;
+              });
+            }
+          });
+        }
       }
     });
   }
@@ -163,16 +175,18 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration:
+            showFeedback ? Duration.zero : const Duration(milliseconds: 300),
         width: 120,
         height: 120,
         margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color:
               isMatched
-                  ? Colors.green.shade300
+                  ? Colors.green.shade400
                   : (showFeedback && !isCorrect && isSelected)
-                  ? Colors.red.shade200
+                  ? Colors.red.shade400
                   : isSelected
                   ? Colors.blue.shade200
                   : Colors.white,
@@ -185,7 +199,7 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
             ),
           ],
         ),
-        child: Center(child: Text(emoji, style: const TextStyle(fontSize: 42))),
+        child: Center(child: Text(emoji, style: const TextStyle(fontSize: 48))),
       ),
     );
   }
@@ -212,7 +226,7 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
             child: Column(
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -272,9 +286,12 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
                                     (index) => GestureDetector(
                                       onTap: () => _handleTap(index, true),
                                       child: AnimatedContainer(
-                                        duration: const Duration(
-                                          milliseconds: 300,
-                                        ),
+                                        duration:
+                                            showFeedback
+                                                ? Duration.zero
+                                                : const Duration(
+                                                  milliseconds: 300,
+                                                ),
                                         curve: Curves.easeInOut,
                                         width: 120,
                                         height: 120,
@@ -346,9 +363,12 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
                                     (index) => GestureDetector(
                                       onTap: () => _handleTap(index, false),
                                       child: AnimatedContainer(
-                                        duration: const Duration(
-                                          milliseconds: 300,
-                                        ),
+                                        duration:
+                                            showFeedback
+                                                ? Duration.zero
+                                                : const Duration(
+                                                  milliseconds: 300,
+                                                ),
                                         curve: Curves.easeInOut,
                                         width: 120,
                                         height: 120,

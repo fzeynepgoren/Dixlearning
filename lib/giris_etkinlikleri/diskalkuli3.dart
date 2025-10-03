@@ -5,6 +5,7 @@ import 'dart:math';
 import 'disgrafi1.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import '../screens/home_screen.dart';
 
 class Diskalkuli3 extends StatefulWidget {
   const Diskalkuli3({super.key});
@@ -51,9 +52,10 @@ class _Diskalkuli3State extends State<Diskalkuli3>
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-    _shakeAnimation = Tween<double>(begin: 0, end: 16)
-        .chain(CurveTween(curve: Curves.elasticIn))
-        .animate(_shakeController);
+    _shakeAnimation = Tween<double>(
+      begin: 0,
+      end: 16,
+    ).chain(CurveTween(curve: Curves.elasticIn)).animate(_shakeController);
   }
 
   @override
@@ -74,48 +76,48 @@ class _Diskalkuli3State extends State<Diskalkuli3>
     });
 
     if (isCorrect) {
-  setState(() {
-    _showCongrats = true;
-    _feedbackText = "Aferin! 🎉"; // emojili
-  });
-  _congratsController.forward(from: 0);
-  await Future.delayed(const Duration(milliseconds: 900));
-  setState(() {
-    _showCongrats = false;
-  });
-} else {
-  setState(() {
-    _isWrong = true;
-    _feedbackText = "Tekrar dene! 😔"; // emojili
-  });
-  HapticFeedback.vibrate();
-  _shakeController.forward(from: 0);
-  await Future.delayed(const Duration(seconds: 2));
-  setState(() {
-    _feedbackText = null; // sadece feedback'i kaldır
-  });
-}
+      setState(() {
+        _showCongrats = true;
+        _feedbackText = "Aferin! 🎉"; // emojili
+      });
+      _congratsController.forward(from: 0);
+      await Future.delayed(const Duration(milliseconds: 900));
+      setState(() {
+        _showCongrats = false;
+      });
+    } else {
+      setState(() {
+        _isWrong = true;
+        _feedbackText = "Tekrar dene! 😔"; // emojili
+      });
+      HapticFeedback.vibrate();
+      _shakeController.forward(from: 0);
+      await Future.delayed(const Duration(seconds: 2));
+      setState(() {
+        _feedbackText = null; // sadece feedback'i kaldır
+      });
+    }
 
-// Sonraki soruya geç
-if (!isLast) {
-  _fadeController.reverse().then((_) {
-    setState(() {
-      _currentProblemIndex++;
-      _problems[_currentProblemIndex]['userAnswer'] = null;
-      _isWrong = false; // yeni soruya geçerken sıfırlıyoruz
-    });
-    _fadeController.forward();
-  });
-} else {
-  await Future.delayed(const Duration(milliseconds: 700));
-  if (mounted) {
-    ActivityTracker.completeActivity();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const Disgrafi1()),
-    );
-  }
-}
+    // Sonraki soruya geç
+    if (!isLast) {
+      _fadeController.reverse().then((_) {
+        setState(() {
+          _currentProblemIndex++;
+          _problems[_currentProblemIndex]['userAnswer'] = null;
+          _isWrong = false; // yeni soruya geçerken sıfırlıyoruz
+        });
+        _fadeController.forward();
+      });
+    } else {
+      await Future.delayed(const Duration(milliseconds: 700));
+      if (mounted) {
+        ActivityTracker.completeActivity();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Disgrafi1()),
+        );
+      }
+    }
   }
 
   List<int> _getNumberOptions() {
@@ -155,6 +157,26 @@ if (!isLast) {
         child: SafeArea(
           child: Column(
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: Colors.black,
+                      size: MediaQuery.of(context).size.width * 0.065,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => const HomeScreen(),
+                        ),
+                        (route) => false,
+                      );
+                    },
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
               Expanded(
                 child: Center(
@@ -198,20 +220,24 @@ if (!isLast) {
                           Wrap(
                             alignment: WrapAlignment.center,
                             spacing: 18,
-                            children: numberOptions.map((num) {
-                              return Draggable<int>(
-                                data: num,
-                                feedback: Material(
-                                  color: Colors.transparent,
-                                  child: _buildNumberBox(num, dragging: true),
-                                ),
-                                childWhenDragging: Opacity(
-                                  opacity: 0.3,
-                                  child: _buildNumberBox(num),
-                                ),
-                                child: _buildNumberBox(num),
-                              );
-                            }).toList(),
+                            children:
+                                numberOptions.map((num) {
+                                  return Draggable<int>(
+                                    data: num,
+                                    feedback: Material(
+                                      color: Colors.transparent,
+                                      child: _buildNumberBox(
+                                        num,
+                                        dragging: true,
+                                      ),
+                                    ),
+                                    childWhenDragging: Opacity(
+                                      opacity: 0.3,
+                                      child: _buildNumberBox(num),
+                                    ),
+                                    child: _buildNumberBox(num),
+                                  );
+                                }).toList(),
                           ),
                         ],
                       ),
@@ -221,49 +247,53 @@ if (!isLast) {
               ),
               Container(
                 height: 80,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: _feedbackText != null
-                    ? AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 400),
-                        child: Container(
-                          key: ValueKey<String>(_feedbackText!),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
-                          decoration: BoxDecoration(
-                            color: _isWrong ? Colors.red : Colors.green,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 10,
-                                offset: Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                _isWrong ? Icons.cancel : Icons.check_circle,
-                                color: Colors.white,
-                                size: 28,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                _isWrong
-                                    ? "İşte doğrusu"
-                                    : "Aferin! 🎉",
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                child:
+                    _feedbackText != null
+                        ? AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 400),
+                          child: Container(
+                            key: ValueKey<String>(_feedbackText!),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _isWrong ? Colors.red : Colors.green,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _isWrong ? Icons.cancel : Icons.check_circle,
+                                  color: Colors.white,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  _isWrong ? "İşte doğrusu" : "Aferin! 🎉",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
+                        )
+                        : const SizedBox.shrink(),
               ),
             ],
           ),
@@ -281,11 +311,7 @@ if (!isLast) {
         color: dragging ? Colors.amberAccent : Colors.pinkAccent,
         borderRadius: BorderRadius.circular(18),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
         ],
       ),
       child: Center(
@@ -349,14 +375,16 @@ if (!isLast) {
                       height: 54,
                       margin: const EdgeInsets.only(top: 16),
                       decoration: BoxDecoration(
-                        color: candidateData.isNotEmpty
-                            ? Colors.yellow[100]
-                            : Colors.white,
+                        color:
+                            candidateData.isNotEmpty
+                                ? Colors.yellow[100]
+                                : Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: hasAnswer
-                              ? (isCorrect ? Colors.green : Colors.red)
-                              : Colors.grey,
+                          color:
+                              hasAnswer
+                                  ? (isCorrect ? Colors.green : Colors.red)
+                                  : Colors.grey,
                           width: 4,
                         ),
                         boxShadow: [
@@ -369,24 +397,26 @@ if (!isLast) {
                         ],
                       ),
                       child: Center(
-                        child: hasAnswer
-                            ? Text(
-                                _isWrong
-                                    ? problem['answer'].toString()
-                                    : answer.toString(),
-                                style: TextStyle(
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.bold,
-                                  color: isCorrect ? Colors.green : Colors.red,
+                        child:
+                            hasAnswer
+                                ? Text(
+                                  _isWrong
+                                      ? problem['answer'].toString()
+                                      : answer.toString(),
+                                  style: TextStyle(
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                  ),
+                                )
+                                : const Text(
+                                  'Cevap',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.grey,
+                                  ),
                                 ),
-                              )
-                            : const Text(
-                                'Cevap',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.grey,
-                                ),
-                              ),
                       ),
                     );
                   },

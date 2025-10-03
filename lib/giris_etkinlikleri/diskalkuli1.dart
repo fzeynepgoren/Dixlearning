@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
+import 'diskalkuli2.dart';
 import 'diskalkuli3.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
@@ -121,7 +122,7 @@ class _Diskalkuli1State extends State<Diskalkuli1>
         ActivityTracker.completeActivity();
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const Diskalkuli3()),
+          MaterialPageRoute(builder: (context) => const Diskalkuli2()),
         );
       }
     });
