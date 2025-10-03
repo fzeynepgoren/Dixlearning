@@ -23,7 +23,7 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
   final List<Map<String, dynamic>> twoLegsGroup = [];
   bool showFeedback = false;
   bool isCorrect = false;
-  bool _dialogShown = false;
+
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -33,7 +33,7 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
     super.initState();
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 800), // Örnek tasarıma uyumlu süre
     );
     _slideController = AnimationController(
       vsync: this,
@@ -48,31 +48,23 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
     _slideController.forward();
   }
 
-  void _checkCompletion() {
-    if (fourLegsGroup.length == 2 && twoLegsGroup.length == 2) {
-      setState(() {
-        isCorrect = true;
-        showFeedback = true;
-      });
-      _feedbackController.forward();
-      Future.delayed(const Duration(milliseconds: 1500), () {
-        if (mounted) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-            (route) => false,
-          );
-        }
-      });
-    }
+  @override
+  void dispose() {
+    _feedbackController.dispose();
+    _slideController.dispose();
+    super.dispose();
   }
 
-  void _showFeedback(String message, bool correct) {
+  void _handleDragFeedback(bool correct) {
+    // Eğer zaten doğru geri bildirim gösteriliyorsa, yanlış geri bildirimi engelle
+    if (showFeedback && isCorrect && !correct) return;
+
     setState(() {
-      showFeedback = true;
       isCorrect = correct;
+      showFeedback = true;
     });
-    _feedbackController.forward();
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    _feedbackController.forward(from: 0);
+    Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
           showFeedback = false;
@@ -82,14 +74,30 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
     });
   }
 
+  void _checkCompletion() {
+    if (fourLegsGroup.length == 2 && twoLegsGroup.length == 2) {
+      _handleDragFeedback(true); // Tüm doğru eşleşmeler bittiğinde pozitif geri bildirim
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
+          // Son görev tamamlandı, Ana ekrana yönlendir.
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+          );
+        }
+      });
+    }
+  }
+
+  // ÖRNEK TASARIM: Sürüklenen Öğenin Kutusu
   Widget _buildItem(Map<String, dynamic> item) {
     return Draggable<Map<String, dynamic>>(
       data: item,
       feedback: Material(
         color: Colors.transparent,
         child: Container(
-          width: 80,
-          height: 80,
+          width: 90,
+          height: 100,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
@@ -102,34 +110,17 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
             ],
           ),
           child: Center(
-            child: Text(item['emoji'], style: const TextStyle(fontSize: 50)),
+            child: Text(item['emoji'],
+                style: const TextStyle(fontSize: 60)),
           ),
         ),
       ),
-      childWhenDragging: Opacity(
-        opacity: 0.3,
-        child: Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Center(
-            child: Text(item['emoji'], style: const TextStyle(fontSize: 50)),
-          ),
-        ),
-      ),
+      // Sürüklenirken yerinde kalıntı bırakmama
+      childWhenDragging: const SizedBox.shrink(),
       child: Container(
-        width: 80,
-        height: 80,
+        width: 90,
+        height: 100,
+        margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -142,22 +133,30 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
           ],
         ),
         child: Center(
-          child: Text(item['emoji'], style: const TextStyle(fontSize: 50)),
+          child: Text(item['emoji'],
+              style: const TextStyle(fontSize: 60)),
         ),
       ),
     );
   }
 
+  // ÖRNEK TASARIM: Grup Kutusu (DragTarget) yapısı
   Widget _buildGroup(
-    String title,
-    List<Map<String, dynamic>> items,
-    bool isFourLegs,
-  ) {
+      String title,
+      List<Map<String, dynamic>> items,
+      bool isFourLegs,
+      ) {
+    // Özel renkler bu soruya uyarlandı
+    Color boxColor = isFourLegs ? Colors.lightBlue.shade100 : Colors.deepPurple.shade100;
+    Color borderColor = isFourLegs ? Colors.lightBlue.shade400 : Colors.deepPurple.shade400;
+
     return DragTarget<Map<String, dynamic>>(
       onWillAcceptWithDetails: (data) {
+        // Doğru kategori kontrolü
         return !data.data['isPlaced'] && data.data['isFourLegs'] == isFourLegs;
       },
       onAcceptWithDetails: (data) {
+        // Doğru yere bırakıldı
         setState(() {
           data.data['isPlaced'] = true;
           if (isFourLegs) {
@@ -166,24 +165,30 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
             twoLegsGroup.add(data.data);
           }
         });
+        _handleDragFeedback(true); // Doğru bırakma: Aferin!
         _checkCompletion();
       },
       builder: (context, candidateData, rejectedData) {
+        // Yanlış kutuya bırakıldığında "Tekrar Dene" geri bildirimi
+        if (rejectedData.isNotEmpty) {
+          Future.microtask(() => _handleDragFeedback(false));
+        }
+
         return Container(
           width: double.infinity,
-          height: 200,
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            color: boxColor,
             border: Border.all(
-              color: isFourLegs ? Colors.green : Colors.purple,
+              color: borderColor,
               width: 2,
             ),
-            boxShadow: const [
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
               BoxShadow(
-                color: Colors.black12,
+                color: Colors.black.withOpacity(0.1),
                 blurRadius: 4,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -192,28 +197,30 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 20,
+                style: const TextStyle(
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: isFourLegs ? Colors.green : Colors.purple,
+                  color: Colors.black,
                 ),
               ),
               const SizedBox(height: 16),
-              Expanded(
+              Flexible(
+                fit: FlexFit.loose,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children:
-                        items.map((item) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: Text(
-                              item['emoji'],
-                              style: const TextStyle(fontSize: 50),
-                            ),
-                          );
-                        }).toList(),
+                    mainAxisAlignment: items.isEmpty
+                        ? MainAxisAlignment.center
+                        : MainAxisAlignment.start,
+                    children: items.map((item) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Text(
+                          item['emoji'],
+                          style: const TextStyle(fontSize: 60),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
               ),
@@ -225,22 +232,15 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
   }
 
   @override
-  void dispose() {
-    _feedbackController.dispose();
-    _slideController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    final screenSize = MediaQuery.of(context).size;
-    final iconSize = screenSize.width * 0.065;
+    final iconSize = MediaQuery.of(context).size.width * 0.065;
 
     return PopScope(
       canPop: false,
       child: Scaffold(
         body: Container(
+          // Gradient arka plan
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -256,6 +256,7 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
           child: SafeArea(
             child: Column(
               children: [
+                // Başlık kaldırıldı, sadece geri tuşu kaldı.
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -266,24 +267,14 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                         size: iconSize,
                       ),
                       onPressed: () {
+                        // Ana ekrana dönme
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const YiyecekIcecekSinifla(),
+                            builder: (context) => const HomeScreen(),
                           ),
-                          (route) => false,
+                              (route) => false,
                         );
                       },
-                    ),
-                    SizedBox(width: iconSize),
-                    Text(
-                      isEnglish
-                          ? 'Animal Leg Classification'
-                          : 'Hayvan Bacak Sınıflandırma',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
                     ),
                   ],
                 ),
@@ -291,63 +282,76 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
+                    // İçerik kutusu
                     child: Container(
-                      margin: const EdgeInsets.all(16),
-                      padding: const EdgeInsets.all(20),
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           ),
                         ],
                       ),
                       child: Column(
                         children: [
-                          Text(
-                            isEnglish
-                                ? 'Drag the animals to the correct group!'
-                                : 'Hayvanları doğru gruba sürükle!',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 1),
+                            child: Text(
+                              isEnglish
+                                  ? 'Drag the animals to the correct group!'
+                                  : 'Hayvanları doğru gruba sürükle!',
+                              style: const TextStyle(
+                                fontSize: 23,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 15),
                           Expanded(
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Expanded(
+                                  flex: 3,
                                   child: Column(
+                                    // Grup kutuları Expanded ile sarıldı.
                                     children: [
-                                      _buildGroup(
-                                        isEnglish ? '4 Legs' : '4 Bacak',
-                                        fourLegsGroup,
-                                        true,
+                                      Expanded(
+                                        child: _buildGroup(
+                                          isEnglish ? '4 Legs' : '4 Bacak',
+                                          fourLegsGroup,
+                                          true,
+                                        ),
                                       ),
                                       const SizedBox(height: 16),
-                                      _buildGroup(
-                                        isEnglish ? '2 Legs' : '2 Bacak',
-                                        twoLegsGroup,
-                                        false,
+                                      Expanded(
+                                        child: _buildGroup(
+                                          isEnglish ? '2 Legs' : '2 Bacak',
+                                          twoLegsGroup,
+                                          false,
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
+                                  flex: 2,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    children:
-                                        items
-                                            .where((item) => !item['isPlaced'])
-                                            .map((item) => _buildItem(item))
-                                            .toList(),
+                                    children: items
+                                        .where((item) => !item['isPlaced'])
+                                        .map((item) => _buildItem(item))
+                                        .toList(),
                                   ),
                                 ),
                               ],
@@ -358,68 +362,58 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                     ),
                   ),
                 ),
+                // Geri Bildirim Kutusu
                 Container(
                   height: 80,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
+                      horizontal: 20, vertical: 10),
+                  child: showFeedback
+                      ? ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            isCorrect ? Icons.check_circle : Icons.cancel,
+                            color: isCorrect ? Colors.green : Colors.red,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            isCorrect
+                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                                : (isEnglish
+                                ? 'Try again! 😔'
+                                : 'Tekrar dene! 😔'),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: isCorrect ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
                             ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? (isEnglish
-                                            ? 'Well done! 🎉'
-                                            : 'Aferin! 🎉')
-                                        : (isEnglish
-                                            ? 'Try again! 😔'
-                                            : 'Tekrar dene! 😔'),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color:
-                                          isCorrect ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                          : const SizedBox.shrink(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                      : const SizedBox.shrink(),
                 ),
               ],
             ),
