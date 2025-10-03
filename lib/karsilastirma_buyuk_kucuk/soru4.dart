@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/karsilastirma_sorulari_screen.dart';
 import 'soru5.dart'; // 5. soruya geçiş
 
 class BalikKucukSorusu extends StatefulWidget {
@@ -31,10 +32,9 @@ class _BalikKucukSorusuState extends State<BalikKucukSorusu>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -57,7 +57,8 @@ class _BalikKucukSorusuState extends State<BalikKucukSorusu>
         if (!mounted) return;
         Navigator.of(context).push(
           MaterialPageRoute(
-              builder: (context) => const ArabaKucukSoru6()), // 5. soruya geçiş
+            builder: (context) => const ArabaKucukSoru6(),
+          ), // 5. soruya geçiş
         );
       });
     } else {
@@ -78,8 +79,9 @@ class _BalikKucukSorusuState extends State<BalikKucukSorusu>
     final screenHeight = screenSize.height;
     final iconSize = screenWidth * 0.065;
     final stageFontSize = screenWidth * 0.038;
-    const Color defaultBtnColor =
-        Color(0xFF2196F3); // Mavi tonlarında renk (istersen değiştir)
+    const Color defaultBtnColor = Color(
+      0xFF2196F3,
+    ); // Mavi tonlarında renk (istersen değiştir)
     final double imageHeight = screenHeight * 0.48;
     const double buttonHeight = 50;
     final double buttonWidth = screenWidth * 0.28;
@@ -107,10 +109,19 @@ class _BalikKucukSorusuState extends State<BalikKucukSorusu>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    const KarsilastirmaSorulariScreen(),
+                          ),
+                        );
                       },
                     ),
                     SizedBox(width: iconSize),
@@ -121,16 +132,14 @@ class _BalikKucukSorusuState extends State<BalikKucukSorusu>
                     position: _slideAnimation,
                     child: Center(
                       child: Container(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 6),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 6),
+                        margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(32),
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.10),
+                              color: Colors.black.withOpacity(0.1),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -146,7 +155,9 @@ class _BalikKucukSorusuState extends State<BalikKucukSorusu>
                               children: [
                                 const Padding(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
                                   child: Text(
                                     'Balıklardan küçük olanı işaretle.',
                                     style: TextStyle(
@@ -162,7 +173,8 @@ class _BalikKucukSorusuState extends State<BalikKucukSorusu>
                                   width: double.infinity,
                                   height: imageHeight,
                                   margin: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.04),
+                                    horizontal: screenWidth * 0.04,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(24),
@@ -177,7 +189,7 @@ class _BalikKucukSorusuState extends State<BalikKucukSorusu>
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(24),
                                     child: Image.asset(
-                                      'assets/uzun_kisa/soru4/Resim4.png', // 4. soru resmi
+                                      'assets/buyuk_kucuk/soru4/Resim4.png', // 4. soru resmi
                                       fit: BoxFit.cover,
                                       width: double.infinity,
                                       height: double.infinity,
@@ -187,7 +199,8 @@ class _BalikKucukSorusuState extends State<BalikKucukSorusu>
                                 const SizedBox(height: 20),
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.13),
+                                    horizontal: screenWidth * 0.13,
+                                  ),
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -201,25 +214,71 @@ class _BalikKucukSorusuState extends State<BalikKucukSorusu>
                                           btnColor = Colors.red.shade500;
                                         }
                                       }
-                                      return SizedBox(
+                                      return Container(
                                         width: buttonWidth,
                                         height: buttonHeight,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                          gradient: LinearGradient(
+                                            colors:
+                                                isSelected
+                                                    ? (isCorrect == true
+                                                        ? [
+                                                          Colors.green.shade400,
+                                                          Colors.green.shade600,
+                                                        ]
+                                                        : isCorrect == false
+                                                        ? [
+                                                          Colors.red.shade400,
+                                                          Colors.red.shade600,
+                                                        ]
+                                                        : [
+                                                          Colors.blue.shade400,
+                                                          Colors.blue.shade600,
+                                                        ])
+                                                    : [
+                                                      Colors.blue.shade300,
+                                                      Colors.blue.shade500,
+                                                    ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.1,
+                                              ),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
                                         child: ElevatedButton(
                                           onPressed: () => _handleSelect(i),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: btnColor,
+                                            backgroundColor: Colors.transparent,
+                                            foregroundColor: Colors.white,
+                                            elevation: 0,
+                                            shadowColor: Colors.transparent,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(12),
+                                                  BorderRadius.circular(16),
                                             ),
                                           ),
-                                          child: const Text(
-                                            'Seç',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 8,
+                                            ),
+                                            child: const Text(
+                                              'Seç',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                letterSpacing: 0.5,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -228,47 +287,6 @@ class _BalikKucukSorusuState extends State<BalikKucukSorusu>
                                   ),
                                 ),
                                 const SizedBox(height: 20),
-                                Container(
-                                  height: 60,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 8),
-                                  child: showFeedback
-                                      ? ScaleTransition(
-                                          scale: CurvedAnimation(
-                                            parent: _feedbackController,
-                                            curve: Curves.elasticOut,
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                isCorrect == true
-                                                    ? Icons.check_circle
-                                                    : Icons.cancel,
-                                                color: isCorrect == true
-                                                    ? Colors.green
-                                                    : Colors.red,
-                                                size: 28,
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Text(
-                                                isCorrect == true
-                                                    ? 'Aferin! 🎉'
-                                                    : 'Tekrar dene! 😔',
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  color: isCorrect == true
-                                                      ? Colors.green
-                                                      : Colors.red,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      : const SizedBox.shrink(),
-                                ),
                               ],
                             ),
                           ),
@@ -276,6 +294,70 @@ class _BalikKucukSorusuState extends State<BalikKucukSorusu>
                       ),
                     ),
                   ),
+                ),
+                // Feedback Kutusu - Asama1 gibi basit
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect == true
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect == true
+                                            ? Colors.green
+                                            : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect == true
+                                        ? 'Aferin! 🎉'
+                                        : 'Tekrar dene! 😔',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect == true
+                                              ? Colors.green
+                                              : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),

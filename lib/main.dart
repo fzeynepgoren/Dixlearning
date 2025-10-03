@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart'; // ← EKLENDİ
+import 'package:google_fonts/google_fonts.dart';
 import 'providers/language_provider.dart';
+import 'providers/theme_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 
@@ -10,49 +11,42 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const MyApp(),
     ),
   );
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  ThemeMode _themeMode = ThemeMode.light;
-
-  void _setThemeMode(ThemeMode mode) {
-    setState(() {
-      _themeMode = mode;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    return Consumer2<ThemeProvider, LanguageProvider>(
+      builder: (context, themeProvider, languageProvider, child) {
+        final isEnglish = languageProvider.isEnglish;
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'DixLearning',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         brightness: Brightness.light,
-        textTheme: GoogleFonts.quicksandTextTheme(), // ← Quicksand fontu burada
+        scaffoldBackgroundColor: const Color.fromARGB(255, 137, 189, 214),
+        textTheme: GoogleFonts.quicksandTextTheme(),
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.blue,
+          backgroundColor: const Color(0xFF6C63FF),
           titleTextStyle: GoogleFonts.quicksand(
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
+        cardColor: Colors.white,
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.indigoAccent,
+            backgroundColor: const Color(0xFF6C63FF),
             foregroundColor: Colors.white,
             textStyle: GoogleFonts.quicksand(fontSize: 18),
           ),
@@ -62,7 +56,7 @@ class _MyAppState extends State<MyApp> {
         brightness: Brightness.dark,
         scaffoldBackgroundColor: Colors.grey[900],
         primarySwatch: Colors.deepPurple,
-        textTheme: GoogleFonts.quicksandTextTheme(), // ← Karanlık tema için de
+        textTheme: GoogleFonts.quicksandTextTheme(),
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.black87,
           titleTextStyle: GoogleFonts.quicksand(
@@ -80,16 +74,12 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
       ),
-      themeMode: _themeMode,
-      home: LoginScreen(
-        onThemeChanged: _setThemeMode,
-        themeMode: _themeMode,
-      ),
+      themeMode: themeProvider.themeMode,
+      home: const LoginScreen(),
       routes: {
-        '/home': (context) => HomeScreen(
-          onThemeChanged: _setThemeMode,
-          themeMode: _themeMode,
-        ),
+        '/home': (context) => const HomeScreen(),
+      },
+    );
       },
     );
   }

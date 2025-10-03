@@ -11,8 +11,7 @@ class SeninWidget extends StatefulWidget {
   State<SeninWidget> createState() => _SeninWidgetState();
 }
 
-class _SeninWidgetState extends State<SeninWidget>
-    with TickerProviderStateMixin {
+class _SeninWidgetState extends State<SeninWidget> with TickerProviderStateMixin {
   final List<String> leftItems = ['🍎', '🍌', '🍇'];
   final List<String> rightItems = ['Muz', 'Üzüm', 'Elma'];
   late List<String> shuffledRightItems;
@@ -22,7 +21,10 @@ class _SeninWidgetState extends State<SeninWidget>
   List<bool> matchedRight = [false, false, false];
   bool showFeedback = false;
   bool isCorrect = false;
+  bool allMatched = false;
   late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
   bool _dialogShown = false;
 
   final Map<String, String> itemToName = {
@@ -35,340 +37,328 @@ class _SeninWidgetState extends State<SeninWidget>
   void initState() {
     super.initState();
     shuffledRightItems = List.from(rightItems)..shuffle();
+
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 600),
     );
+
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
-  void _handleLeftTap(int index) {
-    if (matchedLeft[index]) return;
-    setState(() {
-      selectedLeftIndex = index;
-    });
-    _checkMatch();
-  }
+  void _handleTap(int index, bool isLeft) {
+    if (allMatched) return;
 
-  void _handleRightTap(int index) {
-    if (matchedRight[index]) return;
     setState(() {
-      selectedRightIndex = index;
+      if (isLeft) {
+        if (matchedLeft[index]) return;
+        selectedLeftIndex = index;
+      } else {
+        if (matchedRight[index]) return;
+        selectedRightIndex = index;
+      }
+      if (selectedLeftIndex != null && selectedRightIndex != null) {
+        _checkMatch();
+      }
     });
-    _checkMatch();
   }
 
   void _checkMatch() {
-    if (selectedLeftIndex != null && selectedRightIndex != null) {
-      String left = leftItems[selectedLeftIndex!];
-      String right = shuffledRightItems[selectedRightIndex!];
-      setState(() {
-        isCorrect = itemToName[left] == right;
-        showFeedback = true;
-      });
-      _feedbackController.forward(from: 0);
-      if (isCorrect) {
-        setState(() {
-          matchedLeft[selectedLeftIndex!] = true;
-          matchedRight[selectedRightIndex!] = true;
-        });
+    setState(() {
+      isCorrect = itemToName[leftItems[selectedLeftIndex!]] == shuffledRightItems[selectedRightIndex!];
+      showFeedback = true;
+    });
 
-        if (matchedLeft.every((element) => element)) {
-          if (!_dialogShown) {
-            _dialogShown = true;
-            Future.delayed(const Duration(milliseconds: 500), () {
-              if (mounted) {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) => Dialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+    _feedbackController.forward(from: 0);
+
+    if (isCorrect) {
+      matchedLeft[selectedLeftIndex!] = true;
+      matchedRight[selectedRightIndex!] = true;
+
+      if (matchedLeft.every((element) => element)) {
+        allMatched = true;
+        if (!_dialogShown) {
+          _dialogShown = true;
+          Future.delayed(const Duration(seconds: 1), () {
+            if (mounted) _showCompletionDialog();
+          });
+        }
+      }
+    }
+
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          showFeedback = false;
+          selectedLeftIndex = null;
+          selectedRightIndex = null;
+        });
+      }
+    });
+  }
+
+  void _showCompletionDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.deepPurple.shade100,
+                Colors.deepPurple.shade50,
+              ],
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.emoji_events, size: 80, color: Colors.amber),
+              const SizedBox(height: 20),
+              const Text(
+                'Tebrikler! 🎉',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                '2. aşamayı tamamladınız!',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, color: Colors.deepPurple),
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () {
+                  ActivityTracker.completeActivity();
+                  Navigator.of(context).pop();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                child: const Text('Ana Menüye Dön', style: TextStyle(fontSize: 18, color: Colors.white)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCard({
+    required int index,
+    required bool isLeft,
+    required String text,
+    required TextStyle style,
+  }) {
+    final bool isSelected = isLeft ? selectedLeftIndex == index : selectedRightIndex == index;
+    final bool isMatched = isLeft ? matchedLeft[index] : matchedRight[index];
+    final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
+
+    Color cardColor = Colors.white;
+    if (isMatched) {
+      cardColor = Colors.green.shade200;
+    } else if (isWrongSelection) {
+      cardColor = Colors.red.shade200;
+    } else if (isSelected) {
+      cardColor = Colors.blue.shade200;
+    }
+
+    return GestureDetector(
+      onTap: isMatched ? null : () => _handleTap(index, isLeft),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        width: 120,
+        height: 120,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 6, offset: const Offset(0, 3)),
+          ],
+        ),
+        child: Center(child: Text(text, style: style, textAlign: TextAlign.center)),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => const HomeScreen()),
+                          (route) => false,
+                        );
+                      },
                     ),
+                  ],
+                ),
+                Expanded(
+                  child: SlideTransition(
+                    position: _slideAnimation,
                     child: Container(
-                      padding: const EdgeInsets.all(20),
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.deepPurple.shade100,
-                            Colors.deepPurple.shade50,
-                          ],
-                        ),
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 10)),
+                        ],
                       ),
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
-                            Icons.emoji_events,
-                            size: 80,
-                            color: Colors.amber,
-                          ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            'Tebrikler! 🎉',
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.deepPurple,
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                            child: Text(
+                              isEnglish ? 'Match the fruits with their names!' : 'Meyveleri isimleriyle eşleştir!',
+                              style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold, color: Colors.black),
+                              textAlign: TextAlign.center,
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            '2. aşamayı tamamladınız!',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.deepPurple,
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-                          ElevatedButton(
-                            onPressed: () {
-                              // Etkinlik tamamlandı
-                              ActivityTracker.completeActivity();
-                              
-                              Navigator.of(context).pop();
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const HomeScreen()),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepPurple,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 40, vertical: 15),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                            ),
-                            child: const Text(
-                              'Ana Menüye Dön',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                              ),
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: List.generate(
+                                      leftItems.length,
+                                      (index) => _buildCard(
+                                        index: index,
+                                        isLeft: true,
+                                        text: leftItems[index],
+                                        style: const TextStyle(fontSize: 42),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 4,
+                                  height: screenSize.height * 0.45,
+                                  margin: const EdgeInsets.symmetric(horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade400,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: List.generate(
+                                      shuffledRightItems.length,
+                                      (index) => _buildCard(
+                                        index: index,
+                                        isLeft: false,
+                                        text: shuffledRightItems[index],
+                                        style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.black),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                );
-              }
-            });
-          }
-        }
-      }
-
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) {
-          setState(() {
-            showFeedback = false;
-            selectedLeftIndex = null;
-            selectedRightIndex = null;
-          });
-        }
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        backgroundColor: const Color(0xFFE1F5FE),
-        appBar: AppBar(
-          title: Text(
-            isEnglish ? 'Fruit-Name Matching' : 'Meyve-İsim Eşleştirme',
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
-          backgroundColor: Colors.deepPurple,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
-          ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-              Text(
-                isEnglish
-                    ? 'Match the fruits with their names!'
-                    : 'Meyveleri isimleriyle eşleştir!',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          leftItems.length,
-                          (index) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: GestureDetector(
-                              onTap: () => _handleLeftTap(index),
-                              child: Container(
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  color: matchedLeft[index]
-                                      ? Colors.green.shade300
-                                      : (showFeedback &&
-                                              !isCorrect &&
-                                              selectedLeftIndex == index)
-                                          ? Colors.red.shade200
-                                          : selectedLeftIndex == index
-                                              ? Colors.blue.shade200
-                                              : Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: showFeedback
+                      ? ScaleTransition(
+                          scale: CurvedAnimation(parent: _feedbackController, curve: Curves.elasticOut),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: const Offset(0, 5))],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(isCorrect ? Icons.check_circle : Icons.cancel, color: isCorrect ? Colors.green : Colors.red, size: 28),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect ? 'Aferin! 🎉' : 'Üzgünüm, yanlış eşleştirme! 😔',
+                                  style: TextStyle(fontSize: 18, color: isCorrect ? Colors.green : Colors.red, fontWeight: FontWeight.bold),
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    leftItems[index],
-                                    style: const TextStyle(
-                                      fontSize: 42,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              ],
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 4,
-                      height: MediaQuery.of(context).size.height * 0.5,
-                      margin: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurple,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          shuffledRightItems.length,
-                          (index) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: GestureDetector(
-                              onTap: () => _handleRightTap(index),
-                              child: Container(
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  color: matchedRight[index]
-                                      ? Colors.green.shade300
-                                      : (showFeedback &&
-                                              !isCorrect &&
-                                              selectedRightIndex == index)
-                                          ? Colors.red.shade200
-                                          : selectedRightIndex == index
-                                              ? Colors.blue.shade200
-                                              : Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    shuffledRightItems[index],
-                                    style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.deepPurple,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                        )
+                      : const SizedBox.shrink(),
                 ),
-              ),
-              const SizedBox(height: 20),
-              if (showFeedback)
-                ScaleTransition(
-                  scale: CurvedAnimation(
-                    parent: _feedbackController,
-                    curve: Curves.elasticOut,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? 'Aferin! 🎉'
-                              : 'Üzgünüm, yanlış eşleştirme! 😔',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              const SizedBox(height: 20),
-            ],
+              ],
+            ),
           ),
         ),
       ),

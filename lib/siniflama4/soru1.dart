@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
 import 'soru2.dart';
-
-void main() => runApp(const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: DuyguSiniflama(),
-    ));
+import 'package:provider/provider.dart';
+import '../../providers/language_provider.dart';
+import '../../screens/home_screen.dart';
 
 class DuyguSiniflama extends StatefulWidget {
   const DuyguSiniflama({super.key});
@@ -15,119 +13,278 @@ class DuyguSiniflama extends StatefulWidget {
   State<DuyguSiniflama> createState() => _DuyguSiniflamaState();
 }
 
-class _DuyguSiniflamaState extends State<DuyguSiniflama> {
-  final Map<String, String> dogruEslesmeler = {
-    'mutlu1': 'Mutlu',
-    'mutlu2': 'Mutlu',
-    'uzgun1': 'Üzgün',
-    'uzgun2': 'Üzgün',
-    'kizgin1': 'Kızgın',
-    'kizgin2': 'Kızgın',
+class _DuyguSiniflamaState extends State<DuyguSiniflama>
+    with TickerProviderStateMixin {
+  final List<Map<String, dynamic>> items = [
+    {'emoji': '😊', 'id': 'mutlu1', 'organ': 'Mutlu', 'isPlaced': false},
+    {'emoji': '😂', 'id': 'mutlu2', 'organ': 'Mutlu', 'isPlaced': false},
+    {'emoji': '😢', 'id': 'uzgun1', 'organ': 'Üzgün', 'isPlaced': false},
+    {'emoji': '😞', 'id': 'uzgun2', 'organ': 'Üzgün', 'isPlaced': false},
+    {'emoji': '😠', 'id': 'kizgin1', 'organ': 'Kızgın', 'isPlaced': false},
+    {'emoji': '😤', 'id': 'kizgin2', 'organ': 'Kızgın', 'isPlaced': false},
+  ];
+
+  final Map<String, List<Map<String, dynamic>>> organGroups = {
+    'Mutlu': [],
+    'Üzgün': [],
+    'Kızgın': [],
   };
 
-  late List<String> yuzler;
-  late List<String> shuffledYuzler;
-  final List<String> kategoriler = ['Mutlu', 'Üzgün', 'Kızgın'];
-
-  Set<String> eslesenler = {};
-  Map<String, Color?> yuzRenkleri = {};
-
-  String? mesaj;
-  Color? mesajRenk;
-  IconData? mesajIkon;
+  bool showFeedback = false;
+  bool isCorrect = false;
+  bool _dialogShown = false;
+  late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
-    yuzler = dogruEslesmeler.keys.toList();
-    kategoriler.shuffle(Random());
-    shuffledYuzler = List<String>.from(yuzler);
-    shuffledYuzler.shuffle(Random());
+    items.shuffle(Random());
+    _feedbackController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
+    _slideController.forward();
   }
 
-  void gosterMesaj(String text, Color renk, IconData ikon) {
+  @override
+  void dispose() {
+    _feedbackController.dispose();
+    _slideController.dispose();
+    super.dispose();
+  }
+
+  void _handleDrag(Map<String, dynamic> item, String organ) {
     setState(() {
-      mesaj = text;
-      mesajRenk = renk;
-      mesajIkon = ikon;
+      isCorrect = item['organ'] == organ;
+      showFeedback = true;
     });
-    Future.delayed(const Duration(seconds: 2), () {
+    _feedbackController.forward(from: 0);
+
+    if (isCorrect) {
       setState(() {
-        mesaj = null;
+        if (!item['isPlaced']) {
+          organGroups[organ]!.add(item);
+          item['isPlaced'] = true;
+        }
       });
-    });
-  }
+      _checkCompletion();
+    }
 
-  void renkliGoster(String id, Color renk) {
-    setState(() {
-      yuzRenkleri[id] = renk;
-    });
     Future.delayed(const Duration(seconds: 1), () {
-      setState(() {
-        yuzRenkleri[id] = null;
-      });
-    });
-  }
-
-  // ✅ SADECE BU FONKSİYONDA GÜNCELLEME YAPILDI
-  void eslesmeYapildi(String data, String kategori) {
-    if (dogruEslesmeler[data] == kategori) {
-      setState(() {
-        eslesenler.add(data);
-      });
-      renkliGoster(data, Colors.green.shade200);
-      gosterMesaj('Aferin! 🎉', Colors.green, Icons.check_circle);
-
-      // ✅ Tüm yüzler eşleştiyse, 1 saniye sonra otomatik olarak yeni sayfaya geç
-      if (eslesenler.length == dogruEslesmeler.length) {
-        Future.delayed(const Duration(seconds: 1), () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const DuyuOrganlariSinifla()),
-          );
+      if (mounted) {
+        setState(() {
+          showFeedback = false;
         });
       }
-    } else {
-      renkliGoster(data, Colors.red.shade300);
-      gosterMesaj('Tekrar dene! 😔', Colors.red, Icons.cancel);
+    });
+  }
+
+  void _checkCompletion() {
+    final allPlaced = items.every((e) => e['isPlaced'] == true);
+    if (allPlaced && !_dialogShown) {
+      _dialogShown = true;
+
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const DuyuOrganlariSinifla()),
+          );
+        }
+      });
     }
   }
 
-  Widget _buildYuz(String id,
-      {bool small = false, bool eslesti = false, Color? renk}) {
-    double size = small ? 52 : 76;
-    double opacity = eslesti ? 0.4 : 1.0;
-    String emoji;
+  @override
+  Widget build(BuildContext context) {
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+    final horizontalPadding = screenSize.width * 0.05;
+    final verticalPadding = screenSize.height * 0.02;
 
-    if (id.startsWith('mutlu')) {
-      emoji = '😊';
-    } else if (id.startsWith('uzgun')) {
-      emoji = '😢';
-    } else {
-      emoji = '😠';
-    }
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: renk ?? Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Center(
-        child: Opacity(
-          opacity: opacity,
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              emoji,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: size * 0.9,
-                height: 1.0,
-              ),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: EdgeInsets.all(screenSize.width * 0.025),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: horizontalPadding,
+                              vertical: verticalPadding * 0.5,
+                            ),
+                            child: Text(
+                              isEnglish
+                                  ? 'Drag and drop the faces to the correct box.'
+                                  : 'Yüz ifadelerini duygularına göre uygun kutuya sürükle!',
+                              style: TextStyle(
+                                fontSize: screenSize.width * 0.05,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          SizedBox(height: screenSize.height * 0.02),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    children: [
+                                      _buildGroupContainer(
+                                        isEnglish ? 'Happy' : 'Mutlu',
+                                        organGroups['Mutlu']!,
+                                        'Mutlu',
+                                        Colors.yellow.shade100,
+                                        Colors.yellow.shade400,
+                                      ),
+                                      _buildGroupContainer(
+                                        isEnglish ? 'Sad' : 'Üzgün',
+                                        organGroups['Üzgün']!,
+                                        'Üzgün',
+                                        Colors.blue.shade100,
+                                        Colors.blue.shade400,
+                                      ),
+                                      _buildGroupContainer(
+                                        isEnglish ? 'Angry' : 'Kızgın',
+                                        organGroups['Kızgın']!,
+                                        'Kızgın',
+                                        Colors.red.shade100,
+                                        Colors.red.shade400,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: screenSize.width * 0.04),
+                                Expanded(
+                                  flex: 2,
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: items.map((item) {
+                                        return Draggable<Map<String, dynamic>>(
+                                          data: item,
+                                          feedback: Material(
+                                            color: Colors.transparent,
+                                            child: _buildItemBox(item),
+                                          ),
+                                          childWhenDragging: Opacity(
+                                            opacity: 0.5,
+                                            child: _buildItemBox(item),
+                                          ),
+                                          child: item['isPlaced']
+                                              ? const SizedBox.shrink()
+                                              : _buildItemBox(item),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  height: screenSize.height * 0.1,
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
+                  child: showFeedback
+                      ? ScaleTransition(
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                isCorrect ? Icons.check_circle : Icons.cancel,
+                                color: isCorrect ? Colors.green : Colors.red,
+                                size: screenSize.width * 0.07,
+                              ),
+                              SizedBox(width: screenSize.width * 0.025),
+                              Text(
+                                isCorrect
+                                    ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                                    : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
+                                style: TextStyle(
+                                  fontSize: screenSize.width * 0.045,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
             ),
           ),
         ),
@@ -135,177 +292,85 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F3FF),
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text('Duygulara Göre Sınıflama'),
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 8),
-            const Text(
-              'Yüz ifadelerini duygularına göre uygun kutuya sürükle!',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: kategoriler.map((kategori) {
-                        const Color renk = Color(0xFFE0F7FA);
-                        const Color border = Colors.black;
+  Widget _buildGroupContainer(
+      String title,
+      List<Map<String, dynamic>> group,
+      String organType,
+      Color boxColor,
+      Color borderColor) {
+    final screenSize = MediaQuery.of(context).size;
+    final emojiSize = screenSize.width * 0.12;
 
-                        final eslesenYuzler = eslesenler
-                            .where((e) => dogruEslesmeler[e] == kategori)
-                            .toList();
-
-                        return Expanded(
-                          child: DragTarget<String>(
-                            builder: (context, _, __) {
-                              return Container(
-                                width: double.infinity,
-                                margin: const EdgeInsets.symmetric(vertical: 6),
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: renk,
-                                  border: Border.all(color: border, width: 1.5),
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      kategori,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Wrap(
-                                      spacing: 8,
-                                      runSpacing: 8,
-                                      children: eslesenYuzler
-                                          .map((e) => _buildYuz(e,
-                                              small: true,
-                                              eslesti: true,
-                                              renk: yuzRenkleri[e]))
-                                          .toList(),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            onWillAcceptWithDetails: (data) =>
-                                data != null && !eslesenler.contains(data),
-                            onAcceptWithDetails: (data) {
-                              eslesmeYapildi(data.data, kategori);
-                            },
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: shuffledYuzler.map((id) {
-                        bool eslesti = eslesenler.contains(id);
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: eslesti
-                              ? SizedBox(
-                                  width: 76,
-                                  height: 76,
-                                  child: _buildYuz(id,
-                                      small: false,
-                                      eslesti: true,
-                                      renk: yuzRenkleri[id]),
-                                )
-                              : Draggable<String>(
-                                  data: id,
-                                  feedback: Material(
-                                    color: Colors.transparent,
-                                    child: SizedBox(
-                                      width: 76,
-                                      height: 76,
-                                      child: _buildYuz(id,
-                                          small: false, renk: yuzRenkleri[id]),
-                                    ),
-                                  ),
-                                  childWhenDragging: Opacity(
-                                    opacity: 0.3,
-                                    child: _buildYuz(id,
-                                        small: false, renk: yuzRenkleri[id]),
-                                  ),
-                                  child: SizedBox(
-                                    width: 76,
-                                    height: 76,
-                                    child: _buildYuz(id,
-                                        small: false, renk: yuzRenkleri[id]),
-                                  ),
-                                ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
+    return Expanded(
+      child: DragTarget<Map<String, dynamic>>(
+        onWillAccept: (data) => !data!['isPlaced'],
+        onAccept: (data) => _handleDrag(data, organType),
+        builder: (context, candidateData, rejectedData) {
+          return Container(
+            width: double.infinity,
+            margin: EdgeInsets.symmetric(vertical: screenSize.height * 0.01, horizontal: screenSize.width * 0.04),
+            decoration: BoxDecoration(
+              color: boxColor,
+              border: Border.all(
+                color: borderColor,
+                width: 2,
               ),
+              borderRadius: BorderRadius.circular(16),
             ),
-            if (mesaj != null) ...[
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(mesajIkon, color: mesajRenk),
-                  const SizedBox(width: 6),
-                  Text(
-                    mesaj!,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: mesajRenk,
-                    ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: screenSize.width * 0.055,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-            ],
-          ],
-        ),
+                ),
+                SizedBox(height: screenSize.height * 0.02),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: screenSize.width * 0.02,
+                  children: group
+                      .map(
+                        (item) => Text(
+                      item['emoji'],
+                      style: TextStyle(fontSize: emojiSize),
+                    ),
+                  )
+                      .toList(),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
-}
 
-// ✅ SONRASI İÇİN BOŞ SAYFA
-class SonrakiSoru extends StatelessWidget {
-  const SonrakiSoru({super.key});
+  Widget _buildItemBox(Map<String, dynamic> item) {
+    final screenSize = MediaQuery.of(context).size;
+    final itemSize = screenSize.width * 0.2;
+    final emojiSize = screenSize.width * 0.1;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F3FF),
-      body: Center(child: Container()), // Boş ekran
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: screenSize.height * 0.002),
+      width: itemSize,
+      height: itemSize,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
+      ),
+      child: Center(
+        child: Text(
+          item['emoji'],
+          style: TextStyle(fontSize: emojiSize),
+        ),
+      ),
     );
   }
 }

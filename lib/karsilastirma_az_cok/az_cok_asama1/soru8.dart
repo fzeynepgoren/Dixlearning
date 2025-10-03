@@ -118,25 +118,7 @@ class _AzCokSoru8State extends State<AzCokSoru8> with TickerProviderStateMixin {
                         );
                       },
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.04,
-                        vertical: screenHeight * 0.008,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: const Color(0xFF8FC8F7), width: 2),
-                        borderRadius: BorderRadius.circular(screenWidth * 0.2),
-                      ),
-                      child: Text(
-                        '3. Aşama',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: stageFontSize,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
+
                     SizedBox(width: iconSize),
                   ],
                 ),
@@ -164,7 +146,7 @@ class _AzCokSoru8State extends State<AzCokSoru8> with TickerProviderStateMixin {
                                 ? 'Choose the one with more.'
                                 : 'Çok olanı işaretle.',
                             style: const TextStyle(
-                              fontSize: 23,
+                              fontSize: 25,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),

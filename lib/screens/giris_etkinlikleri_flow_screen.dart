@@ -5,6 +5,7 @@ import '../giris_etkinlikleri/disleksi4.dart';
 import '../giris_etkinlikleri/disgrafi2.dart';
 import '../giris_etkinlikleri/disgrafi3.dart';
 import '../giris_etkinlikleri/diskalkuli1.dart';
+import '../giris_etkinlikleri/diskalkuli2.dart';
 import '../giris_etkinlikleri/diskalkuli3.dart';
 import 'home_screen.dart';
 
@@ -34,14 +35,7 @@ class IntroFlowController {
 }
 
 class GirisEtkinlikleriFlowScreen extends StatefulWidget {
-  final bool? isEnglish;
-  final void Function(bool isEnglish)? onLanguageChanged;
-
-  const GirisEtkinlikleriFlowScreen({
-    super.key,
-    this.isEnglish,
-    this.onLanguageChanged,
-  });
+  const GirisEtkinlikleriFlowScreen({super.key});
 
   @override
   State<GirisEtkinlikleriFlowScreen> createState() =>
@@ -62,6 +56,7 @@ class _GirisEtkinlikleriFlowScreenState
         () => const Disleksi2(),
         () => const Disleksi4(),
         () => const Diskalkuli1(),
+        () => const Diskalkuli2(),
         () => const Diskalkuli3(),
         () => const HeceDoldurma(),
         () => const Disgrafi2(),
@@ -69,10 +64,7 @@ class _GirisEtkinlikleriFlowScreenState
       onFlowComplete: () {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (_) => HomeScreen(
-              isEnglish: widget.isEnglish,
-              onLanguageChanged: widget.onLanguageChanged,
-            ),
+            builder: (_) => const HomeScreen(),
           ),
           (route) => false,
         );
@@ -82,9 +74,7 @@ class _GirisEtkinlikleriFlowScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _IntroFlowWidget(controller: _controller),
-    );
+    return Scaffold(body: _IntroFlowWidget(controller: _controller));
   }
 }
 
@@ -109,20 +99,19 @@ class _IntroFlowWidgetState extends State<_IntroFlowWidget> {
 class _ActivityWrapper extends StatelessWidget {
   final Widget child;
   final VoidCallback onComplete;
-  const _ActivityWrapper({
-    required this.child,
-    required this.onComplete,
-  });
+  const _ActivityWrapper({required this.child, required this.onComplete});
 
   @override
   Widget build(BuildContext context) {
     return Navigator(
-      onGenerateRoute: (settings) => MaterialPageRoute(
-        builder: (context) => _ActivityCompletionListener(
-          onComplete: onComplete,
-          child: child,
-        ),
-      ),
+      onGenerateRoute:
+          (settings) => MaterialPageRoute(
+            builder:
+                (context) => _ActivityCompletionListener(
+                  onComplete: onComplete,
+                  child: child,
+                ),
+          ),
     );
   }
 }
@@ -144,9 +133,6 @@ class _ActivityCompletionListenerState
     extends State<_ActivityCompletionListener> {
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: widget.child,
-    );
+    return WillPopScope(onWillPop: () async => false, child: widget.child);
   }
 }

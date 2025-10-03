@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
-import '../../main.dart';
 import '../screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import 'soru2.dart'; // Eğer HarfHayvanEsle burada tanımlıysa
-import 'soru3.dart'; // soru2'de
-import 'soru4.dart'; // soru3'te
-import 'soru5.dart'; // soru4'te
 
 class RenkNesneEsle extends StatefulWidget {
   const RenkNesneEsle({super.key});
@@ -19,18 +14,18 @@ class RenkNesneEsle extends StatefulWidget {
 class _RenkNesneEsleState extends State<RenkNesneEsle>
     with TickerProviderStateMixin {
   final List<String> leftImages = ['🍓', '🍋', '🍀'];
-  final List<String> rightColors = ['Sarı', 'Kırmızı', 'Yeşil'];
-  final List<String> rightColorsEnglish = ['Yellow', 'Red', 'Green'];
+  final List<String> rightColors = ['Kırmızı', 'Sarı', 'Yeşil'];
+  final List<String> rightColorsEnglish = ['Red', 'Yellow', 'Green'];
   late List<String> shuffledColors;
   int? selectedLeftIndex;
   int? selectedRightIndex;
-  List<bool> matchedLeft = List.filled(3, false);
-  List<bool> matchedRight = List.filled(3, false);
-  int matchedPairs = 0;
+  List<bool> matchedLeft = [false, false, false];
+  List<bool> matchedRight = [false, false, false];
   bool showFeedback = false;
   bool isCorrect = false;
   late AnimationController _feedbackController;
-  bool _dialogShown = false;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   final Map<String, String> imageToColor = {
     '🍓': 'Kırmızı',
@@ -49,69 +44,74 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
     super.initState();
     final isEnglish =
         Provider.of<LanguageProvider>(context, listen: false).isEnglish;
-    shuffledColors = List.from(isEnglish ? rightColorsEnglish : rightColors);
-    shuffledColors.shuffle();
-    while (_listsAreEqual(
-        isEnglish ? rightColorsEnglish : rightColors, shuffledColors)) {
-      shuffledColors.shuffle();
-    }
-    _feedbackController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
+    shuffledColors =
+        List.from(isEnglish ? rightColorsEnglish : rightColors)..shuffle();
+    _feedbackController =
+        AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
+    _slideController =
+        AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
-  bool _listsAreEqual(List<String> a, List<String> b) {
-    if (a.length != b.length) return false;
-    for (int i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) return false;
-    }
-    return true;
-  }
-
-  void _handleLeftTap(int index) {
-    if (matchedLeft[index]) return;
+  void _handleTap(int index, bool isLeft) {
+    if (isLeft && matchedLeft[index]) return;
+    if (!isLeft && matchedRight[index]) return;
     setState(() {
-      selectedLeftIndex = index;
+      if (isLeft) {
+        selectedLeftIndex = index;
+      } else {
+        selectedRightIndex = index;
+      }
     });
-    _checkMatch();
-  }
 
-  void _handleRightTap(int index) {
-    if (matchedRight[index]) return;
-    setState(() {
-      selectedRightIndex = index;
-    });
-    _checkMatch();
-  }
-
-  void _checkMatch() {
     if (selectedLeftIndex != null && selectedRightIndex != null) {
-      String left = leftImages[selectedLeftIndex!];
-      String right = shuffledColors[selectedRightIndex!];
       final isEnglish =
           Provider.of<LanguageProvider>(context, listen: false).isEnglish;
       setState(() {
-        isCorrect = isEnglish
-            ? imageToColorEnglish[left] == right
-            : imageToColor[left] == right;
+        isCorrect = (isEnglish
+            ? imageToColorEnglish[leftImages[selectedLeftIndex!]] ==
+                shuffledColors[selectedRightIndex!]
+            : imageToColor[leftImages[selectedLeftIndex!]] ==
+                shuffledColors[selectedRightIndex!]);
         showFeedback = true;
       });
       _feedbackController.forward(from: 0);
+
       if (isCorrect) {
         setState(() {
           matchedLeft[selectedLeftIndex!] = true;
           matchedRight[selectedRightIndex!] = true;
-          matchedPairs++;
         });
+
+        // Tüm eşleşmeler tamamlandıysa
+        if (matchedLeft.every((e) => e)) {
+          ActivityTracker.completeActivity();
+          Future.delayed(const Duration(milliseconds: 800), () {
+            if (mounted) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const HomeScreen()),
+              );
+            }
+          });
+        }
       }
-      Future.delayed(const Duration(milliseconds: 800), () {
+
+      Future.delayed(const Duration(milliseconds: 900), () {
         if (mounted) {
           setState(() {
             showFeedback = false;
@@ -123,329 +123,236 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    bool allMatched =
-        matchedLeft.every((e) => e) && matchedRight.every((e) => e);
-    if (allMatched && !_dialogShown) {
-      _dialogShown = true;
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.deepPurple.shade100,
-                      Colors.deepPurple.shade50,
-                    ],
-                  ),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.emoji_events,
-                      size: 80,
-                      color: Colors.amber,
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Tebrikler! 🎉',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      '3. aşamayı tamamladınız!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.deepPurple,
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        // Etkinlik tamamlandı
+  Widget _buildCard(String content, bool isLeft, int index,
+      {bool isEnglish = false}) {
+    final bool isSelected =
+        isLeft ? selectedLeftIndex == index : selectedRightIndex == index;
+    final bool isMatched = isLeft ? matchedLeft[index] : matchedRight[index];
+    final bool isWrong = showFeedback && !isCorrect && isSelected;
 
-                        ActivityTracker.completeActivity();
-
-                        
-
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const HomeScreen()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      child: const Text(
-                        'Ana Menüye Dön',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }
-      });
+    Color cardColor = Colors.white;
+    if (isMatched) {
+      cardColor = Colors.green.shade200;
+    } else if (isWrong) {
+      cardColor = Colors.red.shade200;
     }
-    return Scaffold(
-      backgroundColor: const Color(0xFFE1F5FE),
-      appBar: AppBar(
-        title: Text(
-            isEnglish ? 'Color-Object Matching' : 'Renk Nesne Eşleştirme',
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            // Etkinlik tamamlandı
 
-            ActivityTracker.completeActivity();
-
-            
-
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-            );
-          },
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 12),
-            Text(
-              isEnglish
-                  ? 'Match the objects with their colors!'
-                  : 'Nesneleri renkleriyle eşleştir!',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            Expanded(
-              child: Center(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          leftImages.length,
-                          (index) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: GestureDetector(
-                              onTap: () => _handleLeftTap(index),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  color: matchedLeft[index]
-                                      ? Colors.green.shade300
-                                      : (showFeedback &&
-                                              !isCorrect &&
-                                              selectedLeftIndex == index)
-                                          ? Colors.red.shade200
-                                          : selectedLeftIndex == index
-                                              ? Colors.blue.shade200
-                                              : Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    leftImages[index],
-                                    style: const TextStyle(fontSize: 42),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Center(
-                      child: SizedBox(
-                        height: (120 + 32.0) * leftImages.length - 32.0,
-                        child: Container(
-                          width: 3,
-                          decoration: BoxDecoration(
-                            color: Colors.deepPurple,
-                            borderRadius: BorderRadius.circular(2),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.deepPurple.withOpacity(0.18),
-                                spreadRadius: 1,
-                                blurRadius: 6,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          shuffledColors.length,
-                          (index) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: GestureDetector(
-                              onTap: () => _handleRightTap(index),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  color: matchedRight[index]
-                                      ? Colors.green.shade300
-                                      : (showFeedback &&
-                                              !isCorrect &&
-                                              selectedRightIndex == index)
-                                          ? Colors.red.shade200
-                                          : selectedRightIndex == index
-                                              ? Colors.blue.shade200
-                                              : Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    shuffledColors[index],
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.deepPurple,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            if (showFeedback)
-              ScaleTransition(
-                scale: CurvedAnimation(
-                  parent: _feedbackController,
-                  curve: Curves.elasticOut,
-                ),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        isCorrect ? Icons.check_circle : Icons.cancel,
-                        color: isCorrect ? Colors.green : Colors.red,
-                        size: 28,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            const SizedBox(height: 20),
-            if (allMatched)
-              ScaleTransition(
-                scale: CurvedAnimation(
-                  parent: _feedbackController,
-                  curve: Curves.elasticOut,
-                ),
-                child: Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.white, size: 24),
-                      SizedBox(width: 8),
-                      Text(
-                        'Tüm eşleştirmeler tamamlandı!',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+    return GestureDetector(
+      onTap: isMatched ? null : () => _handleTap(index, isLeft),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: 110,
+        height: 110,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(20),
+          border:
+              isSelected && !isMatched
+                  ? Border.all(color: Colors.blue.shade400, width: 4)
+                  : null,
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.13),
+                blurRadius: 8,
+                offset: const Offset(0, 4))
           ],
+        ),
+        child: Center(
+          child: Text(
+            content,
+            style: TextStyle(
+              fontSize: isLeft ? 54 : 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );
   }
-}
+
+  @override
+  Widget build(BuildContext context) {
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                // Geri butonu üstte sola hizalı
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back,
+                          color: Colors.black, size: iconSize),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (context) => const HomeScreen()),
+                          (route) => false,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Center(
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 500),
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.96),
+                          borderRadius: BorderRadius.circular(28),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.09),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Text(
+                              isEnglish
+                                  ? 'Match the objects with their colors!'
+                                  : 'Nesneleri renkleriyle eşleştir!',
+                              style: const TextStyle(
+                                fontSize: 23,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 18),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: List.generate(
+                                        leftImages.length,
+                                        (i) => _buildCard(leftImages[i], true, i),
+                                      ),
+                                    ),
+                                  ),
+                                  // Ortadaki çizgi
+                                  Container(
+                                    width: 4,
+                                    height: 425,
+                                    margin: const EdgeInsets.symmetric(horizontal: 14),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.blue.shade400,
+                                          Colors.blue.shade200,
+                                          Colors.blue.shade100,
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: List.generate(
+                                        shuffledColors.length,
+                                        (i) => _buildCard(shuffledColors[i], false, i,
+                                            isEnglish: isEnglish),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                // Feedback alanı
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: showFeedback
+                      ? ScaleTransition(
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect
+                                      ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                                      : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: isCorrect ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+    }

@@ -19,30 +19,28 @@ class MatchingQuestionsScreen extends StatelessWidget {
       {
         'emoji': '🍎',
         'title': isEnglish ? 'Stage 1 Questions' : '1.Aşama Soruları',
-        'desc': isEnglish
-            ? 'Fruit matching and more!'
-            : 'Meyve eşleştirme ve fazlası!',
+        'desc':
+            isEnglish
+                ? 'Fruit matching and more!'
+                : 'Meyve eşleştirme ve fazlası!',
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const MeyveEsle(),
-            ),
+            MaterialPageRoute(builder: (context) => const MeyveEsle()),
           );
         },
       },
       {
         'emoji': '🔤',
         'title': isEnglish ? 'Stage 2 Questions' : '2.Aşama Soruları',
-        'desc': isEnglish
-            ? 'Letter games and puzzles!'
-            : 'Harf oyunları ve bulmacalar!',
+        'desc':
+            isEnglish
+                ? 'Letter games and puzzles!'
+                : 'Harf oyunları ve bulmacalar!',
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const Soru1(),
-            ),
+            MaterialPageRoute(builder: (context) => const Soru1()),
           );
         },
       },
@@ -54,9 +52,7 @@ class MatchingQuestionsScreen extends StatelessWidget {
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const ActivityMatching(),
-            ),
+            MaterialPageRoute(builder: (context) => const ActivityMatching()),
           );
         },
       },
@@ -67,9 +63,7 @@ class MatchingQuestionsScreen extends StatelessWidget {
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const DuyguYuzEsle(),
-            ),
+            MaterialPageRoute(builder: (context) => const DuyguYuzEsle()),
           );
         },
       },
@@ -80,13 +74,17 @@ class MatchingQuestionsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           isEnglish ? 'Matching Questions' : 'Eşleme Soruları',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontSize: 24, 
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: const Color(0xFF6C63FF),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -107,7 +105,7 @@ class MatchingQuestionsScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
+                  gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [mainColor, accentColor],

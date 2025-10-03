@@ -20,7 +20,7 @@ class _AtikSiniflaState extends State<AtikSinifla>
       'emoji': '🧃',
       'id': 'plastik_bardak',
       'type': 'plastik',
-      'isPlaced': false
+      'isPlaced': false,
     },
     {'emoji': '🍾', 'id': 'cam_sise', 'type': 'cam', 'isPlaced': false},
     {'emoji': '🥛', 'id': 'cam_bardak', 'type': 'cam', 'isPlaced': false},
@@ -33,6 +33,8 @@ class _AtikSiniflaState extends State<AtikSinifla>
   bool isCorrect = false;
   bool _dialogShown = false;
   late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
@@ -41,11 +43,24 @@ class _AtikSiniflaState extends State<AtikSinifla>
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
@@ -107,11 +122,8 @@ class _AtikSiniflaState extends State<AtikSinifla>
         _dialogShown = true;
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (context) => const OlaySinifla(),
-              ),
-              (route) => false,
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const OlaySinifla()),
             );
           }
         });
@@ -122,291 +134,281 @@ class _AtikSiniflaState extends State<AtikSinifla>
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    return Scaffold(
-      backgroundColor: const Color(0xFFE1F5FE),
-      appBar: AppBar(
-        title: Text(
-          isEnglish ? 'Classify Waste by Type' : 'Atık Türüne Göre Sınıflama',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.deepPurple.shade100,
-                  Colors.deepPurple.shade50,
-                  Colors.white,
-                ],
-              ),
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+    final horizontalPadding = screenSize.width * 0.05;
+    final verticalPadding = screenSize.height * 0.02;
+
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(24.0),
+          child: SafeArea(
             child: Column(
               children: [
-                const SizedBox(height: 12),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
                       ),
-                    ],
-                  ),
-                  child: Text(
-                    isEnglish
-                        ? 'Drag the waste to the correct bin!'
-                        : 'Atıkları doğru kutuya sürükle!',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.deepPurple,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
                     ),
-                    textAlign: TextAlign.center,
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 32),
                 Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: _buildGroup(
-                          isEnglish ? 'Paper Bin' : 'Kağıt Kutusu',
-                          paperGroup,
-                          'kagit',
-                          Colors.blue.shade200,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildGroup(
-                          isEnglish ? 'Plastic Bin' : 'Plastik Kutusu',
-                          plasticGroup,
-                          'plastik',
-                          Colors.orange.shade200,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildGroup(
-                          isEnglish ? 'Glass Bin' : 'Cam Kutusu',
-                          glassGroup,
-                          'cam',
-                          Colors.green.shade200,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      if (!item['isPlaced']) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Draggable<Map<String, dynamic>>(
-                            data: item,
-                            feedback: _buildDraggableItem(item),
-                            childWhenDragging: Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: _buildDraggableItem(item),
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: EdgeInsets.all(screenSize.width * 0.025),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           ),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20),
-                if (showFeedback)
-                  Center(
-                    child: ScaleTransition(
-                      scale: CurvedAnimation(
-                        parent: _feedbackController,
-                        curve: Curves.elasticOut,
+                        ],
                       ),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 24,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isCorrect ? Icons.check_circle : Icons.cancel,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              size: 32,
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: horizontalPadding,
+                              vertical: verticalPadding * 0.5,
                             ),
-                            const SizedBox(width: 12),
-                            Text(
-                              isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
+                            child: Text(
+                              isEnglish
+                                  ? 'Drag the waste to the correct bin!'
+                                  : 'Atıkları doğru kutuya sürükle!',
                               style: TextStyle(
-                                fontSize: 24,
-                                color: isCorrect ? Colors.green : Colors.red,
+                                fontSize: screenSize.width * 0.05,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.black,
                               ),
+                              textAlign: TextAlign.center,
                             ),
-                          ],
-                        ),
+                          ),
+                          SizedBox(height: screenSize.height * 0.02),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    children: [
+                                      _buildGroup(
+                                        isEnglish ? 'Paper Bin' : 'Kağıt Kutusu',
+                                        paperGroup,
+                                        'kagit',
+                                        Colors.blue.shade50,
+                                        Colors.blue,
+                                      ),
+                                      _buildGroup(
+                                        isEnglish
+                                            ? 'Plastic Bin'
+                                            : 'Plastik Kutusu',
+                                        plasticGroup,
+                                        'plastik',
+                                        Colors.green.shade50,
+                                        Colors.green,
+                                      ),
+                                      _buildGroup(
+                                        isEnglish ? 'Glass Bin' : 'Cam Kutusu',
+                                        glassGroup,
+                                        'cam',
+                                        Colors.purple.shade50,
+                                        Colors.purple,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: screenSize.width * 0.04),
+                                Expanded(
+                                  flex: 2,
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: items
+                                          .where((item) => !item['isPlaced'])
+                                          .map((item) {
+                                        return Draggable<Map<String, dynamic>>(
+                                          data: item,
+                                          feedback: Material(
+                                            color: Colors.transparent,
+                                            child: _buildDraggableItem(item),
+                                          ),
+                                          childWhenDragging: Opacity(
+                                            opacity: 0.3,
+                                            child: _buildDraggableItem(item),
+                                          ),
+                                          child: _buildDraggableItem(item),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                const SizedBox(height: 20),
+                ),
+                Container(
+                  height: screenSize.height * 0.1,
+                  padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPadding, vertical: verticalPadding),
+                  child: showFeedback
+                      ? ScaleTransition(
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                isCorrect ? Icons.check_circle : Icons.cancel,
+                                color: isCorrect ? Colors.green : Colors.red,
+                                size: screenSize.width * 0.07,
+                              ),
+                              SizedBox(width: screenSize.width * 0.025),
+                              Text(
+                                isCorrect
+                                    ? (isEnglish
+                                        ? 'Well done! 🎉'
+                                        : 'Aferin! 🎉')
+                                    : (isEnglish
+                                        ? 'Try again! 😔'
+                                        : 'Tekrar dene! 😔'),
+                                style: TextStyle(
+                                  fontSize: screenSize.width * 0.045,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildGroup(String title, List<Map<String, dynamic>> group,
-      String type, Color color) {
-    return DragTarget<Map<String, dynamic>>(
-      onWillAcceptWithDetails: (data) => true,
-      onAcceptWithDetails: (data) => _handleDrag(data.data, type),
-      builder: (context, candidateData, rejectedData) {
-        return Container(
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
+  Widget _buildGroup(
+    String title,
+    List<Map<String, dynamic>> group,
+    String type,
+    Color boxColor,
+    Color borderColor,
+  ) {
+    final screenSize = MediaQuery.of(context).size;
+    final titleSize = screenSize.width * 0.05;
+    final emojiSize = screenSize.width * 0.1;
+
+    return Expanded(
+      child: DragTarget<Map<String, dynamic>>(
+        onWillAccept: (data) => !data!['isPlaced'],
+        onAccept: (data) => _handleDrag(data, type),
+        builder: (context, candidateData, rejectedData) {
+          return Container(
+            width: double.infinity,
+            margin: EdgeInsets.symmetric(
+                vertical: screenSize.height * 0.01,
+                horizontal: screenSize.width * 0.04),
+            decoration: BoxDecoration(
+              color: boxColor,
+              border: Border.all(
+                color: borderColor,
+                width: 2,
               ),
-            ],
-          ),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    topRight: Radius.circular(15),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: titleSize,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
+                  textAlign: TextAlign.center,
                 ),
-                width: double.infinity,
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        title.split(' ')[0],
-                        style: const TextStyle(
-                          fontSize: 47,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                SizedBox(height: screenSize.height * 0.01),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: screenSize.width * 0.02,
+                  children: group
+                      .map(
+                        (item) => Text(
+                          item['emoji'],
+                          style: TextStyle(fontSize: emojiSize),
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      Text(
-                        title.split(' ').length > 1 ? title.split(' ')[1] : '',
-                        style: const TextStyle(
-                          fontSize: 47,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
+                      )
+                      .toList(),
                 ),
-              ),
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: group
-                        .map((item) => Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 12.0),
-                              child: Text(
-                                item['emoji'],
-                                style: const TextStyle(fontSize: 48),
-                                textAlign: TextAlign.center,
-                              ),
-                            ))
-                        .toList(),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
   Widget _buildDraggableItem(Map<String, dynamic> item) {
+    final screenSize = MediaQuery.of(context).size;
+    final itemSize = screenSize.width * 0.2;
+    final emojiSize = screenSize.width * 0.1;
+
     return Container(
-      width: 80,
-      height: 80,
+      margin: EdgeInsets.symmetric(vertical: screenSize.height * 0.003),
+      width: itemSize,
+      height: itemSize,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: Offset(0, 2),
           ),
         ],
       ),
       child: Center(
         child: Text(
           item['emoji'],
-          style: const TextStyle(fontSize: 40),
+          style: TextStyle(fontSize: emojiSize),
         ),
       ),
     );

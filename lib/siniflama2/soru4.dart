@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import 'soru5.dart';
+import 'soru5.dart'; // Make sure this path is correct.
 
 class TeknolojikSinifla extends StatefulWidget {
   const TeknolojikSinifla({super.key});
@@ -12,51 +12,72 @@ class TeknolojikSinifla extends StatefulWidget {
 
 class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
     with TickerProviderStateMixin {
-  final List<Map<String, dynamic>> items = [
-    {'emoji': '📱', 'id': 'telefon', 'isTech': true, 'isPlaced': false},
-    {'emoji': '📚', 'id': 'kitap', 'isTech': false, 'isPlaced': false},
-    {'emoji': '💻', 'id': 'tablet', 'isTech': true, 'isPlaced': false},
-    {'emoji': '✏️', 'id': 'kalem', 'isTech': false, 'isPlaced': false},
-  ];
+  final Map<String, String> dogruEslesmeler = {
+    '📱': 'Teknolojik',
+    '📚': 'Geleneksel',
+    '💻': 'Teknolojik',
+    '🕯': 'Geleneksel',
+  };
 
-  final List<Map<String, dynamic>> techGroup = [];
-  final List<Map<String, dynamic>> nonTechGroup = [];
+  late List<String> emojiler;
+  final List<String> kategoriler = ['Teknolojik', 'Geleneksel'];
+
+  Set<String> eslesenler = {};
   bool showFeedback = false;
   bool isCorrect = false;
   bool _dialogShown = false;
   late AnimationController _feedbackController;
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
+    emojileriKaristir();
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 600),
     );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
+    _slideController.forward();
   }
 
   @override
   void dispose() {
     _feedbackController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
-  void _handleDrag(Map<String, dynamic> item, bool isTech) {
+  void emojileriKaristir() {
+    final List<String> tumEmojiler = dogruEslesmeler.keys.toList();
+    tumEmojiler.shuffle();
+    emojiler = tumEmojiler;
+  }
+
+  void _handleDrag(String draggedEmoji, String targetCategory) {
+    bool isCorrectMatch = dogruEslesmeler[draggedEmoji] == targetCategory;
+
     setState(() {
-      isCorrect = item['isTech'] == isTech;
+      isCorrect = isCorrectMatch;
       showFeedback = true;
     });
+
     _feedbackController.forward(from: 0);
 
-    if (isCorrect) {
+    if (isCorrectMatch) {
       setState(() {
-        if (!item['isPlaced']) {
-          if (isTech) {
-            techGroup.add(item);
-          } else {
-            nonTechGroup.add(item);
-          }
-          item['isPlaced'] = true;
+        if (!eslesenler.contains(draggedEmoji)) {
+          eslesenler.add(draggedEmoji);
         }
       });
       _checkCompletion();
@@ -72,272 +93,253 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
   }
 
   void _checkCompletion() {
-    if (techGroup.length + nonTechGroup.length == items.length) {
-      bool isCorrect = true;
-      for (var item in techGroup) {
-        if (!item['isTech']) {
-          isCorrect = false;
-          break;
+    if (eslesenler.length == emojiler.length) {
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted && !_dialogShown) {
+          _dialogShown = true;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const ParaSinifla()),
+          );
         }
-      }
-      for (var item in nonTechGroup) {
-        if (item['isTech']) {
-          isCorrect = false;
-          break;
-        }
-      }
-      if (isCorrect && !_dialogShown) {
-        _dialogShown = true;
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ParaSinifla(),
-                ));
-          }
-        });
-      }
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    return Scaffold(
-      backgroundColor: const Color(0xFFE1F5FE),
-      appBar: AppBar(
-        title: Text(
-          isEnglish
-              ? 'Classify Technological Objects'
-              : 'Teknolojik Aletleri Sınıfla',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.deepPurple.shade100,
-                  Colors.deepPurple.shade50,
-                  Colors.white,
-                ],
-              ),
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                const Color(0xffffffff),
+              ],
+              stops: const [0.0, 0.5, 1.0],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(24.0),
+          child: SafeArea(
             child: Column(
               children: [
-                const SizedBox(height: 12),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
                       ),
-                    ],
-                  ),
-                  child: Text(
-                    isEnglish
-                        ? 'Drag the items to the correct group!'
-                        : 'Nesneleri doğru gruba sürükle!',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.deepPurple,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
                     ),
-                    textAlign: TextAlign.center,
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 32),
                 Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: _buildGroup(
-                          isEnglish ? 'Technological' : 'Teknolojik',
-                          techGroup,
-                          true,
-                          Colors.green.shade200,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildGroup(
-                          isEnglish
-                              ? 'Non-Technological'
-                              : 'Teknolojik Olmayan',
-                          nonTechGroup,
-                          false,
-                          Colors.blue.shade200,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      if (!item['isPlaced']) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Draggable<Map<String, dynamic>>(
-                            data: item,
-                            feedback: _buildDraggableItem(item),
-                            childWhenDragging: Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: _buildDraggableItem(item),
-                          ),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20),
-                if (showFeedback)
-                  ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
+                  child: SlideTransition(
+                    position: _slideAnimation,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 20,
-                      ),
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 28,
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                : (isEnglish
-                                    ? 'Try again! 😔'
-                                    : 'Tekrar dene! 😔'),
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
+                            child: Text(
+                              isEnglish
+                                  ? 'Drag the items to the correct group!'
+                                  : 'Nesneleri doğru gruba sürükle!',
+                              style: const TextStyle(
+                                fontSize: 23,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    children: kategoriler
+                                        .map(
+                                          (kategori) => Expanded(
+                                            child: _buildGroupContainer(
+                                                kategori, isEnglish),
+                                          ),
+                                        )
+                                        .toList(),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: emojiler
+                                        .where((emoji) =>
+                                            !eslesenler.contains(emoji))
+                                        .map((emoji) {
+                                      return Draggable<String>(
+                                        data: emoji,
+                                        feedback: Material(
+                                          color: Colors.transparent,
+                                          child: _buildItemBox(emoji),
+                                        ),
+                                        childWhenDragging:
+                                            const SizedBox.shrink(),
+                                        child: _buildItemBox(emoji),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                const SizedBox(height: 20),
+                ),
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child: showFeedback
+                      ? ScaleTransition(
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect
+                                      ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                                      : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: isCorrect ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildGroup(String title, List<Map<String, dynamic>> group,
-      bool isTech, Color color) {
-    return DragTarget<Map<String, dynamic>>(
-      onWillAcceptWithDetails: (data) => true,
-      onAcceptWithDetails: (data) => _handleDrag(data.data, isTech),
+  Widget _buildGroupContainer(String kategori, bool isEnglish) {
+    Color boxColor =
+        kategori == 'Teknolojik' ? Colors.deepPurple.shade100 : Colors.blue.shade100;
+    Color borderColor =
+        kategori == 'Teknolojik' ? Colors.deepPurple.shade300 : Colors.blue.shade400;
+
+    return DragTarget<String>(
+      onWillAccept: (data) => !eslesenler.contains(data!),
+      onAccept: (data) => _handleDrag(data!, kategori),
       builder: (context, candidateData, rejectedData) {
         return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
+            color: boxColor,
+            border: Border.all(
+              color: borderColor,
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    topRight: Radius.circular(15),
-                  ),
-                ),
-                width: double.infinity,
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
+              Text(
+                isEnglish
+                    ? (kategori == 'Teknolojik' ? 'Technological' : 'Traditional')
+                    : kategori,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
               ),
-              Expanded(
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 8,
-                    crossAxisSpacing: 8,
-                  ),
-                  itemCount: group.length,
-                  itemBuilder: (context, index) {
-                    return _buildDraggableItem(group[index]);
-                  },
-                ),
+              const SizedBox(height: 16),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                children: eslesenler
+                    .where((e) => dogruEslesmeler[e] == kategori)
+                    .map(
+                      (e) => Text(
+                        e,
+                        style: const TextStyle(fontSize: 60),
+                      ),
+                    )
+                    .toList(),
               ),
             ],
           ),
@@ -346,25 +348,22 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
     );
   }
 
-  Widget _buildDraggableItem(Map<String, dynamic> item) {
+  Widget _buildItemBox(String emoji) {
     return Container(
-      width: 80,
-      height: 80,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      width: 90,
+      height: 100,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Center(
         child: Text(
-          item['emoji'],
-          style: const TextStyle(fontSize: 40),
+          emoji,
+          style: const TextStyle(fontSize: 60),
         ),
       ),
     );
