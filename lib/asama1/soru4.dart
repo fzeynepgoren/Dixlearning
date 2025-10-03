@@ -364,10 +364,156 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
                               color:
                               isCorrect ? Colors.green : Colors.red,
                               fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
+                            textAlign: TextAlign.center,
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 15),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: List.generate(
+                                    leftItems.length,
+                                    (index) => GestureDetector(
+                                      onTap: () => _handleTap(index, true),
+                                      child: AnimatedContainer(
+                                        duration:
+                                            showFeedback
+                                                ? Duration.zero
+                                                : const Duration(
+                                                  milliseconds: 300,
+                                                ),
+                                        curve: Curves.easeInOut,
+                                        width: 120,
+                                        height: 120,
+                                        margin: const EdgeInsets.symmetric(
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color:
+                                              matchedLeft[index]
+                                                  ? Colors.green.shade400
+                                                  : (showFeedback &&
+                                                      !isCorrect &&
+                                                      selectedLeftIndex ==
+                                                          index)
+                                                  ? Colors.red.shade400
+                                                  : (selectedLeftIndex == index)
+                                                  ? Colors.blue.shade200
+                                                  : Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.2,
+                                              ),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            leftItems[index],
+                                            style: const TextStyle(
+                                              fontSize: 48,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: 4,
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.blue.shade400,
+                                      Colors.blue.shade200,
+                                      Colors.blue.shade100,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: List.generate(
+                                    rightItems.length,
+                                    (index) => GestureDetector(
+                                      onTap: () => _handleTap(index, false),
+                                      child: AnimatedContainer(
+                                        duration:
+                                            showFeedback
+                                                ? Duration.zero
+                                                : const Duration(
+                                                  milliseconds: 300,
+                                                ),
+                                        curve: Curves.easeInOut,
+                                        width: 120,
+                                        height: 120,
+                                        margin: const EdgeInsets.symmetric(
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color:
+                                              matchedRight[index]
+                                                  ? Colors.green.shade400
+                                                  : (showFeedback &&
+                                                      !isCorrect &&
+                                                      selectedRightIndex ==
+                                                          index)
+                                                  ? Colors.red.shade400
+                                                  : (selectedRightIndex ==
+                                                      index)
+                                                  ? Colors.blue.shade200
+                                                  : Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.2,
+                                              ),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            rightItems[index],
+                                            style: const TextStyle(
+                                              fontSize: 48,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   )
                       : const SizedBox.shrink(),

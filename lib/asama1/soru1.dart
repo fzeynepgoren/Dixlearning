@@ -202,7 +202,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                           MaterialPageRoute(
                             builder: (context) => const HomeScreen(),
                           ),
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                     ),

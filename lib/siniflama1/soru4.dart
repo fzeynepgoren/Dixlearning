@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import 'soru5.dart';
+
+import 'soru5.dart'; // HayvanBacakSinifla sınıfı için
+import '../../screens/home_screen.dart'; // Geri tuşu için eklendi
+
 
 class YiyecekIcecekSinifla extends StatefulWidget {
   const YiyecekIcecekSinifla({super.key});
@@ -23,7 +26,7 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
   final List<Map<String, dynamic>> drinkGroup = [];
   bool showFeedback = false;
   bool isCorrect = false;
-  bool _dialogShown = false;
+
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -33,7 +36,7 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
     super.initState();
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 800),
     );
     _slideController = AnimationController(
       vsync: this,
@@ -55,65 +58,190 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
     super.dispose();
   }
 
-  void _handleDrag(Map<String, dynamic> item, bool isFood) {
+  void _handleDragFeedback(bool correct) {
+    // Eğer zaten doğru geri bildirim gösteriliyorsa, yanlış geri bildirimi engelle
+    if (showFeedback && isCorrect && !correct) return;
+
     setState(() {
-      isCorrect = item['isFood'] == isFood;
+      isCorrect = correct;
       showFeedback = true;
     });
     _feedbackController.forward(from: 0);
-
-    if (isCorrect) {
-      setState(() {
-        if (!item['isPlaced']) {
-          if (isFood) {
-            foodGroup.add(item);
-          } else {
-            drinkGroup.add(item);
-          }
-          item['isPlaced'] = true;
-        }
-      });
-      _checkCompletion();
-    }
-
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
           showFeedback = false;
         });
+        _feedbackController.reset(); // Geri bildirim sonrası controller'ı sıfırla
       }
     });
   }
 
   void _checkCompletion() {
-    if (foodGroup.length + drinkGroup.length == items.length) {
-      bool allCorrect = foodGroup.every((item) => item['isFood']) &&
-          drinkGroup.every((item) => !item['isFood']);
+    if (foodGroup.length == 2 && drinkGroup.length == 2) {
+      _handleDragFeedback(true);
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HayvanBacakSinifla()),
+          );
+        }
+      });
+    }
+  }
 
-      if (allCorrect && !_dialogShown) {
-        _dialogShown = true;
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (mounted) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const HayvanBacakSinifla(),
+  // Sürüklenen Öğenin Kutusu
+  Widget _buildItem(Map<String, dynamic> item) {
+    return Draggable<Map<String, dynamic>>(
+      data: item,
+      feedback: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: 90,
+          height: 100,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
               ),
-            );
+            ],
+          ),
+          child: Center(
+            child: Text(item['emoji'], style: const TextStyle(fontSize: 60)),
+          ),
+        ),
+      ),
+      childWhenDragging: const SizedBox.shrink(),
+      child: Container(
+        width: 90,
+        height: 100,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(item['emoji'], style: const TextStyle(fontSize: 60)),
+        ),
+      ),
+    );
+  }
+
+  // Grup Kutusu (DragTarget) yapısı
+  Widget _buildGroup(
+      String title,
+      List<Map<String, dynamic>> items,
+      bool isFood,
+      ) {
+    Color boxColor = isFood ? Colors.lightBlue.shade100 : Colors.deepPurple.shade100;
+    Color borderColor = isFood ? Colors.lightBlue.shade400 : Colors.deepPurple.shade400;
+
+    return DragTarget<Map<String, dynamic>>(
+      onWillAcceptWithDetails: (data) {
+        // Yanlış yere sürüklenirse negatif geri bildirim göster
+        if (data.data['isFood'] != isFood) {
+          // Bu, sürükleme sırasında erken geri bildirim vermemizi sağlar.
+          // Ancak istenen davranış sadece **bırakıldığında** olmasıdır.
+          // Bu yüzden bu bloğu siliyorum ve 'rejectedData' kontrolünü kullanıyorum.
+          return false;
+        }
+        return !data.data['isPlaced'];
+      },
+      onAcceptWithDetails: (data) {
+        // Doğru yere bırakıldı
+        setState(() {
+          data.data['isPlaced'] = true;
+          if (isFood) {
+            foodGroup.add(data.data);
+          } else {
+            drinkGroup.add(data.data);
           }
         });
-      }
-    }
+        _handleDragFeedback(true); // Doğru bırakma: Aferin!
+        _checkCompletion();
+      },
+      builder: (context, candidateData, rejectedData) {
+        // Hata Düzeltme: Yanlış yere bırakıldığında "Tekrar Dene" geri bildirimi
+        if (rejectedData.isNotEmpty) {
+          Future.microtask(() => _handleDragFeedback(false));
+        }
+
+        return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          decoration: BoxDecoration(
+            color: boxColor,
+            border: Border.all(
+              color: borderColor,
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Flexible(
+                fit: FlexFit.loose,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: items.isEmpty
+                        ? MainAxisAlignment.center
+                        : MainAxisAlignment.start,
+                    children: items.map((item) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Text(
+                          item['emoji'],
+                          style: const TextStyle(fontSize: 60),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    final screenSize = MediaQuery.of(context).size;
-    final iconSize = screenSize.width * 0.065;
+    final iconSize = MediaQuery.of(context).size.width * 0.065;
 
-    return WillPopScope(
-      onWillPop: () async => false,
+    return PopScope(
+      canPop: false,
       child: Scaffold(
         body: Container(
           decoration: BoxDecoration(
@@ -131,8 +259,9 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
           child: SafeArea(
             child: Column(
               children: [
+                // Başlık kaldırıldı, sadece geri tuşu kaldı.
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     IconButton(
                       icon: Icon(
@@ -141,11 +270,18 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                         size: iconSize,
                       ),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        // Ana ekrana dönme
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
+                          ),
+                              (route) => false,
+                        );
                       },
                     ),
                   ],
                 ),
+                const SizedBox(height: 10),
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
@@ -167,9 +303,7 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 1,
-                            ),
+                                horizontal: 20, vertical: 1),
                             child: Text(
                               isEnglish
                                   ? 'Drag the items to the correct group!'
@@ -193,18 +327,18 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                                   child: Column(
                                     children: [
                                       Expanded(
-                                        child: _buildGroupContainer(
+                                        child: _buildGroup(
+                                          isEnglish ? 'Food' : 'Yiyecek',
                                           foodGroup,
                                           true,
-                                          isEnglish,
                                         ),
                                       ),
                                       const SizedBox(height: 16),
                                       Expanded(
-                                        child: _buildGroupContainer(
+                                        child: _buildGroup(
+                                          isEnglish ? 'Drink' : 'İçecek',
                                           drinkGroup,
                                           false,
-                                          isEnglish,
                                         ),
                                       ),
                                     ],
@@ -217,17 +351,8 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: items
                                         .where((item) => !item['isPlaced'])
-                                        .map((item) {
-                                      return Draggable<Map<String, dynamic>>(
-                                        data: item,
-                                        feedback: Material(
-                                          color: Colors.transparent,
-                                          child: _buildItemBox(item),
-                                        ),
-                                        childWhenDragging: const SizedBox.shrink(),
-                                        child: _buildItemBox(item),
-                                      );
-                                    }).toList(),
+                                        .map((item) => _buildItem(item))
+                                        .toList(),
                                   ),
                                 ),
                               ],
@@ -238,6 +363,7 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                     ),
                   ),
                 ),
+                // Geri Bildirim Kutusu
                 Container(
                   height: 80,
                   padding: const EdgeInsets.symmetric(
@@ -246,139 +372,55 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                   ),
                   child: showFeedback
                       ? ScaleTransition(
-                          scale: CurvedAnimation(
-                            parent: _feedbackController,
-                            curve: Curves.elasticOut,
+                    scale: CurvedAnimation(
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
                           ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 20,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  isCorrect ? Icons.check_circle : Icons.cancel,
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  isCorrect
-                                      ? (isEnglish
-                                          ? 'Well done! 🎉'
-                                          : 'Aferin! 🎉')
-                                      : (isEnglish
-                                          ? 'Try again! 😔'
-                                          : 'Tekrar dene! 😔'),
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: isCorrect ? Colors.green : Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            isCorrect ? Icons.check_circle : Icons.cancel,
+                            color: isCorrect ? Colors.green : Colors.red,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            isCorrect
+                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                                : (isEnglish
+                                ? 'Try again! 😔'
+                                : 'Tekrar dene! 😔'),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: isCorrect ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        )
+                        ],
+                      ),
+                    ),
+                  )
                       : const SizedBox.shrink(),
                 ),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGroupContainer(
-      List<Map<String, dynamic>> group,
-      bool isFood,
-      bool isEnglish,
-      ) {
-    Color boxColor = isFood ? const Color(0xFFE8F5E8) : const Color(0xFFD6ECFF);
-    Color borderColor = isFood ? Colors.green : Colors.lightBlue;
-
-    return DragTarget<Map<String, dynamic>>(
-      onWillAccept: (item) => true,
-      onAccept: (item) => _handleDrag(item!, isFood),
-      builder: (context, candidateData, rejectedData) {
-        return Container(
-          width: double.infinity,
-          height: 140,
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          decoration: BoxDecoration(
-            color: boxColor,
-            border: Border.all(
-              color: borderColor,
-              width: 2,
-            ),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                isFood
-                    ? (isEnglish ? 'Food' : 'Yiyecek')
-                    : (isEnglish ? 'Drinks' : 'İçecek'),
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 8,
-                children: group
-                    .map((item) => Text(
-                  item['emoji'],
-                  style: const TextStyle(fontSize: 36),
-                ))
-                    .toList(),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildItemBox(Map<String, dynamic> item) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          item['emoji'],
-          style: const TextStyle(fontSize: 48),
         ),
       ),
     );

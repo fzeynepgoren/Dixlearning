@@ -31,6 +31,7 @@ flutter:
   assets:
     - assets/giris/disgrafi1/ses1.mp3
     - assets/giris/disgrafi1/ses2.mp3
+    - assets/asama3/
     - assets/asama3/soru1/block_tower.png
     - assets/asama3/soru1/finger_painting.png
     - assets/asama3/soru1/kicking_ball.png
@@ -43,6 +44,7 @@ flutter:
     - assets/erkek_maskot.png
     - assets/kiz_maskot.png
     - assets/konusma_balonu.png
+    - assets/SIRALAMA_RESIMLERI/
     - assets/az_cok_asa1/
     - assets/uzun_kisa/
     - assets/buyuk_kucuk/soru1/Resim1.png
@@ -54,6 +56,48 @@ flutter:
     - assets/buyuk_kucuk/soru7/Resim7.png
     - assets/buyuk_kucuk/soru8/Resim8.png
     - assets/buyuk_kucuk/soru9/Resim9.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru1/tohum.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru1/filiz.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru1/cicekli_agac.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru1/agac.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru2/yumurta.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru2/yumurta_civciv.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru2/civciv.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru2/tavuk.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru3/iki_isirikli_elma.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru3/butun_elma.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru3/bitmis_elma.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru3/bir_isirikli_elma.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru4/malzemeler.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru4/kek.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru4/hamur.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru4/firin.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru5/yetiskin.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru5/yasli.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru5/cocuk.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru5/bebek.png
+    - assets/siniflama1/
+    - assets/siniflama2/
+    - assets/buyuk_kucuk/
+    - assets/kalin_ince_asa1/
+    - assets/kalin_ince_asa1/soru1/Resim1.png
+    - assets/kalin_ince_asa1/soru1/Resim2.png
+    - assets/kalin_ince_asa1/soru2/Resim3.png
+    - assets/kalin_ince_asa1/soru2/Resim4.png
+    - assets/kalin_ince_asa1/soru3/Resim5.png
+    - assets/kalin_ince_asa1/soru3/Resim6.png
+    - assets/kalin_ince_asa1/soru4/Resim7.png
+    - assets/kalin_ince_asa1/soru4/Resim8.png
+    - assets/kalin_ince_asa1/soru5/Resim9.png
+    - assets/kalin_ince_asa1/soru5/Resim10.png
+    - assets/kalin_ince_asa1/soru6/Resim11.png
+    - assets/kalin_ince_asa1/soru6/Resim12.png
+    - assets/kalin_ince_asa1/soru7/Resim13.png
+    - assets/kalin_ince_asa1/soru7/Resim14.png
+    - assets/kalin_ince_asa1/soru8/Resim15.png
+    - assets/kalin_ince_asa1/soru8/Resim16.png
+    - assets/kalin_ince_asa1/soru9/Resim17.png
+    - assets/kalin_ince_asa1/soru9/Resim18.png
     - assets/kalin_ince_asa1/
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/tohum.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/filiz.png
