@@ -5,22 +5,13 @@ import 'login_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import '../providers/theme_provider.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SettingsScreen extends StatefulWidget {
-  final void Function(ThemeMode)? onThemeChanged;
-  final ThemeMode? themeMode;
-  final void Function(bool isEnglish)? onLanguageChanged;
-  final bool? isEnglish;
-  const SettingsScreen({
-    super.key,
-    this.onThemeChanged,
-    this.themeMode,
-    this.onLanguageChanged,
-    this.isEnglish,
-  });
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -28,123 +19,18 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
-  bool _isDark = false;
   String _userName = 'Kullanıcı';
   int _userAge = 10;
   String _avatar = '👦';
 
-  @override
-  void initState() {
-    super.initState();
-    _isDark = widget.themeMode == ThemeMode.dark;
-  }
 
-  void _showEditProfileModal(BuildContext context, bool isEnglish) {
-    String tempName = _userName;
-    int tempAge = _userAge;
-    String tempAvatar = _avatar;
-    final avatars = ['👦', '👧', '🧑', '🧒'];
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
-        return StatefulBuilder(builder: (context, setModalState) {
-          return Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-              left: 24,
-              right: 24,
-              top: 24,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  isEnglish ? 'Edit Profile' : 'Profili Düzenle',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 18),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: avatars
-                      .map((avatar) => GestureDetector(
-                    onTap: () {
-                      setModalState(() {
-                        tempAvatar = avatar;
-                      });
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 6),
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: tempAvatar == avatar ? const Color(0xFF6C63FF) : Colors.transparent,
-                          width: 3,
-                        ),
-                      ),
-                      child: Text(avatar, style: const TextStyle(fontSize: 36)),
-                    ),
-                  ))
-                      .toList(),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: isEnglish ? 'Name' : 'Ad',
-                    border: const OutlineInputBorder(),
-                  ),
-                  controller: TextEditingController(text: tempName),
-                  onChanged: (val) => tempName = val,
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: isEnglish ? 'Age' : 'Yaş',
-                    border: const OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                  controller: TextEditingController(text: tempAge.toString()),
-                  onChanged: (val) => tempAge = int.tryParse(val) ?? tempAge,
-                ),
-                const SizedBox(height: 18),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _userName = tempName;
-                      _userAge = tempAge;
-                      _avatar = tempAvatar;
-                    });
-                    Navigator.pop(context);
-                  },
-                  child: Text(isEnglish ? 'Save' : 'Kaydet'),
-                ),
-                const SizedBox(height: 8),
-              ],
-            ),
-          );
-        });
-      },
-    );
-  }
-
-  @override
-  void didUpdateWidget(covariant SettingsScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.isEnglish != widget.isEnglish) {
-      setState(() {});
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    const Color mainColor = Color(0xFFB3E5FC); // Açık gök mavisi
-    const Color accentColor = Color(0xFF81D4FA); // Daha koyu açık mavi
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    const Color mainColor = Color.fromARGB(255, 137, 189, 214); // Açık gök mavisi
+    const Color accentColor = Color.fromARGB(255, 104, 178, 211); // Daha koyu açık mavi
     final Color cardBg = Theme.of(context).cardColor;
     final Color cardText = Theme.of(context).textTheme.bodyLarge!.color!;
     final Color cardSubText = Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey[600]!;
@@ -271,20 +157,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ],
                       ),
                     ),
-                    ElevatedButton.icon(
-                      onPressed: () => _showEditProfileModal(context, isEnglish),
-                      icon: const Icon(Icons.edit, size: 18),
-                      label: Text(isEnglish ? 'Edit' : 'Düzenle'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: mainColor,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        textStyle: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -394,24 +266,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        FlutterSwitch(
-                          width: 110.0,
-                          height: 38.0,
-                          valueFontSize: 14.0,
-                          toggleSize: 28.0,
-                          value: isEnglish,
-                          borderRadius: 20.0,
-                          padding: 4.0,
-                          activeColor: Colors.teal,
-                          inactiveColor: Colors.grey[300]!,
-                          activeText: 'English',
-                          inactiveText: 'Türkçe',
-                          activeTextFontWeight: FontWeight.w700,
-                          inactiveTextFontWeight: FontWeight.w700,
-                          showOnOff: true,
-                          onToggle: (val) async {
-                            await Provider.of<LanguageProvider>(context, listen: false).setLanguage(val);
-                          },
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                              width: 2,
+                            ),
+                          ),
+                          child: FlutterSwitch(
+                            width: 110.0,
+                            height: 38.0,
+                            valueFontSize: 14.0,
+                            toggleSize: 28.0,
+                            value: isEnglish,
+                            borderRadius: 20.0,
+                            padding: 4.0,
+                            activeColor: mainColor,
+                            inactiveColor: accentColor,
+                            activeText: 'English',
+                            inactiveText: 'Türkçe',
+                            activeTextFontWeight: FontWeight.w700,
+                            inactiveTextFontWeight: FontWeight.w700,
+                            showOnOff: true,
+                            onToggle: (val) async {
+                              await Provider.of<LanguageProvider>(context, listen: false).setLanguage(val);
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -466,24 +347,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Switch(
-                          value: _isDark,
-                          activeColor: mainColor,
-                          onChanged: (val) {
-                            setState(() {
-                              _isDark = val;
-                            });
-                            if (widget.onThemeChanged != null) {
-                              widget.onThemeChanged!(val ? ThemeMode.dark : ThemeMode.light);
-                            }
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          _isDark ? (isEnglish ? 'Dark' : 'Koyu') : (isEnglish ? 'Light' : 'Açık'),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: _isDark ? Colors.deepPurple : Colors.black,
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                              width: 2,
+                            ),
+                          ),
+                          child: FlutterSwitch(
+                            width: 110.0,
+                            height: 38.0,
+                            valueFontSize: 14.0,
+                            toggleSize: 28.0,
+                            value: themeProvider.isDark,
+                            borderRadius: 20.0,
+                            padding: 4.0,
+                            activeColor: mainColor,
+                            inactiveColor: accentColor,
+                            activeText: isEnglish ? 'Dark' : 'Koyu',
+                            inactiveText: isEnglish ? 'Light' : 'Açık',
+                            activeTextFontWeight: FontWeight.w700,
+                            inactiveTextFontWeight: FontWeight.w700,
+                            showOnOff: true,
+                            onToggle: (val) {
+                              themeProvider.setThemeMode(val ? ThemeMode.dark : ThemeMode.light);
+                            },
                           ),
                         ),
                       ],

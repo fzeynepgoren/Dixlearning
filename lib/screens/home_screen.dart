@@ -11,20 +11,10 @@ import '../widgets/custom_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import 'sorting_activities_screen.dart';
-import 'dart:convert'; // Added for json.decode
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
-  final void Function(ThemeMode)? onThemeChanged;
-  final ThemeMode? themeMode;
-  final bool? isEnglish;
-  final void Function(bool isEnglish)? onLanguageChanged;
-  const HomeScreen({
-    super.key,
-    this.onThemeChanged,
-    this.themeMode,
-    this.isEnglish,
-    this.onLanguageChanged,
-  });
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -110,13 +100,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder:
-              (context) => SettingsScreen(
-                onThemeChanged: widget.onThemeChanged,
-                themeMode: widget.themeMode,
-                isEnglish: widget.isEnglish,
-                onLanguageChanged: widget.onLanguageChanged,
-              ),
+          builder: (context) => const SettingsScreen(),
         ),
       );
     }
@@ -132,13 +116,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder:
-                (context) => LoginScreen(
-                  onThemeChanged: widget.onThemeChanged,
-                  themeMode: widget.themeMode,
-                  isEnglish: widget.isEnglish,
-                  onLanguageChanged: widget.onLanguageChanged,
-                ),
+            builder: (context) => const LoginScreen(),
           ),
           (route) => false,
         );
@@ -221,10 +199,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 : 'Isınma oyunları ve eğlence!',
         'onTap': () {
           _navigateToActivity(
-            GirisEtkinlikleriScreen(
-              isEnglish: isEnglish,
-              onLanguageChanged: widget.onLanguageChanged,
-            ),
+            const GirisEtkinlikleriScreen(),
           );
         },
       },

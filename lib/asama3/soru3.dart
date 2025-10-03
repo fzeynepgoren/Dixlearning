@@ -14,7 +14,7 @@ class Soru3 extends StatefulWidget {
 
 class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
   final List<String> leftItems = ['👨‍🏫', '👨‍⚕️', '👨‍🍳'];
-  final List<String> rightItems = ['Öğrenci', 'Hasta', 'Fırıncı'];
+  final List<String> rightItems = ['Öğrenci', 'Fırıncı', 'Hasta'];
   late List<String> shuffledRightItems;
   int? selectedLeftIndex;
   int? selectedRightIndex;
