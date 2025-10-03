@@ -339,7 +339,7 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
 
                               // BAŞLANGIÇ: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ (425.0 Yüksekliğe Ayarlandı)
                               SizedBox(
-                                height: 425.0, // Çizginin uzunluğu (yüksekliği)
+                                height: 450.0, // Çizginin uzunluğu (yüksekliği)
                                 child: Container(
                                   width: 4,
                                   margin: const EdgeInsets.symmetric(
