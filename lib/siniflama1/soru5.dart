@@ -77,13 +77,15 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
 
   void _checkCompletion() {
     if (fourLegsGroup.length == 2 && twoLegsGroup.length == 2) {
-      _handleDragFeedback(true); // Tüm doğru eşleşmeler bittiğinde pozitif geri bildirim
+      _handleDragFeedback(
+        true,
+      ); // Tüm doğru eşleşmeler bittiğinde pozitif geri bildirim
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
           // Son görev tamamlandı, Ana ekrana yönlendir.
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
+            (route) => false,
           );
         }
       });
@@ -111,8 +113,7 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
             ],
           ),
           child: Center(
-            child: Text(item['emoji'],
-                style: const TextStyle(fontSize: 60)),
+            child: Text(item['emoji'], style: const TextStyle(fontSize: 60)),
           ),
         ),
       ),
@@ -134,8 +135,7 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
           ],
         ),
         child: Center(
-          child: Text(item['emoji'],
-              style: const TextStyle(fontSize: 60)),
+          child: Text(item['emoji'], style: const TextStyle(fontSize: 60)),
         ),
       ),
     );
@@ -143,13 +143,15 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
 
   // ÖRNEK TASARIM: Grup Kutusu (DragTarget) yapısı
   Widget _buildGroup(
-      String title,
-      List<Map<String, dynamic>> items,
-      bool isFourLegs,
-      ) {
+    String title,
+    List<Map<String, dynamic>> items,
+    bool isFourLegs,
+  ) {
     // Özel renkler bu soruya uyarlandı
-    Color boxColor = isFourLegs ? Colors.lightBlue.shade100 : Colors.deepPurple.shade100;
-    Color borderColor = isFourLegs ? Colors.lightBlue.shade400 : Colors.deepPurple.shade400;
+    Color boxColor =
+        isFourLegs ? Colors.lightBlue.shade100 : Colors.deepPurple.shade100;
+    Color borderColor =
+        isFourLegs ? Colors.lightBlue.shade400 : Colors.deepPurple.shade400;
 
     return DragTarget<Map<String, dynamic>>(
       onWillAcceptWithDetails: (data) {
@@ -180,10 +182,7 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           decoration: BoxDecoration(
             color: boxColor,
-            border: Border.all(
-              color: borderColor,
-              width: 2,
-            ),
+            border: Border.all(color: borderColor, width: 2),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -210,18 +209,20 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    mainAxisAlignment: items.isEmpty
-                        ? MainAxisAlignment.center
-                        : MainAxisAlignment.start,
-                    children: items.map((item) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Text(
-                          item['emoji'],
-                          style: const TextStyle(fontSize: 60),
-                        ),
-                      );
-                    }).toList(),
+                    mainAxisAlignment:
+                        items.isEmpty
+                            ? MainAxisAlignment.center
+                            : MainAxisAlignment.start,
+                    children:
+                        items.map((item) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Text(
+                              item['emoji'],
+                              style: const TextStyle(fontSize: 60),
+                            ),
+                          );
+                        }).toList(),
                   ),
                 ),
               ),
@@ -273,7 +274,7 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                           MaterialPageRoute(
                             builder: (context) => const HomeScreen(),
                           ),
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                     ),
@@ -302,7 +303,9 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 1),
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Drag the animals to the correct group!'
@@ -349,10 +352,11 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                                   flex: 2,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    children: items
-                                        .where((item) => !item['isPlaced'])
-                                        .map((item) => _buildItem(item))
-                                        .toList(),
+                                    children:
+                                        items
+                                            .where((item) => !item['isPlaced'])
+                                            .map((item) => _buildItem(item))
+                                            .toList(),
                                   ),
                                 ),
                               ],
@@ -367,54 +371,65 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                 Container(
                   height: 80,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                : (isEnglish
-                                ? 'Try again! 😔'
-                                : 'Tekrar dene! 😔'),
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
