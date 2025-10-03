@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import 'soru2.dart';
 import 'soru5.dart';
 
 class YiyecekIcecekSinifla extends StatefulWidget {

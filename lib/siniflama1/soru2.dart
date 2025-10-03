@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import 'soru1.dart';
 import 'soru4.dart';
 
 // DİKKAT: YiyecekIcecekSinifla sınıfı burada tanımlı DEĞİLDİR.

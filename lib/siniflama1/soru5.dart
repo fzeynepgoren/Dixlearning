@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import '../screens/home_screen.dart';
+import 'soru4.dart';
 
 class HayvanBacakSinifla extends StatefulWidget {
   const HayvanBacakSinifla({super.key});
