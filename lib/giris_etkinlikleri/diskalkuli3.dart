@@ -84,6 +84,7 @@ class _Diskalkuli3State extends State<Diskalkuli3>
       await Future.delayed(const Duration(milliseconds: 900));
       setState(() {
         _showCongrats = false;
+        _feedbackText = null; // feedback'i temizle
       });
     } else {
       setState(() {
@@ -105,6 +106,7 @@ class _Diskalkuli3State extends State<Diskalkuli3>
           _currentProblemIndex++;
           _problems[_currentProblemIndex]['userAnswer'] = null;
           _isWrong = false; // yeni soruya geçerken sıfırlıyoruz
+          _feedbackText = null; // feedback'i de temizle
         });
         _fadeController.forward();
       });
@@ -184,8 +186,8 @@ class _Diskalkuli3State extends State<Diskalkuli3>
                     duration: const Duration(milliseconds: 500),
                     child: Container(
                       key: ValueKey<int>(_currentProblemIndex),
-                      margin: const EdgeInsets.symmetric(horizontal: 12),
-                      padding: const EdgeInsets.all(20),
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.95),
                         borderRadius: BorderRadius.circular(24),
