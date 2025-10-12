@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'package:dixlearning/asama4/soru2.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import 'package:dixlearning/asama2/soru2.dart';
 
 class DuyguYuzEsle extends StatefulWidget {
@@ -169,7 +169,8 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
                           ),
                           (route) => false,
                         );
@@ -240,20 +241,32 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
                                             // 2) Geri bildirim anında yanlış seçilmişse: kırmızı
                                             // 3) Geri bildirim yokken sadece seçiliyse: mavi
                                             // 4) Diğer durumlarda: beyaz
-                                            color: matchedLeft[index]
-                                                ? Colors.green.shade400
-                                                : (showFeedback
-                                                ? ((selectedLeftIndex == index && !isCorrect)
-                                                ? Colors.red.shade400
-                                                : Colors.white)
-                                                : (selectedLeftIndex == index
-                                                ? Colors.blue.shade200
-                                                : Colors.white)),
-                                            borderRadius: BorderRadius.circular(20),
+                                            color:
+                                                matchedLeft[index]
+                                                    ? Colors.green.shade400
+                                                    : (showFeedback
+                                                        ? ((selectedLeftIndex ==
+                                                                    index &&
+                                                                !isCorrect)
+                                                            ? Colors
+                                                                .red
+                                                                .shade400
+                                                            : Colors.white)
+                                                        : (selectedLeftIndex ==
+                                                                index
+                                                            ? Colors
+                                                                .blue
+                                                                .shade200
+                                                            : Colors.white)),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
                                             // ÖNCEKİ YEŞİL BORDER'I KALDIRDIK -> border: null
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black.withOpacity(0.2),
+                                                color: Colors.black.withOpacity(
+                                                  0.2,
+                                                ),
                                                 blurRadius: 6,
                                                 offset: const Offset(0, 3),
                                               ),
@@ -275,7 +288,9 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
                                 ),
                                 Container(
                                   width: 4,
-                                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       begin: Alignment.topCenter,
@@ -313,20 +328,32 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
                                             // 2) Yanlış eşleşmede kırmızı
                                             // 3) Seçiliyse mavi
                                             // 4) Diğer durumlarda beyaz
-                                            color: matchedRight[index]
-                                                ? Colors.green.shade400
-                                                : (showFeedback
-                                                ? ((selectedRightIndex == index && !isCorrect)
-                                                ? Colors.red.shade400
-                                                : Colors.white)
-                                                : (selectedRightIndex == index
-                                                ? Colors.blue.shade200
-                                                : Colors.white)),
-                                            borderRadius: BorderRadius.circular(20),
+                                            color:
+                                                matchedRight[index]
+                                                    ? Colors.green.shade400
+                                                    : (showFeedback
+                                                        ? ((selectedRightIndex ==
+                                                                    index &&
+                                                                !isCorrect)
+                                                            ? Colors
+                                                                .red
+                                                                .shade400
+                                                            : Colors.white)
+                                                        : (selectedRightIndex ==
+                                                                index
+                                                            ? Colors
+                                                                .blue
+                                                                .shade200
+                                                            : Colors.white)),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
                                             // border’ı tamamen kaldırıyoruz
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black.withOpacity(0.2),
+                                                color: Colors.black.withOpacity(
+                                                  0.2,
+                                                ),
                                                 blurRadius: 6,
                                                 offset: const Offset(0, 3),
                                               ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -44,19 +44,22 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
     super.initState();
     final isEnglish =
         Provider.of<LanguageProvider>(context, listen: false).isEnglish;
-    shuffledColors =
-        List.from(isEnglish ? rightColorsEnglish : rightColors)..shuffle();
-    _feedbackController =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
-    _slideController =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
+    shuffledColors = List.from(isEnglish ? rightColorsEnglish : rightColors)
+      ..shuffle();
+    _feedbackController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -82,11 +85,12 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
       final isEnglish =
           Provider.of<LanguageProvider>(context, listen: false).isEnglish;
       setState(() {
-        isCorrect = (isEnglish
-            ? imageToColorEnglish[leftImages[selectedLeftIndex!]] ==
-                shuffledColors[selectedRightIndex!]
-            : imageToColor[leftImages[selectedLeftIndex!]] ==
-                shuffledColors[selectedRightIndex!]);
+        isCorrect =
+            (isEnglish
+                ? imageToColorEnglish[leftImages[selectedLeftIndex!]] ==
+                    shuffledColors[selectedRightIndex!]
+                : imageToColor[leftImages[selectedLeftIndex!]] ==
+                    shuffledColors[selectedRightIndex!]);
         showFeedback = true;
       });
       _feedbackController.forward(from: 0);
@@ -104,7 +108,7 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
             if (mounted) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const HomeScreen()),
+                MaterialPageRoute(builder: (_) => const MatchingQuestionsScreen()),
               );
             }
           });
@@ -123,8 +127,12 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
     }
   }
 
-  Widget _buildCard(String content, bool isLeft, int index,
-      {bool isEnglish = false}) {
+  Widget _buildCard(
+    String content,
+    bool isLeft,
+    int index, {
+    bool isEnglish = false,
+  }) {
     final bool isSelected =
         isLeft ? selectedLeftIndex == index : selectedRightIndex == index;
     final bool isMatched = isLeft ? matchedLeft[index] : matchedRight[index];
@@ -153,9 +161,10 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
                   : null,
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.13),
-                blurRadius: 8,
-                offset: const Offset(0, 4))
+              color: Colors.black.withOpacity(0.13),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
           ],
         ),
         child: Center(
@@ -205,12 +214,17 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                              builder: (context) => const HomeScreen()),
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
+                          ),
                           (route) => false,
                         );
                       },
@@ -256,10 +270,12 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
                                 children: [
                                   Expanded(
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
                                       children: List.generate(
                                         leftImages.length,
-                                        (i) => _buildCard(leftImages[i], true, i),
+                                        (i) =>
+                                            _buildCard(leftImages[i], true, i),
                                       ),
                                     ),
                                   ),
@@ -267,7 +283,9 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
                                   Container(
                                     width: 4,
                                     height: 425,
-                                    margin: const EdgeInsets.symmetric(horizontal: 14),
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                    ),
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         begin: Alignment.topCenter,
@@ -283,11 +301,16 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
                                   ),
                                   Expanded(
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
                                       children: List.generate(
                                         shuffledColors.length,
-                                        (i) => _buildCard(shuffledColors[i], false, i,
-                                            isEnglish: isEnglish),
+                                        (i) => _buildCard(
+                                          shuffledColors[i],
+                                          false,
+                                          i,
+                                          isEnglish: isEnglish,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -303,50 +326,65 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
                 // Feedback alanı
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                          scale: CurvedAnimation(
-                            parent: _feedbackController,
-                            curve: Curves.elasticOut,
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 5),
-                                ),
-                              ],
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  isCorrect ? Icons.check_circle : Icons.cancel,
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  isCorrect
-                                      ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                      : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: isCorrect ? Colors.green : Colors.red,
-                                    fontWeight: FontWeight.bold,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
@@ -355,4 +393,4 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
       ),
     );
   }
-    }
+}

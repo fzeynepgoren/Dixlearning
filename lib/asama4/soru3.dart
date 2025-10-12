@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import 'soru4.dart';
 
 class Soru3 extends StatefulWidget {
@@ -158,8 +158,10 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
       // Geri tuşu ile HomeScreen’e dön ve stack’i temizle
       onWillPop: () async {
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (route) => false,
+          MaterialPageRoute(
+            builder: (context) => const MatchingQuestionsScreen(),
+          ),
+          (route) => false,
         );
         return false;
       },
@@ -189,9 +191,10 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
                           ),
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                     ),
@@ -242,43 +245,52 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                                 Expanded(
                                   child: Column(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                        MainAxisAlignment.spaceEvenly,
                                     children: List.generate(
                                       leftItems.length,
-                                          (index) => GestureDetector(
+                                      (index) => GestureDetector(
                                         onTap: () => _handleLeftTap(index),
                                         child: AnimatedContainer(
-                                          duration:
-                                          const Duration(milliseconds: 300),
+                                          duration: const Duration(
+                                            milliseconds: 300,
+                                          ),
                                           curve: Curves.easeInOut,
                                           width: 120,
                                           height: 120,
                                           margin: const EdgeInsets.symmetric(
-                                              vertical: 8),
+                                            vertical: 8,
+                                          ),
                                           decoration: BoxDecoration(
                                             // Renk mantığı:
                                             // 1) matched -> yeşil
                                             // 2) geri bildirimde ve yanlış seçiliyse -> kırmızı
                                             // 3) geri bildirim yok ve seçiliyse -> mavi
                                             // 4) diğer -> beyaz
-                                            color: matchedLeft[index]
-                                                ? Colors.green.shade400
-                                                : (showFeedback
-                                                ? ((selectedLeftIndex ==
-                                                index &&
-                                                !isCorrect)
-                                                ? Colors.red.shade400
-                                                : Colors.white)
-                                                : (selectedLeftIndex ==
-                                                index
-                                                ? Colors.blue.shade200
-                                                : Colors.white)),
-                                            borderRadius:
-                                            BorderRadius.circular(20),
+                                            color:
+                                                matchedLeft[index]
+                                                    ? Colors.green.shade400
+                                                    : (showFeedback
+                                                        ? ((selectedLeftIndex ==
+                                                                    index &&
+                                                                !isCorrect)
+                                                            ? Colors
+                                                                .red
+                                                                .shade400
+                                                            : Colors.white)
+                                                        : (selectedLeftIndex ==
+                                                                index
+                                                            ? Colors
+                                                                .blue
+                                                                .shade200
+                                                            : Colors.white)),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black
-                                                    .withOpacity(0.2),
+                                                color: Colors.black.withOpacity(
+                                                  0.2,
+                                                ),
                                                 blurRadius: 6,
                                                 offset: const Offset(0, 3),
                                               ),
@@ -288,7 +300,8 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                                             child: Text(
                                               leftItems[index],
                                               style: const TextStyle(
-                                                  fontSize: 48),
+                                                fontSize: 48,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -301,7 +314,8 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                                 Container(
                                   width: 4,
                                   margin: const EdgeInsets.symmetric(
-                                      horizontal: 10),
+                                    horizontal: 10,
+                                  ),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       begin: Alignment.topCenter,
@@ -320,38 +334,47 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                                 Expanded(
                                   child: Column(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                        MainAxisAlignment.spaceEvenly,
                                     children: List.generate(
                                       shuffledRightItems.length,
-                                          (index) => GestureDetector(
+                                      (index) => GestureDetector(
                                         onTap: () => _handleRightTap(index),
                                         child: AnimatedContainer(
-                                          duration:
-                                          const Duration(milliseconds: 300),
+                                          duration: const Duration(
+                                            milliseconds: 300,
+                                          ),
                                           curve: Curves.easeInOut,
                                           width: 120,
                                           height: 120,
                                           margin: const EdgeInsets.symmetric(
-                                              vertical: 8),
+                                            vertical: 8,
+                                          ),
                                           decoration: BoxDecoration(
-                                            color: matchedRight[index]
-                                                ? Colors.green.shade400
-                                                : (showFeedback
-                                                ? ((selectedRightIndex ==
-                                                index &&
-                                                !isCorrect)
-                                                ? Colors.red.shade400
-                                                : Colors.white)
-                                                : (selectedRightIndex ==
-                                                index
-                                                ? Colors.blue.shade200
-                                                : Colors.white)),
-                                            borderRadius:
-                                            BorderRadius.circular(20),
+                                            color:
+                                                matchedRight[index]
+                                                    ? Colors.green.shade400
+                                                    : (showFeedback
+                                                        ? ((selectedRightIndex ==
+                                                                    index &&
+                                                                !isCorrect)
+                                                            ? Colors
+                                                                .red
+                                                                .shade400
+                                                            : Colors.white)
+                                                        : (selectedRightIndex ==
+                                                                index
+                                                            ? Colors
+                                                                .blue
+                                                                .shade200
+                                                            : Colors.white)),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black
-                                                    .withOpacity(0.2),
+                                                color: Colors.black.withOpacity(
+                                                  0.2,
+                                                ),
                                                 blurRadius: 6,
                                                 offset: const Offset(0, 3),
                                               ),
@@ -388,57 +411,57 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                     horizontal: 20,
                     vertical: 10,
                   ),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isCorrect
-                                ? Icons.check_circle
-                                : Icons.cancel,
-                            color:
-                            isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? 'Aferin! 🎉'
-                                : 'Tekrar dene! 😔',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect
-                                  ? Colors.green
-                                  : Colors.red,
-                              fontWeight: FontWeight.bold,
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? 'Aferin! 🎉'
+                                        : 'Tekrar dene! 😔',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
