@@ -1,5 +1,6 @@
 import 'package:dixlearning/asama1/soru4.dart';
 import 'package:flutter/material.dart';
+import '../screens/matching_questions_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -204,11 +205,11 @@ class _GeometricMatchingState extends State<GeometricMatching>
 
   // Şekil kartlarının modern tasarımı
   Widget buildShapeCard(
-      Shape shape, {
-        bool isMatched = false,
-        bool isShadow = false,
-        bool isSelected = false,
-      }) {
+    Shape shape, {
+    bool isMatched = false,
+    bool isShadow = false,
+    bool isSelected = false,
+  }) {
     Color cardColor;
     Color iconColor;
 
@@ -226,7 +227,7 @@ class _GeometricMatchingState extends State<GeometricMatching>
 
     return AnimatedContainer(
       duration:
-      showFeedback ? Duration.zero : const Duration(milliseconds: 300),
+          showFeedback ? Duration.zero : const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
       width: 120,
       height: 120,
@@ -235,9 +236,9 @@ class _GeometricMatchingState extends State<GeometricMatching>
         color: cardColor,
         borderRadius: BorderRadius.circular(20),
         border:
-        isSelected && !isMatched && !isShadow
-            ? Border.all(color: Colors.white, width: 3)
-            : null,
+            isSelected && !isMatched && !isShadow
+                ? Border.all(color: Colors.white, width: 3)
+                : null,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -248,15 +249,15 @@ class _GeometricMatchingState extends State<GeometricMatching>
       ),
       child: Center(
         child:
-        shape.shape == 'Üçgen'
-            ? SizedBox(
-          width: 50,
-          height: 50,
-          child: CustomPaint(
-            painter: TrianglePainter(color: iconColor),
-          ),
-        )
-            : Icon(shape.icon, size: 48, color: iconColor),
+            shape.shape == 'Üçgen'
+                ? SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CustomPaint(
+                    painter: TrianglePainter(color: iconColor),
+                  ),
+                )
+                : Icon(shape.icon, size: 48, color: iconColor),
       ),
     );
   }
@@ -292,7 +293,12 @@ class _GeometricMatchingState extends State<GeometricMatching>
                       size: screenSize.width * 0.065,
                     ),
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => const MatchingQuestionsScreen(),
+                        ),
+                        (route) => false,
+                      );
                     },
                   ),
                 ],
@@ -350,13 +356,13 @@ class _GeometricMatchingState extends State<GeometricMatching>
 
                                       return GestureDetector(
                                         onTap:
-                                        isMatched || showFeedback
-                                            ? null
-                                            : () {
-                                          setState(() {
-                                            selectedLeftShape = shape;
-                                          });
-                                        },
+                                            isMatched || showFeedback
+                                                ? null
+                                                : () {
+                                                  setState(() {
+                                                    selectedLeftShape = shape;
+                                                  });
+                                                },
                                         child: buildShapeCard(
                                           shape,
                                           isSelected: isSelected,
@@ -369,7 +375,8 @@ class _GeometricMatchingState extends State<GeometricMatching>
 
                               // BAŞLANGIÇ: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ (425.0 Yüksekliğe Ayarlandı)
                               SizedBox(
-                                height: 425.0, // Çizginin uzunluğu burada ayarlandı
+                                height:
+                                    425.0, // Çizginin uzunluğu burada ayarlandı
                                 child: Container(
                                   width: 4, // Çizginin kalınlığı
                                   margin: const EdgeInsets.symmetric(
@@ -389,12 +396,12 @@ class _GeometricMatchingState extends State<GeometricMatching>
                                   ),
                                 ),
                               ),
-                              // SON: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ
 
+                              // SON: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ
                               Expanded(
                                 child: Column(
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceAround,
+                                      MainAxisAlignment.spaceAround,
                                   children: [
                                     ...rightShapes.map((shape) {
                                       final isMatched = matches.containsValue(
@@ -402,19 +409,19 @@ class _GeometricMatchingState extends State<GeometricMatching>
                                       );
                                       return GestureDetector(
                                         onTap:
-                                        isMatched ||
-                                            selectedLeftShape == null ||
-                                            showFeedback
-                                            ? null
-                                            : () {
-                                          if (selectedLeftShape !=
-                                              null) {
-                                            checkMatch(
-                                              selectedLeftShape!.shape,
-                                              shape.shape,
-                                            );
-                                          }
-                                        },
+                                            isMatched ||
+                                                    selectedLeftShape == null ||
+                                                    showFeedback
+                                                ? null
+                                                : () {
+                                                  if (selectedLeftShape !=
+                                                      null) {
+                                                    checkMatch(
+                                                      selectedLeftShape!.shape,
+                                                      shape.shape,
+                                                    );
+                                                  }
+                                                },
                                         child: buildShapeCard(
                                           shape,
                                           isShadow: !isMatched,
@@ -440,51 +447,51 @@ class _GeometricMatchingState extends State<GeometricMatching>
                   vertical: 10,
                 ),
                 child:
-                showFeedback
-                    ? ScaleTransition(
-                  scale: CurvedAnimation(
-                    parent: _feedbackController,
-                    curve: Curves.elasticOut,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 20,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 10,
-                          offset: Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color:
-                            isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
+                    showFeedback
+                        ? ScaleTransition(
+                          scale: CurvedAnimation(
+                            parent: _feedbackController,
+                            curve: Curves.elasticOut,
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-                    : const SizedBox.shrink(),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                        : const SizedBox.shrink(),
               ),
             ],
           ),
@@ -510,9 +517,9 @@ class TrianglePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint =
-    Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.fill;
 
     final path = Path();
     path.moveTo(size.width / 2, 0);

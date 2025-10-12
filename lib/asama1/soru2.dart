@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import '../utils/activity_tracker.dart';
 import 'soru3.dart'; // GeometricMatching burada tanımlı
 
@@ -173,7 +173,8 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
                           ),
                           (route) => false,
                         );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'soru5.dart';
 import '../utils/activity_tracker.dart';
+import '../screens/matching_questions_screen.dart';
 
 class Soru4 extends StatefulWidget {
   const Soru4({super.key});
@@ -123,7 +124,13 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
+                          ),
+                          (route) => false,
+                        );
                       },
                     ),
                   ],
