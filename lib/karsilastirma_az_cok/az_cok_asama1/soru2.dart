@@ -131,14 +131,19 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
                   child: SlideTransition(
                     position: _slideAnimation,
                     child: Container(
-                      margin: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                      padding: const EdgeInsets.all(24),
+                      margin: const EdgeInsets.fromLTRB(
+                        4,
+                        0,
+                        4,
+                        0,
+                      ), // Sağdan ve soldan daha geniş
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.95),
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.black.withOpacity(0.1),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -171,7 +176,7 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: Colors.black,
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: Colors.grey.shade200,
@@ -191,36 +196,38 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
                           const SizedBox(height: 8),
 
                           // ÜST BUTON - YANLIŞ CEVAP
-                          SizedBox(
-                            width: double.infinity,
-                            height: 40,
-                            child: ElevatedButton(
-                              onPressed: () => checkAnswer(false),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    selectedAnswer == false
-                                        ? (isCorrect
-                                            ? Colors.green.shade500
-                                            : Colors.red.shade500)
-                                        : const Color(0xFFFF8000),
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                          Center(
+                            child: SizedBox(
+                              width: screenWidth * 0.65,
+                              height: 40,
+                              child: ElevatedButton(
+                                onPressed: () => checkAnswer(false),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      selectedAnswer == false
+                                          ? (isCorrect
+                                              ? Colors.green
+                                              : Colors.red)
+                                          : Colors.deepOrange.shade400,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: selectedAnswer == false ? 8 : 4,
+                                  shadowColor:
+                                      selectedAnswer == false
+                                          ? (isCorrect
+                                              ? Colors.green.shade300
+                                              : Colors.red.shade300)
+                                          : Colors.deepOrange.shade300,
                                 ),
-                                elevation: selectedAnswer == false ? 8 : 4,
-                                shadowColor:
-                                    selectedAnswer == false
-                                        ? (isCorrect
-                                            ? Colors.green.shade300
-                                            : Colors.red.shade300)
-                                        : const Color(0xFFFF8000),
-                              ),
-                              child: const Text(
-                                'Seç',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                                child: const Text(
+                                  'Seç',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               ),
                             ),
@@ -232,7 +239,7 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: Colors.black,
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: Colors.grey.shade200,
@@ -252,36 +259,38 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
                           const SizedBox(height: 8),
 
                           // ALT BUTON - DOĞRU CEVAP
-                          SizedBox(
-                            width: double.infinity,
-                            height: 40,
-                            child: ElevatedButton(
-                              onPressed: () => checkAnswer(true),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    selectedAnswer == true
-                                        ? (isCorrect
-                                            ? Colors.green.shade500
-                                            : Colors.red.shade500)
-                                        : const Color(0xFFFF8000),
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                          Center(
+                            child: SizedBox(
+                              width: screenWidth * 0.65,
+                              height: 40,
+                              child: ElevatedButton(
+                                onPressed: () => checkAnswer(true),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      selectedAnswer == true
+                                          ? (isCorrect
+                                              ? Colors.green
+                                              : Colors.red)
+                                          : Colors.deepOrange.shade400,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: selectedAnswer == true ? 8 : 4,
+                                  shadowColor:
+                                      selectedAnswer == true
+                                          ? (isCorrect
+                                              ? Colors.green.shade300
+                                              : Colors.red.shade300)
+                                          : Colors.deepOrange.shade300,
                                 ),
-                                elevation: selectedAnswer == true ? 8 : 4,
-                                shadowColor:
-                                    selectedAnswer == true
-                                        ? (isCorrect
-                                            ? Colors.green.shade300
-                                            : Colors.red.shade300)
-                                        : const Color(0xFFFF8000),
-                              ),
-                              child: const Text(
-                                'Seç',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                                child: const Text(
+                                  'Seç',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               ),
                             ),
@@ -292,9 +301,9 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
                   ),
                 ),
 
-                // Geri bildirim alanı
+                // Sabit Feedback Alanı - Alt kısımda sabit alan
                 Container(
-                  height: 80,
+                  height: 80, // Sabit yükseklik
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 10,
@@ -312,8 +321,15 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
                                 horizontal: 20,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -347,7 +363,7 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
                               ),
                             ),
                           )
-                          : const SizedBox.shrink(),
+                          : const SizedBox.shrink(), // Boş alan
                 ),
               ],
             ),

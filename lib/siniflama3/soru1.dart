@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
 import 'soru2.dart';
-import '../../screens/classification_questions_screen.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
+import '../screens/siniflandirma_sorulari_screen.dart';
+
 
 class SekilSiniflama extends StatefulWidget {
   const SekilSiniflama({super.key});
@@ -145,9 +146,7 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const ClassificationQuestionsScreen(),
+                            builder: (context) => const ClassificationQuestionsScreen(),
                           ),
                           (route) => false,
                         );

@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
-import '../../screens/classification_questions_screen.dart';
-import 'soru4.dart';
+import '../screens/siniflandirma_sorulari_screen.dart';
 
 class CinsiyetEsleme extends StatefulWidget {
   const CinsiyetEsleme({super.key});
@@ -261,9 +260,7 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const ClassificationQuestionsScreen(),
+                            builder: (context) => const ClassificationQuestionsScreen(),
                           ),
                           (route) => false,
                         );

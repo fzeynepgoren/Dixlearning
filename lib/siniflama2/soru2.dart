@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import 'soru4.dart'; // Corrected class name from Soru4 to TeknolojikSinifla
+import '../screens/siniflandirma_sorulari_screen.dart';
 
 class CanliCansizSinifla extends StatefulWidget {
   const CanliCansizSinifla({super.key});

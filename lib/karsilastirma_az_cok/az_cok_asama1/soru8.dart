@@ -132,7 +132,12 @@ class _AzCokSoru8State extends State<AzCokSoru8> with TickerProviderStateMixin {
                   child: SlideTransition(
                     position: _slideAnimation,
                     child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      margin: const EdgeInsets.fromLTRB(
+                        4,
+                        0,
+                        4,
+                        0,
+                      ), // Sağdan ve soldan daha geniş
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.95),
@@ -166,28 +171,37 @@ class _AzCokSoru8State extends State<AzCokSoru8> with TickerProviderStateMixin {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 40,
-                            child: ElevatedButton(
-                              onPressed: () => checkAnswer(true),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    selectedAnswer == true
-                                        ? (isCorrect
-                                            ? Colors.green.shade500
-                                            : Colors.red.shade500)
-                                        : const Color(0xffc3bebe),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                          Center(
+                            child: SizedBox(
+                              width: screenWidth * 0.65,
+                              height: 40,
+                              child: ElevatedButton(
+                                onPressed: () => checkAnswer(true),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      selectedAnswer == true
+                                          ? (isCorrect
+                                              ? Colors.green
+                                              : Colors.red)
+                                          : Colors.brown.shade500,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: selectedAnswer == true ? 8 : 4,
+                                  shadowColor:
+                                      selectedAnswer == true
+                                          ? (isCorrect
+                                              ? Colors.green.shade300
+                                              : Colors.red.shade300)
+                                          : Colors.brown.shade400,
                                 ),
-                              ),
-                              child: const Text(
-                                'Seç',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                                child: const Text(
+                                  'Seç',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               ),
                             ),
@@ -200,28 +214,37 @@ class _AzCokSoru8State extends State<AzCokSoru8> with TickerProviderStateMixin {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 40,
-                            child: ElevatedButton(
-                              onPressed: () => checkAnswer(false),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    selectedAnswer == false
-                                        ? (isCorrect
-                                            ? Colors.green.shade500
-                                            : Colors.red.shade500)
-                                        : const Color(0xffc3bebe),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                          Center(
+                            child: SizedBox(
+                              width: screenWidth * 0.65,
+                              height: 40,
+                              child: ElevatedButton(
+                                onPressed: () => checkAnswer(false),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      selectedAnswer == false
+                                          ? (isCorrect
+                                              ? Colors.green
+                                              : Colors.red)
+                                          : Colors.brown.shade500,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: selectedAnswer == false ? 8 : 4,
+                                  shadowColor:
+                                      selectedAnswer == false
+                                          ? (isCorrect
+                                              ? Colors.green.shade300
+                                              : Colors.red.shade300)
+                                          : Colors.brown.shade400,
                                 ),
-                              ),
-                              child: const Text(
-                                'Seç',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                                child: const Text(
+                                  'Seç',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               ),
                             ),
@@ -244,34 +267,55 @@ class _AzCokSoru8State extends State<AzCokSoru8> with TickerProviderStateMixin {
                               parent: _feedbackController,
                               curve: Curves.elasticOut,
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  isCorrect ? Icons.check_circle : Icons.cancel,
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  isCorrect
-                                      ? (isEnglish
-                                          ? 'Well done! 🎉'
-                                          : 'Aferin! 🎉')
-                                      : (isEnglish
-                                          ? 'Try again! 😔'
-                                          : 'Tekrar dene! 😔'),
-                                  style: TextStyle(
-                                    fontSize: 18,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
                                     color:
                                         isCorrect ? Colors.green : Colors.red,
-                                    fontWeight: FontWeight.bold,
+                                    size: 28,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           )
-                          : const SizedBox.shrink(),
+                          : const SizedBox.shrink(), // Boş alan
                 ),
               ],
             ),

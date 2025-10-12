@@ -80,8 +80,6 @@ class _UzunKisaPalmiyeSupurgeSorusuState
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
     final iconSize = screenWidth * 0.065;
-    final stageFontSize = screenWidth * 0.038;
-    const Color defaultBtnColor = Color(0xFFF5F5DC); // bej
     final double imageHeight = screenHeight * 0.48;
     const double buttonHeight = 50;
     final double buttonWidth = screenWidth * 0.28;
@@ -217,33 +215,71 @@ class _UzunKisaPalmiyeSupurgeSorusuState
                                         MainAxisAlignment.spaceBetween,
                                     children: List.generate(2, (i) {
                                       final isSelected = selectedIndex == i;
-                                      Color btnColor = defaultBtnColor;
-                                      if (isSelected) {
-                                        if (isCorrect == true) {
-                                          btnColor = Colors.green.shade500;
-                                        } else if (isCorrect == false) {
-                                          btnColor = Colors.red.shade500;
-                                        }
-                                      }
-                                      return SizedBox(
+                                      return Container(
                                         width: buttonWidth,
                                         height: buttonHeight,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                          gradient: LinearGradient(
+                                            colors:
+                                                isSelected
+                                                    ? (isCorrect == true
+                                                        ? [
+                                                          Colors.green.shade400,
+                                                          Colors.green.shade600,
+                                                        ]
+                                                        : isCorrect == false
+                                                        ? [
+                                                          Colors.red.shade400,
+                                                          Colors.red.shade600,
+                                                        ]
+                                                        : [
+                                                          Colors.blue.shade400,
+                                                          Colors.blue.shade600,
+                                                        ])
+                                                    : [
+                                                      Colors.blue.shade300,
+                                                      Colors.blue.shade500,
+                                                    ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.1,
+                                              ),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
                                         child: ElevatedButton(
                                           onPressed: () => _handleSelect(i),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: btnColor,
+                                            backgroundColor: Colors.transparent,
+                                            foregroundColor: Colors.white,
+                                            elevation: 0,
+                                            shadowColor: Colors.transparent,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(12),
+                                                  BorderRadius.circular(16),
                                             ),
                                           ),
-                                          child: const Text(
-                                            'Seç',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 8,
+                                            ),
+                                            child: const Text(
+                                              'Seç',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                letterSpacing: 0.5,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -252,53 +288,6 @@ class _UzunKisaPalmiyeSupurgeSorusuState
                                   ),
                                 ),
                                 const SizedBox(height: 20),
-                                // Feedback barı
-                                Container(
-                                  height: 60,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 8,
-                                  ),
-                                  child:
-                                      showFeedback
-                                          ? ScaleTransition(
-                                            scale: CurvedAnimation(
-                                              parent: _feedbackController,
-                                              curve: Curves.elasticOut,
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  isCorrect == true
-                                                      ? Icons.check_circle
-                                                      : Icons.cancel,
-                                                  color:
-                                                      isCorrect == true
-                                                          ? Colors.green
-                                                          : Colors.red,
-                                                  size: 28,
-                                                ),
-                                                const SizedBox(width: 10),
-                                                Text(
-                                                  isCorrect == true
-                                                      ? 'Aferin! 🎉'
-                                                      : 'Tekrar dene! 😔',
-                                                  style: TextStyle(
-                                                    fontSize: 18,
-                                                    color:
-                                                        isCorrect == true
-                                                            ? Colors.green
-                                                            : Colors.red,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                          : const SizedBox.shrink(),
-                                ),
                               ],
                             ),
                           ),
@@ -306,6 +295,70 @@ class _UzunKisaPalmiyeSupurgeSorusuState
                       ),
                     ),
                   ),
+                ),
+                // Feedback Kutusu - Asama1 gibi basit
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect == true
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect == true
+                                            ? Colors.green
+                                            : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect == true
+                                        ? 'Aferin! 🎉'
+                                        : 'Tekrar dene! 😔',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect == true
+                                              ? Colors.green
+                                              : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
