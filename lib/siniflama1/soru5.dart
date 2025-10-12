@@ -510,7 +510,9 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                         // Ana ekrana dönme
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) =>
+                                    const ClassificationQuestionsScreen(),
                           ),
                           (route) => false,
                         );

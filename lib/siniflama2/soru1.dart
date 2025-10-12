@@ -174,7 +174,9 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 1),
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Drag and drop the foods to the correct box.'
@@ -196,14 +198,17 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
                                 Expanded(
                                   flex: 3,
                                   child: Column(
-                                    children: kategoriler
-                                        .map(
-                                          (kategori) => Expanded(
-                                            child: _buildGroupContainer(
-                                                kategori, isEnglish),
-                                          ),
-                                        )
-                                        .toList(),
+                                    children:
+                                        kategoriler
+                                            .map(
+                                              (kategori) => Expanded(
+                                                child: _buildGroupContainer(
+                                                  kategori,
+                                                  isEnglish,
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
                                   ),
                                 ),
                                 const SizedBox(width: 16),
@@ -211,21 +216,25 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
                                   flex: 2,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    children: emojiler
-                                        .where((emoji) =>
-                                            !eslesenler.contains(emoji))
-                                        .map((emoji) {
-                                      return Draggable<String>(
-                                        data: emoji,
-                                        feedback: Material(
-                                          color: Colors.transparent,
-                                          child: _buildItemBox(emoji),
-                                        ),
-                                        childWhenDragging:
-                                            const SizedBox.shrink(),
-                                        child: _buildItemBox(emoji),
-                                      );
-                                    }).toList(),
+                                    children:
+                                        emojiler
+                                            .where(
+                                              (emoji) =>
+                                                  !eslesenler.contains(emoji),
+                                            )
+                                            .map((emoji) {
+                                              return Draggable<String>(
+                                                data: emoji,
+                                                feedback: Material(
+                                                  color: Colors.transparent,
+                                                  child: _buildItemBox(emoji),
+                                                ),
+                                                childWhenDragging:
+                                                    const SizedBox.shrink(),
+                                                child: _buildItemBox(emoji),
+                                              );
+                                            })
+                                            .toList(),
                                   ),
                                 ),
                               ],
@@ -239,54 +248,65 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
                 Container(
                   height: 80,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                          scale: CurvedAnimation(
-                            parent: _feedbackController,
-                            curve: Curves.elasticOut,
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 5),
-                                ),
-                              ],
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  isCorrect ? Icons.check_circle : Icons.cancel,
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  isCorrect
-                                      ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                      : (isEnglish
-                                          ? 'Try again! 😔'
-                                          : 'Tekrar dene! 😔'),
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: isCorrect ? Colors.green : Colors.red,
-                                    fontWeight: FontWeight.bold,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
@@ -311,10 +331,7 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           decoration: BoxDecoration(
             color: boxColor,
-            border: Border.all(
-              color: borderColor,
-              width: 2,
-            ),
+            border: Border.all(color: borderColor, width: 2),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -334,15 +351,13 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
               Wrap(
                 alignment: WrapAlignment.center,
                 spacing: 8,
-                children: eslesenler
-                    .where((e) => dogruEslesmeler[e] == kategori)
-                    .map(
-                      (e) => Text(
-                        e,
-                        style: const TextStyle(fontSize: 60),
-                      ),
-                    )
-                    .toList(),
+                children:
+                    eslesenler
+                        .where((e) => dogruEslesmeler[e] == kategori)
+                        .map(
+                          (e) => Text(e, style: const TextStyle(fontSize: 60)),
+                        )
+                        .toList(),
               ),
             ],
           ),
@@ -363,12 +378,7 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
           BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
-      child: Center(
-        child: Text(
-          emoji,
-          style: const TextStyle(fontSize: 60),
-        ),
-      ),
+      child: Center(child: Text(emoji, style: const TextStyle(fontSize: 60))),
     );
   }
 }

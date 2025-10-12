@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import '../screens/home_screen.dart'; // Ana menü ekranının yolu
+import '../screens/matching_questions_screen.dart'; // Ana menü ekranının yolu
 
 class HayvanEsle extends StatefulWidget {
   const HayvanEsle({super.key});
@@ -111,7 +111,9 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const HomeScreen(),
+                                      builder:
+                                          (context) =>
+                                              const MatchingQuestionsScreen(),
                                     ),
                                   );
                                 },
@@ -234,7 +236,8 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
                           ),
                           (route) => false,
                         );

@@ -5,6 +5,7 @@ import '../providers/language_provider.dart';
 import '../siniflama2/soru1.dart';
 import '../siniflama3/soru1.dart';
 import '../siniflama4/soru1.dart';
+import 'home_screen.dart';
 
 class ClassificationQuestionsScreen extends StatelessWidget {
   const ClassificationQuestionsScreen({super.key});
@@ -75,6 +76,15 @@ class ClassificationQuestionsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
+            );
+          },
+        ),
         title: Text(
           isEnglish ? 'Classification Activities' : 'Sınıflama Etkinlikleri',
           style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

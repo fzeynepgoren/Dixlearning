@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import '../utils/activity_tracker.dart';
 import 'soru5.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -20,7 +20,7 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
   final List<String> rightItemsEnglish = [
     'Historical artifact',
     'Medicine',
-    'Book'
+    'Book',
   ];
   late List<String> shuffledItems;
   int? selectedLeftIndex;
@@ -51,10 +51,9 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -80,8 +79,9 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
             Provider.of<LanguageProvider>(context, listen: false).isEnglish;
         final rightItemsList = isEnglish ? rightItemsEnglish : rightItems;
         // Check if the building matches with the correct item
-        isCorrect = (leftBuildings[selectedLeftIndex!] == '🏛️' &&
-            shuffledItems[selectedRightIndex!] == rightItemsList[0]) ||
+        isCorrect =
+            (leftBuildings[selectedLeftIndex!] == '🏛️' &&
+                shuffledItems[selectedRightIndex!] == rightItemsList[0]) ||
             (leftBuildings[selectedLeftIndex!] == '🏥' &&
                 shuffledItems[selectedRightIndex!] == rightItemsList[1]) ||
             (leftBuildings[selectedLeftIndex!] == '🏫' &&
@@ -102,7 +102,8 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
               if (mounted) {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                      builder: (context) => const RenkNesneEsle()),
+                    builder: (context) => const RenkNesneEsle(),
+                  ),
                 );
               }
             });
@@ -129,7 +130,7 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
     required TextStyle style,
   }) {
     final bool isSelected =
-    isLeft ? selectedLeftIndex == index : selectedRightIndex == index;
+        isLeft ? selectedLeftIndex == index : selectedRightIndex == index;
     final bool isMatched = isLeft ? matchedLeft[index] : matchedRight[index];
     final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
 
@@ -164,11 +165,7 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
           ],
         ),
         child: Center(
-          child: Text(
-            text,
-            style: style,
-            textAlign: TextAlign.center,
-          ),
+          child: Text(text, style: style, textAlign: TextAlign.center),
         ),
       ),
     );
@@ -203,11 +200,18 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
-                              (route) => false,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
+                          ),
+                          (route) => false,
                         );
                       },
                     ),
@@ -233,7 +237,10 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
                       child: Column(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Match the structures with their appropriate objects.'
@@ -252,10 +259,11 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
                               children: [
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: List.generate(
                                       leftBuildings.length,
-                                          (index) => _buildCard(
+                                      (index) => _buildCard(
                                         index: index,
                                         isLeft: true,
                                         text: leftBuildings[index],
@@ -271,7 +279,9 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
                                 Container(
                                   width: 4,
                                   height: 425,
-                                  margin: const EdgeInsets.symmetric(horizontal: 12),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
@@ -288,15 +298,22 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
 
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: List.generate(
                                       shuffledItems.length,
-                                          (index) => _buildCard(
+                                      (index) => _buildCard(
                                         index: index,
                                         isLeft: false,
                                         text: shuffledItems[index],
                                         style: TextStyle(
-                                          fontSize: isEnglish && shuffledItems[index].length > 10 ? 14 : 16,
+                                          fontSize:
+                                              isEnglish &&
+                                                      shuffledItems[index]
+                                                              .length >
+                                                          10
+                                                  ? 14
+                                                  : 16,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
                                         ),
@@ -316,62 +333,64 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
                 Container(
                   height: 80,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isCorrect
-                                ? Icons.check_circle
-                                : Icons.cancel,
-                            color:
-                            isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? (isEnglish
-                                ? 'Well done! 🎉'
-                                : 'Aferin! 🎉')
-                                : (isEnglish
-                                ? 'Try again! 😔'
-                                : 'Tekrar dene! 😔'),
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect
-                                  ? Colors.green
-                                  : Colors.red,
-                              fontWeight: FontWeight.bold,
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
