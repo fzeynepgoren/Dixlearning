@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/karsilastirma_sorulari_screen.dart';
 import 'soru7.dart';
 
 class UzunKisaKupSilindirSorusu extends StatefulWidget {
@@ -32,10 +33,9 @@ class _UzunKisaKupSilindirSorusuState extends State<UzunKisaKupSilindirSorusu>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -58,7 +58,8 @@ class _UzunKisaKupSilindirSorusuState extends State<UzunKisaKupSilindirSorusu>
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-              builder: (context) => const UzunKisaTavsanBisikletSorusu()),
+            builder: (context) => const UzunKisaTavsanBisikletSorusu(),
+          ),
         );
       });
     } else {
@@ -108,10 +109,20 @@ class _UzunKisaKupSilindirSorusuState extends State<UzunKisaKupSilindirSorusu>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    const KarsilastirmaSorulariScreen(),
+                          ),
+                          (route) => false,
+                        );
                       },
                     ),
                     SizedBox(width: iconSize),
@@ -123,9 +134,13 @@ class _UzunKisaKupSilindirSorusuState extends State<UzunKisaKupSilindirSorusu>
                     child: Center(
                       child: Container(
                         margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 6),
+                          vertical: 8,
+                          horizontal: 6,
+                        ),
                         padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 6),
+                          vertical: 8,
+                          horizontal: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(32),
@@ -148,7 +163,9 @@ class _UzunKisaKupSilindirSorusuState extends State<UzunKisaKupSilindirSorusu>
                                 // Row with back button and stage label removed from here
                                 const Padding(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
                                   child: Text(
                                     'Kısa olanı işaretle.',
                                     style: TextStyle(
@@ -165,7 +182,8 @@ class _UzunKisaKupSilindirSorusuState extends State<UzunKisaKupSilindirSorusu>
                                   width: double.infinity,
                                   height: imageHeight,
                                   margin: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.04),
+                                    horizontal: screenWidth * 0.04,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(24),
@@ -191,7 +209,8 @@ class _UzunKisaKupSilindirSorusuState extends State<UzunKisaKupSilindirSorusu>
                                 // Seçim kutucukları
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.13),
+                                    horizontal: screenWidth * 0.13,
+                                  ),
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -236,43 +255,48 @@ class _UzunKisaKupSilindirSorusuState extends State<UzunKisaKupSilindirSorusu>
                                 Container(
                                   height: 60,
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 8),
-                                  child: showFeedback
-                                      ? ScaleTransition(
-                                          scale: CurvedAnimation(
-                                            parent: _feedbackController,
-                                            curve: Curves.elasticOut,
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                isCorrect == true
-                                                    ? Icons.check_circle
-                                                    : Icons.cancel,
-                                                color: isCorrect == true
-                                                    ? Colors.green
-                                                    : Colors.red,
-                                                size: 28,
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Text(
-                                                isCorrect == true
-                                                    ? 'Aferin! 🎉'
-                                                    : 'Tekrar dene! 😔',
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  color: isCorrect == true
-                                                      ? Colors.green
-                                                      : Colors.red,
-                                                  fontWeight: FontWeight.bold,
+                                    horizontal: 20,
+                                    vertical: 8,
+                                  ),
+                                  child:
+                                      showFeedback
+                                          ? ScaleTransition(
+                                            scale: CurvedAnimation(
+                                              parent: _feedbackController,
+                                              curve: Curves.elasticOut,
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  isCorrect == true
+                                                      ? Icons.check_circle
+                                                      : Icons.cancel,
+                                                  color:
+                                                      isCorrect == true
+                                                          ? Colors.green
+                                                          : Colors.red,
+                                                  size: 28,
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      : const SizedBox.shrink(),
+                                                const SizedBox(width: 10),
+                                                Text(
+                                                  isCorrect == true
+                                                      ? 'Aferin! 🎉'
+                                                      : 'Tekrar dene! 😔',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color:
+                                                        isCorrect == true
+                                                            ? Colors.green
+                                                            : Colors.red,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                          : const SizedBox.shrink(),
                                 ),
                               ],
                             ),
