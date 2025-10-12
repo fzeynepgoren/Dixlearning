@@ -321,7 +321,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                                 // BAŞLANGIÇ: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ (Kısaltıldı)
                                 SizedBox(
                                   // Çizginin uzunluğunu (yüksekliğini) 450.0'a kısıtladık.
-                                  height: 450.0,
+                                  height: 425.0,
                                   child: Container(
                                     width: 4, // Çizginin kalınlığı
                                     margin: const EdgeInsets.symmetric(

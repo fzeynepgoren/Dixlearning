@@ -369,7 +369,7 @@ class _GeometricMatchingState extends State<GeometricMatching>
 
                               // BAŞLANGIÇ: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ (425.0 Yüksekliğe Ayarlandı)
                               SizedBox(
-                                height: 450.0, // Çizginin uzunluğu burada ayarlandı
+                                height: 425.0, // Çizginin uzunluğu burada ayarlandı
                                 child: Container(
                                   width: 4, // Çizginin kalınlığı
                                   margin: const EdgeInsets.symmetric(
