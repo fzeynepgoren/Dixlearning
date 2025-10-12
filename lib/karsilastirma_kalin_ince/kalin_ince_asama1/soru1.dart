@@ -50,13 +50,13 @@ class _KalinInceSoru1State extends State<KalinInceSoru1>
   void checkAnswer(bool isInce) {
     setState(() {
       selectedAnswer = isInce;
-      isCorrect = !isInce; // Kalın olanı seçmeli, bu yüzden !isInce
+      isCorrect = isInce; // Üstteki (true) kalın, doğru cevap
       showFeedback = true;
     });
     _feedbackController.forward(from: 0);
 
-    if (!isInce) {
-      // Kalın olan seçildiğinde (false) ilerle
+    if (isInce) {
+      // Üstteki kalın olan seçildiğinde (true) ilerle
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushReplacement(
