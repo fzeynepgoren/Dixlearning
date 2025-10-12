@@ -35,14 +35,7 @@ class IntroFlowController {
 }
 
 class GirisEtkinlikleriFlowScreen extends StatefulWidget {
-  final bool? isEnglish;
-  final void Function(bool isEnglish)? onLanguageChanged;
-
-  const GirisEtkinlikleriFlowScreen({
-    super.key,
-    this.isEnglish,
-    this.onLanguageChanged,
-  });
+  const GirisEtkinlikleriFlowScreen({super.key});
 
   @override
   State<GirisEtkinlikleriFlowScreen> createState() =>
@@ -71,11 +64,7 @@ class _GirisEtkinlikleriFlowScreenState
       onFlowComplete: () {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
-            builder:
-                (_) => HomeScreen(
-                  isEnglish: widget.isEnglish,
-                  onLanguageChanged: widget.onLanguageChanged,
-                ),
+            builder: (_) => const HomeScreen(),
           ),
           (route) => false,
         );

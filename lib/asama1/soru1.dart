@@ -83,7 +83,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
   }
 
   void _handleLeftTap(int index) {
-    if (matchedLeft[currentPage][index]) return;
+    if (matchedLeft[currentPage][index] || showFeedback) return;
     setState(() {
       selectedLeftIndex = index;
     });
@@ -91,7 +91,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
   }
 
   void _handleRightTap(int index) {
-    if (matchedRight[currentPage][index]) return;
+    if (matchedRight[currentPage][index] || showFeedback) return;
     setState(() {
       selectedRightIndex = index;
     });
@@ -317,24 +317,32 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                                     ),
                                   ),
                                 ),
-                                Container(
-                                  width: 4,
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Colors.blue.shade400,
-                                        Colors.blue.shade200,
-                                        Colors.blue.shade100,
-                                      ],
+
+                                // BAŞLANGIÇ: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ (Kısaltıldı)
+                                SizedBox(
+                                  // Çizginin uzunluğunu (yüksekliğini) 450.0'a kısıtladık.
+                                  height: 425.0,
+                                  child: Container(
+                                    width: 4, // Çizginin kalınlığı
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 10,
                                     ),
-                                    borderRadius: BorderRadius.circular(2),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.blue.shade400,
+                                          Colors.blue.shade200,
+                                          Colors.blue.shade100,
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
                                   ),
                                 ),
+
+                                // SON: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ
                                 Expanded(
                                   child: Column(
                                     mainAxisAlignment:

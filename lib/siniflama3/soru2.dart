@@ -100,9 +100,7 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
         if (mounted) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const TasitSinifla(),
-            ),
+            MaterialPageRoute(builder: (context) => const TasitSinifla()),
           );
         }
       });
@@ -175,11 +173,30 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
                                 Expanded(
                                   flex: 3,
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      _buildGroup('Küçük', sizeGroups['kucuk']!, 'kucuk', Colors.blue.shade50, Colors.blue),
-                                      _buildGroup('Orta', sizeGroups['orta']!, 'orta', Colors.orange.shade50, Colors.orange),
-                                      _buildGroup('Büyük', sizeGroups['buyuk']!, 'buyuk', Colors.red.shade50, Colors.red),
+                                      _buildGroup(
+                                        'Küçük',
+                                        sizeGroups['kucuk']!,
+                                        'kucuk',
+                                        Colors.purple.shade100,
+                                        Colors.purple.shade300,
+                                      ),
+                                      _buildGroup(
+                                        'Orta',
+                                        sizeGroups['orta']!,
+                                        'orta',
+                                        Colors.blue.shade100,
+                                        Colors.blue.shade400,
+                                      ),
+                                      _buildGroup(
+                                        'Büyük',
+                                        sizeGroups['buyuk']!,
+                                        'buyuk',
+                                        Colors.yellow.shade100,
+                                        Colors.yellow.shade600,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -188,18 +205,30 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
                                   flex: 2,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    children: items
-                                        .where((item) => !item['isPlaced'])
-                                        .map((item) => Draggable<Map<String, dynamic>>(
-                                      data: item,
-                                      feedback: Material(
-                                        color: Colors.transparent,
-                                        child: _buildItemBox(item['emoji'], item['size']),
-                                      ),
-                                      childWhenDragging: const SizedBox.shrink(),
-                                      child: _buildItemBox(item['emoji'], item['size']),
-                                    ))
-                                        .toList(),
+                                    children:
+                                        items
+                                            .where((item) => !item['isPlaced'])
+                                            .map(
+                                              (item) => Draggable<
+                                                Map<String, dynamic>
+                                              >(
+                                                data: item,
+                                                feedback: Material(
+                                                  color: Colors.transparent,
+                                                  child: _buildItemBox(
+                                                    item['emoji'],
+                                                    item['size'],
+                                                  ),
+                                                ),
+                                                childWhenDragging:
+                                                    const SizedBox.shrink(),
+                                                child: _buildItemBox(
+                                                  item['emoji'],
+                                                  item['size'],
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
                                   ),
                                 ),
                               ],
@@ -212,32 +241,62 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
                 ),
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(parent: _feedbackController, curve: Curves.elasticOut),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? 'Aferin! 🎉'
+                                        : 'Tekrar dene! 😔',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
@@ -247,7 +306,13 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
     );
   }
 
-  Widget _buildGroup(String title, List<Map<String, dynamic>> group, String sizeType, Color boxColor, Color borderColor) {
+  Widget _buildGroup(
+    String title,
+    List<Map<String, dynamic>> group,
+    String sizeType,
+    Color boxColor,
+    Color borderColor,
+  ) {
     return DragTarget<Map<String, dynamic>>(
       onWillAccept: (data) => true,
       onAccept: (data) => _handleDrag(data, sizeType),
@@ -268,7 +333,10 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
                   title,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               Expanded(
@@ -277,18 +345,22 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
                     alignment: WrapAlignment.center,
                     spacing: 10,
                     runSpacing: 4,
-                    children: group
-                        .map((item) => Text(
-                      item['emoji'],
-                      style: TextStyle(
-                        fontSize: item['size'] == 'kucuk'
-                            ? 18
-                            : item['size'] == 'orta'
-                            ? 30
-                            : 54,
-                      ),
-                    ))
-                        .toList(),
+                    children:
+                        group
+                            .map(
+                              (item) => Text(
+                                item['emoji'],
+                                style: TextStyle(
+                                  fontSize:
+                                      item['size'] == 'kucuk'
+                                          ? 18
+                                          : item['size'] == 'orta'
+                                          ? 30
+                                          : 54,
+                                ),
+                              ),
+                            )
+                            .toList(),
                   ),
                 ),
               ),
@@ -303,35 +375,30 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
     double fontSize;
     switch (size) {
       case 'kucuk':
-        fontSize = 18;
+        fontSize = 16;
         break;
       case 'orta':
-        fontSize = 30;
+        fontSize = 24;
         break;
       case 'buyuk':
-        fontSize = 54;
+        fontSize = 40;
         break;
       default:
-        fontSize = 30;
+        fontSize = 24;
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      width: 90,
-      height: 70,
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      width: 70,
+      height: 60,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
+          BoxShadow(color: Colors.black12, blurRadius: 3, offset: Offset(0, 1)),
         ],
       ),
-      child: Center(
-        child: Text(
-          emoji,
-          style: TextStyle(fontSize: fontSize),
-        ),
-      ),
+      child: Center(child: Text(emoji, style: TextStyle(fontSize: fontSize))),
     );
   }
 }

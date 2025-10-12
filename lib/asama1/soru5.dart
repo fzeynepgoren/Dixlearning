@@ -37,6 +37,7 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
   }
 
   void _handleTap(int index, bool isLeft) {
+    if (showFeedback) return;
     setState(() {
       if (isLeft) {
         if (matchedLeft[index]) return;
@@ -336,24 +337,31 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
                                   ),
                                 ),
                               ),
-                              Container(
-                                width: 4,
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                ),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Colors.blue.shade400,
-                                      Colors.blue.shade200,
-                                      Colors.blue.shade100,
-                                    ],
+
+                              // BAŞLANGIÇ: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ (425.0 Yüksekliğe Ayarlandı)
+                              SizedBox(
+                                height: 425.0, // Çizginin uzunluğu (yüksekliği)
+                                child: Container(
+                                  width: 4,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10,
                                   ),
-                                  borderRadius: BorderRadius.circular(2),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.blue.shade400,
+                                        Colors.blue.shade200,
+                                        Colors.blue.shade100,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
                                 ),
                               ),
+
+                              // SON: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ
                               Expanded(
                                 child: Column(
                                   mainAxisAlignment:

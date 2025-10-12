@@ -31,6 +31,7 @@ class _TasitSiniflaState extends State<TasitSinifla>
   bool isCorrect = false;
   bool _dialogShown = false;
   String? _lastAcceptedType;
+  String feedbackMessage = '';
 
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -70,11 +71,17 @@ class _TasitSiniflaState extends State<TasitSinifla>
 
   void _handleDrag(Map<String, dynamic> item, String targetType) {
     bool correct = item['type'] == targetType;
+    final isEnglish =
+        Provider.of<LanguageProvider>(context, listen: false).isEnglish;
 
     setState(() {
       isCorrect = correct;
       showFeedback = true;
       _lastAcceptedType = correct ? targetType : null;
+      feedbackMessage =
+          correct
+              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+              : (isEnglish ? 'Sorry! 😔' : 'Üzgünüz! 😔');
 
       if (correct && !item['isPlaced']) {
         typeGroups[targetType]?.add(item);
@@ -209,22 +216,22 @@ class _TasitSiniflaState extends State<TasitSinifla>
                                         isEnglish ? 'Land' : 'Kara',
                                         typeGroups['kara']!,
                                         'kara',
-                                        Colors.green.shade50,
-                                        Colors.green,
+                                        Colors.purple.shade50,
+                                        Colors.purple.shade200,
                                       ),
                                       _buildGroup(
                                         isEnglish ? 'Sea' : 'Deniz',
                                         typeGroups['deniz']!,
                                         'deniz',
                                         Colors.blue.shade50,
-                                        Colors.lightBlue,
+                                        Colors.blue.shade200,
                                       ),
                                       _buildGroup(
                                         isEnglish ? 'Air' : 'Hava',
                                         typeGroups['hava']!,
                                         'hava',
-                                        Colors.purple.shade50,
-                                        Colors.deepPurpleAccent,
+                                        Colors.yellow.shade50,
+                                        Colors.yellow.shade200,
                                       ),
                                     ],
                                   ),
@@ -235,31 +242,39 @@ class _TasitSiniflaState extends State<TasitSinifla>
                                   child: SingleChildScrollView(
                                     child: Column(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                          MainAxisAlignment.center,
                                       children:
                                           items
                                               .where(
                                                 (item) => !item['isPlaced'],
                                               )
                                               .map(
-                                                (item) => Draggable<
-                                                  Map<String, dynamic>
-                                                >(
-                                                  data: item,
-                                                  feedback: Material(
-                                                    color: Colors.transparent,
+                                                (item) => Padding(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        vertical: 4,
+                                                      ),
+                                                  child: Draggable<
+                                                    Map<String, dynamic>
+                                                  >(
+                                                    data: item,
+                                                    feedback: Material(
+                                                      color: Colors.transparent,
+                                                      child:
+                                                          _buildDraggableItem(
+                                                            item,
+                                                          ),
+                                                    ),
+                                                    childWhenDragging: Opacity(
+                                                      opacity: 0.3,
+                                                      child:
+                                                          _buildDraggableItem(
+                                                            item,
+                                                          ),
+                                                    ),
                                                     child: _buildDraggableItem(
                                                       item,
                                                     ),
-                                                  ),
-                                                  childWhenDragging: Opacity(
-                                                    opacity: 0.3,
-                                                    child: _buildDraggableItem(
-                                                      item,
-                                                    ),
-                                                  ),
-                                                  child: _buildDraggableItem(
-                                                    item,
                                                   ),
                                                 ),
                                               )
@@ -288,32 +303,46 @@ class _TasitSiniflaState extends State<TasitSinifla>
                               parent: _feedbackController,
                               curve: Curves.elasticOut,
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  isCorrect ? Icons.check_circle : Icons.cancel,
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  isCorrect
-                                      ? (isEnglish
-                                          ? 'Well done! 🎉'
-                                          : 'Aferin! 🎉')
-                                      : (isEnglish
-                                          ? 'Try again! 😔'
-                                          : 'Tekrar dene! 😔'),
-                                  style: TextStyle(
-                                    fontSize: 18,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
                                     color:
                                         isCorrect ? Colors.green : Colors.red,
-                                    fontWeight: FontWeight.bold,
+                                    size: 28,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    feedbackMessage,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           )
                           : const SizedBox.shrink(),
@@ -334,8 +363,31 @@ class _TasitSiniflaState extends State<TasitSinifla>
     Color borderColor,
   ) {
     return DragTarget<Map<String, dynamic>>(
-      onWillAccept: (data) => data?['type'] == type,
-      onAccept: (data) => _handleDrag(data, type),
+      onWillAccept: (data) => true,
+      onAccept: (data) {
+        bool isCorrectMatch = data?['type'] == type;
+
+        if (isCorrectMatch) {
+          _handleDrag(data, type);
+        } else {
+          final isEnglish =
+              Provider.of<LanguageProvider>(context, listen: false).isEnglish;
+          setState(() {
+            isCorrect = false;
+            showFeedback = true;
+            feedbackMessage = isEnglish ? 'Sorry! 😔' : 'Üzgünüz! 😔';
+          });
+          _feedbackController.forward(from: 0);
+
+          Future.delayed(const Duration(seconds: 1), () {
+            if (mounted) {
+              setState(() {
+                showFeedback = false;
+              });
+            }
+          });
+        }
+      },
       builder: (context, candidateData, rejectedData) {
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
@@ -395,20 +447,19 @@ class _TasitSiniflaState extends State<TasitSinifla>
 
   Widget _buildDraggableItem(Map<String, dynamic> item) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      width: 90,
-      height: 70,
+      width: 70,
+      height: 60,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+          BoxShadow(color: Colors.black12, blurRadius: 3, offset: Offset(0, 1)),
         ],
       ),
       child: Center(
         child: Text(
           item['emoji'],
-          style: const TextStyle(fontSize: 50, color: Colors.black),
+          style: const TextStyle(fontSize: 40, color: Colors.black),
         ),
       ),
     );

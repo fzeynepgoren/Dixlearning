@@ -135,11 +135,9 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
 
     Color cardColor = Colors.white;
     if (isMatched) {
-      cardColor = Colors.green.shade500;
+      cardColor = Colors.green.shade200;
     } else if (isWrongSelection) {
-      cardColor = Colors.red.shade500;
-    } else if (isSelected) {
-      cardColor = isLeft ? Colors.blue.shade200 : Colors.yellow.shade500;
+      cardColor = Colors.red.shade200;
     }
 
     return GestureDetector(
@@ -153,6 +151,10 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
         decoration: BoxDecoration(
           color: cardColor,
           borderRadius: BorderRadius.circular(20),
+          border:
+              isSelected && !isMatched
+                  ? Border.all(color: Colors.blue.shade400, width: 4)
+                  : null,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
@@ -268,7 +270,7 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
                                 ),
                                 Container(
                                   width: 4,
-                                  height: screenSize.height * 0.55,
+                                  height: 425,
                                   margin: const EdgeInsets.symmetric(horizontal: 12),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
@@ -321,35 +323,52 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
                       parent: _feedbackController,
                       curve: Curves.elasticOut,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect
-                              ? Icons.check_circle
-                              : Icons.cancel,
-                          color:
-                          isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? (isEnglish
-                              ? 'Well done! 🎉'
-                              : 'Aferin! 🎉')
-                              : (isEnglish
-                              ? 'Try again! 😔'
-                              : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect
-                                ? Colors.green
-                                : Colors.red,
-                            fontWeight: FontWeight.bold,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isCorrect
+                                ? Icons.check_circle
+                                : Icons.cancel,
+                            color:
+                            isCorrect ? Colors.green : Colors.red,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            isCorrect
+                                ? (isEnglish
+                                ? 'Well done! 🎉'
+                                : 'Aferin! 🎉')
+                                : (isEnglish
+                                ? 'Try again! 😔'
+                                : 'Tekrar dene! 😔'),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: isCorrect
+                                  ? Colors.green
+                                  : Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   )
                       : const SizedBox.shrink(),

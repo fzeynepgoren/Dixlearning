@@ -1,27 +1,24 @@
 import 'package:flutter/material.dart';
 import 'giris_etkinlikleri_flow_screen.dart';
 import 'home_screen.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 
 class GirisEtkinlikleriScreen extends StatelessWidget {
-  final bool? isEnglish;
-  final void Function(bool isEnglish)? onLanguageChanged;
-  const GirisEtkinlikleriScreen(
-      {super.key, this.isEnglish, this.onLanguageChanged});
+  const GirisEtkinlikleriScreen({super.key});
 
   void _startRandomActivity(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => GirisEtkinlikleriFlowScreen(
-          isEnglish: isEnglish,
-          onLanguageChanged: onLanguageChanged,
-        ),
+        builder: (context) => const GirisEtkinlikleriFlowScreen(),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     return Scaffold(
       body: Stack(
         children: [
@@ -38,7 +35,7 @@ class GirisEtkinlikleriScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    isEnglish == true
+                    isEnglish
                         ? 'Entry Activities'
                         : 'Giriş Etkinlikleri',
                     style: const TextStyle(
@@ -72,7 +69,7 @@ class GirisEtkinlikleriScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          isEnglish == true
+                          isEnglish
                               ? 'Total Questions:'
                               : 'Toplam Soru:',
                           style: const TextStyle(
@@ -124,7 +121,7 @@ class GirisEtkinlikleriScreen extends StatelessWidget {
                       shadowColor: Colors.black.withOpacity(0.3),
                     ),
                     child: Text(
-                      isEnglish == true
+                      isEnglish
                           ? 'Start Entry Activities'
                           : 'Giriş Etkinliklerine Başla',
                       style: const TextStyle(
@@ -148,10 +145,7 @@ class GirisEtkinlikleriScreen extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => HomeScreen(
-                        isEnglish: isEnglish ?? false,
-                        onLanguageChanged: onLanguageChanged,
-                      ),
+                      builder: (context) => const HomeScreen(),
                     ),
                   );
                 },

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
-import '../../screens/home_screen.dart';
+import '../../screens/karsilastirma_sorulari_screen.dart';
 import 'package:dixlearning/karsilastirma_az_cok/az_cok_asama1/asama_gecis_ekrani.dart';
 
 class AzCokSoru3 extends StatefulWidget {
@@ -114,7 +114,9 @@ class _AzCokSoru3State extends State<AzCokSoru3> with TickerProviderStateMixin {
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) =>
+                                    const KarsilastirmaSorulariScreen(),
                           ),
                           (route) => false,
                         );

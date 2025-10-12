@@ -69,13 +69,13 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
   }
 
   void _handleLeftTap(int index) {
-    if (matchedLeft[index]) return;
+    if (matchedLeft[index] || showFeedback) return;
     setState(() => selectedLeftIndex = index);
     _checkMatch();
   }
 
   void _handleRightTap(int index) {
-    if (matchedRight[index]) return;
+    if (matchedRight[index] || showFeedback) return;
     setState(() => selectedRightIndex = index);
     _checkMatch();
   }
@@ -275,25 +275,32 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                                     }),
                                   ),
                                 ),
-                                // Orta çizgi
-                                Container(
-                                  width: 4,
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Colors.blue.shade400,
-                                        Colors.blue.shade200,
-                                        Colors.blue.shade100,
-                                      ],
+
+                                // BAŞLANGIÇ: ORTA ÇİZGİ BÖLÜMÜ (425.0 Yüksekliğe Ayarlandı)
+                                SizedBox(
+                                  // Uzunluk (yükseklik) burada 425.0 olarak ayarlandı.
+                                  height: 475.0,
+                                  child: Container(
+                                    width: 4, // Kalınlık
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 10,
                                     ),
-                                    borderRadius: BorderRadius.circular(2),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.blue.shade400,
+                                          Colors.blue.shade200,
+                                          Colors.blue.shade100,
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
                                   ),
                                 ),
+                                // SON: ORTA ÇİZGİ BÖLÜMÜ
+
                                 // Sağ oyuncaklar
                                 Expanded(
                                   child: Column(
