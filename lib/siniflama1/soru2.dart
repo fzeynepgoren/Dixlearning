@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import 'soru1.dart';
 import 'soru4.dart';
-import '../../screens/home_screen.dart';
+import '../screens/siniflandirma_sorulari_screen.dart';
+
 
 class UzunKisaSinifla extends StatefulWidget {
   const UzunKisaSinifla({super.key});
@@ -117,9 +117,9 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
   // ÖRNEK TASARIM: Sürüklenen Öğenin Kutusu
   Widget _buildItem(Map<String, dynamic> item) {
     bool isLong = item['isLong'];
-    double boxWidth = 90; // Tüm kutular aynı genişlik
-    double boxHeight = 100; // Tüm kutular aynı yükseklik
-    double imgSize = isLong ? 80 : 50; // Sadece resim boyutu farklı
+    double boxWidth = isLong ? 90 : 75;
+    double boxHeight = isLong ? 100 : 85;
+    double imgSize = isLong ? 100 : 55;
 
     return Draggable<Map<String, dynamic>>(
       data: item,
@@ -310,7 +310,7 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder: (context) => const ClassificationQuestionsScreen(),
                           ),
                           (route) => false,
                         );

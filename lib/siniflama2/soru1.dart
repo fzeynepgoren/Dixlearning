@@ -5,6 +5,8 @@ import 'soru2.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/home_screen.dart';
+import '../screens/siniflandirma_sorulari_screen.dart';
+
 
 class MeyveSebzeEsleme extends StatefulWidget {
   const MeyveSebzeEsleme({super.key});
@@ -143,7 +145,7 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder: (context) => const ClassificationQuestionsScreen(),
                           ),
                           (route) => false,
                         );
