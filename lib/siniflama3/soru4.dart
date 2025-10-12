@@ -239,47 +239,34 @@ class _TasitSiniflaState extends State<TasitSinifla>
                                 const SizedBox(width: 16),
                                 Expanded(
                                   flex: 2,
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children:
-                                          items
-                                              .where(
-                                                (item) => !item['isPlaced'],
-                                              )
-                                              .map(
-                                                (item) => Padding(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        vertical: 4,
-                                                      ),
-                                                  child: Draggable<
-                                                    Map<String, dynamic>
-                                                  >(
-                                                    data: item,
-                                                    feedback: Material(
-                                                      color: Colors.transparent,
-                                                      child:
-                                                          _buildDraggableItem(
-                                                            item,
-                                                          ),
-                                                    ),
-                                                    childWhenDragging: Opacity(
-                                                      opacity: 0.3,
-                                                      child:
-                                                          _buildDraggableItem(
-                                                            item,
-                                                          ),
-                                                    ),
-                                                    child: _buildDraggableItem(
-                                                      item,
-                                                    ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children:
+                                        items
+                                            .where((item) => !item['isPlaced'])
+                                            .map(
+                                              (item) => Draggable<
+                                                Map<String, dynamic>
+                                              >(
+                                                data: item,
+                                                feedback: Material(
+                                                  color: Colors.transparent,
+                                                  child: _buildDraggableItem(
+                                                    item,
                                                   ),
                                                 ),
-                                              )
-                                              .toList(),
-                                    ),
+                                                childWhenDragging: Opacity(
+                                                  opacity: 0.3,
+                                                  child: _buildDraggableItem(
+                                                    item,
+                                                  ),
+                                                ),
+                                                child: _buildDraggableItem(
+                                                  item,
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
                                   ),
                                 ),
                               ],
@@ -447,6 +434,7 @@ class _TasitSiniflaState extends State<TasitSinifla>
 
   Widget _buildDraggableItem(Map<String, dynamic> item) {
     return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
       width: 70,
       height: 60,
       decoration: BoxDecoration(
