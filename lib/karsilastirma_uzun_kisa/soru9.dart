@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../screens/home_screen.dart';
+import '../screens/karsilastirma_sorulari_screen.dart';
 
 class UzunKisaMantarSemsiyeSorusu extends StatefulWidget {
   const UzunKisaMantarSemsiyeSorusu({super.key});
@@ -10,7 +10,8 @@ class UzunKisaMantarSemsiyeSorusu extends StatefulWidget {
 }
 
 class _UzunKisaMantarSemsiyeSorusuState
-    extends State<UzunKisaMantarSemsiyeSorusu> with TickerProviderStateMixin {
+    extends State<UzunKisaMantarSemsiyeSorusu>
+    with TickerProviderStateMixin {
   int? selectedIndex;
   bool? isCorrect;
   bool showFeedback = false;
@@ -32,10 +33,9 @@ class _UzunKisaMantarSemsiyeSorusuState
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -57,7 +57,9 @@ class _UzunKisaMantarSemsiyeSorusuState
       Future.delayed(const Duration(seconds: 2), () {
         if (!mounted) return;
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(
+            builder: (context) => const KarsilastirmaSorulariScreen(),
+          ),
           (route) => false,
         );
       });
@@ -79,8 +81,9 @@ class _UzunKisaMantarSemsiyeSorusuState
     final screenHeight = screenSize.height;
     final iconSize = screenWidth * 0.065;
     final stageFontSize = screenWidth * 0.038;
-    const Color defaultBtnColor =
-        Color(0xFFD7CCC8); // bej (resmin arka planına uygun)
+    const Color defaultBtnColor = Color(
+      0xFFD7CCC8,
+    ); // bej (resmin arka planına uygun)
     final double imageHeight = screenHeight * 0.48;
     const double buttonHeight = 50;
     final double buttonWidth = screenWidth * 0.28;
@@ -109,10 +112,20 @@ class _UzunKisaMantarSemsiyeSorusuState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    const KarsilastirmaSorulariScreen(),
+                          ),
+                          (route) => false,
+                        );
                       },
                     ),
                     SizedBox(width: iconSize),
@@ -124,9 +137,13 @@ class _UzunKisaMantarSemsiyeSorusuState
                     child: Center(
                       child: Container(
                         margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 6),
+                          vertical: 8,
+                          horizontal: 6,
+                        ),
                         padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 6),
+                          vertical: 8,
+                          horizontal: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(32),
@@ -149,7 +166,9 @@ class _UzunKisaMantarSemsiyeSorusuState
                                 // Row with back button and stage label removed from here
                                 const Padding(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
                                   child: Text(
                                     'Uzun olanı işaretle.',
                                     style: TextStyle(
@@ -166,7 +185,8 @@ class _UzunKisaMantarSemsiyeSorusuState
                                   width: double.infinity,
                                   height: imageHeight,
                                   margin: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.04),
+                                    horizontal: screenWidth * 0.04,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(24),
@@ -192,7 +212,8 @@ class _UzunKisaMantarSemsiyeSorusuState
                                 // Seçim kutucukları
                                 Padding(
                                   padding: EdgeInsets.symmetric(
-                                      horizontal: screenWidth * 0.13),
+                                    horizontal: screenWidth * 0.13,
+                                  ),
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -237,43 +258,48 @@ class _UzunKisaMantarSemsiyeSorusuState
                                 Container(
                                   height: 60,
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 8),
-                                  child: showFeedback
-                                      ? ScaleTransition(
-                                          scale: CurvedAnimation(
-                                            parent: _feedbackController,
-                                            curve: Curves.elasticOut,
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                isCorrect == true
-                                                    ? Icons.check_circle
-                                                    : Icons.cancel,
-                                                color: isCorrect == true
-                                                    ? Colors.green
-                                                    : Colors.red,
-                                                size: 28,
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Text(
-                                                isCorrect == true
-                                                    ? 'Aferin! 🎉'
-                                                    : 'Tekrar dene! 😔',
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  color: isCorrect == true
-                                                      ? Colors.green
-                                                      : Colors.red,
-                                                  fontWeight: FontWeight.bold,
+                                    horizontal: 20,
+                                    vertical: 8,
+                                  ),
+                                  child:
+                                      showFeedback
+                                          ? ScaleTransition(
+                                            scale: CurvedAnimation(
+                                              parent: _feedbackController,
+                                              curve: Curves.elasticOut,
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  isCorrect == true
+                                                      ? Icons.check_circle
+                                                      : Icons.cancel,
+                                                  color:
+                                                      isCorrect == true
+                                                          ? Colors.green
+                                                          : Colors.red,
+                                                  size: 28,
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      : const SizedBox.shrink(),
+                                                const SizedBox(width: 10),
+                                                Text(
+                                                  isCorrect == true
+                                                      ? 'Aferin! 🎉'
+                                                      : 'Tekrar dene! 😔',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color:
+                                                        isCorrect == true
+                                                            ? Colors.green
+                                                            : Colors.red,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                          : const SizedBox.shrink(),
                                 ),
                               ],
                             ),

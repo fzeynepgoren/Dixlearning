@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/karsilastirma_sorulari_screen.dart';
 import 'soru2.dart';
 
 class UzunKisaAgacSorusu extends StatefulWidget {
@@ -111,7 +112,14 @@ class _UzunKisaAgacSorusuState extends State<UzunKisaAgacSorusu>
                         size: iconSize,
                       ),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    const KarsilastirmaSorulariScreen(),
+                          ),
+                          (route) => false,
+                        );
                       },
                     ),
                     SizedBox(width: iconSize),

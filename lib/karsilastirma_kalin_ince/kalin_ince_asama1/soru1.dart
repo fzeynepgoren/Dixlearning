@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
-import '../../screens/home_screen.dart';
+import '../../screens/karsilastirma_sorulari_screen.dart';
 import 'package:dixlearning/karsilastirma_kalin_ince/kalin_ince_asama1/soru2.dart';
 
 class KalinInceSoru1 extends StatefulWidget {
@@ -50,13 +50,13 @@ class _KalinInceSoru1State extends State<KalinInceSoru1>
   void checkAnswer(bool isInce) {
     setState(() {
       selectedAnswer = isInce;
-      isCorrect = !isInce; // Kalın olanı seçmeli, bu yüzden !isInce
+      isCorrect = isInce; // Üstteki (true) kalın, doğru cevap
       showFeedback = true;
     });
     _feedbackController.forward(from: 0);
 
-    if (!isInce) {
-      // Kalın olan seçildiğinde (false) ilerle
+    if (isInce) {
+      // Üstteki kalın olan seçildiğinde (true) ilerle
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushReplacement(
@@ -117,7 +117,9 @@ class _KalinInceSoru1State extends State<KalinInceSoru1>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) =>
+                                    const KarsilastirmaSorulariScreen(),
                           ),
                           (route) => false,
                         );

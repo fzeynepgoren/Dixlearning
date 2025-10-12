@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
-import '../../screens/home_screen.dart';
+import '../../screens/karsilastirma_sorulari_screen.dart';
 import 'package:dixlearning/karsilastirma_kalin_ince/kalin_ince_asama1/soru8.dart';
 
 class KalinInceSoru7 extends StatefulWidget {
@@ -116,7 +116,9 @@ class _KalinInceSoru7State extends State<KalinInceSoru7>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) =>
+                                    const KarsilastirmaSorulariScreen(),
                           ),
                           (route) => false,
                         );

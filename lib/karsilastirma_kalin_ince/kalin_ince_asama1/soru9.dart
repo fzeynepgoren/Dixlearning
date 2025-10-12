@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
-import '../../screens/home_screen.dart';
+import '../../screens/karsilastirma_sorulari_screen.dart';
 
 class KalinInceSoru9 extends StatefulWidget {
   const KalinInceSoru9({super.key});
@@ -58,7 +58,9 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            MaterialPageRoute(
+              builder: (context) => const KarsilastirmaSorulariScreen(),
+            ),
             (route) => false,
           );
         }
@@ -116,7 +118,9 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) =>
+                                    const KarsilastirmaSorulariScreen(),
                           ),
                           (route) => false,
                         );

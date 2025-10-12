@@ -3,6 +3,7 @@ import '../karsilastirma_az_cok/az_cok_asama1/soru1.dart';
 import '../karsilastirma_kalin_ince/kalin_ince_asama1/soru1.dart';
 import '../karsilastirma_uzun_kisa/soru1.dart';
 import '../karsilastirma_buyuk_kucuk/soru1.dart';
+import 'home_screen.dart';
 
 class KarsilastirmaSorulariScreen extends StatelessWidget {
   const KarsilastirmaSorulariScreen({super.key});
@@ -15,6 +16,15 @@ class KarsilastirmaSorulariScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Karşılaştırma Soruları'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
+            );
+          },
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -23,7 +33,7 @@ class KarsilastirmaSorulariScreen extends StatelessWidget {
             end: Alignment.bottomCenter,
             colors: [
               mainColor.withOpacity(0.10),
-              accentColor.withOpacity(0.10)
+              accentColor.withOpacity(0.10),
             ],
           ),
         ),
@@ -42,7 +52,8 @@ class KarsilastirmaSorulariScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const AzCokSoru1()),
+                        builder: (context) => const AzCokSoru1(),
+                      ),
                     );
                   },
                   mainColor,
@@ -56,7 +67,8 @@ class KarsilastirmaSorulariScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const KalinInceSoru1()),
+                        builder: (context) => const KalinInceSoru1(),
+                      ),
                     );
                   },
                   mainColor,
@@ -70,7 +82,8 @@ class KarsilastirmaSorulariScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const UzunKisaAgacSorusu()),
+                        builder: (context) => const UzunKisaAgacSorusu(),
+                      ),
                     );
                   },
                   mainColor,
@@ -84,7 +97,8 @@ class KarsilastirmaSorulariScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const BuyukKucukSoru1()),
+                        builder: (context) => const BuyukKucukSoru1(),
+                      ),
                     );
                   },
                   mainColor,
@@ -141,8 +155,11 @@ class KarsilastirmaSorulariScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios,
-                  color: Colors.white, size: 22),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.white,
+                size: 22,
+              ),
             ],
           ),
         ),

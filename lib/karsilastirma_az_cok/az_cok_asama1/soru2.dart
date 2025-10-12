@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
-import '../../screens/home_screen.dart';
+import '../../screens/karsilastirma_sorulari_screen.dart';
 import 'package:dixlearning/karsilastirma_az_cok/az_cok_asama1/soru3.dart';
 
 class AzCokSoru2 extends StatefulWidget {
@@ -33,10 +33,9 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -59,9 +58,7 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => const AzCokSoru3(),
-            ),
+            MaterialPageRoute(builder: (context) => const AzCokSoru3()),
           );
         }
       });
@@ -105,18 +102,23 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
           child: SafeArea(
             child: Column(
               children: [
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                              builder: (context) => const HomeScreen()),
-                              (route) => false,
+                            builder:
+                                (context) =>
+                                    const KarsilastirmaSorulariScreen(),
+                          ),
+                          (route) => false,
                         );
                       },
                     ),
@@ -147,7 +149,9 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
                           // Başlık
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 1),
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Choose the one with more.'
@@ -193,21 +197,23 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
                             child: ElevatedButton(
                               onPressed: () => checkAnswer(false),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: selectedAnswer == false
-                                    ? (isCorrect
-                                    ? Colors.green.shade500
-                                    : Colors.red.shade500)
-                                    : const Color(0xFFFF8000),
+                                backgroundColor:
+                                    selectedAnswer == false
+                                        ? (isCorrect
+                                            ? Colors.green.shade500
+                                            : Colors.red.shade500)
+                                        : const Color(0xFFFF8000),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 elevation: selectedAnswer == false ? 8 : 4,
-                                shadowColor: selectedAnswer == false
-                                    ? (isCorrect
-                                    ? Colors.green.shade300
-                                    : Colors.red.shade300)
-                                    : const Color(0xFFFF8000),
+                                shadowColor:
+                                    selectedAnswer == false
+                                        ? (isCorrect
+                                            ? Colors.green.shade300
+                                            : Colors.red.shade300)
+                                        : const Color(0xFFFF8000),
                               ),
                               child: const Text(
                                 'Seç',
@@ -252,21 +258,23 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
                             child: ElevatedButton(
                               onPressed: () => checkAnswer(true),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: selectedAnswer == true
-                                    ? (isCorrect
-                                    ? Colors.green.shade500
-                                    : Colors.red.shade500)
-                                    : const Color(0xFFFF8000),
+                                backgroundColor:
+                                    selectedAnswer == true
+                                        ? (isCorrect
+                                            ? Colors.green.shade500
+                                            : Colors.red.shade500)
+                                        : const Color(0xFFFF8000),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 elevation: selectedAnswer == true ? 8 : 4,
-                                shadowColor: selectedAnswer == true
-                                    ? (isCorrect
-                                    ? Colors.green.shade300
-                                    : Colors.red.shade300)
-                                    : const Color(0xFFFF8000),
+                                shadowColor:
+                                    selectedAnswer == true
+                                        ? (isCorrect
+                                            ? Colors.green.shade300
+                                            : Colors.red.shade300)
+                                        : const Color(0xFFFF8000),
                               ),
                               child: const Text(
                                 'Seç',
@@ -287,51 +295,59 @@ class _AzCokSoru2State extends State<AzCokSoru2> with TickerProviderStateMixin {
                 // Geri bildirim alanı
                 Container(
                   height: 80,
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? (isEnglish
-                                ? 'Well done! 🎉'
-                                : 'Aferin! 🎉')
-                                : (isEnglish
-                                ? 'Try again! 😔'
-                                : 'Tekrar dene! 😔'),
-                            style: TextStyle(
-                              fontSize: 18,
-                              color:
-                              isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
