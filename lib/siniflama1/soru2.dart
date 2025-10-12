@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import 'soru1.dart';
 import 'soru4.dart';
-import '../../screens/home_screen.dart';
+import '../../screens/classification_questions_screen.dart';
 
 class UzunKisaSinifla extends StatefulWidget {
   const UzunKisaSinifla({super.key});
@@ -310,7 +310,9 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) =>
+                                    const ClassificationQuestionsScreen(),
                           ),
                           (route) => false,
                         );

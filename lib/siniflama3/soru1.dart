@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
 import 'soru2.dart';
-import '../../screens/home_screen.dart';
+import '../../screens/classification_questions_screen.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
 
@@ -145,7 +145,9 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) =>
+                                    const ClassificationQuestionsScreen(),
                           ),
                           (route) => false,
                         );

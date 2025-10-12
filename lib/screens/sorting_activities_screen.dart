@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 import '../../SIRALAMA_SORULARI/Asama3/soru1.dart';
+import 'home_screen.dart';
 
 class SortingActivitiesScreen extends StatelessWidget {
   const SortingActivitiesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final stages = [
-      '1. Aşama',
-      '2. Aşama',
-      '3. Aşama',
-      '4. Aşama',
-      '5. Aşama',
-    ];
+    final stages = ['1. Aşama', '2. Aşama', '3. Aşama', '4. Aşama', '5. Aşama'];
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
+            );
+          },
+        ),
         title: const Text('Sıralama Etkinlikleri'),
       ),
       body: ListView.builder(
@@ -25,8 +29,10 @@ class SortingActivitiesScreen extends StatelessWidget {
             child: ListTile(
               title: Text(
                 stages[index],
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
               ),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {

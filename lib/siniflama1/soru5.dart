@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import '../screens/home_screen.dart';
+import '../screens/classification_questions_screen.dart';
 import 'soru4.dart';
 
 class HayvanBacakSinifla extends StatefulWidget {
@@ -85,7 +85,9 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
         if (mounted) {
           // Son görev tamamlandı, Ana ekrana yönlendir.
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            MaterialPageRoute(
+              builder: (context) => const ClassificationQuestionsScreen(),
+            ),
             (route) => false,
           );
         }
@@ -273,7 +275,9 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                         // Ana ekrana dönme
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) =>
+                                    const ClassificationQuestionsScreen(),
                           ),
                           (route) => false,
                         );

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
 import 'soru5.dart'; // HayvanBacakSinifla sınıfı için
-import '../../screens/home_screen.dart'; // Geri tuşu için eklendi
+import '../../screens/classification_questions_screen.dart'; // Geri tuşu için eklendi
 
 class YiyecekIcecekSinifla extends StatefulWidget {
   const YiyecekIcecekSinifla({super.key});
@@ -275,7 +275,9 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                         // Ana ekrana dönme
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) =>
+                                    const ClassificationQuestionsScreen(),
                           ),
                           (route) => false,
                         );

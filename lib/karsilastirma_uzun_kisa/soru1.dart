@@ -77,7 +77,7 @@ class _UzunKisaAgacSorusuState extends State<UzunKisaAgacSorusu>
     final screenHeight = screenSize.height;
     final iconSize = screenWidth * 0.065;
     final stageFontSize = screenWidth * 0.038;
-    const Color defaultBtnColor = Color(0xFF2E7D32); // koyu yeşil (okunabilir)
+    const Color defaultBtnColor = Color(0xFF2196F3); // mavi
     final double imageHeight = screenHeight * 0.48;
     const double buttonHeight = 50;
     final double buttonWidth = screenWidth * 0.28;

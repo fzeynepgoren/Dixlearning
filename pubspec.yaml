@@ -100,6 +100,15 @@ flutter:
     - assets/kalin_ince_asa1/soru9/Resim17.png
     - assets/kalin_ince_asa1/soru9/Resim18.png
     - assets/kalin_ince_asa1/
+    - assets/uzun_kisa/soru1/agaclar.jpg
+    - assets/uzun_kisa/soru2/kalemler.png
+    - assets/uzun_kisa/soru3/yollar.png
+    - assets/uzun_kisa/soru4/cocuklar.png
+    - assets/uzun_kisa/soru5/hayvanlar.png
+    - assets/uzun_kisa/soru6/kupvesilindir.png
+    - assets/uzun_kisa/soru7/tavsanvebisiklet.png
+    - assets/uzun_kisa/soru8/palmiyevesupurge.png
+    - assets/uzun_kisa/soru9/mantarvesemsiye.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/tohum.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/filiz.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/cicekli_agac.png
