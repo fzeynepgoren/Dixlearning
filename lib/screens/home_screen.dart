@@ -94,13 +94,49 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (index == 0) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => const ProfileScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = Offset(1.0, 0.0);
+            const end = Offset.zero;
+            const curve = Curves.easeInOutCubic;
+            
+            var tween = Tween(begin: begin, end: end).chain(
+              CurveTween(curve: curve),
+            );
+            
+            var offsetAnimation = animation.drive(tween);
+            
+            return SlideTransition(
+              position: offsetAnimation,
+              child: child,
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        ),
       );
     } else if (index == 2) {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => const SettingsScreen(),
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => const SettingsScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = Offset(1.0, 0.0);
+            const end = Offset.zero;
+            const curve = Curves.easeInOutCubic;
+            
+            var tween = Tween(begin: begin, end: end).chain(
+              CurveTween(curve: curve),
+            );
+            
+            var offsetAnimation = animation.drive(tween);
+            
+            return SlideTransition(
+              position: offsetAnimation,
+              child: child,
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 300),
         ),
       );
     }
@@ -276,10 +312,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-              colors: [
-                const Color.fromARGB(255, 137, 189, 214),
-                const Color.fromARGB(255, 104, 178, 211),
-              ],
+              colors: Theme.of(context).brightness == Brightness.dark
+                  ? [
+                      const Color(0xFF1E1E1E), // Dark grey
+                      const Color(0xFF121212), // Darker grey
+                    ]
+                  : [
+                      const Color.fromARGB(255, 137, 189, 214),
+                      const Color.fromARGB(255, 104, 178, 211),
+                    ],
                 ),
               ),
           child: SingleChildScrollView(
@@ -546,7 +587,9 @@ class _AnimatedActivityCardState extends State<_AnimatedActivityCard>
                   borderRadius: BorderRadius.circular(35),
                   color: widget.cardColor,
                   border: Border.all(
-                    color: Colors.white,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[600]!
+                        : Colors.white,
                     width: 3,
                   ),
                   boxShadow: [

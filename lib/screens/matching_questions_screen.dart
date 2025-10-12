@@ -25,18 +25,24 @@ class MatchingQuestionsScreen extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Colors.blue.shade100,
-                  Colors.blue.shade200,
-                  Colors.blue.shade300,
-                ],
+                colors: Theme.of(context).brightness == Brightness.dark
+                    ? [
+                        const Color(0xFF0D1117), // GitHub dark
+                        const Color(0xFF161B22), // Darker
+                        const Color(0xFF21262D), // Darkest
+                      ]
+                    : [
+                        Colors.blue.shade100,
+                        Colors.blue.shade200,
+                        Colors.blue.shade300,
+                      ],
               ),
             ),
             child: Stack(
               children: [
                 // Yıldızlı arka plan
                 CustomPaint(
-                  painter: StarBackgroundPainter(progress: progress),
+                  painter: StarBackgroundPainter(progress: progress, context: context),
                   size: Size.infinite,
                 ),
 
@@ -66,7 +72,7 @@ class MatchingQuestionsScreen extends StatelessWidget {
 
                 // Kıvrımlı yol
                 CustomPaint(
-                  painter: CurvedPathPainter(progress: progress),
+                  painter: CurvedPathPainter(progress: progress, context: context),
                   size: Size.infinite,
                 ),
 
@@ -260,9 +266,11 @@ class MatchingQuestionsScreen extends StatelessWidget {
 
 class StarBackgroundPainter extends CustomPainter {
   final double progress;
+  final BuildContext context;
 
   StarBackgroundPainter({
     required this.progress,
+    required this.context,
   });
 
   @override
@@ -276,7 +284,9 @@ class StarBackgroundPainter extends CustomPainter {
       final starPaint = Paint()
         ..color = progress > 0.25 
             ? Colors.yellow.shade400
-            : Colors.white.withOpacity(0.8)
+            : Theme.of(context).brightness == Brightness.dark
+                ? Colors.white.withOpacity(0.6)
+                : Colors.white.withOpacity(0.8)
         ..style = PaintingStyle.fill;
       
       canvas.drawCircle(Offset(x, y), radius, starPaint);
@@ -291,15 +301,19 @@ class StarBackgroundPainter extends CustomPainter {
 
 class CurvedPathPainter extends CustomPainter {
   final double progress;
+  final BuildContext context;
 
   CurvedPathPainter({
     required this.progress,
+    required this.context,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.8)
+      ..color = Theme.of(context).brightness == Brightness.dark
+          ? Colors.white.withOpacity(0.6)
+          : Colors.white.withOpacity(0.8)
       ..strokeWidth = 12
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;

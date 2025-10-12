@@ -20,13 +20,20 @@ class CustomBottomNavBar extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [mainColor.withOpacity(0.95), accentColor.withOpacity(0.95)],
+          colors: Theme.of(context).brightness == Brightness.dark
+              ? [
+                  const Color(0xFF1E1E1E).withOpacity(0.95),
+                  const Color(0xFF121212).withOpacity(0.95),
+                ]
+              : [mainColor.withOpacity(0.95), accentColor.withOpacity(0.95)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: mainColor.withOpacity(0.18),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withOpacity(0.3)
+                : mainColor.withOpacity(0.18),
             blurRadius: 12,
             offset: const Offset(0, -2),
           ),
