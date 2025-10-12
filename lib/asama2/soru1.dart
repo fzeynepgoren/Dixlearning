@@ -5,6 +5,7 @@ import '../screens/matching_questions_screen.dart';
 import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import '../providers/progress_provider.dart';
 
 class Soru1 extends StatefulWidget {
   const Soru1({super.key});
@@ -84,6 +85,7 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
 
           if (matchedLeft.every((element) => element)) {
             ActivityTracker.completeActivity();
+            Provider.of<ProgressProvider>(context, listen: false).completeStage2();
 
             Future.delayed(const Duration(seconds: 2), () {
               if (mounted) {

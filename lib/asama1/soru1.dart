@@ -4,6 +4,7 @@ import '../screens/matching_questions_screen.dart';
 import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import '../providers/progress_provider.dart';
 
 class MeyveEsle extends StatefulWidget {
   const MeyveEsle({super.key});
@@ -126,6 +127,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
               _slideController.forward(from: 0); // Reset animation for new page
             } else {
               ActivityTracker.completeActivity();
+              Provider.of<ProgressProvider>(context, listen: false).completeStage1();
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const GDisgrafi1()),

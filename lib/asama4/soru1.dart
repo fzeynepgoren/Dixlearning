@@ -3,6 +3,8 @@ import '../utils/activity_tracker.dart';
 import 'package:dixlearning/asama4/soru2.dart';
 import '../screens/matching_questions_screen.dart';
 import 'package:dixlearning/asama2/soru2.dart';
+import 'package:provider/provider.dart';
+import '../providers/progress_provider.dart';
 
 class DuyguYuzEsle extends StatefulWidget {
   const DuyguYuzEsle({super.key});
@@ -112,6 +114,7 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
               // Etkinlik tamamlandı
 
               ActivityTracker.completeActivity();
+              Provider.of<ProgressProvider>(context, listen: false).completeStage4();
 
               Navigator.pushReplacement(
                 context,
