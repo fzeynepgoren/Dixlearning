@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
-import '../../screens/home_screen.dart';
+import '../../screens/karsilastirma_sorulari_screen.dart';
 
 class AzCokSoru9 extends StatefulWidget {
   const AzCokSoru9({super.key});
@@ -33,10 +33,9 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -60,7 +59,9 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            MaterialPageRoute(
+              builder: (context) => const KarsilastirmaSorulariScreen(),
+            ),
           );
         }
       });
@@ -109,12 +110,19 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
-                              (route) => false,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    const KarsilastirmaSorulariScreen(),
+                          ),
+                          (route) => false,
                         );
                       },
                     ),
@@ -166,11 +174,12 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
                             child: ElevatedButton(
                               onPressed: () => checkAnswer(false),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: selectedAnswer == false
-                                    ? (isCorrect
-                                    ? Colors.green.shade500
-                                    : Colors.red.shade500)
-                                    : const Color(0xfffdbe00),
+                                backgroundColor:
+                                    selectedAnswer == false
+                                        ? (isCorrect
+                                            ? Colors.green.shade500
+                                            : Colors.red.shade500)
+                                        : const Color(0xfffdbe00),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -199,11 +208,12 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
                             child: ElevatedButton(
                               onPressed: () => checkAnswer(true),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: selectedAnswer == true
-                                    ? (isCorrect
-                                    ? Colors.green.shade500
-                                    : Colors.red.shade500)
-                                    : const Color(0xfffdbe00),
+                                backgroundColor:
+                                    selectedAnswer == true
+                                        ? (isCorrect
+                                            ? Colors.green.shade500
+                                            : Colors.red.shade500)
+                                        : const Color(0xfffdbe00),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -225,36 +235,45 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
                 ),
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                              : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  isCorrect
+                                      ? (isEnglish
+                                          ? 'Well done! 🎉'
+                                          : 'Aferin! 🎉')
+                                      : (isEnglish
+                                          ? 'Try again! 😔'
+                                          : 'Tekrar dene! 😔'),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),

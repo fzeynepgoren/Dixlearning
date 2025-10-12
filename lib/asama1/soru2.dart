@@ -279,7 +279,7 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                                 // BAŞLANGIÇ: ORTA ÇİZGİ BÖLÜMÜ (425.0 Yüksekliğe Ayarlandı)
                                 SizedBox(
                                   // Uzunluk (yükseklik) burada 425.0 olarak ayarlandı.
-                                  height: 425.0,
+                                  height: 475.0,
                                   child: Container(
                                     width: 4, // Kalınlık
                                     margin: const EdgeInsets.symmetric(

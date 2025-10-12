@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
 import 'soru2.dart';
+import '../../screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
-import '../../screens/home_screen.dart';
-import 'package:dixlearning/karsilastirma_kalin_ince/kalin_ince_asama1/soru3.dart';
 
 class SekilSiniflama extends StatefulWidget {
   const SekilSiniflama({super.key});
@@ -17,26 +16,20 @@ class SekilSiniflama extends StatefulWidget {
 class _SekilSiniflamaState extends State<SekilSiniflama>
     with TickerProviderStateMixin {
   final Map<String, String> dogruEslesmeler = {
-    'ucgen1': 'Üçgen',
-    'kare1': 'Kare',
-    'daire1': 'Daire',
-    'ucgen2': 'Üçgen',
-    'kare2': 'Kare',
-    'daire2': 'Daire',
+    '🔺': 'Üçgen',
+    '🔻': 'Üçgen',
+    '🔵': 'Daire',
+    '🟣': 'Daire',
+    '🟩': 'Kare',
+    '🟨': 'Kare',
   };
 
-  late List<String> sekiller;
-  late List<String> shuffledSekiller;
+  late List<String> emojiler;
   final List<String> kategoriler = ['Üçgen', 'Daire', 'Kare'];
 
   Set<String> eslesenler = {};
-  Map<String, Color?> sekilRenkleri = {};
-  Map<String, Color?> kategoriRenkleri = {};
-
-  String feedbackText = 'Sürükle bırak ile eşleştir!';
-  Color feedbackColor = Colors.yellow.shade800;
-  IconData feedbackIcon = Icons.lightbulb_outline;
   bool showFeedback = false;
+  bool isCorrect = false;
 
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -45,14 +38,10 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
   @override
   void initState() {
     super.initState();
-    sekiller = dogruEslesmeler.keys.toList();
-    kategoriler.shuffle(Random());
-    shuffledSekiller = List<String>.from(sekiller);
-    shuffledSekiller.shuffle(Random());
-
+    emojileriKaristir();
     _feedbackController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 800),
     );
     _slideController = AnimationController(
       vsync: this,
@@ -74,62 +63,48 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
     super.dispose();
   }
 
-  void gosterGeriBildirim(String mesaj, Color renk, IconData ikon) {
+  void emojileriKaristir() {
+    final List<String> tumEmojiler = dogruEslesmeler.keys.toList();
+    tumEmojiler.shuffle(Random());
+    emojiler = tumEmojiler;
+  }
+
+  void _handleDrag(String draggedEmoji, String targetCategory) {
+    bool isCorrectMatch = dogruEslesmeler[draggedEmoji] == targetCategory;
+
     setState(() {
-      feedbackText = mesaj;
-      feedbackColor = renk;
-      feedbackIcon = ikon;
+      isCorrect = isCorrectMatch;
       showFeedback = true;
     });
 
-    _feedbackController.forward(from: 0).then((_) {
-      if (eslesenler.length == dogruEslesmeler.length) {
-        kontrolVeIlerle(context);
-      }
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted && eslesenler.length != dogruEslesmeler.length) {
-          setState(() {
-            showFeedback = false;
-          });
-        }
-      });
-    });
-  }
+    _feedbackController.forward(from: 0);
 
-  void kutuyuRenklendir(String kategori, Color renk) {
-    setState(() {
-      kategoriRenkleri[kategori] = renk;
-    });
-    Future.delayed(const Duration(milliseconds: 500), () {
+    if (isCorrectMatch) {
+      setState(() {
+        eslesenler.add(draggedEmoji);
+      });
+      _checkCompletion();
+    }
+
+    Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
-          kategoriRenkleri.remove(kategori);
+          showFeedback = false;
         });
       }
     });
   }
 
-  void kontrolVeIlerle(BuildContext context) {
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const BoyutSinifla()),
-        );
-      }
-    });
-  }
-
-  void eslesmeYapildi(String data, String kategori) {
-    if (dogruEslesmeler[data] == kategori) {
-      setState(() {
-        eslesenler.add(data);
+  void _checkCompletion() {
+    if (eslesenler.length == emojiler.length) {
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const BoyutSinifla()),
+          );
+        }
       });
-      gosterGeriBildirim('Aferin! 🎉', Colors.green, Icons.check_circle);
-      kutuyuRenklendir(kategori, Colors.green.shade200);
-    } else {
-      gosterGeriBildirim('Tekrar dene! 😔', Colors.red, Icons.cancel);
-      kutuyuRenklendir(kategori, Colors.red.shade200);
     }
   }
 
@@ -205,7 +180,7 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
                             child: Text(
                               isEnglish
                                   ? 'Drag and drop the shapes to the correct box.'
-                                  : 'Şekilleri türlerine göre uygun kutuya sürükle!',
+                                  : 'Şekilleri uygun kutuya sürükle!',
                               style: const TextStyle(
                                 fontSize: 23,
                                 fontWeight: FontWeight.bold,
@@ -217,122 +192,49 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
                           const SizedBox(height: 15),
                           Expanded(
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Expanded(
                                   flex: 3,
                                   child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: kategoriler.map((kategori) {
-                                      Color renk = const Color(0xFFE0F7FA);
-                                      Color border = Colors.black;
-
-                                      Color? dynamicBoxColor =
-                                          kategori == 'Kare'
-                                              ? Colors.orange.shade50
-                                              : kategori == 'Daire'
-                                                  ? Colors.red.shade50
-                                                  : Colors.blue.shade50;
-                                      border = kategori == 'Kare'
-                                          ? Colors.orange
-                                          : kategori == 'Daire'
-                                              ? Colors.red
-                                              : Colors.blue;
-
-                                      return Expanded(
-                                        child: DragTarget<String>(
-                                          builder: (context, _, __) {
-                                            final eslesenSekiller = eslesenler
-                                                .where((e) =>
-                                                    dogruEslesmeler[e] ==
-                                                    kategori)
-                                                .toList();
-                                            return Container(
-                                              width: double.infinity,
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 7),
-                                              padding: const EdgeInsets.all(7),
-                                              decoration: BoxDecoration(
-                                                color: kategoriRenkleri[
-                                                        kategori] ??
-                                                    dynamicBoxColor,
-                                                border: Border.all(
-                                                    color: border, width: 2),
-                                                borderRadius:
-                                                    BorderRadius.circular(16),
+                                    children:
+                                        kategoriler
+                                            .map(
+                                              (kategori) => Expanded(
+                                                child: _buildGroupContainer(
+                                                  kategori,
+                                                  isEnglish,
+                                                ),
                                               ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Center(
-                                                    child: Text(
-                                                      kategori,
-                                                      style: TextStyle(
-                                                        fontSize: 24,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: border,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 8),
-                                                  Wrap(
-                                                    spacing: 8,
-                                                    alignment:
-                                                        WrapAlignment.center,
-                                                    children: eslesenSekiller
-                                                        .map((e) =>
-                                                            _buildSekil(e,
-                                                                small: true))
-                                                        .toList(),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                          onWillAcceptWithDetails: (data) =>
-                                              !eslesenler.contains(data),
-                                          onAcceptWithDetails: (data) {
-                                            eslesmeYapildi(
-                                                data as String, kategori);
-                                          },
-                                        ),
-                                      );
-                                    }).toList(),
+                                            )
+                                            .toList(),
                                   ),
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
                                   flex: 2,
                                   child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: shuffledSekiller.map((id) {
-                                      bool eslesti = eslesenler.contains(id);
-                                      return eslesti
-                                          ? Container()
-                                          : Draggable<String>(
-                                              data: id,
-                                              feedback: Material(
-                                                color: Colors.transparent,
-                                                child: SizedBox(
-                                                  width: 64,
-                                                  height: 64,
-                                                  child: Center(
-                                                    child: _buildSekil(id),
-                                                  ),
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children:
+                                        emojiler
+                                            .where(
+                                              (emoji) =>
+                                                  !eslesenler.contains(emoji),
+                                            )
+                                            .map((emoji) {
+                                              return Draggable<String>(
+                                                data: emoji,
+                                                feedback: Material(
+                                                  color: Colors.transparent,
+                                                  child: _buildItemBox(emoji),
                                                 ),
-                                              ),
-                                              childWhenDragging: Opacity(
-                                                opacity: 0.3,
-                                                child: _buildSekil(id),
-                                              ),
-                                              child: _buildSekil(id),
-                                            );
-                                    }).toList(),
+                                                childWhenDragging:
+                                                    const SizedBox.shrink(),
+                                                child: _buildItemBox(emoji),
+                                              );
+                                            })
+                                            .toList(),
                                   ),
                                 ),
                               ],
@@ -346,50 +248,65 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
                 Container(
                   height: 80,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                          scale: CurvedAnimation(
-                            parent: _feedbackController,
-                            curve: Curves.elasticOut,
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 5),
-                                ),
-                              ],
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  feedbackIcon,
-                                  color: feedbackColor,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  feedbackText,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: feedbackColor,
-                                    fontWeight: FontWeight.bold,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
@@ -399,74 +316,82 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
     );
   }
 
-  Widget _buildSekil(String id, {bool small = false}) {
-    Widget sekil;
-    Color color;
-    double size = small ? 40 : 56;
+  Widget _buildGroupContainer(String kategori, bool isEnglish) {
+    Color? boxColor;
+    Color borderColor;
 
-    if (id == 'ucgen1') {
-      color = Colors.purple.shade200;
-    } else if (id == 'ucgen2') {
-      color = Colors.yellow;
-    } else if (id == 'daire1') {
-      color = Colors.pink;
-    } else if (id == 'daire2') {
-      color = Colors.cyan;
-    } else if (id == 'kare1') {
-      color = Colors.lightGreen;
-    } else if (id == 'kare2') {
-      color = const Color(0xFF430394);
+    if (kategori == 'Üçgen') {
+      boxColor = Colors.purple.shade100;
+      borderColor = Colors.purple.shade300;
+    } else if (kategori == 'Daire') {
+      boxColor = Colors.blue.shade100;
+      borderColor = Colors.blue.shade400;
     } else {
-      color = Colors.grey;
+      boxColor = Colors.yellow.shade100;
+      borderColor = Colors.yellow.shade600;
     }
 
-    if (id.contains('ucgen')) {
-      sekil = CustomPaint(
-        size: Size(size, size),
-        painter: _TrianglePainter(color),
-      );
-    } else if (id.contains('daire')) {
-      sekil = Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: color,
-        ),
-      );
-    } else {
-      sekil = Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.rectangle,
-          color: color,
-        ),
-      );
-    }
-    return sekil;
+    return DragTarget<String>(
+      onWillAccept: (data) => !eslesenler.contains(data!),
+      onAccept: (data) => _handleDrag(data!, kategori),
+      builder: (context, candidateData, rejectedData) {
+        return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          decoration: BoxDecoration(
+            color: boxColor,
+            border: Border.all(color: borderColor, width: 2),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                isEnglish
+                    ? (kategori == 'Üçgen'
+                        ? 'Triangle'
+                        : kategori == 'Daire'
+                        ? 'Circle'
+                        : 'Square')
+                    : kategori,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                children:
+                    eslesenler
+                        .where((e) => dogruEslesmeler[e] == kategori)
+                        .map(
+                          (e) => Text(e, style: const TextStyle(fontSize: 50)),
+                        )
+                        .toList(),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
-}
 
-class _TrianglePainter extends CustomPainter {
-  final Color renk;
-  _TrianglePainter(this.renk);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = renk
-      ..style = PaintingStyle.fill;
-
-    final path = Path()
-      ..moveTo(size.width / 2, 0)
-      ..lineTo(0, size.height)
-      ..lineTo(size.width, size.height)
-      ..close();
-
-    canvas.drawPath(path, paint);
+  Widget _buildItemBox(String emoji) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 1),
+      width: 60,
+      height: 65,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1)),
+        ],
+      ),
+      child: Center(child: Text(emoji, style: const TextStyle(fontSize: 35))),
+    );
   }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
