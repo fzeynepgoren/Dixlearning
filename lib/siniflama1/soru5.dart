@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import '../screens/home_screen.dart';
+import '../screens/siniflandirma_sorulari_screen.dart';
 import 'soru4.dart';
 
 class HayvanBacakSinifla extends StatefulWidget {
@@ -82,10 +83,246 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
       ); // Tüm doğru eşleşmeler bittiğinde pozitif geri bildirim
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
-          // Son görev tamamlandı, Ana ekrana yönlendir.
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-            (route) => false,
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder:
+                (context) => Dialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  elevation: 25,
+                  child: Container(
+                    padding: const EdgeInsets.all(40),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Colors.white, Colors.blue.shade50],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 25,
+                          offset: const Offset(0, 15),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Custom Golden Trophy Icon
+                        Container(
+                          width: 120,
+                          height: 120,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Trophy Cup
+                              Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.amber.shade300,
+                                  borderRadius: BorderRadius.circular(40),
+                                  border: Border.all(
+                                    color: Colors.blue.shade800,
+                                    width: 2,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.amber.withOpacity(0.3),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.star,
+                                    color: Colors.amber.shade600,
+                                    size: 40,
+                                  ),
+                                ),
+                              ),
+                              // Trophy Handles
+                              Positioned(
+                                left: 10,
+                                top: 25,
+                                child: Container(
+                                  width: 20,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.shade300,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Colors.blue.shade800,
+                                      width: 2,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                right: 10,
+                                top: 25,
+                                child: Container(
+                                  width: 20,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.shade300,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Colors.blue.shade800,
+                                      width: 2,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // Trophy Base
+                              Positioned(
+                                bottom: 0,
+                                child: Container(
+                                  width: 100,
+                                  height: 25,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.shade800,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.blue.shade800,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Container(
+                                      width: 60,
+                                      height: 8,
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.shade400,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // Decorative Stars
+                              Positioned(
+                                top: 5,
+                                left: 20,
+                                child: Icon(
+                                  Icons.star,
+                                  color: Colors.amber.shade400,
+                                  size: 12,
+                                ),
+                              ),
+                              Positioned(
+                                top: 5,
+                                right: 20,
+                                child: Icon(
+                                  Icons.star,
+                                  color: Colors.amber.shade400,
+                                  size: 12,
+                                ),
+                              ),
+                              Positioned(
+                                bottom: 30,
+                                left: 15,
+                                child: Icon(
+                                  Icons.star,
+                                  color: Colors.amber.shade400,
+                                  size: 10,
+                                ),
+                              ),
+                              Positioned(
+                                bottom: 30,
+                                right: 15,
+                                child: Icon(
+                                  Icons.star,
+                                  color: Colors.amber.shade400,
+                                  size: 10,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        Text(
+                          Provider.of<LanguageProvider>(
+                                context,
+                                listen: false,
+                              ).isEnglish
+                              ? 'CONGRATULATIONS!'
+                              : 'TEBRİKLER',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.blue.shade800,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          Provider.of<LanguageProvider>(
+                                context,
+                                listen: false,
+                              ).isEnglish
+                              ? 'You have completed the activity!'
+                              : 'Etkinliği tamamladınız!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey.shade600,
+                            height: 1.5,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 35),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) =>
+                                          const ClassificationQuestionsScreen(),
+                                ),
+                                (route) => false,
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.blue.shade600,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 40,
+                                vertical: 18,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              elevation: 12,
+                              shadowColor: Colors.blue.withOpacity(0.4),
+                            ),
+                            child: Text(
+                              Provider.of<LanguageProvider>(
+                                    context,
+                                    listen: false,
+                                  ).isEnglish
+                                  ? 'GO TO MENU'
+                                  : 'MENÜYE GİT',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
           );
         }
       });

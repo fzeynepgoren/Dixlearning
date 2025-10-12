@@ -6,6 +6,7 @@ import '../siniflama1/soru1.dart';
 import '../siniflama2/soru1.dart';
 import '../siniflama3/soru1.dart';
 import '../siniflama4/soru1.dart';
+import 'home_screen.dart';
 
 class ClassificationQuestionsScreen extends StatelessWidget {
   const ClassificationQuestionsScreen({super.key});
@@ -21,58 +22,53 @@ class ClassificationQuestionsScreen extends StatelessWidget {
         'emoji': '📏',
         'title': isEnglish ? 'Stage 1 Questions' : '1.Aşama Soruları',
         'desc':
-        isEnglish ? 'Long and short objects!' : 'Uzun ve kısa nesneler!',
+            isEnglish ? 'Long and short objects!' : 'Uzun ve kısa nesneler!',
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const CinsiyetEsleme(),
-            ),
+            MaterialPageRoute(builder: (context) => const CinsiyetEsleme()),
           );
         },
       },
       {
         'emoji': '🐱',
         'title': isEnglish ? 'Stage 2 Questions' : '2.Aşama Soruları',
-        'desc': isEnglish
-            ? 'Living and non-living things!'
-            : 'Canlı ve cansız nesneler!',
+        'desc':
+            isEnglish
+                ? 'Living and non-living things!'
+                : 'Canlı ve cansız nesneler!',
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const MeyveSebzeEsleme(),
-            ),
+            MaterialPageRoute(builder: (context) => const MeyveSebzeEsleme()),
           );
         },
       },
       {
         'emoji': '📦',
         'title': isEnglish ? 'Stage 3 Questions' : '3.Aşama Soruları',
-        'desc': isEnglish
-            ? 'Objects by size!'
-            : 'Nesneleri boyutlarına göre sınıfla!',
+        'desc':
+            isEnglish
+                ? 'Objects by size!'
+                : 'Nesneleri boyutlarına göre sınıfla!',
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const SekilSiniflama(),
-            ),
+            MaterialPageRoute(builder: (context) => const SekilSiniflama()),
           );
         },
       },
       {
         'emoji': '👃',
         'title': isEnglish ? 'Stage 4 Questions' : '4.Aşama Soruları',
-        'desc': isEnglish
-            ? 'Classify by sensory organs!'
-            : 'Duyu organlarına göre sınıfla!',
+        'desc':
+            isEnglish
+                ? 'Classify by sensory organs!'
+                : 'Duyu organlarına göre sınıfla!',
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const DuyguSiniflama(),
-            ),
+            MaterialPageRoute(builder: (context) => const DuyguSiniflama()),
           );
         },
       },
@@ -83,14 +79,21 @@ class ClassificationQuestionsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           isEnglish ? 'Classification Activities' : 'Sınıflama Etkinlikleri',
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         backgroundColor: mainColor,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            // Ana ekrana dön
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
+            );
+          },
+        ),
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),

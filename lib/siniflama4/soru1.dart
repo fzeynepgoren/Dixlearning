@@ -5,6 +5,8 @@ import 'soru2.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/home_screen.dart';
+import '../screens/siniflandirma_sorulari_screen.dart';
+
 
 class DuyguSiniflama extends StatefulWidget {
   const DuyguSiniflama({super.key});
@@ -252,36 +254,55 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
                   ),
                 ),
                 Container(
-                  height: screenSize.height * 0.1,
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
                   child: showFeedback
                       ? ScaleTransition(
-                          scale: CurvedAnimation(
-                            parent: _feedbackController,
-                            curve: Curves.elasticOut,
+                    scale: CurvedAnimation(
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                isCorrect ? Icons.check_circle : Icons.cancel,
-                                color: isCorrect ? Colors.green : Colors.red,
-                                size: screenSize.width * 0.07,
-                              ),
-                              SizedBox(width: screenSize.width * 0.025),
-                              Text(
-                                isCorrect
-                                    ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                    : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
-                                style: TextStyle(
-                                  fontSize: screenSize.width * 0.045,
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            isCorrect ? Icons.check_circle : Icons.cancel,
+                            color: isCorrect ? Colors.green : Colors.red,
+                            size: 28,
                           ),
-                        )
+                          const SizedBox(width: 10),
+                          Text(
+                            isCorrect
+                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                                : (isEnglish
+                                ? 'Try again! 😔'
+                                : 'Tekrar dene! 😔'),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: isCorrect ? Colors.green : Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
                       : const SizedBox.shrink(),
                 ),
               ],
