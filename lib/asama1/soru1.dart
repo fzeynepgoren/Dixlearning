@@ -83,7 +83,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
   }
 
   void _handleLeftTap(int index) {
-    if (matchedLeft[currentPage][index]) return;
+    if (matchedLeft[currentPage][index] || showFeedback) return;
     setState(() {
       selectedLeftIndex = index;
     });
@@ -91,7 +91,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
   }
 
   void _handleRightTap(int index) {
-    if (matchedRight[currentPage][index]) return;
+    if (matchedRight[currentPage][index] || showFeedback) return;
     setState(() {
       selectedRightIndex = index;
     });

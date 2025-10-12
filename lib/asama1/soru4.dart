@@ -38,6 +38,7 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
   }
 
   void _handleTap(int index, bool isLeft) {
+    if (showFeedback) return;
     setState(() {
       if (isLeft) {
         if (matchedLeft[index]) return;

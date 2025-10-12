@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'soru2.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
@@ -43,10 +43,9 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -68,8 +67,9 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
       }
 
       if (selectedLeftIndex != null && selectedRightIndex != null) {
-        isCorrect = (leftBuildings[selectedLeftIndex!] == '🐵' &&
-            shuffledItems[selectedRightIndex!] == '🐒') ||
+        isCorrect =
+            (leftBuildings[selectedLeftIndex!] == '🐵' &&
+                shuffledItems[selectedRightIndex!] == '🐒') ||
             (leftBuildings[selectedLeftIndex!] == '🐴' &&
                 shuffledItems[selectedRightIndex!] == '🐎') ||
             (leftBuildings[selectedLeftIndex!] == '🐶' &&
@@ -88,9 +88,7 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
             Future.delayed(const Duration(seconds: 2), () {
               if (mounted) {
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const Soru2(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const Soru2()),
                 );
               }
             });
@@ -116,7 +114,8 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
     required String text,
     required TextStyle style,
   }) {
-    final bool isSelected = isLeft ? selectedLeftIndex == index : selectedRightIndex == index;
+    final bool isSelected =
+        isLeft ? selectedLeftIndex == index : selectedRightIndex == index;
     final bool isMatched = isLeft ? matchedLeft[index] : matchedRight[index];
     final bool isWrongSelection = showFeedback && !isCorrect && isSelected;
 
@@ -149,11 +148,7 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
           ],
         ),
         child: Center(
-          child: Text(
-            text,
-            style: style,
-            textAlign: TextAlign.center,
-          ),
+          child: Text(text, style: style, textAlign: TextAlign.center),
         ),
       ),
     );
@@ -188,11 +183,18 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
-                              (route) => false,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
+                          ),
+                          (route) => false,
                         );
                       },
                     ),
@@ -218,7 +220,10 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
                       child: Column(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Which image belongs to which animal? Match them.'
@@ -237,10 +242,11 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: List.generate(
                                       leftBuildings.length,
-                                          (index) => _buildCard(
+                                      (index) => _buildCard(
                                         index: index,
                                         isLeft: true,
                                         text: leftBuildings[index],
@@ -255,8 +261,10 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
                                 ),
                                 Container(
                                   width: 4,
-                                  height: screenSize.height * 0.55,
-                                  margin: const EdgeInsets.symmetric(horizontal: 12),
+                                  height: 425,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
@@ -272,10 +280,11 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
                                 ),
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: List.generate(
                                       shuffledItems.length,
-                                          (index) => _buildCard(
+                                      (index) => _buildCard(
                                         index: index,
                                         isLeft: false,
                                         text: shuffledItems[index],
@@ -299,38 +308,65 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
                 // Alt bildirim alanı
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect
-                              ? Icons.check_circle
-                              : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                              : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),

@@ -4,7 +4,6 @@ import '../providers/language_provider.dart';
 import 'soru5.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
 
-
 class YiyecekIcecekSinifla extends StatefulWidget {
   const YiyecekIcecekSinifla({super.key});
 
@@ -66,12 +65,14 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
       showFeedback = true;
     });
     _feedbackController.forward(from: 0);
+
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
           showFeedback = false;
         });
-        _feedbackController.reset(); // Geri bildirim sonrası controller'ı sıfırla
+        _feedbackController
+            .reset(); // Geri bildirim sonrası controller'ı sıfırla
       }
     });
   }
@@ -140,12 +141,14 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
 
   // Grup Kutusu (DragTarget) yapısı
   Widget _buildGroup(
-      String title,
-      List<Map<String, dynamic>> items,
-      bool isFood,
-      ) {
-    Color boxColor = isFood ? Colors.lightBlue.shade100 : Colors.deepPurple.shade100;
-    Color borderColor = isFood ? Colors.lightBlue.shade400 : Colors.deepPurple.shade400;
+    String title,
+    List<Map<String, dynamic>> items,
+    bool isFood,
+  ) {
+    Color boxColor =
+        isFood ? Colors.lightBlue.shade100 : Colors.deepPurple.shade100;
+    Color borderColor =
+        isFood ? Colors.lightBlue.shade400 : Colors.deepPurple.shade400;
 
     return DragTarget<Map<String, dynamic>>(
       onWillAcceptWithDetails: (data) {
@@ -182,10 +185,7 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           decoration: BoxDecoration(
             color: boxColor,
-            border: Border.all(
-              color: borderColor,
-              width: 2,
-            ),
+            border: Border.all(color: borderColor, width: 2),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -212,18 +212,20 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    mainAxisAlignment: items.isEmpty
-                        ? MainAxisAlignment.center
-                        : MainAxisAlignment.start,
-                    children: items.map((item) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Text(
-                          item['emoji'],
-                          style: const TextStyle(fontSize: 60),
-                        ),
-                      );
-                    }).toList(),
+                    mainAxisAlignment:
+                        items.isEmpty
+                            ? MainAxisAlignment.center
+                            : MainAxisAlignment.start,
+                    children:
+                        items.map((item) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Text(
+                              item['emoji'],
+                              style: const TextStyle(fontSize: 60),
+                            ),
+                          );
+                        }).toList(),
                   ),
                 ),
               ),
@@ -274,7 +276,7 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                           MaterialPageRoute(
                             builder: (context) => const ClassificationQuestionsScreen(),
                           ),
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                     ),
@@ -302,7 +304,9 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 1),
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Drag the items to the correct group!'
@@ -346,12 +350,19 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                                 const SizedBox(width: 16),
                                 Expanded(
                                   flex: 2,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: items
-                                        .where((item) => !item['isPlaced'])
-                                        .map((item) => _buildItem(item))
-                                        .toList(),
+                                  child: AbsorbPointer(
+                                    absorbing: showFeedback,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children:
+                                          items
+                                              .where(
+                                                (item) => !item['isPlaced'],
+                                              )
+                                              .map((item) => _buildItem(item))
+                                              .toList(),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -369,53 +380,62 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                     horizontal: 20,
                     vertical: 10,
                   ),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                : (isEnglish
-                                ? 'Try again! 😔'
-                                : 'Tekrar dene! 😔'),
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),

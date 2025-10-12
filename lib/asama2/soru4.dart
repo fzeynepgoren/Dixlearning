@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'soru5.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -202,7 +202,8 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
                           ),
                           (route) => false,
                         );
@@ -271,12 +272,20 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
                                 ),
                                 Container(
                                   width: 4,
-                                  height: screenSize.height * 0.45,
+                                  height: 425,
                                   margin: const EdgeInsets.symmetric(
                                     horizontal: 12,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey.shade400,
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.blue.shade400,
+                                        Colors.blue.shade200,
+                                        Colors.blue.shade100,
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                 ),

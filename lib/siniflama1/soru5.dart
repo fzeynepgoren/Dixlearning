@@ -66,6 +66,7 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
       showFeedback = true;
     });
     _feedbackController.forward(from: 0);
+
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
@@ -587,13 +588,19 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                                 const SizedBox(width: 16),
                                 Expanded(
                                   flex: 2,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children:
-                                        items
-                                            .where((item) => !item['isPlaced'])
-                                            .map((item) => _buildItem(item))
-                                            .toList(),
+                                  child: AbsorbPointer(
+                                    absorbing: showFeedback,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children:
+                                          items
+                                              .where(
+                                                (item) => !item['isPlaced'],
+                                              )
+                                              .map((item) => _buildItem(item))
+                                              .toList(),
+                                    ),
                                   ),
                                 ),
                               ],
