@@ -21,7 +21,7 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
     Colors.blue.shade200,
     Colors.purple.shade100,
     Colors.green.shade200,
-    Colors.orange.shade200
+    Colors.orange.shade200,
   ];
   final List<String> letters = ['d', 'b', 'm', 'n', 'u', 'ö'];
   final Map<String, Color> letterToColorMap = {};
@@ -49,10 +49,9 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
 
     _feedbackController = AnimationController(
@@ -115,13 +114,17 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                              builder: (context) => const HomeScreen()),
-                              (route) => false,
+                            builder: (context) => const HomeScreen(),
+                          ),
+                          (route) => false,
                         );
                       },
                     ),
@@ -131,8 +134,10 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                   child: SlideTransition(
                     position: _slideAnimation,
                     child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: screenSize.width*0.03),
-                      padding: EdgeInsets.all(screenSize.width*0.04),
+                      margin: EdgeInsets.symmetric(
+                        horizontal: screenSize.width * 0.03,
+                      ),
+                      padding: EdgeInsets.all(screenSize.width * 0.04),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.95),
                         borderRadius: BorderRadius.circular(24),
@@ -148,7 +153,9 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                         children: [
                           Container(
                             padding: EdgeInsets.symmetric(
-                                horizontal: screenSize.width*0.05, vertical: 12),
+                              horizontal: screenSize.width * 0.05,
+                              vertical: 12,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Drag the colored letters above to the correct gray circles below!'
@@ -170,26 +177,41 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                             physics: const NeverScrollableScrollPhysics(),
                             mainAxisSpacing: gridSpacing,
                             crossAxisSpacing: gridSpacing,
-                            children: letters.map((letter) {
-                              return Draggable<String>(
-                                data: letter,
-                                feedback: Material(
-                                  color: Colors.transparent,
-                                  child: _buildLetterBubble(letter,
-                                      size: bubbleSize, dragging: true),
-                                ),
-                                childWhenDragging: Opacity(
-                                  opacity: correctMatches[letter]! ? 0.0 : 0.4,
-                                  child: _buildLetterBubble(letter, size: bubbleSize),
-                                ),
-                                child: correctMatches[letter]!
-                                    ? Opacity(
-                                  opacity: 0.0,
-                                  child: _buildLetterBubble(letter, size: bubbleSize),
-                                )
-                                    : _buildLetterBubble(letter, size: bubbleSize),
-                              );
-                            }).toList(),
+                            children:
+                                letters.map((letter) {
+                                  return Draggable<String>(
+                                    data: letter,
+                                    feedback: Material(
+                                      color: Colors.transparent,
+                                      child: _buildLetterBubble(
+                                        letter,
+                                        size: bubbleSize,
+                                        dragging: true,
+                                      ),
+                                    ),
+                                    childWhenDragging: Opacity(
+                                      opacity:
+                                          correctMatches[letter]! ? 0.0 : 0.4,
+                                      child: _buildLetterBubble(
+                                        letter,
+                                        size: bubbleSize,
+                                      ),
+                                    ),
+                                    child:
+                                        correctMatches[letter]!
+                                            ? Opacity(
+                                              opacity: 0.0,
+                                              child: _buildLetterBubble(
+                                                letter,
+                                                size: bubbleSize,
+                                              ),
+                                            )
+                                            : _buildLetterBubble(
+                                              letter,
+                                              size: bubbleSize,
+                                            ),
+                                  );
+                                }).toList(),
                           ),
                           SizedBox(height: 30),
 
@@ -197,8 +219,10 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                           Expanded(
                             child: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 500),
-                              transitionBuilder:
-                                  (Widget child, Animation<double> animation) {
+                              transitionBuilder: (
+                                Widget child,
+                                Animation<double> animation,
+                              ) {
                                 return FadeTransition(
                                   opacity: animation,
                                   child: child,
@@ -210,122 +234,165 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                                 mainAxisSpacing: gridSpacing,
                                 crossAxisSpacing: gridSpacing,
                                 padding: EdgeInsets.all(gridSpacing),
-                                children: shuffledLetters.map((letter) {
-                                  final isLastIncorrect =
-                                      letter == lastIncorrect;
-                                  return DragTarget<String>(
-                                    onWillAcceptWithDetails: (receivedLetter) =>
-                                    !correctMatches[letter]!,
-                                    onAcceptWithDetails: (receivedLetter) {
-                                      setState(() {
-                                        lastIncorrect = '';
-                                        if (letter == receivedLetter.data) {
-                                          correctMatches[letter] = true;
-                                          letterToColorMap[letter] =
-                                          colors[letters.indexOf(letter)];
-                                          correctCount++;
-                                          isCorrect = true;
-                                        } else {
-                                          incorrectCount++;
-                                          lastIncorrect = letter;
-                                          isCorrect = false;
-                                        }
+                                children:
+                                    shuffledLetters.map((letter) {
+                                      final isLastIncorrect =
+                                          letter == lastIncorrect;
+                                      return DragTarget<String>(
+                                        onWillAcceptWithDetails:
+                                            (receivedLetter) =>
+                                                !correctMatches[letter]!,
+                                        onAcceptWithDetails: (receivedLetter) {
+                                          setState(() {
+                                            lastIncorrect = '';
+                                            if (letter == receivedLetter.data) {
+                                              correctMatches[letter] = true;
+                                              letterToColorMap[letter] =
+                                                  colors[letters.indexOf(
+                                                    letter,
+                                                  )];
+                                              correctCount++;
+                                              isCorrect = true;
+                                            } else {
+                                              incorrectCount++;
+                                              lastIncorrect = letter;
+                                              isCorrect = false;
+                                            }
 
-                                        showFeedback = true;
-                                        _feedbackController.forward(from: 0);
+                                            showFeedback = true;
+                                            _feedbackController.forward(
+                                              from: 0,
+                                            );
 
-                                        Future.delayed(
-                                            const Duration(seconds: 2), () {
-                                          if (mounted) {
-                                            setState(() {
-                                              showFeedback = false;
-                                            });
-                                          }
-                                        });
-
-                                        if (correctCount == letters.length) {
-                                          Future.delayed(
-                                              const Duration(milliseconds: 1000),
-                                                  () {
+                                            Future.delayed(
+                                              const Duration(seconds: 2),
+                                              () {
                                                 if (mounted) {
-                                                  ActivityTracker.completeActivity();
+                                                  setState(() {
+                                                    showFeedback = false;
+                                                  });
+                                                }
+                                              },
+                                            );
 
-                                                  Navigator.pushReplacement(
-                                                    context,
-                                                    PageRouteBuilder(
-                                                      pageBuilder: (context,
-                                                          animation,
-                                                          secondaryAnimation) =>
-                                                      const Diskalkuli1(),
-                                                      transitionsBuilder: (context,
+                                            if (correctCount ==
+                                                letters.length) {
+                                              Future.delayed(
+                                                const Duration(
+                                                  milliseconds: 1000,
+                                                ),
+                                                () {
+                                                  if (mounted) {
+                                                    ActivityTracker.completeActivity();
+
+                                                    Navigator.pushReplacement(
+                                                      context,
+                                                      PageRouteBuilder(
+                                                        pageBuilder:
+                                                            (
+                                                              context,
+                                                              animation,
+                                                              secondaryAnimation,
+                                                            ) =>
+                                                                const Diskalkuli1(),
+                                                        transitionsBuilder: (
+                                                          context,
                                                           animation,
                                                           secondaryAnimation,
-                                                          child) {
-                                                        const begin =
-                                                        Offset(1.0, 0.0);
-                                                        const end = Offset.zero;
-                                                        const curve = Curves.ease;
-                                                        var tween = Tween(
+                                                          child,
+                                                        ) {
+                                                          const begin = Offset(
+                                                            1.0,
+                                                            0.0,
+                                                          );
+                                                          const end =
+                                                              Offset.zero;
+                                                          const curve =
+                                                              Curves.ease;
+                                                          var tween = Tween(
                                                             begin: begin,
-                                                            end: end)
-                                                            .chain(CurveTween(
-                                                            curve: curve));
-                                                        return SlideTransition(
-                                                          position:
-                                                          animation.drive(tween),
-                                                          child: child,
-                                                        );
-                                                      },
-                                                    ),
-                                                  );
-                                                }
-                                              });
-                                        }
-                                      });
-                                    },
-                                    builder: (context, accepted, rejected) {
-                                      final target = AnimatedContainer(
-                                        duration: const Duration(milliseconds: 300),
-                                        decoration: BoxDecoration(
-                                          color: correctMatches[letter]!
-                                              ? colors[letters.indexOf(letter)]
-                                              : Colors.grey.shade200,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(color: Colors.black26),
-                                          boxShadow: correctMatches[letter]!
-                                              ? [
-                                            BoxShadow(
-                                              color: colors[letters.indexOf(letter)]
-                                                  .withOpacity(0.3),
-                                              blurRadius: 12,
-                                              offset: const Offset(0, 4),
+                                                            end: end,
+                                                          ).chain(
+                                                            CurveTween(
+                                                              curve: curve,
+                                                            ),
+                                                          );
+                                                          return SlideTransition(
+                                                            position: animation
+                                                                .drive(tween),
+                                                            child: child,
+                                                          );
+                                                        },
+                                                      ),
+                                                    );
+                                                  }
+                                                },
+                                              );
+                                            }
+                                          });
+                                        },
+                                        builder: (context, accepted, rejected) {
+                                          final target = AnimatedContainer(
+                                            duration: const Duration(
+                                              milliseconds: 300,
                                             ),
-                                          ]
-                                              : [],
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          letter,
-                                          style: TextStyle(
-                                            fontSize: bubbleSize * 0.6,
-                                            fontWeight: FontWeight.bold,
-                                            color: correctMatches[letter]!
-                                                ? Colors.white
-                                                : Colors.black,
-                                          ),
-                                        ),
-                                      );
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  correctMatches[letter]!
+                                                      ? colors[letters.indexOf(
+                                                        letter,
+                                                      )]
+                                                      : Colors.grey.shade200,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: Colors.black26,
+                                              ),
+                                              boxShadow:
+                                                  correctMatches[letter]!
+                                                      ? [
+                                                        BoxShadow(
+                                                          color: colors[letters
+                                                                  .indexOf(
+                                                                    letter,
+                                                                  )]
+                                                              .withOpacity(0.3),
+                                                          blurRadius: 12,
+                                                          offset: const Offset(
+                                                            0,
+                                                            4,
+                                                          ),
+                                                        ),
+                                                      ]
+                                                      : [],
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              letter,
+                                              style: TextStyle(
+                                                fontSize: bubbleSize * 0.6,
+                                                fontWeight: FontWeight.bold,
+                                                color:
+                                                    correctMatches[letter]!
+                                                        ? Colors.white
+                                                        : Colors.black,
+                                              ),
+                                            ),
+                                          );
 
-                                      if (correctMatches[letter]!) {
-                                        return target.animate().scale(duration: 500.ms);
-                                      } else if (isLastIncorrect) {
-                                        return target.animate().shake(duration: 900.ms);
-                                      } else {
-                                        return target;
-                                      }
-                                    },
-                                  );
-                                }).toList(),
+                                          if (correctMatches[letter]!) {
+                                            return target.animate().scale(
+                                              duration: 500.ms,
+                                            );
+                                          } else if (isLastIncorrect) {
+                                            return target.animate().shake(
+                                              duration: 900.ms,
+                                            );
+                                          } else {
+                                            return target;
+                                          }
+                                        },
+                                      );
+                                    }).toList(),
                               ),
                             ),
                           ),
@@ -336,37 +403,60 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                 ),
                 Container(
                   height: 80,
-                  padding:
-                  EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          isCorrect ? Icons.check_circle : Icons.cancel,
-                          color: isCorrect ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          isCorrect
-                              ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                              : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isCorrect ? Colors.green : Colors.red,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
@@ -376,27 +466,36 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildLetterBubble(String letter, {bool dragging = false, double size = 60}) {
+  Widget _buildLetterBubble(
+    String letter, {
+    bool dragging = false,
+    double size = 60,
+  }) {
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         color: colors[letters.indexOf(letter)],
         shape: BoxShape.circle,
-        boxShadow: dragging
-            ? [
-          BoxShadow(
-              color: Colors.black26,
-              blurRadius: 12,
-              offset: const Offset(4, 4))
-        ]
-            : [],
+        boxShadow:
+            dragging
+                ? [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 12,
+                    offset: const Offset(4, 4),
+                  ),
+                ]
+                : [],
       ),
       child: Center(
         child: Text(
           letter,
           style: TextStyle(
-              color: Colors.black, fontSize: size * 0.55, fontWeight: FontWeight.bold),
+            color: Colors.black,
+            fontSize: size * 0.55,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
