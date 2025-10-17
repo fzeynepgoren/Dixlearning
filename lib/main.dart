@@ -4,17 +4,19 @@ import 'package:google_fonts/google_fonts.dart';
 import 'providers/language_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/progress_provider.dart';
+import 'providers/user_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 
 void main() {
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => LanguageProvider()),
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => ProgressProvider()),
-      ],
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => LanguageProvider()),
+            ChangeNotifierProvider(create: (_) => ThemeProvider()),
+            ChangeNotifierProvider(create: (_) => ProgressProvider()),
+            ChangeNotifierProvider(create: (_) => UserProvider()),
+          ],
       child: const MyApp(),
     ),
   );

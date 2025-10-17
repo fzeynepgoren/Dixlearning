@@ -49,13 +49,13 @@ class MatchingQuestionsScreen extends StatelessWidget {
                 // Başlık
                 Positioned(
                   top: 100,
-                  left: 0,
-                  right: 0,
+                  left: 20,
+                  right: 20,
                   child: Center(
                     child: Text(
                       isEnglish ? 'Matching Questions Roadmap' : 'Eşleme Soruları Yol Haritası',
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         shadows: [
@@ -66,6 +66,9 @@ class MatchingQuestionsScreen extends StatelessWidget {
                           ),
                         ],
                       ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
