@@ -19,22 +19,35 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
-  String _userName = 'Kullanıcı';
-  int _userAge = 10;
-  String _avatar = '👦';
-
-
+  final String _userName = 'Kullanıcı';
+  final int _userAge = 10;
+  final String _avatar = '👦';
 
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final themeProvider = Provider.of<ThemeProvider>(context);
-    const Color mainColor = Color.fromARGB(255, 137, 189, 214); // Açık gök mavisi
-    const Color accentColor = Color.fromARGB(255, 104, 178, 211); // Daha koyu açık mavi
+    const Color mainColor = Color.fromARGB(
+      255,
+      137,
+      189,
+      214,
+    ); // Açık gök mavisi
+    const Color accentColor = Color.fromARGB(
+      255,
+      104,
+      178,
+      211,
+    ); // Daha koyu açık mavi
     final Color cardBg = Theme.of(context).cardColor;
     final Color cardText = Theme.of(context).textTheme.bodyLarge!.color!;
-    final Color cardSubText = Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.grey[600]!;
-    final Color cardShadow = mainColor.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.25 : 0.10);
+    final Color cardSubText =
+        Theme.of(context).brightness == Brightness.dark
+            ? Colors.white70
+            : Colors.grey[600]!;
+    final Color cardShadow = mainColor.withOpacity(
+      Theme.of(context).brightness == Brightness.dark ? 0.25 : 0.10,
+    );
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -50,17 +63,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: Theme.of(context).brightness == Brightness.dark
-                    ? [
-                        const Color(0xFF1E1E1E), // Dark grey
-                        const Color(0xFF121212), // Darker grey
-                      ]
-                    : [mainColor, accentColor],
+                colors:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? [
+                          const Color(0xFF1E1E1E), // Dark grey
+                          const Color(0xFF121212), // Darker grey
+                        ]
+                        : [mainColor, accentColor],
               ),
             ),
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 6,
+                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -70,7 +87,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         shape: BoxShape.circle,
                       ),
                       padding: const EdgeInsets.all(8),
-                      child: const Icon(FluentIcons.settings_24_regular, size: 32, color: Colors.white),
+                      child: const Icon(
+                        FluentIcons.settings_24_regular,
+                        size: 32,
+                        color: Colors.white,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Column(
@@ -87,8 +108,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          isEnglish ? 'Personalize your app' : 'Uygulamanı kişiselleştir',
-                          style: const TextStyle(fontSize: 13, color: Colors.white70),
+                          isEnglish
+                              ? 'Personalize your app'
+                              : 'Uygulamanı kişiselleştir',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.white70,
+                          ),
                         ),
                       ],
                     ),
@@ -100,14 +126,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              mainColor,
-              accentColor,
-            ],
+            colors: [mainColor, accentColor],
           ),
         ),
         child: SingleChildScrollView(
@@ -139,7 +162,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     CircleAvatar(
                       radius: 32,
                       backgroundColor: accentColor.withOpacity(0.15),
-                      child: Text(_avatar, style: const TextStyle(fontSize: 36)),
+                      child: Text(
+                        _avatar,
+                        style: const TextStyle(fontSize: 36),
+                      ),
                     ),
                     const SizedBox(width: 18),
                     Expanded(
@@ -156,7 +182,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            (isEnglish ? 'Age: ' : 'Yaş: ') + _userAge.toString(),
+                            (isEnglish ? 'Age: ' : 'Yaş: ') +
+                                _userAge.toString(),
                             style: TextStyle(fontSize: 15, color: cardSubText),
                           ),
                         ],
@@ -188,7 +215,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(FluentIcons.alert_24_regular, color: Colors.teal, size: 28),
+                        const Icon(
+                          FluentIcons.alert_24_regular,
+                          color: Colors.teal,
+                          size: 28,
+                        ),
                         const SizedBox(width: 10),
                         Text(
                           isEnglish ? 'Notifications' : 'Bildirimler',
@@ -202,7 +233,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      isEnglish ? 'Get notified about new events!' : 'Yeni etkinliklerden haberdar ol!',
+                      isEnglish
+                          ? 'Get notified about new events!'
+                          : 'Yeni etkinliklerden haberdar ol!',
                       style: TextStyle(fontSize: 13, color: cardSubText),
                     ),
                     const SizedBox(height: 18),
@@ -211,7 +244,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       children: [
                         Switch(
                           value: _notificationsEnabled,
-                          activeColor: accentColor,
+                          activeThumbColor: accentColor,
                           onChanged: (value) {
                             setState(() {
                               _notificationsEnabled = value;
@@ -246,7 +279,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(FluentIcons.globe_24_regular, color: Colors.teal, size: 28),
+                        const Icon(
+                          FluentIcons.globe_24_regular,
+                          color: Colors.teal,
+                          size: 28,
+                        ),
                         const SizedBox(width: 10),
                         Text(
                           isEnglish ? 'Language' : 'Dil',
@@ -260,7 +297,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      isEnglish ? 'Switch app language' : 'Uygulama dilini değiştir',
+                      isEnglish
+                          ? 'Switch app language'
+                          : 'Uygulama dilini değiştir',
                       style: GoogleFonts.poppins(
                         fontSize: 12.5,
                         color: cardSubText,
@@ -295,7 +334,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             inactiveTextFontWeight: FontWeight.w700,
                             showOnOff: true,
                             onToggle: (val) async {
-                              await Provider.of<LanguageProvider>(context, listen: false).setLanguage(val);
+                              await Provider.of<LanguageProvider>(
+                                context,
+                                listen: false,
+                              ).setLanguage(val);
                             },
                           ),
                         ),
@@ -327,7 +369,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(FluentIcons.weather_sunny_24_regular, color: Colors.amber[700], size: 28),
+                        Icon(
+                          FluentIcons.weather_sunny_24_regular,
+                          color: Colors.amber[700],
+                          size: 28,
+                        ),
                         const SizedBox(width: 10),
                         Text(
                           isEnglish ? 'Theme' : 'Tema',
@@ -341,7 +387,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      isEnglish ? 'Switch between light and dark mode' : 'Açık ve koyu mod arasında geçiş yap',
+                      isEnglish
+                          ? 'Switch between light and dark mode'
+                          : 'Açık ve koyu mod arasında geçiş yap',
                       style: GoogleFonts.poppins(
                         fontSize: 12.5,
                         color: cardSubText,
@@ -376,7 +424,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             inactiveTextFontWeight: FontWeight.w700,
                             showOnOff: true,
                             onToggle: (val) {
-                              themeProvider.setThemeMode(val ? ThemeMode.dark : ThemeMode.light);
+                              themeProvider.setThemeMode(
+                                val ? ThemeMode.dark : ThemeMode.light,
+                              );
                             },
                           ),
                         ),
@@ -405,19 +455,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(FluentIcons.shield_24_regular, color: Colors.blue, size: 28),
+                    const Icon(
+                      FluentIcons.shield_24_regular,
+                      color: Colors.blue,
+                      size: 28,
+                    ),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            isEnglish ? 'Privacy & Security' : 'Gizlilik & Güvenlik',
-                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: cardText),
+                            isEnglish
+                                ? 'Privacy & Security'
+                                : 'Gizlilik & Güvenlik',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: cardText,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            isEnglish ? 'Your information is always safe!' : 'Bilgilerin güvende!',
+                            isEnglish
+                                ? 'Your information is always safe!'
+                                : 'Bilgilerin güvende!',
                             style: TextStyle(fontSize: 13, color: cardSubText),
                           ),
                         ],
@@ -452,9 +514,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         return AlertDialog(
                           title: Text(
                             isEnglish ? 'Logout' : 'Çıkış Yap',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           content: Text(
                             isEnglish
@@ -492,7 +552,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                   child: Row(
                     children: [
-                      const Icon(FluentIcons.sign_out_24_regular, color: Colors.red, size: 28),
+                      const Icon(
+                        FluentIcons.sign_out_24_regular,
+                        color: Colors.red,
+                        size: 28,
+                      ),
                       const SizedBox(width: 14),
                       Expanded(
                         child: Column(
@@ -500,17 +564,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           children: [
                             Text(
                               isEnglish ? 'Logout' : 'Çıkış Yap',
-                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: cardText),
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                                color: cardText,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              isEnglish ? 'Sign out of your account' : 'Hesabınızdan çıkış yapın',
-                              style: TextStyle(fontSize: 13, color: cardSubText),
+                              isEnglish
+                                  ? 'Sign out of your account'
+                                  : 'Hesabınızdan çıkış yapın',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: cardSubText,
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.grey,
+                        size: 16,
+                      ),
                     ],
                   ),
                 ),
@@ -519,7 +596,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 30),
               Center(
                 child: Text(
-                  isEnglish ? 'Always safe and fun! 🎉🔒' : 'Her zaman güvenli ve eğlenceli! 🎉🔒',
+                  isEnglish
+                      ? 'Always safe and fun! 🎉🔒'
+                      : 'Her zaman güvenli ve eğlenceli! 🎉🔒',
                   style: const TextStyle(
                     fontSize: 18,
                     color: Color(0xFF6C63FF),
@@ -550,18 +629,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => const ProfileScreen(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                pageBuilder:
+                    (context, animation, secondaryAnimation) =>
+                        const ProfileScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
                   const begin = Offset(-1.0, 0.0);
                   const end = Offset.zero;
                   const curve = Curves.easeInOutCubic;
-                  
-                  var tween = Tween(begin: begin, end: end).chain(
-                    CurveTween(curve: curve),
-                  );
-                  
+
+                  var tween = Tween(
+                    begin: begin,
+                    end: end,
+                  ).chain(CurveTween(curve: curve));
+
                   var offsetAnimation = animation.drive(tween);
-                  
+
                   return SlideTransition(
                     position: offsetAnimation,
                     child: child,
@@ -574,18 +661,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                pageBuilder:
+                    (context, animation, secondaryAnimation) =>
+                        const HomeScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
                   const begin = Offset(-1.0, 0.0);
                   const end = Offset.zero;
                   const curve = Curves.easeInOutCubic;
-                  
-                  var tween = Tween(begin: begin, end: end).chain(
-                    CurveTween(curve: curve),
-                  );
-                  
+
+                  var tween = Tween(
+                    begin: begin,
+                    end: end,
+                  ).chain(CurveTween(curve: curve));
+
                   var offsetAnimation = animation.drive(tween);
-                  
+
                   return SlideTransition(
                     position: offsetAnimation,
                     child: child,

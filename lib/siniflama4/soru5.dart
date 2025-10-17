@@ -147,7 +147,7 @@ class _OlaySiniflaState extends State<OlaySinifla>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Custom Golden Trophy Icon
-                        Container(
+                        SizedBox(
                           width: 120,
                           height: 120,
                           child: Stack(
@@ -582,8 +582,8 @@ class _OlaySiniflaState extends State<OlaySinifla>
     final double boxHeight = screenSize.height * 0.045; // Örnek boyut
 
     return DragTarget<Map<String, dynamic>>(
-      onWillAccept: (data) => !item['isPlaced'],
-      onAccept: (data) => _handleDrag(data, item['type']),
+      onWillAcceptWithDetails: (data) => !item['isPlaced'],
+      onAcceptWithDetails: (data) => _handleDrag(data.data, item['type']),
       builder: (context, candidateItems, rejectedItems) {
         return Container(
           width: double.infinity,

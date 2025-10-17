@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
 import 'home_screen.dart';
 import 'settings_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -31,170 +29,198 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Container(
-          height: MediaQuery.of(context).size.height * 0.7,
-          decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0xFF1E1E1E)
-                : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(2),
+      builder:
+          (context) => StatefulBuilder(
+            builder:
+                (context, setModalState) => Container(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  decoration: BoxDecoration(
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF1E1E1E)
+                            : Colors.white,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  isEnglish ? 'Edit Profile' : 'Profili Düzenle',
-                  style: GoogleFonts.quicksand(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: isEnglish ? 'Name' : 'Ad',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onChanged: (value) => tempName = value,
-                  controller: TextEditingController(text: tempName),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: isEnglish ? 'Surname' : 'Soyad',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onChanged: (value) => tempSurname = value,
-                  controller: TextEditingController(text: tempSurname),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: isEnglish ? 'Age' : 'Yaş',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) => tempAge = int.tryParse(value) ?? tempAge,
-                  controller: TextEditingController(text: tempAge.toString()),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  isEnglish ? 'Choose Avatar:' : 'Avatar Seç:',
-                  style: GoogleFonts.quicksand(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: ['👦', '👧', '🧑', '👨', '👩'].map((emoji) {
-                    return GestureDetector(
-                      onTap: () {
-                        setModalState(() {
-                          tempAvatar = emoji;
-                        });
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 12),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: tempAvatar == emoji ? Colors.blue[100] : Colors.grey[100],
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: tempAvatar == emoji ? Colors.blue : Colors.grey[300]!,
-                            width: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(2),
+                            ),
                           ),
                         ),
-                        child: Text(
-                          emoji,
-                          style: const TextStyle(fontSize: 24),
+                        const SizedBox(height: 20),
+                        Text(
+                          isEnglish ? 'Edit Profile' : 'Profili Düzenle',
+                          style: GoogleFonts.quicksand(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
                         ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const Spacer(),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(
-                          isEnglish ? 'Cancel' : 'İptal',
+                        const SizedBox(height: 20),
+                        TextField(
+                          decoration: InputDecoration(
+                            labelText: isEnglish ? 'Name' : 'Ad',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onChanged: (value) => tempName = value,
+                          controller: TextEditingController(text: tempName),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          decoration: InputDecoration(
+                            labelText: isEnglish ? 'Surname' : 'Soyad',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onChanged: (value) => tempSurname = value,
+                          controller: TextEditingController(text: tempSurname),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          decoration: InputDecoration(
+                            labelText: isEnglish ? 'Age' : 'Yaş',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          keyboardType: TextInputType.number,
+                          onChanged:
+                              (value) =>
+                                  tempAge = int.tryParse(value) ?? tempAge,
+                          controller: TextEditingController(
+                            text: tempAge.toString(),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          isEnglish ? 'Choose Avatar:' : 'Avatar Seç:',
                           style: GoogleFonts.quicksand(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Colors.grey[600],
+                            color: Colors.black87,
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children:
+                              ['👦', '👧', '🧑', '👨', '👩'].map((emoji) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    setModalState(() {
+                                      tempAvatar = emoji;
+                                    });
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.only(right: 12),
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          tempAvatar == emoji
+                                              ? Colors.blue[100]
+                                              : Colors.grey[100],
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color:
+                                            tempAvatar == emoji
+                                                ? Colors.blue
+                                                : Colors.grey[300]!,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      emoji,
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                        ),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text(
+                                  isEnglish ? 'Cancel' : 'İptal',
+                                  style: GoogleFonts.quicksand(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _userName = tempName;
+                                    _userSurname = tempSurname;
+                                    _userAge = tempAge;
+                                    _avatar = tempAvatar;
+                                  });
+                                  Navigator.pop(context);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF6C63FF),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text(
+                                  isEnglish ? 'Save' : 'Kaydet',
+                                  style: GoogleFonts.quicksand(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            _userName = tempName;
-                            _userSurname = tempSurname;
-                            _userAge = tempAge;
-                            _avatar = tempAvatar;
-                          });
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6C63FF),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          isEnglish ? 'Save' : 'Kaydet',
-                          style: GoogleFonts.quicksand(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ],
-            ),
           ),
-        ),
-      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    const Color mainColor = Color.fromARGB(255, 137, 189, 214); // Açık gök mavisi
-    const Color accentColor = Color.fromARGB(255, 104, 178, 211); // Daha koyu açık mavi
+    const Color mainColor = Color.fromARGB(
+      255,
+      137,
+      189,
+      214,
+    ); // Açık gök mavisi
+    const Color accentColor = Color.fromARGB(
+      255,
+      104,
+      178,
+      211,
+    ); // Daha koyu açık mavi
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -209,12 +235,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: Theme.of(context).brightness == Brightness.dark
-                    ? [
-                        const Color(0xFF1E1E1E), // Dark grey
-                        const Color(0xFF121212), // Darker grey
-                      ]
-                    : [mainColor, accentColor],
+                colors:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? [
+                          const Color(0xFF1E1E1E), // Dark grey
+                          const Color(0xFF121212), // Darker grey
+                        ]
+                        : [mainColor, accentColor],
               ),
             ),
             child: SafeArea(
@@ -273,15 +300,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: Theme.of(context).brightness == Brightness.dark
-                ? [
-                    const Color(0xFF1E1E1E), // Dark grey
-                    const Color(0xFF121212), // Darker grey
-                  ]
-                : [
-                    mainColor,
-                    accentColor,
-                  ],
+            colors:
+                Theme.of(context).brightness == Brightness.dark
+                    ? [
+                      const Color(0xFF1E1E1E), // Dark grey
+                      const Color(0xFF121212), // Darker grey
+                    ]
+                    : [mainColor, accentColor],
           ),
         ),
         child: Center(
@@ -311,10 +336,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: CircleAvatar(
                     radius: 54,
                     backgroundColor: Colors.white,
-                    child: Text(
-                      _avatar,
-                      style: const TextStyle(fontSize: 60),
-                    ),
+                    child: Text(_avatar, style: const TextStyle(fontSize: 60)),
                   ),
                 ),
               ),
@@ -350,18 +372,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                pageBuilder:
+                    (context, animation, secondaryAnimation) =>
+                        const HomeScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
                   const begin = Offset(-1.0, 0.0);
                   const end = Offset.zero;
                   const curve = Curves.easeInOutCubic;
-                  
-                  var tween = Tween(begin: begin, end: end).chain(
-                    CurveTween(curve: curve),
-                  );
-                  
+
+                  var tween = Tween(
+                    begin: begin,
+                    end: end,
+                  ).chain(CurveTween(curve: curve));
+
                   var offsetAnimation = animation.drive(tween);
-                  
+
                   return SlideTransition(
                     position: offsetAnimation,
                     child: child,
@@ -374,18 +404,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => const SettingsScreen(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                pageBuilder:
+                    (context, animation, secondaryAnimation) =>
+                        const SettingsScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
                   const begin = Offset(1.0, 0.0);
                   const end = Offset.zero;
                   const curve = Curves.easeInOutCubic;
-                  
-                  var tween = Tween(begin: begin, end: end).chain(
-                    CurveTween(curve: curve),
-                  );
-                  
+
+                  var tween = Tween(
+                    begin: begin,
+                    end: end,
+                  ).chain(CurveTween(curve: curve));
+
                   var offsetAnimation = animation.drive(tween);
-                  
+
                   return SlideTransition(
                     position: offsetAnimation,
                     child: child,

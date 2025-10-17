@@ -299,7 +299,7 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                                 horizontal: 20,
                               ),
                               decoration: BoxDecoration(
-                                color: isCorrect ? Colors.green : Colors.red,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: const [
                                   BoxShadow(
@@ -316,7 +316,8 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                                     isCorrect
                                         ? Icons.check_circle
                                         : Icons.cancel,
-                                    color: Colors.white,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
                                     size: 28,
                                   ),
                                   const SizedBox(width: 10),
@@ -328,9 +329,10 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                                         : (isEnglish
                                             ? "Here's the right one! 🧐"
                                             : 'İşte doğrusu! 🧐'),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 18,
-                                      color: Colors.white,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

@@ -128,7 +128,7 @@ class _ParaSiniflaState extends State<ParaSinifla>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Custom Golden Trophy Icon
-                        Container(
+                        SizedBox(
                           width: 120,
                           height: 120,
                           child: Stack(
@@ -555,8 +555,8 @@ class _ParaSiniflaState extends State<ParaSinifla>
             ? Colors.deepPurple.shade300
             : Colors.blue.shade400;
     return DragTarget<String>(
-      onWillAccept: (data) => !eslesenler.contains(data!),
-      onAccept: (data) => _handleDrag(data!, kategori),
+      onWillAcceptWithDetails: (data) => !eslesenler.contains(data.data!),
+      onAcceptWithDetails: (data) => _handleDrag(data.data!, kategori),
       builder: (context, candidateData, rejectedData) {
         return Container(
           width: double.infinity,
@@ -606,12 +606,8 @@ class _ParaSiniflaState extends State<ParaSinifla>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Center(child: _buildItemDisplay(item)),

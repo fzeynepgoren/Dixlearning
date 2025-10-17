@@ -15,7 +15,7 @@ class Disgrafi1 extends StatefulWidget {
 
 class _Disgrafi1State extends State<Disgrafi1> with TickerProviderStateMixin {
   final FlutterTts flutterTts = FlutterTts();
-  int _currentQuestionIndex = 0;
+  final int _currentQuestionIndex = 0;
   bool _isPlaying = false;
   bool _showFeedback = false;
   bool _isCorrect = false;

@@ -3,8 +3,6 @@ import '../utils/activity_tracker.dart';
 import 'package:flutter/services.dart';
 import 'dart:math';
 import 'disgrafi1.dart';
-import 'package:provider/provider.dart';
-import '../providers/language_provider.dart';
 import '../screens/home_screen.dart';
 
 class Diskalkuli3 extends StatefulWidget {
@@ -284,7 +282,7 @@ class _Diskalkuli3State extends State<Diskalkuli3>
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  _isWrong ? "İşte doğrusu" : "Aferin! 🎉",
+                                  _isWrong ? "Tekrar dene! 😔" : "Aferin! 🎉",
                                   style: const TextStyle(
                                     fontSize: 18,
                                     color: Colors.white,

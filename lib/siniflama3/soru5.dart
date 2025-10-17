@@ -132,7 +132,7 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Custom Golden Trophy Icon
-                        Container(
+                        SizedBox(
                           width: 120,
                           height: 120,
                           child: Stack(
@@ -587,8 +587,8 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
         borderRadius: BorderRadius.circular(16),
       ),
       child: DragTarget<Map<String, dynamic>>(
-        onWillAccept: (data) => true, // tüm sürüklemeleri kabul et
-        onAccept: (data) => _handleDrag(data!, key),
+        onWillAcceptWithDetails: (data) => true, // tüm sürüklemeleri kabul et
+        onAcceptWithDetails: (data) => _handleDrag(data.data, key),
         builder: (context, candidateData, rejectedData) {
           return Column(
             children: [

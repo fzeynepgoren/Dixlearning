@@ -1,7 +1,6 @@
 import 'package:dixlearning/karsilastirma_uzun_kisa/soru4.dart';
 import 'package:flutter/material.dart';
 import '../screens/karsilastirma_sorulari_screen.dart';
-import 'asama_gecis_ekrani.dart';
 
 class KisaUzunYolSorusu extends StatefulWidget {
   const KisaUzunYolSorusu({super.key});

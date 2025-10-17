@@ -114,7 +114,7 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Custom Golden Trophy Icon
-                        Container(
+                        SizedBox(
                           width: 120,
                           height: 120,
                           child: Stack(

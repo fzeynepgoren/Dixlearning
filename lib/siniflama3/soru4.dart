@@ -4,7 +4,6 @@ import '../providers/language_provider.dart';
 import 'soru5.dart'; // HayvanYasamSinifla sınıfının bulunduğu dosya
 import '../screens/siniflandirma_sorulari_screen.dart';
 
-
 class TasitSinifla extends StatefulWidget {
   const TasitSinifla({super.key});
 
@@ -352,12 +351,12 @@ class _TasitSiniflaState extends State<TasitSinifla>
     Color borderColor,
   ) {
     return DragTarget<Map<String, dynamic>>(
-      onWillAccept: (data) => true,
-      onAccept: (data) {
-        bool isCorrectMatch = data?['type'] == type;
+      onWillAcceptWithDetails: (data) => true,
+      onAcceptWithDetails: (data) {
+        bool isCorrectMatch = data.data['type'] == type;
 
         if (isCorrectMatch) {
-          _handleDrag(data, type);
+          _handleDrag(data.data, type);
         } else {
           final isEnglish =
               Provider.of<LanguageProvider>(context, listen: false).isEnglish;

@@ -14,8 +14,8 @@ class ClassificationQuestionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    final Color mainColor = const Color(0xFF6C63FF);
-    final Color accentColor = const Color(0xFF00C9A7);
+    const Color mainColor = Color(0xFF6C63FF);
+    const Color accentColor = Color(0xFF00C9A7);
 
     final activities = [
       {

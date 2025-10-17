@@ -90,9 +90,9 @@ class _Diskalkuli2State extends State<Diskalkuli2> {
                       ),
                     ],
                   ),
-                  child: Text(
+                  child: const Text(
                     "Aşağıdaki örüntüyü doğru şekilde tamamla",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF0288D1),

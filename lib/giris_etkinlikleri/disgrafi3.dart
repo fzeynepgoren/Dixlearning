@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
 import '../utils/activity_tracker.dart';
 import 'dart:math';
-import 'disgrafi1.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -111,13 +110,9 @@ class _HeceDoldurmaState extends State<HeceDoldurma>
 
         ActivityTracker.completeActivity();
 
-        
-
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => const HomeScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       }
     }
@@ -157,7 +152,8 @@ class _HeceDoldurmaState extends State<HeceDoldurma>
       backgroundColor: const Color(0xFFE1F5FE),
       appBar: AppBar(
         title: Text(
-            isEnglish ? 'Syllable Completion Game' : 'Hece Tamamlama Oyunu'),
+          isEnglish ? 'Syllable Completion Game' : 'Hece Tamamlama Oyunu',
+        ),
         centerTitle: true,
         backgroundColor: const Color(0xFF0288D1),
         elevation: 0,
@@ -223,25 +219,28 @@ class _HeceDoldurmaState extends State<HeceDoldurma>
                         },
                         builder: (context, candidateData, rejectedData) {
                           return GestureDetector(
-                            onLongPress: userInput[i] != null
-                                ? () => clearInput(i)
-                                : null,
+                            onLongPress:
+                                userInput[i] != null
+                                    ? () => clearInput(i)
+                                    : null,
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               width: 60,
                               height: 60,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: isCorrect
-                                    ? Colors.green
-                                    : (candidateData.isNotEmpty
-                                        ? Colors.yellow[200]
-                                        : Colors.blue.withOpacity(0.5)),
+                                color:
+                                    isCorrect
+                                        ? Colors.green
+                                        : (candidateData.isNotEmpty
+                                            ? Colors.yellow[200]
+                                            : Colors.blue.withOpacity(0.5)),
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: isCorrect
-                                      ? Colors.green
-                                      : Colors.blueAccent,
+                                  color:
+                                      isCorrect
+                                          ? Colors.green
+                                          : Colors.blueAccent,
                                   width: 3,
                                 ),
                                 boxShadow: [
@@ -306,20 +305,21 @@ class _HeceDoldurmaState extends State<HeceDoldurma>
             Wrap(
               spacing: 12,
               runSpacing: 12,
-              children: allLetters.map((letter) {
-                return Draggable<String>(
-                  data: letter,
-                  feedback: Material(
-                    color: Colors.transparent,
-                    child: _buildLetterBox(letter, dragging: true),
-                  ),
-                  childWhenDragging: Opacity(
-                    opacity: 0.3,
-                    child: _buildLetterBox(letter),
-                  ),
-                  child: _buildLetterBox(letter),
-                );
-              }).toList(),
+              children:
+                  allLetters.map((letter) {
+                    return Draggable<String>(
+                      data: letter,
+                      feedback: Material(
+                        color: Colors.transparent,
+                        child: _buildLetterBox(letter, dragging: true),
+                      ),
+                      childWhenDragging: Opacity(
+                        opacity: 0.3,
+                        child: _buildLetterBox(letter),
+                      ),
+                      child: _buildLetterBox(letter),
+                    );
+                  }).toList(),
             ),
           ],
         ),
