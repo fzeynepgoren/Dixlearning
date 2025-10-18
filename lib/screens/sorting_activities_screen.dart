@@ -329,67 +329,165 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
   Widget _buildSpaceRoadmap() {
     return Stack(
       children: [
-        // Asteroid yolu - basit çizgiler
-        Positioned(
-          left: MediaQuery.of(context).size.width * 0.5,
-          top: MediaQuery.of(context).size.height * 0.9,
-          child: Container(
-            width: 200,
-            height: 3,
-            decoration: BoxDecoration(
-              color: Colors.purple.withOpacity(0.8),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-        ),
-
-        // Gezegenler - basit daireler
-        _buildSimplePlanet(5, 0.5, 0.9, Colors.brown),
-        _buildSimplePlanet(4, 0.7, 0.8, Colors.orange),
-        _buildSimplePlanet(3, 0.65, 0.5, Colors.blue),
-        _buildSimplePlanet(2, 0.2, 0.45, Colors.purple),
-        _buildSimplePlanet(1, 0.15, 0.25, Colors.deepPurple),
+        // Asteroid yolu parçaları
+        _buildAsteroidPath(),
+        
+        // Gezegenler - daha güzel tasarım
+        _buildBeautifulPlanet(5, 0.5, 0.9, Colors.brown, Colors.grey),
+        _buildBeautifulPlanet(4, 0.7, 0.8, Colors.orange, Colors.red),
+        _buildBeautifulPlanet(3, 0.65, 0.5, Colors.blue, Colors.green),
+        _buildBeautifulPlanet(2, 0.2, 0.45, Colors.purple, Colors.pink),
+        _buildBeautifulPlanet(1, 0.15, 0.25, Colors.deepPurple, Colors.purple),
       ],
     );
   }
 
-  Widget _buildSimplePlanet(
-    int stageNumber,
-    double leftRatio,
-    double topRatio,
-    Color color,
-  ) {
+  Widget _buildAsteroidPath() {
+    return Stack(
+      children: [
+        // Yol parçaları
+        _buildPathSegment(0.5, 0.9, 0.7, 0.8), // Stage 5 -> Stage 4
+        _buildPathSegment(0.7, 0.8, 0.65, 0.5), // Stage 4 -> Stage 3
+        _buildPathSegment(0.65, 0.5, 0.2, 0.45), // Stage 3 -> Stage 2
+        _buildPathSegment(0.2, 0.45, 0.15, 0.25), // Stage 2 -> Stage 1
+        
+        // Asteroid parçaları
+        _buildAsteroid(0.6, 0.85),
+        _buildAsteroid(0.68, 0.7),
+        _buildAsteroid(0.45, 0.47),
+        _buildAsteroid(0.18, 0.35),
+      ],
+    );
+  }
+
+  Widget _buildPathSegment(double startX, double startY, double endX, double endY) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    final startPoint = Offset(startX * screenWidth, startY * screenHeight);
+    final endPoint = Offset(endX * screenWidth, endY * screenHeight);
+    
     return Positioned(
-      left: MediaQuery.of(context).size.width * leftRatio - 25,
-      top: MediaQuery.of(context).size.height * topRatio - 25,
-      child: Container(
-        width: 50,
-        height: 50,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.5),
-              blurRadius: 10,
-              spreadRadius: 2,
-            ),
-          ],
+      left: startPoint.dx,
+      top: startPoint.dy,
+      child: CustomPaint(
+        size: Size(
+          (endPoint.dx - startPoint.dx).abs(),
+          (endPoint.dy - startPoint.dy).abs(),
         ),
-        child: Center(
-          child: Text(
-            '$stageNumber',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+        painter: PathSegmentPainter(
+          startPoint: Offset(0, 0),
+          endPoint: Offset(
+            endPoint.dx - startPoint.dx,
+            endPoint.dy - startPoint.dy,
           ),
         ),
       ),
     );
   }
+
+  Widget _buildAsteroid(double x, double y) {
+    return Positioned(
+      left: MediaQuery.of(context).size.width * x - 4,
+      top: MediaQuery.of(context).size.height * y - 4,
+      child: Container(
+        width: 8,
+        height: 8,
+        decoration: BoxDecoration(
+          color: Colors.purple.withOpacity(0.9),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.purple.withOpacity(0.5),
+              blurRadius: 4,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBeautifulPlanet(int stageNumber, double leftRatio, double topRatio, Color planetColor, Color ringColor) {
+    return Positioned(
+      left: MediaQuery.of(context).size.width * leftRatio - 30,
+      top: MediaQuery.of(context).size.height * topRatio - 30,
+      child: Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [
+              planetColor,
+              planetColor.withOpacity(0.7),
+            ],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: planetColor.withOpacity(0.6),
+              blurRadius: 15,
+              spreadRadius: 3,
+            ),
+            BoxShadow(
+              color: Colors.white.withOpacity(0.3),
+              blurRadius: 8,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Gezegen halkası
+            Positioned(
+              left: -8,
+              top: -8,
+              child: Container(
+                width: 76,
+                height: 76,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: ringColor.withOpacity(0.8),
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+            // Aşama numarası
+            Center(
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 4,
+                      offset: const Offset(1, 1),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    '$stageNumber',
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 
   Widget _buildPlanetClickableArea({
     required int planetNumber,
@@ -692,4 +790,43 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
       },
     );
   }
+}
+
+class PathSegmentPainter extends CustomPainter {
+  final Offset startPoint;
+  final Offset endPoint;
+
+  PathSegmentPainter({
+    required this.startPoint,
+    required this.endPoint,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.purple.withOpacity(0.8)
+      ..strokeWidth = 6
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    // Yol çizgisi
+    canvas.drawLine(startPoint, endPoint, paint);
+
+    // Yol üzerinde küçük noktalar
+    final pathPaint = Paint()
+      ..color = Colors.purple.withOpacity(0.9)
+      ..style = PaintingStyle.fill;
+
+    final distance = (endPoint - startPoint).distance;
+    final segmentCount = (distance / 20).round();
+    
+    for (int i = 0; i <= segmentCount; i++) {
+      final t = i / segmentCount;
+      final point = Offset.lerp(startPoint, endPoint, t)!;
+      canvas.drawCircle(point, 3, pathPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
