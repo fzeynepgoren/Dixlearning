@@ -121,11 +121,11 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
               left: MediaQuery.of(context).size.width * 0.05,
               child: GestureDetector(
                 onTap: () {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (route) => false,
-            );
-          },
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
                 child: Container(
                   width: 50,
                   height: 50,
@@ -327,9 +327,66 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
   }
 
   Widget _buildSpaceRoadmap() {
-    return SizedBox.expand(
-      child: CustomPaint(
-        painter: SpaceRoadmapPainter(),
+    return Stack(
+      children: [
+        // Asteroid yolu - basit çizgiler
+        Positioned(
+          left: MediaQuery.of(context).size.width * 0.5,
+          top: MediaQuery.of(context).size.height * 0.9,
+          child: Container(
+            width: 200,
+            height: 3,
+            decoration: BoxDecoration(
+              color: Colors.purple.withOpacity(0.8),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+
+        // Gezegenler - basit daireler
+        _buildSimplePlanet(5, 0.5, 0.9, Colors.brown),
+        _buildSimplePlanet(4, 0.7, 0.8, Colors.orange),
+        _buildSimplePlanet(3, 0.65, 0.5, Colors.blue),
+        _buildSimplePlanet(2, 0.2, 0.45, Colors.purple),
+        _buildSimplePlanet(1, 0.15, 0.25, Colors.deepPurple),
+      ],
+    );
+  }
+
+  Widget _buildSimplePlanet(
+    int stageNumber,
+    double leftRatio,
+    double topRatio,
+    Color color,
+  ) {
+    return Positioned(
+      left: MediaQuery.of(context).size.width * leftRatio - 25,
+      top: MediaQuery.of(context).size.height * topRatio - 25,
+      child: Container(
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.5),
+              blurRadius: 10,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            '$stageNumber',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -635,191 +692,4 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
       },
     );
   }
-}
-
-class SpaceRoadmapPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Debug: Canvas boyutunu kontrol et
-    print('Canvas size: ${size.width} x ${size.height}');
-    
-    // Asteroid yolu çiz
-    _drawAsteroidPath(canvas, size);
-
-    // Gezegenleri çiz
-    _drawPlanets(canvas, size);
-  }
-
-  void _drawAsteroidPath(Canvas canvas, Size size) {
-    // Basit test çizimi
-    final testPaint = Paint()
-      ..color = Colors.red
-      ..strokeWidth = 5
-      ..style = PaintingStyle.stroke;
-
-    // Test çizgisi
-    canvas.drawLine(
-      Offset(0, 0),
-      Offset(size.width, size.height),
-      testPaint,
-    );
-
-    final path = Path();
-
-    // S şeklinde asteroid yolu
-    path.moveTo(size.width * 0.5, size.height * 0.9); // Başlangıç (Stage 5)
-    path.quadraticBezierTo(
-      size.width * 0.7,
-      size.height * 0.8, // Stage 4
-      size.width * 0.65,
-      size.height * 0.5, // Stage 3
-    );
-    path.quadraticBezierTo(
-      size.width * 0.2,
-      size.height * 0.45, // Stage 2
-      size.width * 0.15,
-      size.height * 0.25, // Stage 1
-    );
-
-    // Asteroid yolu için paint
-    final asteroidPaint =
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 8
-          ..color = Colors.purple.withOpacity(0.8);
-
-    canvas.drawPath(path, asteroidPaint);
-
-    // Asteroid parçaları çiz
-    _drawAsteroids(canvas, size);
-  }
-
-  void _drawAsteroids(Canvas canvas, Size size) {
-    final asteroidPaint =
-        Paint()
-          ..style = PaintingStyle.fill
-          ..color = Colors.purple.withOpacity(0.9);
-
-    // Yol boyunca asteroid parçaları
-    final positions = [
-      Offset(size.width * 0.5, size.height * 0.9),
-      Offset(size.width * 0.6, size.height * 0.85),
-      Offset(size.width * 0.7, size.height * 0.8),
-      Offset(size.width * 0.68, size.height * 0.7),
-      Offset(size.width * 0.65, size.height * 0.5),
-      Offset(size.width * 0.45, size.height * 0.47),
-      Offset(size.width * 0.2, size.height * 0.45),
-      Offset(size.width * 0.18, size.height * 0.35),
-      Offset(size.width * 0.15, size.height * 0.25),
-    ];
-
-    for (final pos in positions) {
-      canvas.drawCircle(pos, 6, asteroidPaint);
-    }
-  }
-
-  void _drawPlanets(Canvas canvas, Size size) {
-    // Stage 5 - En alttaki kayalık yüzey
-    _drawPlanet(
-      canvas,
-      size.width * 0.5,
-      size.height * 0.9,
-      25,
-      Colors.brown,
-      Colors.grey,
-      5,
-    );
-
-    // Stage 4 - Sağ alttaki turuncu-kırmızı kuyruklu yıldız
-    _drawPlanet(
-      canvas,
-      size.width * 0.7,
-      size.height * 0.8,
-      20,
-      Colors.orange,
-      Colors.red,
-      4,
-    );
-
-    // Stage 3 - Orta sağdaki mavi-yeşil Dünya benzeri gezegen
-    _drawPlanet(
-      canvas,
-      size.width * 0.65,
-      size.height * 0.5,
-      30,
-      Colors.blue,
-      Colors.green,
-      3,
-    );
-
-    // Stage 2 - Orta soldaki pembe halkalı mor gezegen
-    _drawPlanet(
-      canvas,
-      size.width * 0.2,
-      size.height * 0.45,
-      28,
-      Colors.purple,
-      Colors.pink,
-      2,
-    );
-
-    // Stage 1 - Sol üstteki çizgili mor gezegen
-    _drawPlanet(
-      canvas,
-      size.width * 0.15,
-      size.height * 0.25,
-      35,
-      Colors.deepPurple,
-      Colors.purple,
-      1,
-    );
-  }
-
-  void _drawPlanet(
-    Canvas canvas,
-    double x,
-    double y,
-    double radius,
-    Color planetColor,
-    Color ringColor,
-    int stageNumber,
-  ) {
-    // Gezegen gövdesi
-    final planetPaint =
-        Paint()
-          ..style = PaintingStyle.fill
-          ..color = planetColor;
-
-    canvas.drawCircle(Offset(x, y), radius, planetPaint);
-
-    // Gezegen halkası
-    final ringPaint =
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 3
-          ..color = ringColor;
-
-    canvas.drawCircle(Offset(x, y), radius + 8, ringPaint);
-
-    // Aşama numarası
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: '$stageNumber',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(x - textPainter.width / 2, y - textPainter.height / 2),
-    );
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
