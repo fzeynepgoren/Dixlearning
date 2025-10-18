@@ -52,33 +52,13 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF2D1B69), // Koyu mor
-              Color(0xFF8B5FBF), // Orta mor
-              Color(0xFFC77DFF), // Açık mor/pembe
-              Color(0xFFE0AAFF), // Pembe
-            ],
+          image: DecorationImage(
+            image: AssetImage('assets/SIRALAMA_RESIMLERI/spacemap/spacemap.png'),
+            fit: BoxFit.cover,
           ),
         ),
         child: Stack(
           children: [
-            // Yıldızlar arka planı
-            ...List.generate(100, (index) => _buildStar()),
-
-            // Sol üstteki büyük nebula/galaksi
-            _buildNebula(),
-
-            // Sağ alttaki küçük nebula
-            _buildSmallNebula(),
-
-            // Ana gezegenler ve asteroid yolu
-            _buildSpaceRoadmap(),
-
-            // Uzay gemisi
-            _buildSpaceship(),
 
             // Başlık - Sıralama Soruları (şeffaf arka plan)
             Positioned(
@@ -121,11 +101,11 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
               left: MediaQuery.of(context).size.width * 0.05,
               child: GestureDetector(
                 onTap: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
+            );
+          },
                 child: Container(
                   width: 50,
                   height: 50,
@@ -149,38 +129,18 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
               ),
             ),
 
-            // Gezegen tıklama alanları (aşağıdan yukarıya 5-4-3-2-1)
-            // Stage 5 - En alttaki kayalık yüzey (Stage 5)
+            // Gezegen tıklama alanları (spacemap.png'deki konumlara göre)
+            // Stage 1 - Sol üstteki çizgili mor gezegen
             Positioned(
-              left: MediaQuery.of(context).size.width * 0.50,
-              top: MediaQuery.of(context).size.height * 0.90,
+              left: MediaQuery.of(context).size.width * 0.15,
+              top: MediaQuery.of(context).size.height * 0.25,
               child: _buildPlanetClickableArea(
-                planetNumber: 5,
-                onTap: () => _navigateToStage(context, 5),
+                planetNumber: 1,
+                onTap: () => _navigateToStage(context, 1),
               ),
             ),
 
-            // Stage 4 - Sağ alttaki turuncu-kırmızı kuyruklu yıldız (Stage 4)
-            Positioned(
-              left: MediaQuery.of(context).size.width * 0.70,
-              top: MediaQuery.of(context).size.height * 0.80,
-              child: _buildPlanetClickableArea(
-                planetNumber: 4,
-                onTap: () => _navigateToStage(context, 4),
-              ),
-            ),
-
-            // Stage 3 - Orta sağdaki mavi-yeşil Dünya benzeri gezegen (Stage 3)
-            Positioned(
-              left: MediaQuery.of(context).size.width * 0.65,
-              top: MediaQuery.of(context).size.height * 0.50,
-              child: _buildPlanetClickableArea(
-                planetNumber: 3,
-                onTap: () => _navigateToStage(context, 3),
-              ),
-            ),
-
-            // Stage 2 - Orta soldaki pembe halkalı mor gezegen (Stage 2)
+            // Stage 2 - Orta soldaki pembe halkalı mor gezegen
             Positioned(
               left: MediaQuery.of(context).size.width * 0.20,
               top: MediaQuery.of(context).size.height * 0.45,
@@ -190,13 +150,33 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
               ),
             ),
 
-            // Stage 1 - Sol üstteki çizgili mor gezegen (Stage 1)
+            // Stage 3 - Orta sağdaki mavi-yeşil Dünya benzeri gezegen
             Positioned(
-              left: MediaQuery.of(context).size.width * 0.15,
-              top: MediaQuery.of(context).size.height * 0.25,
+              left: MediaQuery.of(context).size.width * 0.65,
+              top: MediaQuery.of(context).size.height * 0.50,
               child: _buildPlanetClickableArea(
-                planetNumber: 1,
-                onTap: () => _navigateToStage(context, 1),
+                planetNumber: 3,
+                onTap: () => _navigateToStage(context, 3),
+              ),
+            ),
+
+            // Stage 4 - Sağ alttaki turuncu-kırmızı kuyruklu yıldız
+            Positioned(
+              left: MediaQuery.of(context).size.width * 0.70,
+              top: MediaQuery.of(context).size.height * 0.80,
+              child: _buildPlanetClickableArea(
+                planetNumber: 4,
+                onTap: () => _navigateToStage(context, 4),
+              ),
+            ),
+
+            // Stage 5 - En alttaki kayalık yüzey
+            Positioned(
+              left: MediaQuery.of(context).size.width * 0.50,
+              top: MediaQuery.of(context).size.height * 0.90,
+              child: _buildPlanetClickableArea(
+                planetNumber: 5,
+                onTap: () => _navigateToStage(context, 5),
               ),
             ),
           ],
@@ -331,7 +311,7 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
       children: [
         // Asteroid yolu parçaları
         _buildAsteroidPath(),
-        
+
         // Gezegenler - daha güzel tasarım
         _buildBeautifulPlanet(5, 0.5, 0.9, Colors.brown, Colors.grey),
         _buildBeautifulPlanet(4, 0.7, 0.8, Colors.orange, Colors.red),
@@ -350,7 +330,6 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
         _buildPathSegment(0.7, 0.8, 0.65, 0.5), // Stage 4 -> Stage 3
         _buildPathSegment(0.65, 0.5, 0.2, 0.45), // Stage 3 -> Stage 2
         _buildPathSegment(0.2, 0.45, 0.15, 0.25), // Stage 2 -> Stage 1
-        
         // Asteroid parçaları
         _buildAsteroid(0.6, 0.85),
         _buildAsteroid(0.68, 0.7),
@@ -360,13 +339,18 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
     );
   }
 
-  Widget _buildPathSegment(double startX, double startY, double endX, double endY) {
+  Widget _buildPathSegment(
+    double startX,
+    double startY,
+    double endX,
+    double endY,
+  ) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
+
     final startPoint = Offset(startX * screenWidth, startY * screenHeight);
     final endPoint = Offset(endX * screenWidth, endY * screenHeight);
-    
+
     return Positioned(
       left: startPoint.dx,
       top: startPoint.dy,
@@ -408,7 +392,13 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
     );
   }
 
-  Widget _buildBeautifulPlanet(int stageNumber, double leftRatio, double topRatio, Color planetColor, Color ringColor) {
+  Widget _buildBeautifulPlanet(
+    int stageNumber,
+    double leftRatio,
+    double topRatio,
+    Color planetColor,
+    Color ringColor,
+  ) {
     return Positioned(
       left: MediaQuery.of(context).size.width * leftRatio - 30,
       top: MediaQuery.of(context).size.height * topRatio - 30,
@@ -418,10 +408,7 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: RadialGradient(
-            colors: [
-              planetColor,
-              planetColor.withOpacity(0.7),
-            ],
+            colors: [planetColor, planetColor.withOpacity(0.7)],
           ),
           boxShadow: [
             BoxShadow(
@@ -487,7 +474,6 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
       ),
     );
   }
-
 
   Widget _buildPlanetClickableArea({
     required int planetNumber,
@@ -792,41 +778,3 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
   }
 }
 
-class PathSegmentPainter extends CustomPainter {
-  final Offset startPoint;
-  final Offset endPoint;
-
-  PathSegmentPainter({
-    required this.startPoint,
-    required this.endPoint,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.purple.withOpacity(0.8)
-      ..strokeWidth = 6
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    // Yol çizgisi
-    canvas.drawLine(startPoint, endPoint, paint);
-
-    // Yol üzerinde küçük noktalar
-    final pathPaint = Paint()
-      ..color = Colors.purple.withOpacity(0.9)
-      ..style = PaintingStyle.fill;
-
-    final distance = (endPoint - startPoint).distance;
-    final segmentCount = (distance / 20).round();
-    
-    for (int i = 0; i <= segmentCount; i++) {
-      final t = i / segmentCount;
-      final point = Offset.lerp(startPoint, endPoint, t)!;
-      canvas.drawCircle(point, 3, pathPaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
-}
