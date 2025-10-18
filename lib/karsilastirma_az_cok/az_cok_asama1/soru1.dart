@@ -204,7 +204,7 @@ class _AzCokSoru1State extends State<AzCokSoru1> with TickerProviderStateMixin {
                                           ? (isCorrect
                                               ? Colors.green
                                               : Colors.red)
-                                          : Colors.orange.shade400,
+                                          : Color(0xFFF5E733),
                                   foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -215,7 +215,7 @@ class _AzCokSoru1State extends State<AzCokSoru1> with TickerProviderStateMixin {
                                           ? (isCorrect
                                               ? Colors.green.shade300
                                               : Colors.red.shade300)
-                                          : Colors.deepOrange.shade300,
+                                          : Color(0xFFF5E733),
                                 ),
                                 child: const Text(
                                   'Seç',
@@ -265,7 +265,7 @@ class _AzCokSoru1State extends State<AzCokSoru1> with TickerProviderStateMixin {
                                           ? (isCorrect
                                               ? Colors.green
                                               : Colors.red)
-                                          : Colors.orange.shade400,
+                                          : Color(0xFFF5E733),
                                   foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -276,7 +276,7 @@ class _AzCokSoru1State extends State<AzCokSoru1> with TickerProviderStateMixin {
                                           ? (isCorrect
                                               ? Colors.green.shade300
                                               : Colors.red.shade300)
-                                          : Colors.deepOrange.shade300,
+                                          : Color(0xFFF5E733),
                                 ),
                                 child: const Text(
                                   'Seç',

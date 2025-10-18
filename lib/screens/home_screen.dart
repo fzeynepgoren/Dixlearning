@@ -4,7 +4,6 @@ import 'giris_etkinlikleri_screen.dart';
 import 'profile_screen.dart';
 import 'settings_screen.dart';
 import 'matching_questions_screen.dart';
-import 'classification_questions_screen.dart';
 import 'karsilastirma_sorulari_screen.dart';
 import 'login_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
@@ -12,6 +11,9 @@ import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import 'sorting_activities_screen.dart';
 import 'dart:convert';
+import 'siniflandirma_sorulari_screen.dart';
+
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
