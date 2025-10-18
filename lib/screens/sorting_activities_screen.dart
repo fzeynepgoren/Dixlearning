@@ -82,7 +82,7 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
 
             // Başlık - Sıralama Soruları (şeffaf arka plan)
             Positioned(
-              top: MediaQuery.of(context).size.height * 0.08,
+              top: MediaQuery.of(context).size.height * 0.05,
               left: 0,
               right: 0,
               child: Center(
@@ -327,9 +327,10 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
   }
 
   Widget _buildSpaceRoadmap() {
-    return CustomPaint(
-      size: Size.infinite,
-      painter: SpaceRoadmapPainter(),
+    return SizedBox.expand(
+      child: CustomPaint(
+        painter: SpaceRoadmapPainter(),
+      ),
     );
   }
 
@@ -425,7 +426,6 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
       ),
     );
   }
-
 
   void _navigateToStage(BuildContext context, int stageNumber) {
     final isEnglish =
@@ -640,32 +640,53 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
 class SpaceRoadmapPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
+    // Debug: Canvas boyutunu kontrol et
+    print('Canvas size: ${size.width} x ${size.height}');
+    
     // Asteroid yolu çiz
     _drawAsteroidPath(canvas, size);
-    
+
     // Gezegenleri çiz
     _drawPlanets(canvas, size);
   }
 
   void _drawAsteroidPath(Canvas canvas, Size size) {
+    // Basit test çizimi
+    final testPaint = Paint()
+      ..color = Colors.red
+      ..strokeWidth = 5
+      ..style = PaintingStyle.stroke;
+
+    // Test çizgisi
+    canvas.drawLine(
+      Offset(0, 0),
+      Offset(size.width, size.height),
+      testPaint,
+    );
+
     final path = Path();
-    
+
     // S şeklinde asteroid yolu
     path.moveTo(size.width * 0.5, size.height * 0.9); // Başlangıç (Stage 5)
     path.quadraticBezierTo(
-      size.width * 0.7, size.height * 0.8, // Stage 4
-      size.width * 0.65, size.height * 0.5, // Stage 3
+      size.width * 0.7,
+      size.height * 0.8, // Stage 4
+      size.width * 0.65,
+      size.height * 0.5, // Stage 3
     );
     path.quadraticBezierTo(
-      size.width * 0.2, size.height * 0.45, // Stage 2
-      size.width * 0.15, size.height * 0.25, // Stage 1
+      size.width * 0.2,
+      size.height * 0.45, // Stage 2
+      size.width * 0.15,
+      size.height * 0.25, // Stage 1
     );
 
     // Asteroid yolu için paint
-    final asteroidPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 8
-      ..color = Colors.purple.withOpacity(0.8);
+    final asteroidPaint =
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 8
+          ..color = Colors.purple.withOpacity(0.8);
 
     canvas.drawPath(path, asteroidPaint);
 
@@ -674,9 +695,10 @@ class SpaceRoadmapPainter extends CustomPainter {
   }
 
   void _drawAsteroids(Canvas canvas, Size size) {
-    final asteroidPaint = Paint()
-      ..style = PaintingStyle.fill
-      ..color = Colors.purple.withOpacity(0.9);
+    final asteroidPaint =
+        Paint()
+          ..style = PaintingStyle.fill
+          ..color = Colors.purple.withOpacity(0.9);
 
     // Yol boyunca asteroid parçaları
     final positions = [
@@ -698,40 +720,84 @@ class SpaceRoadmapPainter extends CustomPainter {
 
   void _drawPlanets(Canvas canvas, Size size) {
     // Stage 5 - En alttaki kayalık yüzey
-    _drawPlanet(canvas, size.width * 0.5, size.height * 0.9, 25, 
-                Colors.brown, Colors.grey, 5);
+    _drawPlanet(
+      canvas,
+      size.width * 0.5,
+      size.height * 0.9,
+      25,
+      Colors.brown,
+      Colors.grey,
+      5,
+    );
 
     // Stage 4 - Sağ alttaki turuncu-kırmızı kuyruklu yıldız
-    _drawPlanet(canvas, size.width * 0.7, size.height * 0.8, 20, 
-                Colors.orange, Colors.red, 4);
+    _drawPlanet(
+      canvas,
+      size.width * 0.7,
+      size.height * 0.8,
+      20,
+      Colors.orange,
+      Colors.red,
+      4,
+    );
 
     // Stage 3 - Orta sağdaki mavi-yeşil Dünya benzeri gezegen
-    _drawPlanet(canvas, size.width * 0.65, size.height * 0.5, 30, 
-                Colors.blue, Colors.green, 3);
+    _drawPlanet(
+      canvas,
+      size.width * 0.65,
+      size.height * 0.5,
+      30,
+      Colors.blue,
+      Colors.green,
+      3,
+    );
 
     // Stage 2 - Orta soldaki pembe halkalı mor gezegen
-    _drawPlanet(canvas, size.width * 0.2, size.height * 0.45, 28, 
-                Colors.purple, Colors.pink, 2);
+    _drawPlanet(
+      canvas,
+      size.width * 0.2,
+      size.height * 0.45,
+      28,
+      Colors.purple,
+      Colors.pink,
+      2,
+    );
 
     // Stage 1 - Sol üstteki çizgili mor gezegen
-    _drawPlanet(canvas, size.width * 0.15, size.height * 0.25, 35, 
-                Colors.deepPurple, Colors.purple, 1);
+    _drawPlanet(
+      canvas,
+      size.width * 0.15,
+      size.height * 0.25,
+      35,
+      Colors.deepPurple,
+      Colors.purple,
+      1,
+    );
   }
 
-  void _drawPlanet(Canvas canvas, double x, double y, double radius, 
-                   Color planetColor, Color ringColor, int stageNumber) {
+  void _drawPlanet(
+    Canvas canvas,
+    double x,
+    double y,
+    double radius,
+    Color planetColor,
+    Color ringColor,
+    int stageNumber,
+  ) {
     // Gezegen gövdesi
-    final planetPaint = Paint()
-      ..style = PaintingStyle.fill
-      ..color = planetColor;
+    final planetPaint =
+        Paint()
+          ..style = PaintingStyle.fill
+          ..color = planetColor;
 
     canvas.drawCircle(Offset(x, y), radius, planetPaint);
 
     // Gezegen halkası
-    final ringPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
-      ..color = ringColor;
+    final ringPaint =
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3
+          ..color = ringColor;
 
     canvas.drawCircle(Offset(x, y), radius + 8, ringPaint);
 
