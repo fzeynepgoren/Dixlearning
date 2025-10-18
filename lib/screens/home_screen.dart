@@ -10,7 +10,7 @@ import 'login_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import 'sorting_activities_screen.dart';
+import 'sorting_roadmap_screen.dart';
 import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
@@ -95,22 +95,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => const ProfileScreen(),
+          pageBuilder:
+              (context, animation, secondaryAnimation) => const ProfileScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             const begin = Offset(1.0, 0.0);
             const end = Offset.zero;
             const curve = Curves.easeInOutCubic;
-            
-            var tween = Tween(begin: begin, end: end).chain(
-              CurveTween(curve: curve),
-            );
-            
+
+            var tween = Tween(
+              begin: begin,
+              end: end,
+            ).chain(CurveTween(curve: curve));
+
             var offsetAnimation = animation.drive(tween);
-            
-            return SlideTransition(
-              position: offsetAnimation,
-              child: child,
-            );
+
+            return SlideTransition(position: offsetAnimation, child: child);
           },
           transitionDuration: const Duration(milliseconds: 300),
         ),
@@ -119,22 +118,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => const SettingsScreen(),
+          pageBuilder:
+              (context, animation, secondaryAnimation) =>
+                  const SettingsScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             const begin = Offset(1.0, 0.0);
             const end = Offset.zero;
             const curve = Curves.easeInOutCubic;
-            
-            var tween = Tween(begin: begin, end: end).chain(
-              CurveTween(curve: curve),
-            );
-            
+
+            var tween = Tween(
+              begin: begin,
+              end: end,
+            ).chain(CurveTween(curve: curve));
+
             var offsetAnimation = animation.drive(tween);
-            
-            return SlideTransition(
-              position: offsetAnimation,
-              child: child,
-            );
+
+            return SlideTransition(position: offsetAnimation, child: child);
           },
           transitionDuration: const Duration(milliseconds: 300),
         ),
@@ -151,9 +150,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       if (mounted) {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(
-            builder: (context) => const LoginScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
           (route) => false,
         );
       }
@@ -167,24 +164,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
   }
 
-  Widget _buildProgressItem(String label, String value, IconData icon, Color color) {
+  Widget _buildProgressItem(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: color,
-            size: 20,
-          ),
+          Icon(icon, color: color, size: 20),
           const SizedBox(height: 4),
           Text(
             value,
@@ -234,9 +229,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 ? 'Warm-up games and fun!'
                 : 'Isınma oyunları ve eğlence!',
         'onTap': () {
-          _navigateToActivity(
-            const GirisEtkinlikleriScreen(),
-          );
+          _navigateToActivity(const GirisEtkinlikleriScreen());
         },
       },
       {
@@ -293,7 +286,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 ? 'Test your sorting skills!'
                 : 'Sıralama becerilerini test et!',
         'onTap': () {
-          _navigateToActivity(const SortingActivitiesScreen());
+          _navigateToActivity(const SortingRoadmapScreen());
         },
       },
     ];
@@ -309,22 +302,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         extendBodyBehindAppBar: true,
         body: Container(
           decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-              colors: Theme.of(context).brightness == Brightness.dark
-                  ? [
-                      const Color(0xFF1E1E1E), // Dark grey
-                      const Color(0xFF121212), // Darker grey
-                    ]
-                  : [
-                      const Color.fromARGB(255, 137, 189, 214),
-                      const Color.fromARGB(255, 104, 178, 211),
-                    ],
-                ),
-              ),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? [
+                        const Color(0xFF1E1E1E), // Dark grey
+                        const Color(0xFF121212), // Darker grey
+                      ]
+                      : [
+                        const Color.fromARGB(255, 137, 189, 214),
+                        const Color.fromARGB(255, 104, 178, 211),
+                      ],
+            ),
+          ),
           child: SingleChildScrollView(
-                child: Padding(
+            child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -413,7 +407,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    isEnglish ? 'Daily Progress' : 'Günlük İlerleme',
+                                    isEnglish
+                                        ? 'Daily Progress'
+                                        : 'Günlük İlerleme',
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -421,8 +417,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                     ),
                                   ),
                                   Text(
-                                    isEnglish 
-                                        ? 'Keep learning every day! 🌟' 
+                                    isEnglish
+                                        ? 'Keep learning every day! 🌟'
                                         : 'Her gün öğrenmeye devam et! 🌟',
                                     style: TextStyle(
                                       fontSize: 14,
@@ -468,29 +464,30 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       ],
                     ),
                   ),
-                  
+
                   // Activities Grid
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 1.2,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 1.2,
+                        ),
                     itemCount: activities.length,
                     itemBuilder: (context, index) {
                       final activity = activities[index];
                       return _AnimatedActivityCard(
-                      emoji: activity['emoji'] as String,
-                      icon: activity['icon'] as IconData,
-                      title: activity['title'] as String,
-                      desc: activity['desc'] as String,
-                      onTap: activity['onTap'] as VoidCallback,
-                      cardColor: activity['color'] as Color,
-                      mainColor: mainColor,
-                      accentColor: accentColor,
+                        emoji: activity['emoji'] as String,
+                        icon: activity['icon'] as IconData,
+                        title: activity['title'] as String,
+                        desc: activity['desc'] as String,
+                        onTap: activity['onTap'] as VoidCallback,
+                        cardColor: activity['color'] as Color,
+                        mainColor: mainColor,
+                        accentColor: accentColor,
                       );
                     },
                   ),
@@ -549,13 +546,9 @@ class _AnimatedActivityCardState extends State<_AnimatedActivityCard>
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    _pulseAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.05,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
     _pulseController.repeat(reverse: true);
   }
 
@@ -587,9 +580,10 @@ class _AnimatedActivityCardState extends State<_AnimatedActivityCard>
                   borderRadius: BorderRadius.circular(35),
                   color: widget.cardColor,
                   border: Border.all(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey[600]!
-                        : Colors.white,
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey[600]!
+                            : Colors.white,
                     width: 3,
                   ),
                   boxShadow: [
@@ -605,8 +599,11 @@ class _AnimatedActivityCardState extends State<_AnimatedActivityCard>
                     ),
                   ],
                 ),
-          child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 12,
+                  ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -619,11 +616,7 @@ class _AnimatedActivityCardState extends State<_AnimatedActivityCard>
                             style: const TextStyle(fontSize: 24),
                           ),
                           const SizedBox(width: 8),
-                          Icon(
-                            widget.icon,
-                            color: Colors.white,
-                            size: 24,
-                          ),
+                          Icon(widget.icon, color: Colors.white, size: 24),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -650,7 +643,7 @@ class _AnimatedActivityCardState extends State<_AnimatedActivityCard>
                     ],
                   ),
                 ),
-                ),
+              ),
             );
           },
         ),
