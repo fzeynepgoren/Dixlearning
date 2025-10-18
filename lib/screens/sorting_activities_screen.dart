@@ -52,28 +52,48 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(
-              'assets/SIRALAMA_RESIMLERI/spacemap/spacemap.png',
-            ),
-            fit: BoxFit.contain, // Resmi uzaklaştır (zoom out)
-            alignment: Alignment.center,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF2D1B69), // Koyu mor
+              Color(0xFF8B5FBF), // Orta mor
+              Color(0xFFC77DFF), // Açık mor/pembe
+              Color(0xFFE0AAFF), // Pembe
+            ],
           ),
         ),
         child: Stack(
           children: [
-            // Başlık - Sıralama Soruları
+            // Yıldızlar arka planı
+            ...List.generate(100, (index) => _buildStar()),
+
+            // Sol üstteki büyük nebula/galaksi
+            _buildNebula(),
+
+            // Sağ alttaki küçük nebula
+            _buildSmallNebula(),
+
+            // Ana gezegenler ve asteroid yolu
+            _buildSpaceRoadmap(),
+
+            // Uzay gemisi
+            _buildSpaceship(),
+
+            // Başlık - Sıralama Soruları (şeffaf arka plan)
             Positioned(
               top: MediaQuery.of(context).size.height * 0.08,
               left: 0,
               right: 0,
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.transparent,
                     borderRadius: BorderRadius.circular(25),
-                    border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
                   ),
                   child: const Text(
                     'Sıralama Soruları',
@@ -82,22 +102,50 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.2,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black,
+                          blurRadius: 3,
+                          offset: Offset(1, 1),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
             ),
-            // Invisible back button
+
+            // Geri tuşu (şeffaf arka plan)
             Positioned(
               top: MediaQuery.of(context).size.height * 0.05,
               left: MediaQuery.of(context).size.width * 0.05,
-              child: _buildInvisibleClickableArea(
+              child: GestureDetector(
                 onTap: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
+            );
+          },
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back,
+                    color: Colors.white,
+                    size: 30,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black,
+                        blurRadius: 3,
+                        offset: Offset(1, 1),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
 
@@ -157,12 +205,140 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
     );
   }
 
+  Widget _buildStar() {
+    final random = DateTime.now().millisecondsSinceEpoch;
+    return Positioned(
+      left: (random + random.hashCode) % MediaQuery.of(context).size.width,
+      top: (random + random.hashCode * 2) % MediaQuery.of(context).size.height,
+      child: Container(
+        width: 2,
+        height: 2,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.white.withOpacity(0.8),
+              blurRadius: 3,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNebula() {
+    return Positioned(
+      left: MediaQuery.of(context).size.width * 0.05,
+      top: MediaQuery.of(context).size.height * 0.05,
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.4,
+        height: MediaQuery.of(context).size.height * 0.3,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [
+              Colors.purple.withOpacity(0.3),
+              Colors.pink.withOpacity(0.2),
+              Colors.transparent,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSmallNebula() {
+    return Positioned(
+      right: MediaQuery.of(context).size.width * 0.1,
+      bottom: MediaQuery.of(context).size.height * 0.1,
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.2,
+        height: MediaQuery.of(context).size.height * 0.15,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [
+              Colors.orange.withOpacity(0.4),
+              Colors.red.withOpacity(0.2),
+              Colors.transparent,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpaceship() {
+    return Positioned(
+      left: MediaQuery.of(context).size.width * 0.35,
+      top: MediaQuery.of(context).size.height * 0.55,
+      child: Container(
+        width: 40,
+        height: 20,
+        decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Stack(
+          children: [
+            // Roket gövdesi
+            Container(
+              width: 30,
+              height: 20,
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            // Roket burnu
+            Positioned(
+              left: 0,
+              top: 5,
+              child: Container(
+                width: 15,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+            ),
+            // Alev
+            Positioned(
+              right: -5,
+              top: 3,
+              child: Container(
+                width: 15,
+                height: 14,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.orange, Colors.yellow],
+                  ),
+                  borderRadius: BorderRadius.circular(7),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpaceRoadmap() {
+    return CustomPaint(
+      size: Size.infinite,
+      painter: SpaceRoadmapPainter(),
+    );
+  }
+
   Widget _buildPlanetClickableArea({
     required int planetNumber,
     required VoidCallback onTap,
   }) {
     final isHovered = hoveredPlanet == planetNumber;
-    
+
     return MouseRegion(
       onEnter: (_) {
         setState(() {
@@ -186,18 +362,21 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                boxShadow: isHovered ? [
-                  BoxShadow(
-                    color: Colors.white.withOpacity(0.8),
-                    blurRadius: 20,
-                    spreadRadius: 5,
-                  ),
-                  BoxShadow(
-                    color: Colors.yellow.withOpacity(0.6),
-                    blurRadius: 30,
-                    spreadRadius: 10,
-                  ),
-                ] : null,
+                boxShadow:
+                    isHovered
+                        ? [
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.8),
+                            blurRadius: 20,
+                            spreadRadius: 5,
+                          ),
+                          BoxShadow(
+                            color: Colors.yellow.withOpacity(0.6),
+                            blurRadius: 30,
+                            spreadRadius: 10,
+                          ),
+                        ]
+                        : null,
               ),
               child: Material(
                 color: Colors.transparent,
@@ -210,9 +389,10 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: isHovered 
-                            ? Colors.white.withOpacity(0.8) 
-                            : Colors.transparent, 
+                        color:
+                            isHovered
+                                ? Colors.white.withOpacity(0.8)
+                                : Colors.transparent,
                         width: isHovered ? 3 : 0,
                       ),
                     ),
@@ -223,13 +403,16 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
                           color: isHovered ? Colors.white : Colors.transparent,
                           fontSize: isHovered ? 20 : 0,
                           fontWeight: FontWeight.bold,
-                          shadows: isHovered ? [
-                            Shadow(
-                              color: Colors.black,
-                              blurRadius: 2,
-                              offset: const Offset(1, 1),
-                            ),
-                          ] : null,
+                          shadows:
+                              isHovered
+                                  ? [
+                                    Shadow(
+                                      color: Colors.black,
+                                      blurRadius: 2,
+                                      offset: const Offset(1, 1),
+                                    ),
+                                  ]
+                                  : null,
                         ),
                       ),
                     ),
@@ -243,34 +426,6 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
     );
   }
 
-  Widget _buildInvisibleClickableArea({required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 80,
-        height: 80,
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          shape: BoxShape.circle,
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(40),
-            onTap: onTap,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.transparent, width: 0),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   void _navigateToStage(BuildContext context, int stageNumber) {
     final isEnglish =
@@ -279,7 +434,7 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
     // Check if previous stages are completed (aşama numaraları tersine çevrildi)
     bool canAccess = true;
     int stageIndex = stageNumber - 1; // 0-based index
-    
+
     // Önceki aşamaları kontrol et (yukarıdan aşağıya)
     for (int i = 0; i < stageIndex; i++) {
       if (!completedStages[i]) {
@@ -480,4 +635,125 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
       },
     );
   }
+}
+
+class SpaceRoadmapPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Asteroid yolu çiz
+    _drawAsteroidPath(canvas, size);
+    
+    // Gezegenleri çiz
+    _drawPlanets(canvas, size);
+  }
+
+  void _drawAsteroidPath(Canvas canvas, Size size) {
+    final path = Path();
+    
+    // S şeklinde asteroid yolu
+    path.moveTo(size.width * 0.5, size.height * 0.9); // Başlangıç (Stage 5)
+    path.quadraticBezierTo(
+      size.width * 0.7, size.height * 0.8, // Stage 4
+      size.width * 0.65, size.height * 0.5, // Stage 3
+    );
+    path.quadraticBezierTo(
+      size.width * 0.2, size.height * 0.45, // Stage 2
+      size.width * 0.15, size.height * 0.25, // Stage 1
+    );
+
+    // Asteroid yolu için paint
+    final asteroidPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 8
+      ..color = Colors.purple.withOpacity(0.8);
+
+    canvas.drawPath(path, asteroidPaint);
+
+    // Asteroid parçaları çiz
+    _drawAsteroids(canvas, size);
+  }
+
+  void _drawAsteroids(Canvas canvas, Size size) {
+    final asteroidPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = Colors.purple.withOpacity(0.9);
+
+    // Yol boyunca asteroid parçaları
+    final positions = [
+      Offset(size.width * 0.5, size.height * 0.9),
+      Offset(size.width * 0.6, size.height * 0.85),
+      Offset(size.width * 0.7, size.height * 0.8),
+      Offset(size.width * 0.68, size.height * 0.7),
+      Offset(size.width * 0.65, size.height * 0.5),
+      Offset(size.width * 0.45, size.height * 0.47),
+      Offset(size.width * 0.2, size.height * 0.45),
+      Offset(size.width * 0.18, size.height * 0.35),
+      Offset(size.width * 0.15, size.height * 0.25),
+    ];
+
+    for (final pos in positions) {
+      canvas.drawCircle(pos, 6, asteroidPaint);
+    }
+  }
+
+  void _drawPlanets(Canvas canvas, Size size) {
+    // Stage 5 - En alttaki kayalık yüzey
+    _drawPlanet(canvas, size.width * 0.5, size.height * 0.9, 25, 
+                Colors.brown, Colors.grey, 5);
+
+    // Stage 4 - Sağ alttaki turuncu-kırmızı kuyruklu yıldız
+    _drawPlanet(canvas, size.width * 0.7, size.height * 0.8, 20, 
+                Colors.orange, Colors.red, 4);
+
+    // Stage 3 - Orta sağdaki mavi-yeşil Dünya benzeri gezegen
+    _drawPlanet(canvas, size.width * 0.65, size.height * 0.5, 30, 
+                Colors.blue, Colors.green, 3);
+
+    // Stage 2 - Orta soldaki pembe halkalı mor gezegen
+    _drawPlanet(canvas, size.width * 0.2, size.height * 0.45, 28, 
+                Colors.purple, Colors.pink, 2);
+
+    // Stage 1 - Sol üstteki çizgili mor gezegen
+    _drawPlanet(canvas, size.width * 0.15, size.height * 0.25, 35, 
+                Colors.deepPurple, Colors.purple, 1);
+  }
+
+  void _drawPlanet(Canvas canvas, double x, double y, double radius, 
+                   Color planetColor, Color ringColor, int stageNumber) {
+    // Gezegen gövdesi
+    final planetPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = planetColor;
+
+    canvas.drawCircle(Offset(x, y), radius, planetPaint);
+
+    // Gezegen halkası
+    final ringPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3
+      ..color = ringColor;
+
+    canvas.drawCircle(Offset(x, y), radius + 8, ringPaint);
+
+    // Aşama numarası
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: '$stageNumber',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    textPainter.paint(
+      canvas,
+      Offset(x - textPainter.width / 2, y - textPainter.height / 2),
+    );
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
