@@ -13,7 +13,7 @@ class SortingActivitiesScreen extends StatefulWidget {
 }
 
 class _SortingActivitiesScreenState extends State<SortingActivitiesScreen> {
-  List<bool> completedStages = [false, false, false, false, false];
+  List<bool> completedStages = [false, false, false, false, false, false];
 
   @override
   void initState() {
@@ -29,6 +29,7 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen> {
       completedStages[2] = prefs.getBool('sorting_stage_3_completed') ?? false;
       completedStages[3] = prefs.getBool('sorting_stage_4_completed') ?? false;
       completedStages[4] = prefs.getBool('sorting_stage_5_completed') ?? false;
+      completedStages[5] = prefs.getBool('sorting_stage_6_completed') ?? false;
     });
   }
 
@@ -40,22 +41,32 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
             colors: [
-              Color(0xFF0F0C29), // Koyu mor
-              Color(0xFF24243e), // Orta mor
-              Color(0xFF302B63), // Açık mor
+              Color(0xFF2D1B69), // Koyu mor
+              Color(0xFF8B5FBF), // Orta mor
+              Color(0xFFC77DFF), // Açık mor/pembe
+              Color(0xFFE0AAFF), // Pembe
             ],
           ),
         ),
         child: Stack(
           children: [
             // Yıldızlar arka planı
-            ...List.generate(50, (index) => _buildStar()),
+            ...List.generate(100, (index) => _buildStar()),
             
-            // Ana gezegenler ve yol
+            // Sol üstteki büyük nebula/galaksi
+            _buildNebula(),
+            
+            // Sağ alttaki küçük nebula
+            _buildSmallNebula(),
+            
+            // Ana gezegenler ve asteroid yolu
             _buildSpaceRoadmap(),
+            
+            // Uzay gemisi
+            _buildSpaceship(),
             
             // Invisible back button
             Positioned(
@@ -71,49 +82,58 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen> {
               ),
             ),
 
-            // Gezegen tıklama alanları
-            // Stage 1 - Dünya (sağ altta)
+            // Gezegen tıklama alanları (fotoğraftaki sıraya göre)
+            // Stage 1 - Sol üstteki girdaplı galaksi/nebula
             Positioned(
               left: MediaQuery.of(context).size.width * 0.15,
-              top: MediaQuery.of(context).size.height * 0.75,
+              top: MediaQuery.of(context).size.height * 0.15,
               child: _buildInvisibleClickableArea(
                 onTap: () => _navigateToStage(context, 1),
               ),
             ),
 
-            // Stage 2 - Halkalı gezegen (sol altta)
+            // Stage 2 - Sağ üstteki büyük halkalı mor gezegen
             Positioned(
-              left: MediaQuery.of(context).size.width * 0.25,
-              top: MediaQuery.of(context).size.height * 0.65,
+              left: MediaQuery.of(context).size.width * 0.75,
+              top: MediaQuery.of(context).size.height * 0.20,
               child: _buildInvisibleClickableArea(
                 onTap: () => _navigateToStage(context, 2),
               ),
             ),
 
-            // Stage 3 - Satürn (ortada)
+            // Stage 3 - Orta soldaki çizgili mor gezegen
             Positioned(
-              left: MediaQuery.of(context).size.width * 0.45,
-              top: MediaQuery.of(context).size.height * 0.55,
+              left: MediaQuery.of(context).size.width * 0.25,
+              top: MediaQuery.of(context).size.height * 0.45,
               child: _buildInvisibleClickableArea(
                 onTap: () => _navigateToStage(context, 3),
               ),
             ),
 
-            // Stage 4 - Dev gezegen (sağ üstte)
+            // Stage 4 - Orta sağdaki halkalı sarı gezegen
             Positioned(
               left: MediaQuery.of(context).size.width * 0.65,
-              top: MediaQuery.of(context).size.height * 0.35,
+              top: MediaQuery.of(context).size.height * 0.50,
               child: _buildInvisibleClickableArea(
                 onTap: () => _navigateToStage(context, 4),
               ),
             ),
 
-            // Stage 5 - Nebula (sol üstte)
+            // Stage 5 - Orta soldaki pembe halkalı mor gezegen
             Positioned(
-              left: MediaQuery.of(context).size.width * 0.15,
-              top: MediaQuery.of(context).size.height * 0.25,
+              left: MediaQuery.of(context).size.width * 0.35,
+              top: MediaQuery.of(context).size.height * 0.70,
               child: _buildInvisibleClickableArea(
                 onTap: () => _navigateToStage(context, 5),
+              ),
+            ),
+
+            // Stage 6 - Orta sağdaki Dünya benzeri gezegen
+            Positioned(
+              left: MediaQuery.of(context).size.width * 0.70,
+              top: MediaQuery.of(context).size.height * 0.75,
+              child: _buildInvisibleClickableArea(
+                onTap: () => _navigateToStage(context, 6),
               ),
             ),
           ],
@@ -132,6 +152,110 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen> {
         decoration: const BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNebula() {
+    return Positioned(
+      left: MediaQuery.of(context).size.width * 0.05,
+      top: MediaQuery.of(context).size.height * 0.05,
+      child: Container(
+        width: 120,
+        height: 120,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [
+              const Color(0xFFE91E63).withOpacity(0.8),
+              const Color(0xFF9C27B0).withOpacity(0.6),
+              const Color(0xFF673AB7).withOpacity(0.4),
+              Colors.transparent,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSmallNebula() {
+    return Positioned(
+      left: MediaQuery.of(context).size.width * 0.70,
+      top: MediaQuery.of(context).size.height * 0.80,
+      child: Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [
+              const Color(0xFFFF9800).withOpacity(0.8),
+              const Color(0xFFFF5722).withOpacity(0.6),
+              const Color(0xFFE91E63).withOpacity(0.4),
+              Colors.transparent,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpaceship() {
+    return Positioned(
+      left: MediaQuery.of(context).size.width * 0.45,
+      top: MediaQuery.of(context).size.height * 0.85,
+      child: Container(
+        width: 40,
+        height: 20,
+        decoration: BoxDecoration(
+          color: const Color(0xFFE53E3E),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Stack(
+          children: [
+            // Uzay gemisi gövdesi
+            Container(
+              width: 40,
+              height: 20,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE53E3E),
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            // Beyaz detaylar
+            Positioned(
+              left: 5,
+              top: 8,
+              child: Container(
+                width: 8,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            // Egzoz efekti
+            Positioned(
+              left: -15,
+              top: 7,
+              child: Container(
+                width: 15,
+                height: 6,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFFFF9800),
+                      const Color(0xFFFF5722),
+                      Colors.transparent,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -206,6 +330,9 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen> {
         break;
       case 5:
         // targetWidget = const SortingStage5();
+        break;
+      case 6:
+        // targetWidget = const SortingStage6();
         break;
     }
 
@@ -380,73 +507,170 @@ class SpaceRoadmapPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke;
-
-    // Gezegenlerin konumları
+    // Asteroid yol segmentleri
+    _drawAsteroidPath(canvas, size);
+    
+    // Gezegenlerin konumları (fotoğraftaki sıraya göre)
     final planets = [
-      Offset(size.width * 0.15, size.height * 0.75), // Dünya
-      Offset(size.width * 0.25, size.height * 0.65), // Halkalı
-      Offset(size.width * 0.45, size.height * 0.55), // Satürn
-      Offset(size.width * 0.65, size.height * 0.35), // Dev
-      Offset(size.width * 0.15, size.height * 0.25), // Nebula
+      Offset(size.width * 0.15, size.height * 0.15), // 1. Sol üstteki girdaplı galaksi/nebula
+      Offset(size.width * 0.75, size.height * 0.20), // 2. Sağ üstteki büyük halkalı mor gezegen
+      Offset(size.width * 0.25, size.height * 0.45), // 3. Orta soldaki çizgili mor gezegen
+      Offset(size.width * 0.65, size.height * 0.50), // 4. Orta sağdaki halkalı sarı gezegen
+      Offset(size.width * 0.35, size.height * 0.70), // 5. Orta soldaki pembe halkalı mor gezegen
+      Offset(size.width * 0.70, size.height * 0.75), // 6. Orta sağdaki Dünya benzeri gezegen
     ];
-
-    // Gezegenler arası yol çizgisi
-    final path = Path();
-    path.moveTo(planets[0].dx, planets[0].dy);
-    for (int i = 1; i < planets.length; i++) {
-      path.lineTo(planets[i].dx, planets[i].dy);
-    }
-    canvas.drawPath(path, paint);
 
     // Gezegenleri çiz
     for (int i = 0; i < planets.length; i++) {
-      final planetPaint = Paint()
-        ..color = _getPlanetColor(i)
-        ..style = PaintingStyle.fill;
+      _drawPlanet(canvas, planets[i], i);
+    }
+  }
 
-      final borderPaint = Paint()
-        ..color = completedStages[i] ? Colors.green : Colors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3;
+  void _drawAsteroidPath(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFF8B5FBF).withOpacity(0.6)
+      ..style = PaintingStyle.fill;
 
-      canvas.drawCircle(planets[i], 30, planetPaint);
-      canvas.drawCircle(planets[i], 30, borderPaint);
+    // Asteroid segmentleri - fotoğraftaki gibi düzensiz şekiller
+    final segments = [
+      // Segment 1 - Alt kısım
+      Path()
+        ..moveTo(size.width * 0.40, size.height * 0.90)
+        ..lineTo(size.width * 0.50, size.height * 0.88)
+        ..lineTo(size.width * 0.45, size.height * 0.85)
+        ..close(),
+      
+      // Segment 2
+      Path()
+        ..moveTo(size.width * 0.35, size.height * 0.75)
+        ..lineTo(size.width * 0.40, size.height * 0.78)
+        ..lineTo(size.width * 0.38, size.height * 0.72)
+        ..close(),
+      
+      // Segment 3
+      Path()
+        ..moveTo(size.width * 0.25, size.height * 0.50)
+        ..lineTo(size.width * 0.30, size.height * 0.48)
+        ..lineTo(size.width * 0.28, size.height * 0.45)
+        ..close(),
+      
+      // Segment 4
+      Path()
+        ..moveTo(size.width * 0.60, size.height * 0.55)
+        ..lineTo(size.width * 0.65, size.height * 0.53)
+        ..lineTo(size.width * 0.63, size.height * 0.50)
+        ..close(),
+      
+      // Segment 5
+      Path()
+        ..moveTo(size.width * 0.70, size.height * 0.30)
+        ..lineTo(size.width * 0.75, size.height * 0.28)
+        ..lineTo(size.width * 0.73, size.height * 0.25)
+        ..close(),
+      
+      // Segment 6
+      Path()
+        ..moveTo(size.width * 0.15, size.height * 0.20)
+        ..lineTo(size.width * 0.20, size.height * 0.18)
+        ..lineTo(size.width * 0.18, size.height * 0.15)
+        ..close(),
+    ];
 
-      // Gezegen numarası
-      final textPainter = TextPainter(
-        text: TextSpan(
-          text: '${i + 1}',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+    for (final segment in segments) {
+      canvas.drawPath(segment, paint);
+    }
+  }
+
+  void _drawPlanet(Canvas canvas, Offset position, int index) {
+    final planetPaint = Paint()
+      ..color = _getPlanetColor(index)
+      ..style = PaintingStyle.fill;
+
+    final borderPaint = Paint()
+      ..color = completedStages[index] ? Colors.green : Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+
+    // Gezegen boyutu
+    final radius = _getPlanetSize(index);
+    
+    // Ana gezegen
+    canvas.drawCircle(position, radius, planetPaint);
+    canvas.drawCircle(position, radius, borderPaint);
+
+    // Halkalar (bazı gezegenler için)
+    if (index == 1 || index == 3 || index == 4) {
+      _drawRings(canvas, position, index);
+    }
+
+    // Gezegen numarası
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: '${index + 1}',
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
         ),
-        textDirection: TextDirection.ltr,
-      );
-      textPainter.layout();
-      textPainter.paint(
-        canvas,
-        Offset(
-          planets[i].dx - textPainter.width / 2,
-          planets[i].dy - textPainter.height / 2,
-        ),
-      );
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    textPainter.paint(
+      canvas,
+      Offset(
+        position.dx - textPainter.width / 2,
+        position.dy - textPainter.height / 2,
+      ),
+    );
+  }
+
+  void _drawRings(Canvas canvas, Offset position, int index) {
+    final ringPaint = Paint()
+      ..color = _getRingColor(index)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+
+    final radius = _getPlanetSize(index);
+    
+    // Halkalar
+    canvas.drawCircle(position, radius + 8, ringPaint);
+    canvas.drawCircle(position, radius + 12, ringPaint);
+    if (index == 1) { // Büyük gezegen için ek halka
+      canvas.drawCircle(position, radius + 16, ringPaint);
+    }
+  }
+
+  double _getPlanetSize(int index) {
+    switch (index) {
+      case 0: return 25; // Nebula - küçük
+      case 1: return 35; // Büyük halkalı gezegen
+      case 2: return 20; // Çizgili mor gezegen
+      case 3: return 22; // Halkalı sarı gezegen
+      case 4: return 28; // Pembe halkalı mor gezegen
+      case 5: return 24; // Dünya benzeri gezegen
+      default: return 25;
     }
   }
 
   Color _getPlanetColor(int index) {
     switch (index) {
-      case 0: return const Color(0xFF4CAF50); // Dünya - Yeşil
-      case 1: return const Color(0xFF9C27B0); // Halkalı - Mor
-      case 2: return const Color(0xFFFF9800); // Satürn - Turuncu
-      case 3: return const Color(0xFF673AB7); // Dev - Mor-mavi
-      case 4: return const Color(0xFFE91E63); // Nebula - Pembe
+      case 0: return const Color(0xFFE91E63); // Sol üstteki girdaplı galaksi/nebula - Pembe
+      case 1: return const Color(0xFF673AB7); // Sağ üstteki büyük halkalı mor gezegen - Mor
+      case 2: return const Color(0xFF9C27B0); // Orta soldaki çizgili mor gezegen - Mor
+      case 3: return const Color(0xFFFF9800); // Orta sağdaki halkalı sarı gezegen - Turuncu
+      case 4: return const Color(0xFF8B5FBF); // Orta soldaki pembe halkalı mor gezegen - Mor-pembe
+      case 5: return const Color(0xFF4CAF50); // Orta sağdaki Dünya benzeri gezegen - Yeşil
       default: return Colors.grey;
+    }
+  }
+
+  Color _getRingColor(int index) {
+    switch (index) {
+      case 1: return const Color(0xFFFFF8E1); // Büyük gezegen için açık sarı halkalar
+      case 3: return const Color(0xFFFFF8E1); // Sarı gezegen için açık sarı halkalar
+      case 4: return const Color(0xFFE91E63); // Pembe gezegen için pembe halkalar
+      default: return Colors.white;
     }
   }
 
