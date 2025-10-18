@@ -13,30 +13,42 @@ class SortingActivitiesScreen extends StatefulWidget {
       _SortingActivitiesScreenState();
 }
 
-class _SortingActivitiesScreenState extends State<SortingActivitiesScreen> {
+class _SortingActivitiesScreenState extends State<SortingActivitiesScreen>
+    with TickerProviderStateMixin {
   List<bool> completedStages = [false, false, false, false, false];
+  late AnimationController _hoverController;
+  int? hoveredPlanet;
 
   @override
   void initState() {
     super.initState();
+    _hoverController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
     _loadCompletedStages();
+  }
+
+  @override
+  void dispose() {
+    _hoverController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadCompletedStages() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      completedStages[0] = prefs.getBool('sorting_stage_1_completed') ?? false;
-      completedStages[1] = prefs.getBool('sorting_stage_2_completed') ?? false;
+      // Aşama numaraları tersine çevrildi: 5-4-3-2-1
+      completedStages[0] = prefs.getBool('sorting_stage_5_completed') ?? false;
+      completedStages[1] = prefs.getBool('sorting_stage_4_completed') ?? false;
       completedStages[2] = prefs.getBool('sorting_stage_3_completed') ?? false;
-      completedStages[3] = prefs.getBool('sorting_stage_4_completed') ?? false;
-      completedStages[4] = prefs.getBool('sorting_stage_5_completed') ?? false;
+      completedStages[3] = prefs.getBool('sorting_stage_2_completed') ?? false;
+      completedStages[4] = prefs.getBool('sorting_stage_1_completed') ?? false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -44,11 +56,37 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen> {
             image: AssetImage(
               'assets/SIRALAMA_RESIMLERI/spacemap/spacemap.png',
             ),
-            fit: BoxFit.cover,
+            fit: BoxFit.contain, // Resmi uzaklaştır (zoom out)
+            alignment: Alignment.center,
           ),
         ),
         child: Stack(
           children: [
+            // Başlık - Sıralama Soruları
+            Positioned(
+              top: MediaQuery.of(context).size.height * 0.08,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(25),
+                    border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
+                  ),
+                  child: const Text(
+                    'Sıralama Soruları',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             // Invisible back button
             Positioned(
               top: MediaQuery.of(context).size.height * 0.05,
@@ -63,53 +101,144 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen> {
               ),
             ),
 
-            // Gezegen tıklama alanları (spacemap.png'deki yol üzerindeki 5 gezegen)
-            // Stage 1 - Sol üstteki çizgili mor gezegen
+            // Gezegen tıklama alanları (aşağıdan yukarıya 5-4-3-2-1)
+            // Stage 5 - En alttaki kayalık yüzey (Stage 5)
             Positioned(
-              left: MediaQuery.of(context).size.width * 0.15,
-              top: MediaQuery.of(context).size.height * 0.25,
-              child: _buildInvisibleClickableArea(
-                onTap: () => _navigateToStage(context, 1),
+              left: MediaQuery.of(context).size.width * 0.50,
+              top: MediaQuery.of(context).size.height * 0.90,
+              child: _buildPlanetClickableArea(
+                planetNumber: 5,
+                onTap: () => _navigateToStage(context, 5),
               ),
             ),
 
-            // Stage 2 - Orta soldaki pembe halkalı mor gezegen
-            Positioned(
-              left: MediaQuery.of(context).size.width * 0.20,
-              top: MediaQuery.of(context).size.height * 0.45,
-              child: _buildInvisibleClickableArea(
-                onTap: () => _navigateToStage(context, 2),
-              ),
-            ),
-
-            // Stage 3 - Orta sağdaki mavi-yeşil Dünya benzeri gezegen
-            Positioned(
-              left: MediaQuery.of(context).size.width * 0.65,
-              top: MediaQuery.of(context).size.height * 0.50,
-              child: _buildInvisibleClickableArea(
-                onTap: () => _navigateToStage(context, 3),
-              ),
-            ),
-
-            // Stage 4 - Sağ alttaki turuncu-kırmızı kuyruklu yıldız
+            // Stage 4 - Sağ alttaki turuncu-kırmızı kuyruklu yıldız (Stage 4)
             Positioned(
               left: MediaQuery.of(context).size.width * 0.70,
               top: MediaQuery.of(context).size.height * 0.80,
-              child: _buildInvisibleClickableArea(
+              child: _buildPlanetClickableArea(
+                planetNumber: 4,
                 onTap: () => _navigateToStage(context, 4),
               ),
             ),
 
-            // Stage 5 - En alttaki kayalık yüzey
+            // Stage 3 - Orta sağdaki mavi-yeşil Dünya benzeri gezegen (Stage 3)
             Positioned(
-              left: MediaQuery.of(context).size.width * 0.50,
-              top: MediaQuery.of(context).size.height * 0.90,
-              child: _buildInvisibleClickableArea(
-                onTap: () => _navigateToStage(context, 5),
+              left: MediaQuery.of(context).size.width * 0.65,
+              top: MediaQuery.of(context).size.height * 0.50,
+              child: _buildPlanetClickableArea(
+                planetNumber: 3,
+                onTap: () => _navigateToStage(context, 3),
+              ),
+            ),
+
+            // Stage 2 - Orta soldaki pembe halkalı mor gezegen (Stage 2)
+            Positioned(
+              left: MediaQuery.of(context).size.width * 0.20,
+              top: MediaQuery.of(context).size.height * 0.45,
+              child: _buildPlanetClickableArea(
+                planetNumber: 2,
+                onTap: () => _navigateToStage(context, 2),
+              ),
+            ),
+
+            // Stage 1 - Sol üstteki çizgili mor gezegen (Stage 1)
+            Positioned(
+              left: MediaQuery.of(context).size.width * 0.15,
+              top: MediaQuery.of(context).size.height * 0.25,
+              child: _buildPlanetClickableArea(
+                planetNumber: 1,
+                onTap: () => _navigateToStage(context, 1),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPlanetClickableArea({
+    required int planetNumber,
+    required VoidCallback onTap,
+  }) {
+    final isHovered = hoveredPlanet == planetNumber;
+    
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() {
+          hoveredPlanet = planetNumber;
+        });
+        _hoverController.forward();
+      },
+      onExit: (_) {
+        setState(() {
+          hoveredPlanet = null;
+        });
+        _hoverController.reverse();
+      },
+      child: AnimatedBuilder(
+        animation: _hoverController,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: isHovered ? 1.2 : 1.0,
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: isHovered ? [
+                  BoxShadow(
+                    color: Colors.white.withOpacity(0.8),
+                    blurRadius: 20,
+                    spreadRadius: 5,
+                  ),
+                  BoxShadow(
+                    color: Colors.yellow.withOpacity(0.6),
+                    blurRadius: 30,
+                    spreadRadius: 10,
+                  ),
+                ] : null,
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(40),
+                  onTap: onTap,
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isHovered 
+                            ? Colors.white.withOpacity(0.8) 
+                            : Colors.transparent, 
+                        width: isHovered ? 3 : 0,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '$planetNumber',
+                        style: TextStyle(
+                          color: isHovered ? Colors.white : Colors.transparent,
+                          fontSize: isHovered ? 20 : 0,
+                          fontWeight: FontWeight.bold,
+                          shadows: isHovered ? [
+                            Shadow(
+                              color: Colors.black,
+                              blurRadius: 2,
+                              offset: const Offset(1, 1),
+                            ),
+                          ] : null,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -147,9 +276,12 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen> {
     final isEnglish =
         Provider.of<LanguageProvider>(context, listen: false).isEnglish;
 
-    // Check if previous stages are completed
+    // Check if previous stages are completed (aşama numaraları tersine çevrildi)
     bool canAccess = true;
-    for (int i = 0; i < stageNumber - 1; i++) {
+    int stageIndex = stageNumber - 1; // 0-based index
+    
+    // Önceki aşamaları kontrol et (yukarıdan aşağıya)
+    for (int i = 0; i < stageIndex; i++) {
       if (!completedStages[i]) {
         canAccess = false;
         break;
