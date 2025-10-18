@@ -513,11 +513,26 @@ class SpaceRoadmapPainter extends CustomPainter {
 
     // Gezegenlerin konumları (fotoğraftaki sıraya göre - aşağıdan yukarıya)
     final planets = [
-      Offset(size.width * 0.70, size.height * 0.80), // 1. En alttaki turuncu-kırmızı kuyruklu yıldız
-      Offset(size.width * 0.25, size.height * 0.70), // 2. Sol alttaki Dünya benzeri gezegen
-      Offset(size.width * 0.20, size.height * 0.45), // 3. Orta soldaki mor gezegen (girdaplı)
-      Offset(size.width * 0.70, size.height * 0.35), // 4. Orta sağdaki Satürn benzeri gezegen
-      Offset(size.width * 0.75, size.height * 0.15), // 5. En üstteki büyük mor gezegen (altın halkalı)
+      Offset(
+        size.width * 0.70,
+        size.height * 0.80,
+      ), // 1. En alttaki turuncu-kırmızı kuyruklu yıldız
+      Offset(
+        size.width * 0.25,
+        size.height * 0.70,
+      ), // 2. Sol alttaki Dünya benzeri gezegen
+      Offset(
+        size.width * 0.20,
+        size.height * 0.45,
+      ), // 3. Orta soldaki mor gezegen (girdaplı)
+      Offset(
+        size.width * 0.70,
+        size.height * 0.35,
+      ), // 4. Orta sağdaki Satürn benzeri gezegen
+      Offset(
+        size.width * 0.75,
+        size.height * 0.15,
+      ), // 5. En üstteki büyük mor gezegen (altın halkalı)
     ];
 
     // Gezegenleri çiz
@@ -659,15 +674,23 @@ class SpaceRoadmapPainter extends CustomPainter {
   Color _getPlanetColor(int index) {
     switch (index) {
       case 0:
-        return const Color(0xFFFF5722); // En alttaki turuncu-kırmızı kuyruklu yıldız
+        return const Color(
+          0xFFFF5722,
+        ); // En alttaki turuncu-kırmızı kuyruklu yıldız
       case 1:
-        return const Color(0xFF4CAF50); // Sol alttaki Dünya benzeri gezegen (mavi-yeşil)
+        return const Color(
+          0xFF4CAF50,
+        ); // Sol alttaki Dünya benzeri gezegen (mavi-yeşil)
       case 2:
         return const Color(0xFF673AB7); // Orta soldaki mor gezegen (girdaplı)
       case 3:
-        return const Color(0xFFFF9800); // Orta sağdaki Satürn benzeri gezegen (sarı-turuncu)
+        return const Color(
+          0xFFFF9800,
+        ); // Orta sağdaki Satürn benzeri gezegen (sarı-turuncu)
       case 4:
-        return const Color(0xFF9C27B0); // En üstteki büyük mor gezegen (altın halkalı)
+        return const Color(
+          0xFF9C27B0,
+        ); // En üstteki büyük mor gezegen (altın halkalı)
       default:
         return Colors.grey;
     }
@@ -676,13 +699,19 @@ class SpaceRoadmapPainter extends CustomPainter {
   Color _getRingColor(int index) {
     switch (index) {
       case 1:
-        return const Color(0xFF81C784); // Dünya benzeri gezegen için yeşil halka
+        return const Color(
+          0xFF81C784,
+        ); // Dünya benzeri gezegen için yeşil halka
       case 2:
         return const Color(0xFFE91E63); // Mor gezegen için pembe halka
       case 3:
-        return const Color(0xFFFFF8E1); // Satürn benzeri gezegen için açık sarı halkalar
+        return const Color(
+          0xFFFFF8E1,
+        ); // Satürn benzeri gezegen için açık sarı halkalar
       case 4:
-        return const Color(0xFFFFD700); // En üstteki gezegen için altın halkalar
+        return const Color(
+          0xFFFFD700,
+        ); // En üstteki gezegen için altın halkalar
       default:
         return Colors.white;
     }
