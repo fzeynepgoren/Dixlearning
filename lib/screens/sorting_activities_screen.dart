@@ -9,7 +9,8 @@ class SortingActivitiesScreen extends StatefulWidget {
   const SortingActivitiesScreen({super.key});
 
   @override
-  State<SortingActivitiesScreen> createState() => _SortingActivitiesScreenState();
+  State<SortingActivitiesScreen> createState() =>
+      _SortingActivitiesScreenState();
 }
 
 class _SortingActivitiesScreenState extends State<SortingActivitiesScreen> {
@@ -40,7 +41,9 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen> {
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/SIRALAMA_RESIMLERI/spacemap/spacemap.png'),
+            image: AssetImage(
+              'assets/SIRALAMA_RESIMLERI/spacemap/spacemap.png',
+            ),
             fit: BoxFit.cover,
           ),
         ),
@@ -141,7 +144,8 @@ class _SortingActivitiesScreenState extends State<SortingActivitiesScreen> {
   }
 
   void _navigateToStage(BuildContext context, int stageNumber) {
-    final isEnglish = Provider.of<LanguageProvider>(context, listen: false).isEnglish;
+    final isEnglish =
+        Provider.of<LanguageProvider>(context, listen: false).isEnglish;
 
     // Check if previous stages are completed
     bool canAccess = true;
