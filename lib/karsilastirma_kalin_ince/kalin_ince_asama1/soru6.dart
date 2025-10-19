@@ -160,8 +160,8 @@ class _KalinInceSoru6State extends State<KalinInceSoru6>
                             ),
                             child: Text(
                               isEnglish
-                                  ? 'Choose the thin one.'
-                                  : 'İnce olanı işaretle.',
+                                  ? 'Choose the thick one.'
+                                  : 'Kalın olanı işaretle.',
                               style: const TextStyle(
                                 fontSize: 23,
                                 fontWeight: FontWeight.bold,
