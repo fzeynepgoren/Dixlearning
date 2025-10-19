@@ -3,16 +3,20 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'providers/language_provider.dart';
 import 'providers/theme_provider.dart';
+import 'providers/progress_provider.dart';
+import 'providers/user_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 
 void main() {
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => LanguageProvider()),
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-      ],
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => LanguageProvider()),
+            ChangeNotifierProvider(create: (_) => ThemeProvider()),
+            ChangeNotifierProvider(create: (_) => ProgressProvider()),
+            ChangeNotifierProvider(create: (_) => UserProvider()),
+          ],
       child: const MyApp(),
     ),
   );
@@ -54,23 +58,36 @@ class MyApp extends StatelessWidget {
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: Colors.grey[900],
+        scaffoldBackgroundColor: const Color(0xFF121212), // Material Dark
         primarySwatch: Colors.deepPurple,
-        textTheme: GoogleFonts.quicksandTextTheme(),
+        primaryColor: const Color(0xFF6C63FF),
+        textTheme: GoogleFonts.quicksandTextTheme(
+          ThemeData.dark().textTheme,
+        ),
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.black87,
+          backgroundColor: const Color(0xFF1E1E1E),
+          elevation: 0,
           titleTextStyle: GoogleFonts.quicksand(
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
-        cardColor: Colors.grey[800],
+        cardColor: const Color(0xFF1E1E1E),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.deepPurple,
+            backgroundColor: const Color(0xFF6C63FF),
             foregroundColor: Colors.white,
             textStyle: GoogleFonts.quicksand(fontSize: 18),
+            elevation: 4,
+            shadowColor: Colors.black.withOpacity(0.3),
+          ),
+        ),
+        dividerColor: Colors.grey[700],
+        iconTheme: const IconThemeData(color: Colors.white),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: const Color(0xFF6C63FF),
           ),
         ),
       ),

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'soru2.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import '../providers/progress_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -135,6 +136,7 @@ class _ActivityMatchingState extends State<ActivityMatching>
 
       if (matchedLeft.every((element) => element)) {
         allMatched = true;
+        Provider.of<ProgressProvider>(context, listen: false).completeStage3();
         Future.delayed(const Duration(seconds: 1), () {
           if (mounted) {
             // Yeni oyun için karıştır
@@ -297,7 +299,8 @@ class _ActivityMatchingState extends State<ActivityMatching>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
                           ),
                           (route) => false,
                         );

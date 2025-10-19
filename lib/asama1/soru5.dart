@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import '../screens/home_screen.dart'; // Ana menü ekranının yolu
+import '../screens/matching_questions_screen.dart'; // Ana menü ekranının yolu
 
 class HayvanEsle extends StatefulWidget {
   const HayvanEsle({super.key});
@@ -37,6 +37,7 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
   }
 
   void _handleTap(int index, bool isLeft) {
+    if (showFeedback) return;
     setState(() {
       if (isLeft) {
         if (matchedLeft[index]) return;
@@ -49,7 +50,7 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
       if (selectedLeftIndex != null && selectedRightIndex != null) {
         isCorrect =
             leftAnimals[selectedLeftIndex!] ==
-                rightAnimals[selectedRightIndex!];
+            rightAnimals[selectedRightIndex!];
         showFeedback = true;
         _feedbackController.forward(from: 0);
 
@@ -110,7 +111,9 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const HomeScreen(),
+                                      builder:
+                                          (context) =>
+                                              const MatchingQuestionsScreen(),
                                     ),
                                   );
                                 },
@@ -233,7 +236,8 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
                           ),
                           (route) => false,
                         );
@@ -359,23 +363,23 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
                                   ),
                                 ),
                               ),
-                              // SON: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ
 
+                              // SON: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ
                               Expanded(
                                 child: Column(
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceEvenly,
+                                      MainAxisAlignment.spaceEvenly,
                                   children: List.generate(
                                     rightAnimals.length,
-                                        (index) => GestureDetector(
+                                    (index) => GestureDetector(
                                       onTap: () => _handleTap(index, false),
                                       child: AnimatedContainer(
                                         duration:
-                                        showFeedback
-                                            ? Duration.zero
-                                            : const Duration(
-                                          milliseconds: 300,
-                                        ),
+                                            showFeedback
+                                                ? Duration.zero
+                                                : const Duration(
+                                                  milliseconds: 300,
+                                                ),
                                         curve: Curves.easeInOut,
                                         width: 120,
                                         height: 120,
@@ -384,17 +388,17 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
                                         ),
                                         decoration: BoxDecoration(
                                           color:
-                                          matchedRight[index]
-                                              ? Colors.green.shade400
-                                              : (showFeedback &&
-                                              selectedRightIndex ==
-                                                  index &&
-                                              !isCorrect)
-                                              ? Colors.red.shade400
-                                              : (selectedRightIndex ==
-                                              index)
-                                              ? Colors.blue.shade200
-                                              : Colors.white,
+                                              matchedRight[index]
+                                                  ? Colors.green.shade400
+                                                  : (showFeedback &&
+                                                      selectedRightIndex ==
+                                                          index &&
+                                                      !isCorrect)
+                                                  ? Colors.red.shade400
+                                                  : (selectedRightIndex ==
+                                                      index)
+                                                  ? Colors.blue.shade200
+                                                  : Colors.white,
                                           borderRadius: BorderRadius.circular(
                                             20,
                                           ),
@@ -435,56 +439,56 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
                     vertical: 10,
                   ),
                   child:
-                  showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isCorrect
-                                ? Icons.check_circle
-                                : Icons.cancel,
-                            color:
-                            isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? 'Aferin! 🎉'
-                                : 'Tekrar dene! 😔',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color:
-                              isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? 'Aferin! 🎉'
+                                        : 'Tekrar dene! 😔',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),

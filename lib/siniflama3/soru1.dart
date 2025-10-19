@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
 import 'soru2.dart';
-import '../../screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
+import '../screens/siniflandirma_sorulari_screen.dart';
+
 
 class SekilSiniflama extends StatefulWidget {
   const SekilSiniflama({super.key});
@@ -145,7 +146,7 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder: (context) => const ClassificationQuestionsScreen(),
                           ),
                           (route) => false,
                         );
@@ -381,17 +382,17 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
 
   Widget _buildItemBox(String emoji) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 1),
-      width: 60,
-      height: 65,
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      width: 70,
+      height: 60,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1)),
+          BoxShadow(color: Colors.black12, blurRadius: 3, offset: Offset(0, 1)),
         ],
       ),
-      child: Center(child: Text(emoji, style: const TextStyle(fontSize: 35))),
+      child: Center(child: Text(emoji, style: const TextStyle(fontSize: 40))),
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import '../utils/activity_tracker.dart';
 import 'soru3.dart'; // GeometricMatching burada tanımlı
 
@@ -69,13 +69,13 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
   }
 
   void _handleLeftTap(int index) {
-    if (matchedLeft[index]) return;
+    if (matchedLeft[index] || showFeedback) return;
     setState(() => selectedLeftIndex = index);
     _checkMatch();
   }
 
   void _handleRightTap(int index) {
-    if (matchedRight[index]) return;
+    if (matchedRight[index] || showFeedback) return;
     setState(() => selectedRightIndex = index);
     _checkMatch();
   }
@@ -173,9 +173,10 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
                           ),
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                     ),
@@ -217,19 +218,19 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                                 Expanded(
                                   child: Column(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                        MainAxisAlignment.spaceEvenly,
                                     children: List.generate(leftToys.length, (
-                                        index,
-                                        ) {
+                                      index,
+                                    ) {
                                       return GestureDetector(
                                         onTap: () => _handleLeftTap(index),
                                         child: AnimatedContainer(
                                           duration:
-                                          showFeedback
-                                              ? Duration.zero
-                                              : const Duration(
-                                            milliseconds: 300,
-                                          ),
+                                              showFeedback
+                                                  ? Duration.zero
+                                                  : const Duration(
+                                                    milliseconds: 300,
+                                                  ),
                                           curve: Curves.easeInOut,
                                           width: 120,
                                           height: 120,
@@ -238,17 +239,17 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                                           ),
                                           decoration: BoxDecoration(
                                             color:
-                                            matchedLeft[index]
-                                                ? Colors.green.shade400
-                                                : (showFeedback &&
-                                                !isCorrect &&
-                                                selectedLeftIndex ==
-                                                    index)
-                                                ? Colors.red.shade400
-                                                : (selectedLeftIndex ==
-                                                index)
-                                                ? Colors.blue.shade200
-                                                : Colors.white,
+                                                matchedLeft[index]
+                                                    ? Colors.green.shade400
+                                                    : (showFeedback &&
+                                                        !isCorrect &&
+                                                        selectedLeftIndex ==
+                                                            index)
+                                                    ? Colors.red.shade400
+                                                    : (selectedLeftIndex ==
+                                                        index)
+                                                    ? Colors.blue.shade200
+                                                    : Colors.white,
                                             borderRadius: BorderRadius.circular(
                                               20,
                                             ),
@@ -305,19 +306,19 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                                 Expanded(
                                   child: Column(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                        MainAxisAlignment.spaceEvenly,
                                     children: List.generate(rightToys.length, (
-                                        index,
-                                        ) {
+                                      index,
+                                    ) {
                                       return GestureDetector(
                                         onTap: () => _handleRightTap(index),
                                         child: AnimatedContainer(
                                           duration:
-                                          showFeedback
-                                              ? Duration.zero
-                                              : const Duration(
-                                            milliseconds: 300,
-                                          ),
+                                              showFeedback
+                                                  ? Duration.zero
+                                                  : const Duration(
+                                                    milliseconds: 300,
+                                                  ),
                                           curve: Curves.easeInOut,
                                           width: 120,
                                           height: 120,
@@ -326,17 +327,17 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                                           ),
                                           decoration: BoxDecoration(
                                             color:
-                                            matchedRight[index]
-                                                ? Colors.green.shade400
-                                                : (showFeedback &&
-                                                !isCorrect &&
-                                                selectedRightIndex ==
-                                                    index)
-                                                ? Colors.red.shade400
-                                                : (selectedRightIndex ==
-                                                index)
-                                                ? Colors.blue.shade200
-                                                : Colors.white,
+                                                matchedRight[index]
+                                                    ? Colors.green.shade400
+                                                    : (showFeedback &&
+                                                        !isCorrect &&
+                                                        selectedRightIndex ==
+                                                            index)
+                                                    ? Colors.red.shade400
+                                                    : (selectedRightIndex ==
+                                                        index)
+                                                    ? Colors.blue.shade200
+                                                    : Colors.white,
                                             borderRadius: BorderRadius.circular(
                                               20,
                                             ),
@@ -380,56 +381,56 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
                     vertical: 10,
                   ),
                   child:
-                  showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isCorrect
-                                ? Icons.check_circle
-                                : Icons.cancel,
-                            color:
-                            isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? "Aferin! 🎉"
-                                : "Tekrar dene! 😔",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color:
-                              isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? "Aferin! 🎉"
+                                        : "Tekrar dene! 😔",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),

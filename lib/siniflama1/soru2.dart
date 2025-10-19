@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import 'soru1.dart';
 import 'soru4.dart';
-import '../../screens/home_screen.dart';
+import '../screens/siniflandirma_sorulari_screen.dart';
+
 
 class UzunKisaSinifla extends StatefulWidget {
   const UzunKisaSinifla({super.key});
@@ -103,6 +103,7 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
       isCorrect = correct;
     });
     _feedbackController.forward(from: 0);
+
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
@@ -118,7 +119,7 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
     bool isLong = item['isLong'];
     double boxWidth = isLong ? 90 : 75;
     double boxHeight = isLong ? 100 : 85;
-    double imgSize = isLong ? 70 : 55;
+    double imgSize = isLong ? 100 : 55;
 
     return Draggable<Map<String, dynamic>>(
       data: item,
@@ -178,13 +179,15 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
 
   // ÖRNEK TASARIM: Grup Kutusu (DragTarget) yapısı
   Widget _buildGroup(
-      String title,
-      List<Map<String, dynamic>> items,
-      bool isLong,
-      ) {
-    Color boxColor = isLong ? Colors.lightBlue.shade100 : Colors.deepPurple.shade100;
-    Color borderColor = isLong ? Colors.lightBlue.shade400 : Colors.deepPurple.shade300;
-    double placedImgSize = isLong ? 90 : 75;
+    String title,
+    List<Map<String, dynamic>> items,
+    bool isLong,
+  ) {
+    Color boxColor =
+        isLong ? Colors.lightBlue.shade100 : Colors.deepPurple.shade100;
+    Color borderColor =
+        isLong ? Colors.lightBlue.shade400 : Colors.deepPurple.shade300;
+    double placedImgSize = isLong ? 80 : 50;
 
     return DragTarget<Map<String, dynamic>>(
       onWillAcceptWithDetails: (data) {
@@ -218,10 +221,7 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           decoration: BoxDecoration(
             color: boxColor,
-            border: Border.all(
-              color: borderColor,
-              width: 2,
-            ),
+            border: Border.all(color: borderColor, width: 2),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -248,20 +248,22 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    mainAxisAlignment: items.isEmpty
-                        ? MainAxisAlignment.center
-                        : MainAxisAlignment.start,
-                    children: items.map((item) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Image.asset(
-                          item['image'],
-                          width: placedImgSize,
-                          height: placedImgSize,
-                          fit: BoxFit.contain,
-                        ),
-                      );
-                    }).toList(),
+                    mainAxisAlignment:
+                        items.isEmpty
+                            ? MainAxisAlignment.center
+                            : MainAxisAlignment.start,
+                    children:
+                        items.map((item) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Image.asset(
+                              item['image'],
+                              width: placedImgSize,
+                              height: placedImgSize,
+                              fit: BoxFit.contain,
+                            ),
+                          );
+                        }).toList(),
                   ),
                 ),
               ),
@@ -308,9 +310,9 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder: (context) => const ClassificationQuestionsScreen(),
                           ),
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                     ),
@@ -338,7 +340,9 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 1),
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Drag the objects to the correct group!'
@@ -384,12 +388,19 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                                   flex: 2,
                                   // Sağ tarafta ayrı bir DragTarget kullanmaya gerek yok
                                   // çünkü yanlış bırakma kontrolü _buildGroup içinde yapılıyor.
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: items
-                                        .where((item) => !item['isPlaced'])
-                                        .map((item) => _buildItem(item))
-                                        .toList(),
+                                  child: AbsorbPointer(
+                                    absorbing: showFeedback,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children:
+                                          items
+                                              .where(
+                                                (item) => !item['isPlaced'],
+                                              )
+                                              .map((item) => _buildItem(item))
+                                              .toList(),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -404,54 +415,65 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
                 Container(
                   height: 80,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                : (isEnglish
-                                ? 'Try again! 😔'
-                                : 'Tekrar dene! 😔'),
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),

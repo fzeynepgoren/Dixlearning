@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import 'soru5.dart'; // HayvanYasamSinifla sınıfının bulunduğu dosya
+import '../screens/siniflandirma_sorulari_screen.dart';
+
 
 class TasitSinifla extends StatefulWidget {
   const TasitSinifla({super.key});
@@ -81,7 +83,7 @@ class _TasitSiniflaState extends State<TasitSinifla>
       feedbackMessage =
           correct
               ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-              : (isEnglish ? 'Sorry! 😔' : 'Üzgünüz! 😔');
+              : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔');
 
       if (correct && !item['isPlaced']) {
         typeGroups[targetType]?.add(item);
@@ -239,47 +241,34 @@ class _TasitSiniflaState extends State<TasitSinifla>
                                 const SizedBox(width: 16),
                                 Expanded(
                                   flex: 2,
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children:
-                                          items
-                                              .where(
-                                                (item) => !item['isPlaced'],
-                                              )
-                                              .map(
-                                                (item) => Padding(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        vertical: 4,
-                                                      ),
-                                                  child: Draggable<
-                                                    Map<String, dynamic>
-                                                  >(
-                                                    data: item,
-                                                    feedback: Material(
-                                                      color: Colors.transparent,
-                                                      child:
-                                                          _buildDraggableItem(
-                                                            item,
-                                                          ),
-                                                    ),
-                                                    childWhenDragging: Opacity(
-                                                      opacity: 0.3,
-                                                      child:
-                                                          _buildDraggableItem(
-                                                            item,
-                                                          ),
-                                                    ),
-                                                    child: _buildDraggableItem(
-                                                      item,
-                                                    ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children:
+                                        items
+                                            .where((item) => !item['isPlaced'])
+                                            .map(
+                                              (item) => Draggable<
+                                                Map<String, dynamic>
+                                              >(
+                                                data: item,
+                                                feedback: Material(
+                                                  color: Colors.transparent,
+                                                  child: _buildDraggableItem(
+                                                    item,
                                                   ),
                                                 ),
-                                              )
-                                              .toList(),
-                                    ),
+                                                childWhenDragging: Opacity(
+                                                  opacity: 0.3,
+                                                  child: _buildDraggableItem(
+                                                    item,
+                                                  ),
+                                                ),
+                                                child: _buildDraggableItem(
+                                                  item,
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
                                   ),
                                 ),
                               ],
@@ -375,7 +364,7 @@ class _TasitSiniflaState extends State<TasitSinifla>
           setState(() {
             isCorrect = false;
             showFeedback = true;
-            feedbackMessage = isEnglish ? 'Sorry! 😔' : 'Üzgünüz! 😔';
+            feedbackMessage = isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔';
           });
           _feedbackController.forward(from: 0);
 
@@ -400,7 +389,7 @@ class _TasitSiniflaState extends State<TasitSinifla>
             color: boxColor,
             border: Border.all(
               color: _getBorderColorForType(type, borderColor),
-              width: 4,
+              width: 2,
             ),
             borderRadius: BorderRadius.circular(16),
           ),
@@ -447,6 +436,7 @@ class _TasitSiniflaState extends State<TasitSinifla>
 
   Widget _buildDraggableItem(Map<String, dynamic> item) {
     return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
       width: 70,
       height: 60,
       decoration: BoxDecoration(

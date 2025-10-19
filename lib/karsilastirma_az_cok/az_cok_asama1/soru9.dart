@@ -188,7 +188,7 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
                                           ? (isCorrect
                                               ? Colors.green
                                               : Colors.red)
-                                          : Colors.pink.shade100,
+                                          : Color(0xFFFDC726),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -198,7 +198,7 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
                                           ? (isCorrect
                                               ? Colors.green.shade300
                                               : Colors.red.shade300)
-                                          : Colors.pink.shade100,
+                                          : Color(0xFFFDC726),
                                 ),
                                 child: const Text(
                                   'Seç',
@@ -234,7 +234,7 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
                                           ? (isCorrect
                                               ? Colors.green
                                               : Colors.red)
-                                          : Colors.pink.shade100,
+                                          : Color(0xFFFDC726),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -244,7 +244,7 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
                                           ? (isCorrect
                                               ? Colors.green.shade300
                                               : Colors.red.shade300)
-                                          : Colors.pink.shade100,
+                                          : Color(0xFFFDC726),
                                 ),
                                 child: const Text(
                                   'Seç',

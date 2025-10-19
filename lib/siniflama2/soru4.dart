@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import 'soru5.dart'; // Make sure this path is correct.
+import 'soru5.dart';
+import '../screens/siniflandirma_sorulari_screen.dart';
+
 
 class TeknolojikSinifla extends StatefulWidget {
   const TeknolojikSinifla({super.key});
