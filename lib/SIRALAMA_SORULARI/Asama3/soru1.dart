@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
-import 'package:dixlearning/screens/sorting_activities_screen.dart';
+import 'package:dixlearning/screens/sorting_roadmap_screen.dart';
 import 'soru2.dart';
-
 
 class Asama3Soru1 extends StatefulWidget {
   const Asama3Soru1({super.key});
@@ -33,7 +32,10 @@ class _Asama3Soru1State extends State<Asama3Soru1>
       _PlantStage('Tohum', 'assets/SIRALAMA_RESIMLERI/Asama3/soru1/tohum.png'),
       _PlantStage('Filiz', 'assets/SIRALAMA_RESIMLERI/Asama3/soru1/filiz.png'),
       _PlantStage('Ağaç', 'assets/SIRALAMA_RESIMLERI/Asama3/soru1/agac.png'),
-      _PlantStage('Çiçekli Ağaç', 'assets/SIRALAMA_RESIMLERI/Asama3/soru1/cicekli_agac.png'),
+      _PlantStage(
+        'Çiçekli Ağaç',
+        'assets/SIRALAMA_RESIMLERI/Asama3/soru1/cicekli_agac.png',
+      ),
     ];
     dragSources = List.from(stages)..shuffle();
     _feedbackController = AnimationController(
@@ -66,9 +68,7 @@ class _Asama3Soru1State extends State<Asama3Soru1>
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => const Asama3Soru2(),
-            ),
+            MaterialPageRoute(builder: (context) => const Asama3Soru2()),
           );
         }
       });
@@ -112,13 +112,17 @@ class _Asama3Soru1State extends State<Asama3Soru1>
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.black, size: 28),
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: 28,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const SortingActivitiesScreen(),
+                            builder: (context) => const SortingRoadmapScreen(),
                           ),
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                     ),
@@ -129,7 +133,10 @@ class _Asama3Soru1State extends State<Asama3Soru1>
                   child: Center(
                     child: Container(
                       margin: const EdgeInsets.fromLTRB(8, 6, 8, 6),
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 12,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.97),
                         borderRadius: BorderRadius.circular(24),
@@ -176,7 +183,9 @@ class _Asama3Soru1State extends State<Asama3Soru1>
                                   AnimatedContainer(
                                     key: ValueKey(dragSources[i].label),
                                     duration: const Duration(milliseconds: 200),
-                                    margin: const EdgeInsets.symmetric(vertical: 2),
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(16),
@@ -189,11 +198,16 @@ class _Asama3Soru1State extends State<Asama3Soru1>
                                       ],
                                     ),
                                     child: Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 4,
+                                        horizontal: 12,
+                                      ),
                                       child: Row(
                                         children: [
                                           ClipRRect(
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                             child: Image.asset(
                                               dragSources[i].assetPath,
                                               width: screenWidth * 0.26,
@@ -204,7 +218,11 @@ class _Asama3Soru1State extends State<Asama3Soru1>
                                           const Spacer(),
                                           ReorderableDragStartListener(
                                             index: i,
-                                            child: const Icon(Icons.drag_handle, color: Colors.grey, size: 28),
+                                            child: const Icon(
+                                              Icons.drag_handle,
+                                              color: Colors.grey,
+                                              size: 28,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -245,44 +263,59 @@ class _Asama3Soru1State extends State<Asama3Soru1>
                 // Geri Bildirim
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                : (isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔'),
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
