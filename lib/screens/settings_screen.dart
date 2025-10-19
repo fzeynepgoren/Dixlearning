@@ -6,6 +6,7 @@ import '../widgets/custom_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import '../providers/theme_provider.dart';
+import '../providers/user_provider.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,9 +20,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
-  String _userName = 'Kullanıcı';
-  int _userAge = 10;
-  String _avatar = '👦';
 
 
 
@@ -29,6 +27,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
     const Color mainColor = Color.fromARGB(255, 137, 189, 214); // Açık gök mavisi
     const Color accentColor = Color.fromARGB(255, 104, 178, 211); // Daha koyu açık mavi
     final Color cardBg = Theme.of(context).cardColor;
@@ -50,7 +49,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [mainColor, accentColor],
+                colors: Theme.of(context).brightness == Brightness.dark
+                    ? [
+                        const Color(0xFF1E1E1E), // Dark grey
+                        const Color(0xFF121212), // Darker grey
+                      ]
+                    : [mainColor, accentColor],
               ),
             ),
             child: SafeArea(
@@ -134,7 +138,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     CircleAvatar(
                       radius: 32,
                       backgroundColor: accentColor.withOpacity(0.15),
-                      child: Text(_avatar, style: const TextStyle(fontSize: 36)),
+                      child: Text(userProvider.avatar, style: const TextStyle(fontSize: 36)),
                     ),
                     const SizedBox(width: 18),
                     Expanded(
@@ -142,7 +146,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _userName,
+                            userProvider.fullName,
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -151,7 +155,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            (isEnglish ? 'Age: ' : 'Yaş: ') + _userAge.toString(),
+                            (isEnglish ? 'Age: ' : 'Yaş: ') + userProvider.userAge.toString(),
                             style: TextStyle(fontSize: 15, color: cardSubText),
                           ),
                         ],
@@ -544,13 +548,49 @@ class _SettingsScreenState extends State<SettingsScreen> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => const ProfileScreen(),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(-1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOutCubic;
+                  
+                  var tween = Tween(begin: begin, end: end).chain(
+                    CurveTween(curve: curve),
+                  );
+                  
+                  var offsetAnimation = animation.drive(tween);
+                  
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 300),
+              ),
             );
           } else if (index == 1) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(-1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOutCubic;
+                  
+                  var tween = Tween(begin: begin, end: end).chain(
+                    CurveTween(curve: curve),
+                  );
+                  
+                  var offsetAnimation = animation.drive(tween);
+                  
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 300),
               ),
             );
           }

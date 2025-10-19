@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -124,58 +124,73 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
           showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (context) => Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Colors.blue.shade100, Colors.blue.shade50],
+            builder:
+                (context) => Dialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Colors.blue.shade100, Colors.blue.shade50],
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.emoji_events,
+                          size: 80,
+                          color: Colors.amber,
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Tebrikler! 🎉',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          '4. aşamayı tamamladınız!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        const SizedBox(height: 30),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MatchingQuestionsScreen(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue.shade200,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 15,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                          child: const Text(
+                            'Ana Menüye Dön',
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.emoji_events, size: 80, color: Colors.amber),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Tebrikler! 🎉',
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      '4. aşamayı tamamladınız!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue.shade200,
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      child: const Text('Ana Menüye Dön',
-                          style: TextStyle(fontSize: 18, color: Colors.white)),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           );
         });
       }
@@ -206,8 +221,10 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
       // Sistem geri tuşu: HomeScreen’e dön ve stack’i temizle
       onWillPop: () async {
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (route) => false,
+          MaterialPageRoute(
+            builder: (context) => const MatchingQuestionsScreen(),
+          ),
+          (route) => false,
         );
         return false;
       },
@@ -236,8 +253,11 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
                       icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
-                              (route) => false,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
+                          ),
+                          (route) => false,
                         );
                       },
                     ),
@@ -265,7 +285,10 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
                       child: Column(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
+                            ),
                             child: Text(
                               isEnglish
                                   ? 'Match the emojis with the animals!'
@@ -286,43 +309,64 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
                                 // SOL SÜTUN: Emojiler
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: List.generate(
                                       leftEmojis.length,
-                                          (index) => GestureDetector(
+                                      (index) => GestureDetector(
                                         onTap: () => _handleLeftTap(index),
                                         child: AnimatedContainer(
-                                          duration: const Duration(milliseconds: 300),
+                                          duration: const Duration(
+                                            milliseconds: 300,
+                                          ),
                                           curve: Curves.easeInOut,
                                           width: 120,
                                           height: 120,
-                                          margin: const EdgeInsets.symmetric(vertical: 8),
+                                          margin: const EdgeInsets.symmetric(
+                                            vertical: 8,
+                                          ),
                                           decoration: BoxDecoration(
                                             // 1) matched -> yeşil
                                             // 2) geri bildirim var ve yanlış seçili -> kırmızı
                                             // 3) geri bildirim yok ve seçili -> mavi
                                             // 4) diğer -> beyaz
-                                            color: matchedLeft[index]
-                                                ? Colors.green.shade400
-                                                : (showFeedback
-                                                ? ((selectedLeftIndex == index && !isCorrect)
-                                                ? Colors.red.shade400
-                                                : Colors.white)
-                                                : (selectedLeftIndex == index
-                                                ? Colors.blue.shade200
-                                                : Colors.white)),
-                                            borderRadius: BorderRadius.circular(20),
+                                            color:
+                                                matchedLeft[index]
+                                                    ? Colors.green.shade400
+                                                    : (showFeedback
+                                                        ? ((selectedLeftIndex ==
+                                                                    index &&
+                                                                !isCorrect)
+                                                            ? Colors
+                                                                .red
+                                                                .shade400
+                                                            : Colors.white)
+                                                        : (selectedLeftIndex ==
+                                                                index
+                                                            ? Colors
+                                                                .blue
+                                                                .shade200
+                                                            : Colors.white)),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black.withOpacity(0.2),
+                                                color: Colors.black.withOpacity(
+                                                  0.2,
+                                                ),
                                                 blurRadius: 6,
                                                 offset: const Offset(0, 3),
                                               ),
                                             ],
                                           ),
                                           child: Center(
-                                            child: Text(leftEmojis[index],
-                                                style: const TextStyle(fontSize: 48)),
+                                            child: Text(
+                                              leftEmojis[index],
+                                              style: const TextStyle(
+                                                fontSize: 48,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -334,7 +378,9 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
                                 Container(
                                   height: 550,
                                   width: 4,
-                                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       begin: Alignment.topCenter,
@@ -352,31 +398,48 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
                                 // SAĞ SÜTUN: Hayvan adları
                                 Expanded(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: List.generate(
                                       shuffledAnimals.length,
-                                          (index) => GestureDetector(
+                                      (index) => GestureDetector(
                                         onTap: () => _handleRightTap(index),
                                         child: AnimatedContainer(
-                                          duration: const Duration(milliseconds: 300),
+                                          duration: const Duration(
+                                            milliseconds: 300,
+                                          ),
                                           curve: Curves.easeInOut,
                                           width: 120,
                                           height: 120,
-                                          margin: const EdgeInsets.symmetric(vertical: 8),
+                                          margin: const EdgeInsets.symmetric(
+                                            vertical: 8,
+                                          ),
                                           decoration: BoxDecoration(
-                                            color: matchedRight[index]
-                                                ? Colors.green.shade400
-                                                : (showFeedback
-                                                ? ((selectedRightIndex == index && !isCorrect)
-                                                ? Colors.red.shade400
-                                                : Colors.white)
-                                                : (selectedRightIndex == index
-                                                ? Colors.blue.shade200
-                                                : Colors.white)),
-                                            borderRadius: BorderRadius.circular(20),
+                                            color:
+                                                matchedRight[index]
+                                                    ? Colors.green.shade400
+                                                    : (showFeedback
+                                                        ? ((selectedRightIndex ==
+                                                                    index &&
+                                                                !isCorrect)
+                                                            ? Colors
+                                                                .red
+                                                                .shade400
+                                                            : Colors.white)
+                                                        : (selectedRightIndex ==
+                                                                index
+                                                            ? Colors
+                                                                .blue
+                                                                .shade200
+                                                            : Colors.white)),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black.withOpacity(0.2),
+                                                color: Colors.black.withOpacity(
+                                                  0.2,
+                                                ),
                                                 blurRadius: 6,
                                                 offset: const Offset(0, 3),
                                               ),
@@ -410,50 +473,65 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
                 // ALT GERİ BİLDİRİM BANDI
                 Container(
                   height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isEnglish
-                                ? (isCorrect ? 'Great! 🎉' : 'Try again! 😔')
-                                : (isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔'),
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isEnglish
+                                        ? (isCorrect
+                                            ? 'Great! 🎉'
+                                            : 'Try again! 😔')
+                                        : (isCorrect
+                                            ? 'Aferin! 🎉'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),

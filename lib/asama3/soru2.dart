@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'soru3.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -29,11 +29,7 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
   int? wrongLeftIndex;
   int? wrongRightIndex;
 
-  final Map<String, String> animalToLetter = {
-    '🦒': 'Z',
-    '🐘': 'F',
-    '🐰': 'T',
-  };
+  final Map<String, String> animalToLetter = {'🦒': 'Z', '🐘': 'F', '🐰': 'T'};
 
   void _shuffleLetters() {
     shuffledLetters = List.from(rightLetters)..shuffle();
@@ -78,7 +74,8 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
       }
 
       if (selectedLeftIndex != null && selectedRightIndex != null) {
-        isCorrect = animalToLetter[leftAnimals[selectedLeftIndex!]] ==
+        isCorrect =
+            animalToLetter[leftAnimals[selectedLeftIndex!]] ==
             shuffledLetters[selectedRightIndex!];
 
         showFeedback = true;
@@ -95,7 +92,7 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
               if (mounted) {
                 // Etkinlik tamamlandı
                 ActivityTracker.completeActivity();
-                
+
                 // Yeni oyun için karıştır
                 _shuffleLetters();
 
@@ -163,10 +160,7 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
           ],
         ),
         child: Center(
-          child: Text(
-            animal,
-            style: const TextStyle(fontSize: 42),
-          ),
+          child: Text(animal, style: const TextStyle(fontSize: 42)),
         ),
       ),
     );
@@ -258,7 +252,8 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
                           ),
                           (route) => false,
                         );

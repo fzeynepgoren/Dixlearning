@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'soru4.dart'; // TasitSinifla sınıfının olduğu dosya
+import '../screens/siniflandirma_sorulari_screen.dart';
+
 
 class BoyutSinifla extends StatefulWidget {
   const BoyutSinifla({super.key});
@@ -378,10 +380,10 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
         fontSize = 16;
         break;
       case 'orta':
-        fontSize = 24;
+        fontSize = 36;
         break;
       case 'buyuk':
-        fontSize = 40;
+        fontSize = 60;
         break;
       default:
         fontSize = 24;
@@ -389,8 +391,8 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
-      width: 70,
-      height: 60,
+      width: 80,
+      height: 80,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),

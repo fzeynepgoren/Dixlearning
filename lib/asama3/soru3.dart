@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'soru4.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -160,7 +160,8 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
                           ),
                           (route) => false,
                         );
@@ -244,9 +245,7 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                                                         !matchedLeft[index])
                                                     ? Border.all(
                                                       color:
-                                                          Colors
-                                                              .blue
-                                                              .shade400,
+                                                          Colors.blue.shade400,
                                                       width: 4,
                                                     )
                                                     : null,
@@ -328,9 +327,7 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                                                         !matchedRight[index])
                                                     ? Border.all(
                                                       color:
-                                                          Colors
-                                                              .blue
-                                                              .shade400,
+                                                          Colors.blue.shade400,
                                                       width: 4,
                                                     )
                                                     : null,

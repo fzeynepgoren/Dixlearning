@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/home_screen.dart';
-import 'package:dixlearning/screens/sorting_activities_screen.dart';
+import 'package:dixlearning/screens/sorting_roadmap_screen.dart';
 
 class Asama3Soru5 extends StatefulWidget {
   const Asama3Soru5({super.key});
@@ -33,7 +33,9 @@ class _Asama3Soru5State extends State<Asama3Soru5>
       _PlantStage('Bebek', 'assets/SIRALAMA_RESIMLERI/Asama3/soru5/bebek.png'),
       _PlantStage('Çocuk', 'assets/SIRALAMA_RESIMLERI/Asama3/soru5/cocuk.png'),
       _PlantStage(
-          'Yetişkin', 'assets/SIRALAMA_RESIMLERI/Asama3/soru5/yetiskin.png'),
+        'Yetişkin',
+        'assets/SIRALAMA_RESIMLERI/Asama3/soru5/yetiskin.png',
+      ),
       _PlantStage('Yaşlı', 'assets/SIRALAMA_RESIMLERI/Asama3/soru5/yasli.png'),
     ];
     dragSources = List.from(stages)..shuffle();
@@ -66,9 +68,7 @@ class _Asama3Soru5State extends State<Asama3Soru5>
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => const HomeScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
           );
         }
       });
@@ -109,7 +109,8 @@ class _Asama3Soru5State extends State<Asama3Soru5>
       onWillPop: () async => false,
       child: Scaffold(
         body: Container(
-          decoration: BoxDecoration( // 'const' kaldırıldı
+          decoration: BoxDecoration(
+            // 'const' kaldırıldı
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -129,14 +130,17 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back,
-                          color: Colors.black, size: 28),
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: 28,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const SortingActivitiesScreen(),
+                            builder: (context) => const SortingRoadmapScreen(),
                           ),
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                     ),
@@ -148,7 +152,9 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                     child: Container(
                       margin: const EdgeInsets.fromLTRB(8, 6, 8, 6),
                       padding: const EdgeInsets.symmetric(
-                          vertical: 12, horizontal: 20),
+                        vertical: 12,
+                        horizontal: 20,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.97),
                         borderRadius: BorderRadius.circular(24),
@@ -195,8 +201,9 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                                   AnimatedContainer(
                                     key: ValueKey(dragSources[i].label),
                                     duration: const Duration(milliseconds: 200),
-                                    margin:
-                                        const EdgeInsets.symmetric(vertical: 3),
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 3,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(20),
@@ -210,12 +217,15 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
-                                          vertical: 2, horizontal: 20),
+                                        vertical: 2,
+                                        horizontal: 20,
+                                      ),
                                       child: Row(
                                         children: [
                                           ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(16),
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
                                             child: Image.asset(
                                               dragSources[i].assetPath,
                                               width: imageSize,
@@ -226,8 +236,11 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                                           const Spacer(),
                                           ReorderableDragStartListener(
                                             index: i,
-                                            child: const Icon(Icons.drag_handle,
-                                                color: Colors.grey, size: 32),
+                                            child: const Icon(
+                                              Icons.drag_handle,
+                                              color: Colors.grey,
+                                              size: 32,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -268,51 +281,59 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                 // Geri Bildirim Alanı
                 Container(
                   height: 80,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                          scale: CurvedAnimation(
-                            parent: _feedbackController,
-                            curve: Curves.elasticOut,
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  isCorrect ? Icons.check_circle : Icons.cancel,
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  isCorrect
-                                      ? (isEnglish
-                                          ? 'Well done! 🎉'
-                                          : 'Aferin! 🎉')
-                                      : (isEnglish
-                                          ? 'Try again! 😔'
-                                          : 'Tekrar dene! 😔'),
-                                  style: TextStyle(
-                                    fontSize: 18,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
                                     color:
                                         isCorrect ? Colors.green : Colors.red,
-                                    fontWeight: FontWeight.bold,
+                                    size: 28,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),

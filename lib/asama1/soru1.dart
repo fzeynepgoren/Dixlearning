@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'soru2.dart';
-import '../screens/home_screen.dart';
+import '../screens/matching_questions_screen.dart';
 import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import '../providers/progress_provider.dart';
 
 class MeyveEsle extends StatefulWidget {
   const MeyveEsle({super.key});
@@ -83,7 +84,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
   }
 
   void _handleLeftTap(int index) {
-    if (matchedLeft[currentPage][index]) return;
+    if (matchedLeft[currentPage][index] || showFeedback) return;
     setState(() {
       selectedLeftIndex = index;
     });
@@ -91,7 +92,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
   }
 
   void _handleRightTap(int index) {
-    if (matchedRight[currentPage][index]) return;
+    if (matchedRight[currentPage][index] || showFeedback) return;
     setState(() {
       selectedRightIndex = index;
     });
@@ -126,6 +127,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
               _slideController.forward(from: 0); // Reset animation for new page
             } else {
               ActivityTracker.completeActivity();
+              Provider.of<ProgressProvider>(context, listen: false).completeStage1();
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const GDisgrafi1()),
@@ -200,7 +202,8 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
                           ),
                           (route) => false,
                         );
