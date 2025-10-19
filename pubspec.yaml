@@ -48,7 +48,7 @@ flutter:
     - assets/SIRALAMA_RESIMLERI/
     
     # Karşılaştırma Road Map Resimleri
-    - assets/karsilastirma_road_map/
+  
     
     # Az-Çok Karşılaştırma
     - assets/az_cok_asa1/soru1/

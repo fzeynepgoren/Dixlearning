@@ -277,6 +277,7 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
                                 // ORTA: gradient çizgi
                                 Container(
                                   width: 4,
+                                  height: 475,
                                   margin: const EdgeInsets.symmetric(
                                     horizontal: 10,
                                   ),

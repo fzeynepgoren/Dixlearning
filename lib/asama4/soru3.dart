@@ -313,6 +313,7 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                                 // AYIRICI
                                 Container(
                                   width: 4,
+                                  height: 475,
                                   margin: const EdgeInsets.symmetric(
                                     horizontal: 10,
                                   ),
