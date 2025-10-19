@@ -47,6 +47,9 @@ flutter:
     - assets/konusma_balonu.png
     - assets/SIRALAMA_RESIMLERI/
     
+    # Karşılaştırma Road Map Resimleri
+    - assets/karsilastirma_road_map/
+    
     # Az-Çok Karşılaştırma
     - assets/az_cok_asa1/soru1/
     - assets/az_cok_asa1/soru2/
@@ -144,5 +147,7 @@ flutter:
     - assets/siniflama1/
     - assets/siniflama2/
     - assets/kalin_ince_asa1/
+    - assets/screensphoto/
   
+
     

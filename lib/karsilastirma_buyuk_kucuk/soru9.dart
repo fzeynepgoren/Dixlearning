@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/karsilastirma_sorulari_screen.dart';
-import '../../../screens/home_screen.dart';
 
 class BuyukKucukSoru9 extends StatefulWidget {
   const BuyukKucukSoru9({super.key});
@@ -45,7 +45,7 @@ class _BuyukKucukSoru9State extends State<BuyukKucukSoru9>
     super.dispose();
   }
 
-  void _handleSelect(int index) {
+  void _handleSelect(int index) async {
     setState(() {
       selectedIndex = index;
       isCorrect = (index == 1); // 1: sağdaki küçük olan doğru
@@ -53,11 +53,19 @@ class _BuyukKucukSoru9State extends State<BuyukKucukSoru9>
     });
     _feedbackController.forward(from: 0);
     if (isCorrect == true) {
+      // Level 2 tamamlandı olarak kaydet
+      final prefs = await SharedPreferences.getInstance();
+      final currentLevel = prefs.getInt('karsilastirma_completed_level') ?? 0;
+      if (currentLevel < 2) {
+        await prefs.setInt('karsilastirma_completed_level', 2);
+      }
+
       Future.delayed(const Duration(seconds: 2), () {
         if (!mounted) return;
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-          (route) => false,
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const KarsilastirmaSorulariScreen(),
+          ),
         );
       });
     } else {

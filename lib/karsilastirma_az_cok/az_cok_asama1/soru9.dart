@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/karsilastirma_sorulari_screen.dart';
 
@@ -46,7 +47,7 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void checkAnswer(bool isCorrectAnswer) {
+  void checkAnswer(bool isCorrectAnswer) async {
     setState(() {
       selectedAnswer = isCorrectAnswer;
       isCorrect = isCorrectAnswer;
@@ -55,6 +56,13 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
     _feedbackController.forward(from: 0);
 
     if (isCorrectAnswer) {
+      // Level 1 tamamlandı olarak kaydet
+      final prefs = await SharedPreferences.getInstance();
+      final currentLevel = prefs.getInt('karsilastirma_completed_level') ?? 0;
+      if (currentLevel < 1) {
+        await prefs.setInt('karsilastirma_completed_level', 1);
+      }
+
       // Doğruysa 2 saniye sonra sonraki soruya geç
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
