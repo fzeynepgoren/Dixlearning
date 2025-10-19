@@ -197,7 +197,10 @@ class _AzCokSoru1State extends State<AzCokSoru1> with TickerProviderStateMixin {
                               width: screenWidth * 0.65,
                               height: 40,
                               child: ElevatedButton(
-                                onPressed: () => checkAnswer(true),
+                                onPressed:
+                                    showFeedback
+                                        ? null
+                                        : () => checkAnswer(true),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       selectedAnswer == true
@@ -205,7 +208,7 @@ class _AzCokSoru1State extends State<AzCokSoru1> with TickerProviderStateMixin {
                                               ? Colors.green
                                               : Colors.red)
                                           : Colors.orange.shade400,
-                                  foregroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -258,7 +261,10 @@ class _AzCokSoru1State extends State<AzCokSoru1> with TickerProviderStateMixin {
                               width: screenWidth * 0.65,
                               height: 40,
                               child: ElevatedButton(
-                                onPressed: () => checkAnswer(false),
+                                onPressed:
+                                    showFeedback
+                                        ? null
+                                        : () => checkAnswer(false),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       selectedAnswer == false
@@ -266,7 +272,7 @@ class _AzCokSoru1State extends State<AzCokSoru1> with TickerProviderStateMixin {
                                               ? Colors.green
                                               : Colors.red)
                                           : Colors.orange.shade400,
-                                  foregroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),

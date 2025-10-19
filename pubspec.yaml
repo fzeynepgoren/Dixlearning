@@ -45,8 +45,29 @@ flutter:
     - assets/kiz_maskot.png
     - assets/konusma_balonu.png
     - assets/SIRALAMA_RESIMLERI/
-    - assets/az_cok_asa1/
-    - assets/uzun_kisa/
+    
+    # Az-Çok Karşılaştırma
+    - assets/az_cok_asa1/soru1/
+    - assets/az_cok_asa1/soru2/
+    - assets/az_cok_asa1/soru3/
+    - assets/az_cok_asa1/soru4/
+    - assets/az_cok_asa1/soru5/
+    - assets/az_cok_asa1/soru6/
+    - assets/az_cok_asa1/soru7/
+    - assets/az_cok_asa1/soru8/
+    - assets/az_cok_asa1/soru9/
+    
+    # Uzun-Kısa Karşılaştırma
+    - assets/uzun_kisa/soru1/
+    - assets/uzun_kisa/soru2/
+    - assets/uzun_kisa/soru3/
+    - assets/uzun_kisa/soru4/
+    - assets/uzun_kisa/soru5/
+    - assets/uzun_kisa/soru6/
+    - assets/uzun_kisa/soru7/
+    - assets/uzun_kisa/soru8/
+    - assets/uzun_kisa/soru9/
+    
     - assets/buyuk_kucuk/soru1/Resim1.png
     - assets/buyuk_kucuk/soru2/Resim2.png
     - assets/buyuk_kucuk/soru3/Resim3.png
@@ -122,5 +143,5 @@ flutter:
     - assets/siniflama1/
     - assets/siniflama2/
     - assets/kalin_ince_asa1/
-
+  
     

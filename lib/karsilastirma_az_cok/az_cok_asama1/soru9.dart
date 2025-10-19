@@ -178,7 +178,10 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
                               width: screenWidth * 0.65,
                               height: 40,
                               child: ElevatedButton(
-                                onPressed: () => checkAnswer(false),
+                                onPressed:
+                                    showFeedback
+                                        ? null
+                                        : () => checkAnswer(false),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       selectedAnswer == false
@@ -221,7 +224,10 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
                               width: screenWidth * 0.65,
                               height: 40,
                               child: ElevatedButton(
-                                onPressed: () => checkAnswer(true),
+                                onPressed:
+                                    showFeedback
+                                        ? null
+                                        : () => checkAnswer(true),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       selectedAnswer == true
