@@ -48,8 +48,12 @@ flutter:
     - assets/SIRALAMA_RESIMLERI/
     
     # Karşılaştırma Road Map Resimleri
-  
-    
+    - assets/karsilastirma_road_map/
+
+    # Sınıflandırma Roadmap Resimleri
+    - assets/roadmap_siniflama.png
+
+
     # Az-Çok Karşılaştırma
     - assets/az_cok_asa1/soru1/
     - assets/az_cok_asa1/soru2/
