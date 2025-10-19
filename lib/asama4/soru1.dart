@@ -114,7 +114,10 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
               // Etkinlik tamamlandı
 
               ActivityTracker.completeActivity();
-              Provider.of<ProgressProvider>(context, listen: false).completeStage4();
+              Provider.of<ProgressProvider>(
+                context,
+                listen: false,
+              ).completeStage4();
 
               Navigator.pushReplacement(
                 context,
@@ -291,6 +294,7 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
                                 ),
                                 Container(
                                   width: 4,
+                                  height: 475,
                                   margin: const EdgeInsets.symmetric(
                                     horizontal: 10,
                                   ),
