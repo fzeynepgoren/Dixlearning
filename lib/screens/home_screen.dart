@@ -4,7 +4,6 @@ import 'giris_etkinlikleri_screen.dart';
 import 'profile_screen.dart';
 import 'settings_screen.dart';
 import 'matching_questions_screen.dart';
-import 'classification_questions_screen.dart';
 import 'karsilastirma_sorulari_screen.dart';
 import 'login_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
@@ -12,6 +11,9 @@ import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import 'sorting_roadmap_screen.dart';
 import 'dart:convert';
+import 'siniflandirma_sorulari_screen.dart';
+
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -621,24 +623,26 @@ class _AnimatedActivityCardState extends State<_AnimatedActivityCard>
                       ),
                       const SizedBox(height: 8),
                       // Başlık
-                      Text(
-                        widget.title,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          letterSpacing: 0.3,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black26,
-                              offset: Offset(1, 1),
-                              blurRadius: 2,
-                            ),
-                          ],
+                      Flexible(
+                        child: Text(
+                          widget.title,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: 0.3,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black26,
+                                offset: Offset(1, 1),
+                                blurRadius: 2,
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
