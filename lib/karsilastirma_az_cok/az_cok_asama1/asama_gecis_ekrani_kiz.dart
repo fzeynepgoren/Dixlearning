@@ -94,10 +94,7 @@ class _AsamaGecisEkraniKizState extends State<AsamaGecisEkraniKiz>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF8FC8F7),
-              Color(0xFFE3F0FF),
-            ],
+            colors: [Color(0xFF8FC8F7), Color(0xFFE3F0FF)],
             stops: [0.0, 1.0],
           ),
         ),
@@ -114,30 +111,38 @@ class _AsamaGecisEkraniKizState extends State<AsamaGecisEkraniKiz>
                       Positioned(
                         top: screenHeight * 0.06,
                         left: screenWidth * (0.05 + 0.25 * t),
-                        child: Icon(Icons.cloud,
-                            size: screenWidth * 0.22,
-                            color: Colors.white.withOpacity(0.45)),
+                        child: Icon(
+                          Icons.cloud,
+                          size: screenWidth * 0.22,
+                          color: Colors.white.withOpacity(0.45),
+                        ),
                       ),
                       Positioned(
                         top: screenHeight * 0.13,
                         right: screenWidth * (0.10 + 0.20 * t),
-                        child: Icon(Icons.cloud,
-                            size: screenWidth * 0.18,
-                            color: Colors.white.withOpacity(0.38)),
+                        child: Icon(
+                          Icons.cloud,
+                          size: screenWidth * 0.18,
+                          color: Colors.white.withOpacity(0.38),
+                        ),
                       ),
                       Positioned(
                         top: screenHeight * 0.19,
                         left: screenWidth * (0.30 - 0.18 * t),
-                        child: Icon(Icons.cloud,
-                            size: screenWidth * 0.13,
-                            color: Colors.white.withOpacity(0.32)),
+                        child: Icon(
+                          Icons.cloud,
+                          size: screenWidth * 0.13,
+                          color: Colors.white.withOpacity(0.32),
+                        ),
                       ),
                       Positioned(
                         top: screenHeight * 0.09,
                         right: screenWidth * (0.30 - 0.18 * t),
-                        child: Icon(Icons.cloud,
-                            size: screenWidth * 0.10,
-                            color: Colors.white.withOpacity(0.30)),
+                        child: Icon(
+                          Icons.cloud,
+                          size: screenWidth * 0.10,
+                          color: Colors.white.withOpacity(0.30),
+                        ),
                       ),
                     ],
                   );
@@ -147,8 +152,9 @@ class _AsamaGecisEkraniKizState extends State<AsamaGecisEkraniKiz>
               AnimatedBuilder(
                 animation: _maskotController,
                 builder: (context, child) {
-                  double t =
-                      Curves.easeOutBack.transform(_maskotController.value);
+                  double t = Curves.easeOutBack.transform(
+                    _maskotController.value,
+                  );
                   double bounce = sin(t * pi) * 8;
                   return Positioned(
                     top: screenHeight * 0.08 + (1 - t) * 60 - bounce,
@@ -213,10 +219,7 @@ class _AsamaGecisEkraniKizState extends State<AsamaGecisEkraniKiz>
                       alignment: Alignment.center,
                       child: CustomPaint(
                         painter: _BalloonArrowPainter(),
-                        child: const SizedBox(
-                          width: 44,
-                          height: 22,
-                        ),
+                        child: const SizedBox(width: 44, height: 22),
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.025),
@@ -238,7 +241,7 @@ class _AsamaGecisEkraniKizState extends State<AsamaGecisEkraniKiz>
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF60BAE3),
-                            foregroundColor: Colors.white,
+                            foregroundColor: Colors.black,
                             padding: EdgeInsets.symmetric(
                               horizontal: screenWidth * 0.18,
                               vertical: screenHeight * 0.03,
@@ -262,9 +265,11 @@ class _AsamaGecisEkraniKizState extends State<AsamaGecisEkraniKiz>
                                 ),
                               ),
                               const SizedBox(width: 14),
-                              Icon(Icons.arrow_forward_rounded,
-                                  color: Colors.white,
-                                  size: buttonFontSize * 1.18),
+                              Icon(
+                                Icons.arrow_forward_rounded,
+                                color: Colors.white,
+                                size: buttonFontSize * 1.18,
+                              ),
                             ],
                           ),
                         ),
@@ -281,8 +286,12 @@ class _AsamaGecisEkraniKizState extends State<AsamaGecisEkraniKiz>
                       animation: _confettiController,
                       builder: (context, child) {
                         return CustomPaint(
-                          painter: _ConfettiPainter(_confettiController.value,
-                              24, screenWidth, screenHeight),
+                          painter: _ConfettiPainter(
+                            _confettiController.value,
+                            24,
+                            screenWidth,
+                            screenHeight,
+                          ),
                         );
                       },
                     ),
@@ -299,9 +308,10 @@ class _AsamaGecisEkraniKizState extends State<AsamaGecisEkraniKiz>
 class _BalloonArrowPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
+    final paint =
+        Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.fill;
     final path = Path();
     path.moveTo(0, 0);
     path.lineTo(size.width / 2, size.height);
@@ -337,7 +347,8 @@ class _ConfettiPainter extends CustomPainter {
       final angle = (i / count) * 2 * pi + progress * 2 * pi;
       final radius = width * 0.32 * progress + _rand.nextDouble() * 12;
       final x = width / 2 + cos(angle) * radius + _rand.nextDouble() * 8;
-      final y = height * 0.18 +
+      final y =
+          height * 0.18 +
           sin(angle) * radius +
           progress * height * 0.18 +
           _rand.nextDouble() * 8;

@@ -201,7 +201,10 @@ class _KalinInceSoru8State extends State<KalinInceSoru8>
                               width: screenWidth * 0.65,
                               height: 40,
                               child: ElevatedButton(
-                                onPressed: () => checkAnswer(false),
+                                onPressed:
+                                    showFeedback
+                                        ? null
+                                        : () => checkAnswer(false),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       selectedAnswer == false
@@ -209,7 +212,7 @@ class _KalinInceSoru8State extends State<KalinInceSoru8>
                                               ? Colors.green
                                               : Colors.red)
                                           : Colors.lime.shade300,
-                                  foregroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -264,7 +267,10 @@ class _KalinInceSoru8State extends State<KalinInceSoru8>
                               width: screenWidth * 0.65,
                               height: 40,
                               child: ElevatedButton(
-                                onPressed: () => checkAnswer(true),
+                                onPressed:
+                                    showFeedback
+                                        ? null
+                                        : () => checkAnswer(true),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       selectedAnswer == true
@@ -272,7 +278,7 @@ class _KalinInceSoru8State extends State<KalinInceSoru8>
                                               ? Colors.green
                                               : Colors.red)
                                           : Colors.lime.shade300,
-                                  foregroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
