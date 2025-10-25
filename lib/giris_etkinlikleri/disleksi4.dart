@@ -88,7 +88,7 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
     final iconSize = screenSize.width * 0.065;
 
     // 🔹 Dinamik boyutlar
-    final bubbleSize = screenSize.width * 0.15; // harflerin boyutu
+    final bubbleSize = screenSize.width * 0.12; // harflerin boyutu küçültüldü
     final gridSpacing = screenSize.width * 0.04; // grid aralığı
 
     return WillPopScope(
@@ -417,7 +417,7 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                                 horizontal: 20,
                               ),
                               decoration: BoxDecoration(
-                                color: isCorrect ? Colors.green : Colors.red,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: const [
                                   BoxShadow(
@@ -434,7 +434,8 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                                     isCorrect
                                         ? Icons.check_circle
                                         : Icons.cancel,
-                                    color: Colors.white,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
                                     size: 28,
                                   ),
                                   const SizedBox(width: 10),
@@ -446,9 +447,10 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                                         : (isEnglish
                                             ? 'Try again! 😔'
                                             : 'Tekrar dene! 😔'),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 18,
-                                      color: Colors.white,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
