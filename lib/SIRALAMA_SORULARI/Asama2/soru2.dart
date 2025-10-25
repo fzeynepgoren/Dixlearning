@@ -2,26 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
-import 'soru2.dart';
+import 'soru3.dart';
 import 'package:dixlearning/screens/sorting_roadmap_screen.dart';
 
-class Asama2Soru1 extends StatefulWidget {
-  const Asama2Soru1({super.key});
+class Asama2Soru2 extends StatefulWidget {
+  const Asama2Soru2({super.key});
 
   @override
-  State<Asama2Soru1> createState() => _Asama2Soru1State();
+  State<Asama2Soru2> createState() => _Asama2Soru2State();
 }
 
-class _TimeStage {
+class _FoodStage {
   final String label;
   final String assetPath;
-  _TimeStage(this.label, this.assetPath);
+  _FoodStage(this.label, this.assetPath);
 }
 
-class _Asama2Soru1State extends State<Asama2Soru1>
+class _Asama2Soru2State extends State<Asama2Soru2>
     with TickerProviderStateMixin {
-  late List<_TimeStage> stages;
-  late List<_TimeStage> dragSources;
+  late List<_FoodStage> stages;
+  late List<_FoodStage> dragSources;
   bool showFeedback = false;
   bool isCorrect = false;
   late AnimationController _feedbackController;
@@ -30,15 +30,15 @@ class _Asama2Soru1State extends State<Asama2Soru1>
   void initState() {
     super.initState();
     stages = [
-      _TimeStage(
-        'Sabah',
-        'assets/SIRALAMA_RESIMLERI/Asama2/soru1/gun_dogumu.png',
+      _FoodStage('Çorba', 'assets/SIRALAMA_RESIMLERI/Asama2/soru2/corba.png'),
+      _FoodStage(
+        'Kurabiye',
+        'assets/SIRALAMA_RESIMLERI/Asama2/soru2/kurabiye.png',
       ),
-      _TimeStage(
-        'Öğle',
-        'assets/SIRALAMA_RESIMLERI/Asama2/soru1/gunes_tepede.png',
+      _FoodStage(
+        'Dondurma',
+        'assets/SIRALAMA_RESIMLERI/Asama2/soru2/dondurma.png',
       ),
-      _TimeStage('Akşam', 'assets/SIRALAMA_RESIMLERI/Asama2/soru1/aksam.png'),
     ];
     dragSources = List.from(stages)..shuffle();
     _feedbackController = AnimationController(
@@ -79,7 +79,7 @@ class _Asama2Soru1State extends State<Asama2Soru1>
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const Asama2Soru2()),
+            MaterialPageRoute(builder: (context) => const Asama2Soru3()),
           );
         }
       });
@@ -99,10 +99,6 @@ class _Asama2Soru1State extends State<Asama2Soru1>
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
-    final screenHeight = screenSize.height;
-    final imageSize = MediaQuery.of(context).size.width * 0.26;
-    final dropSize = screenWidth * 0.28;
-    final gap = screenWidth * 0.04;
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -172,8 +168,8 @@ class _Asama2Soru1State extends State<Asama2Soru1>
                             padding: const EdgeInsets.only(bottom: 6.0),
                             child: Text(
                               isEnglish
-                                  ? 'Sort the times of day in the correct order.'
-                                  : 'Günün zamanlarını doğru sıraya koy.',
+                                  ? 'Sort the foods from hot to cold.'
+                                  : 'Yiyecekleri sıcaktan soğuğa doğru sırala.',
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,

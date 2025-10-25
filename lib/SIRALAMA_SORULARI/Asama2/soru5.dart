@@ -2,26 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
-import 'soru2.dart';
 import 'package:dixlearning/screens/sorting_roadmap_screen.dart';
 
-class Asama2Soru1 extends StatefulWidget {
-  const Asama2Soru1({super.key});
+class Asama2Soru5 extends StatefulWidget {
+  const Asama2Soru5({super.key});
 
   @override
-  State<Asama2Soru1> createState() => _Asama2Soru1State();
+  State<Asama2Soru5> createState() => _Asama2Soru5State();
 }
 
-class _TimeStage {
+class _WindStage {
   final String label;
   final String assetPath;
-  _TimeStage(this.label, this.assetPath);
+  _WindStage(this.label, this.assetPath);
 }
 
-class _Asama2Soru1State extends State<Asama2Soru1>
+class _Asama2Soru5State extends State<Asama2Soru5>
     with TickerProviderStateMixin {
-  late List<_TimeStage> stages;
-  late List<_TimeStage> dragSources;
+  late List<_WindStage> stages;
+  late List<_WindStage> dragSources;
   bool showFeedback = false;
   bool isCorrect = false;
   late AnimationController _feedbackController;
@@ -30,15 +29,15 @@ class _Asama2Soru1State extends State<Asama2Soru1>
   void initState() {
     super.initState();
     stages = [
-      _TimeStage(
-        'Sabah',
-        'assets/SIRALAMA_RESIMLERI/Asama2/soru1/gun_dogumu.png',
+      _WindStage('Rüzgar', 'assets/SIRALAMA_RESIMLERI/Asama2/soru5/rüzgar.png'),
+      _WindStage(
+        'Uçan Şapka',
+        'assets/SIRALAMA_RESIMLERI/Asama2/soru5/ucan_sapka.png',
       ),
-      _TimeStage(
-        'Öğle',
-        'assets/SIRALAMA_RESIMLERI/Asama2/soru1/gunes_tepede.png',
+      _WindStage(
+        'Şapkayı Yakalama',
+        'assets/SIRALAMA_RESIMLERI/Asama2/soru5/sapka_yakalama.png',
       ),
-      _TimeStage('Akşam', 'assets/SIRALAMA_RESIMLERI/Asama2/soru1/aksam.png'),
     ];
     dragSources = List.from(stages)..shuffle();
     _feedbackController = AnimationController(
@@ -78,8 +77,11 @@ class _Asama2Soru1State extends State<Asama2Soru1>
 
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const Asama2Soru2()),
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const SortingRoadmapScreen(),
+            ),
+            (route) => false,
           );
         }
       });
@@ -99,10 +101,6 @@ class _Asama2Soru1State extends State<Asama2Soru1>
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
-    final screenHeight = screenSize.height;
-    final imageSize = MediaQuery.of(context).size.width * 0.26;
-    final dropSize = screenWidth * 0.28;
-    final gap = screenWidth * 0.04;
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -172,8 +170,8 @@ class _Asama2Soru1State extends State<Asama2Soru1>
                             padding: const EdgeInsets.only(bottom: 6.0),
                             child: Text(
                               isEnglish
-                                  ? 'Sort the times of day in the correct order.'
-                                  : 'Günün zamanlarını doğru sıraya koy.',
+                                  ? 'Sort the events when wind blows.'
+                                  : 'Rüzgar çıktığında olan olayları sırala.',
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
