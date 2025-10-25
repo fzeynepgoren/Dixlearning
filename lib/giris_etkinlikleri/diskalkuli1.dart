@@ -378,6 +378,13 @@ class _Diskalkuli1State extends State<Diskalkuli1>
                       ),
                     ),
                   ),
+                ),
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child:
                       showFeedback
                           ? ScaleTransition(
