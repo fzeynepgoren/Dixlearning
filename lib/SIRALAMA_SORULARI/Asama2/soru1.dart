@@ -2,27 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
-import '../../screens/home_screen.dart';
 import 'package:dixlearning/screens/sorting_roadmap_screen.dart';
 
-class Asama3Soru5 extends StatefulWidget {
-  const Asama3Soru5({super.key});
+class Asama2Soru1 extends StatefulWidget {
+  const Asama2Soru1({super.key});
 
   @override
-  State<Asama3Soru5> createState() => _Asama3Soru5State();
+  State<Asama2Soru1> createState() => _Asama2Soru1State();
 }
 
-class _PlantStage {
+class _TimeStage {
   final String label;
   final String assetPath;
-  _PlantStage(this.label, this.assetPath);
+  _TimeStage(this.label, this.assetPath);
 }
 
-class _Asama3Soru5State extends State<Asama3Soru5>
+class _Asama2Soru1State extends State<Asama2Soru1>
     with TickerProviderStateMixin {
-  late List<_PlantStage> stages;
-  late List<_PlantStage> dragSources;
-  late List<_PlantStage?> dropTargets;
+  late List<_TimeStage> stages;
+  late List<_TimeStage> dragSources;
   bool showFeedback = false;
   bool isCorrect = false;
   late AnimationController _feedbackController;
@@ -31,16 +29,20 @@ class _Asama3Soru5State extends State<Asama3Soru5>
   void initState() {
     super.initState();
     stages = [
-      _PlantStage('Bebek', 'assets/SIRALAMA_RESIMLERI/Asama3/soru5/bebek.png'),
-      _PlantStage('Çocuk', 'assets/SIRALAMA_RESIMLERI/Asama3/soru5/cocuk.png'),
-      _PlantStage(
-        'Yetişkin',
-        'assets/SIRALAMA_RESIMLERI/Asama3/soru5/yetiskin.png',
+      _TimeStage(
+        'Sabah',
+        'assets/SIRALAMA_RESIMLERI/Asama2/soru1/gunesin_dogusu.jpg',
       ),
-      _PlantStage('Yaşlı', 'assets/SIRALAMA_RESIMLERI/Asama3/soru5/yasli.png'),
+      _TimeStage(
+        'Öğle',
+        'assets/SIRALAMA_RESIMLERI/Asama2/soru1/gunes_tam_tepede.jpg',
+      ),
+      _TimeStage(
+        'Akşam',
+        'assets/SIRALAMA_RESIMLERI/Asama2/soru1/gun_batimi.jpg',
+      ),
     ];
     dragSources = List.from(stages)..shuffle();
-    dropTargets = List<_PlantStage?>.filled(stages.length, null);
     _feedbackController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -55,7 +57,7 @@ class _Asama3Soru5State extends State<Asama3Soru5>
 
   Future<void> _saveStageCompletion() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('sorting_stage_3_completed', true);
+    await prefs.setBool('sorting_stage_2_completed', true);
   }
 
   void checkOrder() async {
@@ -69,7 +71,9 @@ class _Asama3Soru5State extends State<Asama3Soru5>
       }
       showFeedback = true;
     });
+
     _feedbackController.forward(from: 0);
+
     if (isCorrect) {
       // Save completion status
       await _saveStageCompletion();
@@ -95,18 +99,6 @@ class _Asama3Soru5State extends State<Asama3Soru5>
     }
   }
 
-  void removeFromDropTargets(_PlantStage stage) {
-    setState(() {
-      for (int i = 0; i < dropTargets.length; i++) {
-        if (dropTargets[i]?.label == stage.label) {
-          dropTargets[i] = null;
-          dragSources.add(stage);
-          break;
-        }
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
@@ -122,7 +114,6 @@ class _Asama3Soru5State extends State<Asama3Soru5>
       child: Scaffold(
         body: Container(
           decoration: BoxDecoration(
-            // 'const' kaldırıldı
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -131,7 +122,7 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                 Colors.blue.shade200,
                 const Color(0xffffffff),
               ],
-              stops: const [0.0, 0.5, 1.0], // Buraya `const` eklendi
+              stops: const [0.0, 0.5, 1.0],
             ),
           ),
           child: SafeArea(
@@ -183,13 +174,13 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                         children: [
                           // Başlık
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
+                            padding: const EdgeInsets.only(bottom: 6.0),
                             child: Text(
                               isEnglish
-                                  ? 'How do humans grow? Sort the stages.'
-                                  : 'İnsan nasıl gelişir? Sırala.',
+                                  ? 'Sort the times of day in the correct order.'
+                                  : 'Günün zamanlarını doğru sıraya koy.',
                               style: const TextStyle(
-                                fontSize: 23,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
@@ -207,14 +198,14 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                                 });
                               },
                               buildDefaultDragHandles: false,
-                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              padding: const EdgeInsets.symmetric(vertical: 4),
                               children: [
                                 for (int i = 0; i < dragSources.length; i++)
                                   AnimatedContainer(
                                     key: ValueKey(dragSources[i].label),
                                     duration: const Duration(milliseconds: 200),
                                     margin: const EdgeInsets.symmetric(
-                                      vertical: 3,
+                                      vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
@@ -229,20 +220,68 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
-                                        vertical: 2,
-                                        horizontal: 20,
+                                        vertical: 8,
+                                        horizontal: 16,
                                       ),
                                       child: Row(
                                         children: [
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              16,
-                                            ),
-                                            child: Image.asset(
-                                              dragSources[i].assetPath,
-                                              width: imageSize,
-                                              height: imageSize,
-                                              fit: BoxFit.contain,
+                                          Flexible(
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              child: Image.asset(
+                                                dragSources[i].assetPath,
+                                                width: screenWidth * 0.28,
+                                                height: screenWidth * 0.28,
+                                                fit: BoxFit.contain,
+                                                errorBuilder: (
+                                                  context,
+                                                  error,
+                                                  stackTrace,
+                                                ) {
+                                                  return Container(
+                                                    width: screenWidth * 0.28,
+                                                    height: screenWidth * 0.28,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[300],
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            12,
+                                                          ),
+                                                    ),
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Icon(
+                                                          Icons
+                                                              .image_not_supported,
+                                                          color:
+                                                              Colors.grey[600],
+                                                          size: 30,
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 4,
+                                                        ),
+                                                        Text(
+                                                          dragSources[i].label,
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            color:
+                                                                Colors
+                                                                    .grey[600],
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                              ),
                                             ),
                                           ),
                                           const Spacer(),
@@ -261,7 +300,7 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                               ],
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                           // Kontrol Butonu
                           SizedBox(
                             width: double.infinity,
@@ -269,7 +308,7 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                             child: ElevatedButton(
                               onPressed: !showFeedback ? checkOrder : null,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFD9BD8D),
+                                backgroundColor: const Color(0xFFF0C329),
                                 foregroundColor: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),

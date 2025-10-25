@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // Lütfen bu importların projenizde doğru yollara sahip olduğundan emin olun
 import '../providers/language_provider.dart';
 import '../../SIRALAMA_SORULARI/Asama3/soru1.dart';
+import '../../SIRALAMA_SORULARI/Asama2/soru1.dart';
 import 'home_screen.dart';
 
 // Gezegen ve yol renklerini kontrol etmek için yeni sabitler
@@ -22,7 +23,13 @@ class SortingRoadmapScreen extends StatefulWidget {
 class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
     with TickerProviderStateMixin {
   // Aşama numaraları: 1-2-3-4-5
-  List<bool> completedStages = [false, false, false, false, false];
+  List<bool> completedStages = [
+    true,
+    true,
+    false,
+    false,
+    false,
+  ]; // Temporarily unlock stages 1 and 2
 
   // Gezegen etkileşimleri için Controller
   late AnimationController _planetHoverController;
@@ -107,8 +114,12 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
   Future<void> _loadCompletedStages() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      completedStages[0] = prefs.getBool('sorting_stage_1_completed') ?? false;
-      completedStages[1] = prefs.getBool('sorting_stage_2_completed') ?? false;
+      completedStages[0] =
+          prefs.getBool('sorting_stage_1_completed') ??
+          true; // Temporarily unlocked
+      completedStages[1] =
+          prefs.getBool('sorting_stage_2_completed') ??
+          true; // Temporarily unlocked
       completedStages[2] = prefs.getBool('sorting_stage_3_completed') ?? false;
       completedStages[3] = prefs.getBool('sorting_stage_4_completed') ?? false;
       completedStages[4] = prefs.getBool('sorting_stage_5_completed') ?? false;
@@ -496,7 +507,8 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
         // targetWidget = const SortingStage1();
         break;
       case 2:
-        // targetWidget = const SortingStage2();
+        print('Navigating to Asama2Soru1');
+        targetWidget = const Asama2Soru1();
         break;
       case 3:
         targetWidget = const Asama3Soru1();
