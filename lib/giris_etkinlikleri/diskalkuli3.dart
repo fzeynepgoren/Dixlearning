@@ -21,27 +21,19 @@ class _Diskalkuli3State extends State<Diskalkuli3>
   ];
 
   int _currentProblemIndex = 0;
-  bool _showCongrats = false;
   bool _isWrong = false;
   String? _feedbackText;
   late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
   late AnimationController _congratsController;
   late AnimationController _shakeController;
-  late Animation<double> _shakeAnimation;
 
   @override
   void initState() {
     super.initState();
     _fadeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 800),
     );
-    _fadeAnimation = CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    );
-    _fadeController.forward();
     _congratsController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -50,10 +42,7 @@ class _Diskalkuli3State extends State<Diskalkuli3>
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-    _shakeAnimation = Tween<double>(
-      begin: 0,
-      end: 16,
-    ).chain(CurveTween(curve: Curves.elasticIn)).animate(_shakeController);
+    _fadeController.forward();
   }
 
   @override
@@ -66,7 +55,6 @@ class _Diskalkuli3State extends State<Diskalkuli3>
 
   void _onDrop(int value) async {
     final problem = _problems[_currentProblemIndex];
-    final isLast = _currentProblemIndex == _problems.length - 1;
     final isCorrect = value == problem['answer'];
 
     setState(() {
@@ -75,41 +63,37 @@ class _Diskalkuli3State extends State<Diskalkuli3>
 
     if (isCorrect) {
       setState(() {
-        _showCongrats = true;
-        _feedbackText = "Aferin! 🎉"; // emojili
+        _feedbackText = "Aferin! 🎉";
       });
       _congratsController.forward(from: 0);
-      await Future.delayed(const Duration(milliseconds: 900));
+      await Future.delayed(const Duration(seconds: 3));
       setState(() {
-        _showCongrats = false;
-        _feedbackText = null; // feedback'i temizle
+        _feedbackText = null;
       });
     } else {
       setState(() {
         _isWrong = true;
-        _feedbackText = "Tekrar dene! 😔"; // emojili
+        _feedbackText = "İşte doğrusu! 🧐";
       });
       HapticFeedback.vibrate();
       _shakeController.forward(from: 0);
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 3));
       setState(() {
-        _feedbackText = null; // sadece feedback'i kaldır
+        _feedbackText = null;
       });
     }
 
     // Sonraki soruya geç
-    if (!isLast) {
-      _fadeController.reverse().then((_) {
-        setState(() {
-          _currentProblemIndex++;
-          _problems[_currentProblemIndex]['userAnswer'] = null;
-          _isWrong = false; // yeni soruya geçerken sıfırlıyoruz
-          _feedbackText = null; // feedback'i de temizle
-        });
-        _fadeController.forward();
+    if (_currentProblemIndex < _problems.length - 1) {
+      await Future.delayed(const Duration(milliseconds: 500));
+      setState(() {
+        _currentProblemIndex++;
+        _problems[_currentProblemIndex]['userAnswer'] = null;
+        _isWrong = false;
+        _feedbackText = null;
       });
     } else {
-      await Future.delayed(const Duration(milliseconds: 700));
+      await Future.delayed(const Duration(milliseconds: 500));
       if (mounted) {
         ActivityTracker.completeActivity();
         Navigator.pushReplacement(
@@ -180,67 +164,61 @@ class _Diskalkuli3State extends State<Diskalkuli3>
               const SizedBox(height: 20),
               Expanded(
                 child: Center(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 500),
-                    child: Container(
-                      key: ValueKey<int>(_currentProblemIndex),
-                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.95),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          problem['problem'],
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.12,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF37474F),
                           ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            problem['problem'],
-                            style: const TextStyle(
-                              fontSize: 48,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF37474F),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 30),
-                          buildHouse(
-                            hasAnswer: hasAnswer,
-                            isCorrect: isCorrect,
-                            answer: hasAnswer ? problem['userAnswer'] : null,
-                            onDrop: _onDrop,
-                          ),
-                          const SizedBox(height: 36),
-                          Wrap(
-                            alignment: WrapAlignment.center,
-                            spacing: 18,
-                            children:
-                                numberOptions.map((num) {
-                                  return Draggable<int>(
-                                    data: num,
-                                    feedback: Material(
-                                      color: Colors.transparent,
-                                      child: _buildNumberBox(
-                                        num,
-                                        dragging: true,
-                                      ),
-                                    ),
-                                    childWhenDragging: Opacity(
-                                      opacity: 0.3,
-                                      child: _buildNumberBox(num),
-                                    ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 30),
+                        buildHouse(
+                          hasAnswer: hasAnswer,
+                          isCorrect: isCorrect,
+                          answer: hasAnswer ? problem['userAnswer'] : null,
+                          onDrop: _onDrop,
+                        ),
+                        const SizedBox(height: 36),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: MediaQuery.of(context).size.width * 0.04,
+                          runSpacing: MediaQuery.of(context).size.width * 0.03,
+                          children:
+                              numberOptions.map((num) {
+                                return Draggable<int>(
+                                  data: num,
+                                  feedback: Material(
+                                    color: Colors.transparent,
+                                    child: _buildNumberBox(num, dragging: true),
+                                  ),
+                                  childWhenDragging: Opacity(
+                                    opacity: 0.3,
                                     child: _buildNumberBox(num),
-                                  );
-                                }).toList(),
-                          ),
-                        ],
-                      ),
+                                  ),
+                                  child: _buildNumberBox(num),
+                                );
+                              }).toList(),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -262,7 +240,7 @@ class _Diskalkuli3State extends State<Diskalkuli3>
                               horizontal: 20,
                             ),
                             decoration: BoxDecoration(
-                              color: _isWrong ? Colors.red : Colors.green,
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: const [
                                 BoxShadow(
@@ -277,15 +255,15 @@ class _Diskalkuli3State extends State<Diskalkuli3>
                               children: [
                                 Icon(
                                   _isWrong ? Icons.cancel : Icons.check_circle,
-                                  color: Colors.white,
+                                  color: _isWrong ? Colors.red : Colors.green,
                                   size: 28,
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  _isWrong ? "Tekrar dene! 😔" : "Aferin! 🎉",
-                                  style: const TextStyle(
+                                  _isWrong ? "İşte doğrusu! 🧐" : "Aferin! 🎉",
+                                  style: TextStyle(
                                     fontSize: 18,
-                                    color: Colors.white,
+                                    color: _isWrong ? Colors.red : Colors.green,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -303,13 +281,16 @@ class _Diskalkuli3State extends State<Diskalkuli3>
   }
 
   Widget _buildNumberBox(int num, {bool dragging = false}) {
+    final screenSize = MediaQuery.of(context).size;
+    final boxSize = screenSize.width * 0.15;
+
     return Container(
-      width: 60,
-      height: 60,
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      width: boxSize,
+      height: boxSize,
+      margin: EdgeInsets.symmetric(vertical: screenSize.height * 0.01),
       decoration: BoxDecoration(
         color: dragging ? Colors.amberAccent : Colors.pinkAccent,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(boxSize * 0.3),
         boxShadow: const [
           BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
         ],
@@ -317,8 +298,8 @@ class _Diskalkuli3State extends State<Diskalkuli3>
       child: Center(
         child: Text(
           num.toString(),
-          style: const TextStyle(
-            fontSize: 32,
+          style: TextStyle(
+            fontSize: boxSize * 0.5,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -334,10 +315,11 @@ class _Diskalkuli3State extends State<Diskalkuli3>
     required void Function(int) onDrop,
   }) {
     final problem = _problems[_currentProblemIndex];
+    final screenSize = MediaQuery.of(context).size;
 
     return SizedBox(
-      width: 220,
-      height: 260,
+      width: screenSize.width * 0.55,
+      height: screenSize.height * 0.35,
       child: Stack(
         alignment: Alignment.center,
         children: [

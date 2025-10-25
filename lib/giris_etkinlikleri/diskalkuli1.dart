@@ -1,7 +1,7 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'diskalkuli2.dart';
+import '../screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -33,7 +33,7 @@ class _Diskalkuli1State extends State<Diskalkuli1>
     ],
     [
       ['🌼', '🌼', '🌼', '🌼'],
-      ['🌼', '🌼', '🌼', '🌼', '🌼', '🌼', '🌼'],
+      ['🌼', '🌼', '🌼', '🌼', '🌼', '🌼'],
     ],
   ];
 
@@ -54,10 +54,10 @@ class _Diskalkuli1State extends State<Diskalkuli1>
     super.initState();
     _slideController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 800),
     );
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.18),
+      begin: const Offset(0, 0.3),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
@@ -129,7 +129,26 @@ class _Diskalkuli1State extends State<Diskalkuli1>
         ActivityTracker.completeActivity();
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const Diskalkuli2()),
+          PageRouteBuilder(
+            pageBuilder:
+                (context, animation, secondaryAnimation) => const Diskalkuli2(),
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
+              const begin = Offset(1.0, 0.0);
+              const end = Offset.zero;
+              const curve = Curves.ease;
+              var tween = Tween(
+                begin: begin,
+                end: end,
+              ).chain(CurveTween(curve: curve));
+              var offsetAnimation = animation.drive(tween);
+              return SlideTransition(position: offsetAnimation, child: child);
+            },
+          ),
         );
       }
     });
@@ -140,12 +159,7 @@ class _Diskalkuli1State extends State<Diskalkuli1>
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final current = questions[currentIndex];
     final screenSize = MediaQuery.of(context).size;
-
-    // Dinamik ölçüler
-    final iconSize = screenSize.width * 0.062;
-    final horizontalPadding = screenSize.width * 0.06;
-    final verticalPadding = screenSize.height * 0.012;
-    final gapSmall = screenSize.height * 0.01;
+    final iconSize = screenSize.width * 0.065;
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -166,146 +180,203 @@ class _Diskalkuli1State extends State<Diskalkuli1>
           child: SafeArea(
             child: Column(
               children: [
-                // Top bar
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: horizontalPadding,
-                    vertical: verticalPadding,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.arrow_back,
-                          color: Colors.black,
-                          size: iconSize,
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
                       ),
-                    ],
-                  ),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      },
+                    ),
+                  ],
                 ),
-
-                // Card area
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
                     child: Container(
-                      margin: EdgeInsets.symmetric(
-                        horizontal: screenSize.width * 0.02,
-                      ),
-                      padding: EdgeInsets.all(screenSize.width * 0.02),
+                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 18,
-                            offset: const Offset(0, 8),
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           ),
                         ],
                       ),
-                      child: Column(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 500),
+                        transitionBuilder: (
+                          Widget child,
+                          Animation<double> animation,
+                        ) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(1, 0),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: Column(
+                          key: ValueKey<int>(currentIndex),
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
+                              child: Text(
+                                isEnglish
+                                    ? 'Count the objects!'
+                                    : 'Nesneleri say ve kutulara yaz!',
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            _buildEmojiGroup(
+                              current[0],
+                              0,
+                              current[0].length,
+                              isEnglish,
+                            ),
+                            const SizedBox(height: 24),
+                            _buildEmojiGroup(
+                              current[1],
+                              1,
+                              current[1].length,
+                              isEnglish,
+                            ),
+                            const SizedBox(height: 36),
+                            // Kontrol Et butonu
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.blue.shade400,
+                                    Colors.blue.shade600,
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              child: ElevatedButton(
+                                onPressed: showFeedback ? null : checkAnswers,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 40,
+                                    vertical: 18,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                ),
+                                child: Text(
+                                  isEnglish ? 'Check' : 'Kontrol Et',
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                // Alt feedback strip - her iki cevap da doğruysa veya her ikisi de yanlışsa göster
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 300),
+                    opacity:
+                        (showFeedback &&
+                                ((isCorrect[0] == true &&
+                                        isCorrect[1] == true) ||
+                                    (isCorrect[0] == false &&
+                                        isCorrect[1] == false)))
+                            ? 1.0
+                            : 0.0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Başlık
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: horizontalPadding,
-                              vertical: verticalPadding * 0.6,
-                            ),
+                          Icon(
+                            (isCorrect[0] == true && isCorrect[1] == true)
+                                ? Icons.check_circle
+                                : Icons.cancel,
+                            color:
+                                (isCorrect[0] == true && isCorrect[1] == true)
+                                    ? Colors.green
+                                    : Colors.red,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 8),
+                          Flexible(
                             child: Text(
-                              isEnglish
-                                  ? 'Count the objects!'
-                                  : 'Nesneleri say ve kutulara yaz!',
+                              (isCorrect[0] == true && isCorrect[1] == true)
+                                  ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
+                                  : (isEnglish
+                                      ? "Here's the right one! 🧐"
+                                      : 'İşte doğrusu! 🧐'),
                               style: TextStyle(
-                                fontSize: screenSize.width * 0.065,
+                                fontSize: 16,
+                                color:
+                                    (isCorrect[0] == true &&
+                                            isCorrect[1] == true)
+                                        ? Colors.green
+                                        : Colors.red,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
                               ),
                               textAlign: TextAlign.center,
-                            ),
-                          ),
-                          SizedBox(height: gapSmall),
-
-                          // İçerik (kaydırma yok, tam sığacak şekilde)
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: _buildEmojiGroup(
-                                    current[0],
-                                    0,
-                                    current[0].length,
-                                    isEnglish,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: _buildEmojiGroup(
-                                    current[1],
-                                    1,
-                                    current[1].length,
-                                    isEnglish,
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: Center(
-                                    child: ElevatedButton(
-                                      onPressed:
-                                          showFeedback ? null : checkAnswers,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            showFeedback
-                                                ? Colors.grey.shade300
-                                                : Colors.blue.shade300,
-                                        foregroundColor: Colors.white,
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: screenSize.width * 0.06,
-                                          vertical: screenSize.height * 0.01,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                        ),
-                                        elevation: showFeedback ? 0 : 2,
-                                        shadowColor: Colors.blue.shade200,
-                                      ),
-                                      child: Text(
-                                        isEnglish
-                                            ? 'Check Answers'
-                                            : 'Kontrol Et',
-                                        style: TextStyle(
-                                          fontSize: screenSize.width * 0.045,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ),
-
-                // Alt feedback container
-                Container(
-                  height: 80,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: horizontalPadding,
-                    vertical: verticalPadding,
                   ),
                   child:
                       showFeedback
@@ -386,76 +457,38 @@ class _Diskalkuli1State extends State<Diskalkuli1>
     bool isEnglish,
   ) {
     final screenSize = MediaQuery.of(context).size;
-
-    // Daha büyük emoji boyutu ama sayfa kaymasın
-    final emojiSize = math.min(screenSize.width * 0.08, 50.0);
-    final spacingH = screenSize.width * 0.02;
-    final spacingV = screenSize.height * 0.006;
+    final emojiSize = screenSize.width * 0.12;
+    final inputWidth = screenSize.width * 0.2;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Emoji container
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            spacing: spacingH,
-            runSpacing: spacingV,
-            children:
-                emojis
-                    .map(
-                      (e) => Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade50,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(e, style: TextStyle(fontSize: emojiSize)),
-                      ),
-                    )
-                    .toList(),
-          ),
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: screenSize.width * 0.02,
+          runSpacing: screenSize.width * 0.02,
+          children:
+              emojis
+                  .map((e) => Text(e, style: TextStyle(fontSize: emojiSize)))
+                  .toList(),
         ),
-
-        SizedBox(height: screenSize.height * 0.008),
-
-        // TextField
+        SizedBox(height: screenSize.height * 0.015),
         SizedBox(
-          width: math.min(screenSize.width * 0.2, 100),
+          width: inputWidth,
           child: TextField(
             controller: controllers[index],
-            enabled: !showFeedback || isCorrect[index] == false,
+            enabled: !showFeedback,
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: screenSize.width * 0.05,
+              fontSize: screenSize.width * 0.06,
               fontWeight: FontWeight.bold,
             ),
             decoration: InputDecoration(
               hintText: '?',
-              hintStyle: TextStyle(
-                fontSize: screenSize.width * 0.04,
-                color: Colors.grey.shade400,
-              ),
+              hintStyle: TextStyle(fontSize: screenSize.width * 0.05),
               filled: true,
-              fillColor:
-                  showFeedback
-                      ? (isCorrect[index] == true
-                          ? Colors.green.shade50
-                          : Colors.red.shade50)
-                      : Colors.white,
+              fillColor: Colors.white,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -464,24 +497,24 @@ class _Diskalkuli1State extends State<Diskalkuli1>
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color:
-                      isCorrect[index] == null
-                          ? Colors.grey.shade300
-                          : isCorrect[index]!
-                          ? Colors.green.shade400
-                          : Colors.red.shade400,
-                  width: 2.0,
+                      !showFeedback
+                          ? Colors.grey
+                          : (isCorrect[index] == true)
+                          ? Colors.green
+                          : Colors.red,
+                  width: 2.6,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color:
-                      isCorrect[index] == null
-                          ? Colors.blue.shade400
-                          : isCorrect[index]!
-                          ? Colors.green.shade500
-                          : Colors.red.shade500,
-                  width: 2.5,
+                      !showFeedback
+                          ? Colors.blue
+                          : (isCorrect[index] == true)
+                          ? Colors.green
+                          : Colors.red,
+                  width: 2.6,
                 ),
               ),
               contentPadding: const EdgeInsets.symmetric(
@@ -492,7 +525,7 @@ class _Diskalkuli1State extends State<Diskalkuli1>
           ),
         ),
 
-        // Individual feedback for each question
+        // Animated Chip - her cevap için ayrı feedback
         AnimatedSize(
           duration: const Duration(milliseconds: 350),
           curve: Curves.easeOutCubic,
@@ -500,57 +533,32 @@ class _Diskalkuli1State extends State<Diskalkuli1>
             duration: const Duration(milliseconds: 250),
             opacity: showFeedback ? 1.0 : 0.0,
             child: Padding(
-              padding: EdgeInsets.only(top: screenSize.height * 0.004),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 6,
-                  horizontal: 10,
+              padding: const EdgeInsets.only(top: 6),
+              child: Chip(
+                backgroundColor:
+                    isCorrect[index] == true
+                        ? Colors.green.shade100
+                        : Colors.red.shade100,
+                avatar: Icon(
+                  isCorrect[index] == true ? Icons.check : Icons.close,
+                  color: isCorrect[index] == true ? Colors.green : Colors.red,
+                  size: 18,
                 ),
-                decoration: BoxDecoration(
-                  color:
-                      isCorrect[index] == true
-                          ? Colors.green.shade50
-                          : Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color:
-                        isCorrect[index] == true
-                            ? Colors.green.shade300
-                            : Colors.red.shade300,
-                    width: 1.2,
+                label: Text(
+                  isCorrect[index] == true
+                      ? (isEnglish ? "Correct!" : "Doğru!")
+                      : "${isEnglish ? "Correct:" : "Doğrusu:"} $correctCount",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: isCorrect[index] == true ? Colors.green : Colors.red,
                   ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      isCorrect[index] == true
-                          ? Icons.check_circle
-                          : Icons.cancel,
-                      color:
-                          isCorrect[index] == true ? Colors.green : Colors.red,
-                      size: screenSize.width * 0.04,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      isCorrect[index] == true
-                          ? (isEnglish ? "Correct! ✓" : "Doğru! ✓")
-                          : (isEnglish ? "Try again! 😔" : "Tekrar dene! 😔"),
-                      style: TextStyle(
-                        fontSize: screenSize.width * 0.04,
-                        fontWeight: FontWeight.bold,
-                        color:
-                            isCorrect[index] == true
-                                ? Colors.green
-                                : Colors.red,
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ),
           ),
         ),
+        SizedBox(height: screenSize.height * 0.01),
       ],
     );
   }

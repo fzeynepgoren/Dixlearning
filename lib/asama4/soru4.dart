@@ -312,6 +312,7 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
                                 // AYIRICI: mavi gradient çizgi
                                 Container(
                                   width: 4,
+                                  height: 475,
                                   margin: const EdgeInsets.symmetric(
                                     horizontal: 10,
                                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/karsilastirma_sorulari_screen.dart';
 
@@ -46,7 +47,7 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void checkAnswer(bool isCorrectAnswer) {
+  void checkAnswer(bool isCorrectAnswer) async {
     setState(() {
       selectedAnswer = isCorrectAnswer;
       isCorrect = isCorrectAnswer;
@@ -55,6 +56,13 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
     _feedbackController.forward(from: 0);
 
     if (isCorrectAnswer) {
+      // Level 1 tamamlandı olarak kaydet
+      final prefs = await SharedPreferences.getInstance();
+      final currentLevel = prefs.getInt('karsilastirma_completed_level') ?? 0;
+      if (currentLevel < 1) {
+        await prefs.setInt('karsilastirma_completed_level', 1);
+      }
+
       // Doğruysa 2 saniye sonra sonraki soruya geç
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
@@ -178,14 +186,17 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
                               width: screenWidth * 0.65,
                               height: 40,
                               child: ElevatedButton(
-                                onPressed: () => checkAnswer(false),
+                                onPressed:
+                                    showFeedback
+                                        ? null
+                                        : () => checkAnswer(false),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       selectedAnswer == false
                                           ? (isCorrect
                                               ? Colors.green
                                               : Colors.red)
-                                          : Colors.pink.shade100,
+                                          : Color(0xFFFDC726),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -195,7 +206,7 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
                                           ? (isCorrect
                                               ? Colors.green.shade300
                                               : Colors.red.shade300)
-                                          : Colors.pink.shade100,
+                                          : Color(0xFFFDC726),
                                 ),
                                 child: const Text(
                                   'Seç',
@@ -221,14 +232,17 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
                               width: screenWidth * 0.65,
                               height: 40,
                               child: ElevatedButton(
-                                onPressed: () => checkAnswer(true),
+                                onPressed:
+                                    showFeedback
+                                        ? null
+                                        : () => checkAnswer(true),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       selectedAnswer == true
                                           ? (isCorrect
                                               ? Colors.green
                                               : Colors.red)
-                                          : Colors.pink.shade100,
+                                          : Color(0xFFFDC726),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -238,7 +252,7 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
                                           ? (isCorrect
                                               ? Colors.green.shade300
                                               : Colors.red.shade300)
-                                          : Colors.pink.shade100,
+                                          : Color(0xFFFDC726),
                                 ),
                                 child: const Text(
                                   'Seç',

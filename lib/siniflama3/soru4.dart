@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import 'soru5.dart'; // HayvanYasamSinifla sınıfının bulunduğu dosya
-import '../screens/siniflandirma_sorulari_screen.dart';
 
 class TasitSinifla extends StatefulWidget {
   const TasitSinifla({super.key});
@@ -31,7 +30,6 @@ class _TasitSiniflaState extends State<TasitSinifla>
   bool showFeedback = false;
   bool isCorrect = false;
   bool _dialogShown = false;
-  String? _lastAcceptedType;
   String feedbackMessage = '';
 
   late AnimationController _feedbackController;
@@ -78,7 +76,6 @@ class _TasitSiniflaState extends State<TasitSinifla>
     setState(() {
       isCorrect = correct;
       showFeedback = true;
-      _lastAcceptedType = correct ? targetType : null;
       feedbackMessage =
           correct
               ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
@@ -96,7 +93,6 @@ class _TasitSiniflaState extends State<TasitSinifla>
       if (mounted) {
         setState(() {
           showFeedback = false;
-          _lastAcceptedType = null;
         });
       }
     });
@@ -122,9 +118,7 @@ class _TasitSiniflaState extends State<TasitSinifla>
   }
 
   Color _getBorderColorForType(String type, Color defaultColor) {
-    if (showFeedback && _lastAcceptedType == type) {
-      return isCorrect ? Colors.green : Colors.red;
-    }
+    // Çerçeve rengi her zaman sabit kalacak, değişmeyecek
     return defaultColor;
   }
 
@@ -351,12 +345,12 @@ class _TasitSiniflaState extends State<TasitSinifla>
     Color borderColor,
   ) {
     return DragTarget<Map<String, dynamic>>(
-      onWillAcceptWithDetails: (data) => true,
-      onAcceptWithDetails: (data) {
-        bool isCorrectMatch = data.data['type'] == type;
+      onWillAccept: (data) => true,
+      onAccept: (data) {
+        bool isCorrectMatch = data['type'] == type;
 
         if (isCorrectMatch) {
-          _handleDrag(data.data, type);
+          _handleDrag(data, type);
         } else {
           final isEnglish =
               Provider.of<LanguageProvider>(context, listen: false).isEnglish;

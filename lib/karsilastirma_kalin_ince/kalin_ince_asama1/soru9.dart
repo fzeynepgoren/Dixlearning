@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/karsilastirma_sorulari_screen.dart';
 
@@ -46,7 +47,7 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
     super.dispose();
   }
 
-  void checkAnswer(bool isInce) {
+  void checkAnswer(bool isInce) async {
     setState(() {
       selectedAnswer = isInce;
       isCorrect = isInce;
@@ -55,13 +56,19 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
     _feedbackController.forward(from: 0);
 
     if (isInce) {
+      // Level 3 tamamlandı olarak kaydet
+      final prefs = await SharedPreferences.getInstance();
+      final currentLevel = prefs.getInt('karsilastirma_completed_level') ?? 0;
+      if (currentLevel < 3) {
+        await prefs.setInt('karsilastirma_completed_level', 3);
+      }
+
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
-          Navigator.of(context).pushAndRemoveUntil(
+          Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => const KarsilastirmaSorulariScreen(),
             ),
-            (route) => false,
           );
         }
       });
@@ -203,7 +210,10 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
                               width: screenWidth * 0.65,
                               height: 40,
                               child: ElevatedButton(
-                                onPressed: () => checkAnswer(true),
+                                onPressed:
+                                    showFeedback
+                                        ? null
+                                        : () => checkAnswer(true),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       selectedAnswer == true
@@ -211,7 +221,7 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
                                               ? Colors.green
                                               : Colors.red)
                                           : Colors.pinkAccent.shade100,
-                                  foregroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -266,7 +276,10 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
                               width: screenWidth * 0.65,
                               height: 40,
                               child: ElevatedButton(
-                                onPressed: () => checkAnswer(false),
+                                onPressed:
+                                    showFeedback
+                                        ? null
+                                        : () => checkAnswer(false),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       selectedAnswer == false
@@ -274,7 +287,7 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
                                               ? Colors.green
                                               : Colors.red)
                                           : Colors.pinkAccent.shade100,
-                                  foregroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),

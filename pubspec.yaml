@@ -46,8 +46,36 @@ flutter:
     - assets/kiz_maskot.png
     - assets/konusma_balonu.png
     - assets/SIRALAMA_RESIMLERI/
-    - assets/az_cok_asa1/
-    - assets/uzun_kisa/
+    
+    # Karşılaştırma Road Map Resimleri
+    - assets/karsilastirma_road_map/
+
+    # Sınıflandırma Roadmap Resimleri
+    - assets/roadmap_siniflama.png
+
+
+    # Az-Çok Karşılaştırma
+    - assets/az_cok_asa1/soru1/
+    - assets/az_cok_asa1/soru2/
+    - assets/az_cok_asa1/soru3/
+    - assets/az_cok_asa1/soru4/
+    - assets/az_cok_asa1/soru5/
+    - assets/az_cok_asa1/soru6/
+    - assets/az_cok_asa1/soru7/
+    - assets/az_cok_asa1/soru8/
+    - assets/az_cok_asa1/soru9/
+    
+    # Uzun-Kısa Karşılaştırma
+    - assets/uzun_kisa/soru1/
+    - assets/uzun_kisa/soru2/
+    - assets/uzun_kisa/soru3/
+    - assets/uzun_kisa/soru4/
+    - assets/uzun_kisa/soru5/
+    - assets/uzun_kisa/soru6/
+    - assets/uzun_kisa/soru7/
+    - assets/uzun_kisa/soru8/
+    - assets/uzun_kisa/soru9/
+    
     - assets/buyuk_kucuk/soru1/Resim1.png
     - assets/buyuk_kucuk/soru2/Resim2.png
     - assets/buyuk_kucuk/soru3/Resim3.png
@@ -100,12 +128,30 @@ flutter:
     - assets/kalin_ince_asa1/soru9/Resim17.png
     - assets/kalin_ince_asa1/soru9/Resim18.png
     - assets/kalin_ince_asa1/
-    - assets/uzun_kisa/soru1/agaclar.jpg
-    - assets/uzun_kisa/soru2/kalemler.png
-    - assets/uzun_kisa/soru3/yollar.png
-    - assets/uzun_kisa/soru4/cocuklar.png
-    - assets/uzun_kisa/soru5/hayvanlar.png
-    - assets/uzun_kisa/soru6/kupvesilindir.png
-    - assets/uzun_kisa/soru7/tavsanvebisiklet.png
-    - assets/uzun_kisa/soru8/palmiyevesupurge.png
-    - assets/uzun_kisa/soru9/mantarvesemsiye.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru1/tohum.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru1/filiz.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru1/cicekli_agac.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru1/agac.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru2/yumurta.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru2/yumurta_civciv.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru2/civciv.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru2/tavuk.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru3/iki_isirikli_elma.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru3/butun_elma.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru3/bitmis_elma.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru3/bir_isirikli_elma.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru4/malzemeler.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru4/kek.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru4/hamur.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru4/firin.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru5/yetiskin.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru5/yasli.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru5/cocuk.png
+    - assets/SIRALAMA_RESIMLERI/Asama3/soru5/bebek.png
+    - assets/siniflama1/
+    - assets/siniflama2/
+    - assets/kalin_ince_asa1/
+    - assets/screensphoto/
+  
+
+    

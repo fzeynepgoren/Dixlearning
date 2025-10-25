@@ -240,7 +240,7 @@ class _Disleksi2State extends State<Disleksi2>
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Text(
                             currentWordData["emoji"]!,
-                            style: const TextStyle(fontSize: 80),
+                            style: const TextStyle(fontSize: 60),
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -291,8 +291,8 @@ class _Disleksi2State extends State<Disleksi2>
                                           : () => checkAnswer(option),
                                   style: ElevatedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 40,
-                                      vertical: 24,
+                                      horizontal: 30,
+                                      vertical: 20,
                                     ),
                                     backgroundColor: getButtonColor(),
                                     foregroundColor: Colors.white,
@@ -303,7 +303,7 @@ class _Disleksi2State extends State<Disleksi2>
                                   child: Text(
                                     option,
                                     style: const TextStyle(
-                                      fontSize: 36,
+                                      fontSize: 28,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
@@ -360,8 +360,8 @@ class _Disleksi2State extends State<Disleksi2>
                                           ? 'Well done! 🎉'
                                           : 'Aferin! 🎉')
                                       : (isEnglish
-                                          ? "Try again! 😔"
-                                          : 'Tekrar dene! 😔'),
+                                          ? "Here's the right one! 🧐"
+                                          : 'İşte doğrusu! 🧐'),
                                   style: TextStyle(
                                     fontSize: 18,
                                     color:

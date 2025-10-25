@@ -88,7 +88,7 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
     final iconSize = screenSize.width * 0.065;
 
     // 🔹 Dinamik boyutlar
-    final bubbleSize = screenSize.width * 0.15; // harflerin boyutu
+    final bubbleSize = screenSize.width * 0.12; // harflerin boyutu küçültüldü
     final gridSpacing = screenSize.width * 0.04; // grid aralığı
 
     return WillPopScope(

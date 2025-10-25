@@ -206,7 +206,7 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
             style: const TextStyle(
               fontSize: 42,
               fontWeight: FontWeight.bold,
-              color: Colors.deepPurple,
+              color: Colors.black,
             ),
           ),
         ),

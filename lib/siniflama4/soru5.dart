@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
-import '../screens/home_screen.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
 
 class OlaySinifla extends StatefulWidget {
@@ -111,10 +111,15 @@ class _OlaySiniflaState extends State<OlaySinifla>
     });
   }
 
-  void _checkCompletion() {
+  void _checkCompletion() async {
     final allPlaced = sentenceItems.every((item) => item['isPlaced']);
     if (allPlaced && !_dialogShown) {
       _dialogShown = true;
+
+      // Aşama 4'ü tamamlandı olarak kaydet
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('stage_4_completed', true);
+
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
           showDialog(
@@ -515,32 +520,52 @@ class _OlaySiniflaState extends State<OlaySinifla>
                               parent: _feedbackController,
                               curve: Curves.elasticOut,
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  isCorrect ? Icons.check_circle : Icons.cancel,
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  size: screenSize.width * 0.07,
-                                ),
-                                SizedBox(width: screenSize.width * 0.025),
-                                Text(
-                                  isCorrect
-                                      ? (isEnglish
-                                          ? 'Well done! 🎉'
-                                          : 'Aferin! 🎉')
-                                      : (isEnglish
-                                          ? 'Try again! 😔'
-                                          : 'Tekrar dene! 😔'),
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.045,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                vertical: screenSize.height * 0.01,
+                                horizontal: screenSize.width * 0.04,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
                                     color:
                                         isCorrect ? Colors.green : Colors.red,
-                                    fontWeight: FontWeight.bold,
+                                    size: screenSize.width * 0.07,
                                   ),
-                                ),
-                              ],
+                                  SizedBox(width: screenSize.width * 0.025),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: screenSize.width * 0.045,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           )
                           : const SizedBox.shrink(),
@@ -560,16 +585,16 @@ class _OlaySiniflaState extends State<OlaySinifla>
     final Color borderColor;
     switch (item['type']) {
       case 'cause':
+        itemColor = Colors.purple.shade100;
+        borderColor = Colors.purple.shade300;
+        break;
+      case 'effect':
         itemColor = Colors.blue.shade100;
         borderColor = Colors.blue.shade400;
         break;
-      case 'effect':
-        itemColor = Colors.green.shade100;
-        borderColor = Colors.green.shade400;
-        break;
       case 'solution':
-        itemColor = Colors.orange.shade100;
-        borderColor = Colors.orange.shade400;
+        itemColor = Colors.yellow.shade100;
+        borderColor = Colors.yellow.shade400;
         break;
       default:
         itemColor = Colors.grey.shade100;

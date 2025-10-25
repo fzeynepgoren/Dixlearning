@@ -160,8 +160,8 @@ class _KalinInceSoru6State extends State<KalinInceSoru6>
                             ),
                             child: Text(
                               isEnglish
-                                  ? 'Choose the thin one.'
-                                  : 'İnce olanı işaretle.',
+                                  ? 'Choose the thick one.'
+                                  : 'Kalın olanı işaretle.',
                               style: const TextStyle(
                                 fontSize: 23,
                                 fontWeight: FontWeight.bold,
@@ -202,7 +202,10 @@ class _KalinInceSoru6State extends State<KalinInceSoru6>
                               width: screenWidth * 0.65,
                               height: 40,
                               child: ElevatedButton(
-                                onPressed: () => checkAnswer(false),
+                                onPressed:
+                                    showFeedback
+                                        ? null
+                                        : () => checkAnswer(false),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       selectedAnswer == false
@@ -210,7 +213,7 @@ class _KalinInceSoru6State extends State<KalinInceSoru6>
                                               ? Colors.green
                                               : Colors.red)
                                           : Colors.cyan.shade300,
-                                  foregroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -265,7 +268,10 @@ class _KalinInceSoru6State extends State<KalinInceSoru6>
                               width: screenWidth * 0.65,
                               height: 40,
                               child: ElevatedButton(
-                                onPressed: () => checkAnswer(true),
+                                onPressed:
+                                    showFeedback
+                                        ? null
+                                        : () => checkAnswer(true),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       selectedAnswer == true
@@ -273,7 +279,7 @@ class _KalinInceSoru6State extends State<KalinInceSoru6>
                                               ? Colors.green
                                               : Colors.red)
                                           : Colors.cyan.shade300,
-                                  foregroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),

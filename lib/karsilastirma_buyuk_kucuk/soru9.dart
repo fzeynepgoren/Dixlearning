@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/karsilastirma_sorulari_screen.dart';
-import '../../../screens/home_screen.dart';
 
 class BuyukKucukSoru9 extends StatefulWidget {
   const BuyukKucukSoru9({super.key});
@@ -45,7 +45,7 @@ class _BuyukKucukSoru9State extends State<BuyukKucukSoru9>
     super.dispose();
   }
 
-  void _handleSelect(int index) {
+  void _handleSelect(int index) async {
     setState(() {
       selectedIndex = index;
       isCorrect = (index == 1); // 1: sağdaki küçük olan doğru
@@ -53,11 +53,19 @@ class _BuyukKucukSoru9State extends State<BuyukKucukSoru9>
     });
     _feedbackController.forward(from: 0);
     if (isCorrect == true) {
+      // Level 2 tamamlandı olarak kaydet
+      final prefs = await SharedPreferences.getInstance();
+      final currentLevel = prefs.getInt('karsilastirma_completed_level') ?? 0;
+      if (currentLevel < 2) {
+        await prefs.setInt('karsilastirma_completed_level', 2);
+      }
+
       Future.delayed(const Duration(seconds: 2), () {
         if (!mounted) return;
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-          (route) => false,
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const KarsilastirmaSorulariScreen(),
+          ),
         );
       });
     } else {
@@ -213,71 +221,45 @@ class _BuyukKucukSoru9State extends State<BuyukKucukSoru9>
                                           btnColor = Colors.red.shade500;
                                         }
                                       }
-                                      return Container(
+                                      return SizedBox(
                                         width: buttonWidth,
                                         height: buttonHeight,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            16,
-                                          ),
-                                          gradient: LinearGradient(
-                                            colors:
+                                        child: ElevatedButton(
+                                          onPressed:
+                                              showFeedback
+                                                  ? null
+                                                  : () => _handleSelect(i),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
                                                 isSelected
                                                     ? (isCorrect == true
-                                                        ? [
-                                                          Colors.green.shade400,
-                                                          Colors.green.shade600,
-                                                        ]
-                                                        : isCorrect == false
-                                                        ? [
-                                                          Colors.red.shade400,
-                                                          Colors.red.shade600,
-                                                        ]
-                                                        : [
-                                                          Colors.blue.shade400,
-                                                          Colors.blue.shade600,
-                                                        ])
-                                                    : [
-                                                      Colors.blue.shade300,
-                                                      Colors.blue.shade500,
-                                                    ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(
-                                                0.1,
-                                              ),
-                                              blurRadius: 8,
-                                              offset: const Offset(0, 4),
-                                            ),
-                                          ],
-                                        ),
-                                        child: ElevatedButton(
-                                          onPressed: () => _handleSelect(i),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.transparent,
-                                            foregroundColor: Colors.white,
-                                            elevation: 0,
-                                            shadowColor: Colors.transparent,
+                                                        ? Colors.green
+                                                        : Colors.red)
+                                                    : Colors
+                                                        .deepPurple
+                                                        .shade400,
+                                            foregroundColor: Colors.black,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(16),
                                             ),
+                                            elevation: isSelected ? 8 : 4,
+                                            shadowColor:
+                                                isSelected
+                                                    ? (isCorrect == true
+                                                        ? Colors.green.shade300
+                                                        : Colors.red.shade300)
+                                                    : Colors
+                                                        .deepPurple
+                                                        .shade300,
                                           ),
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 8,
-                                            ),
-                                            child: const Text(
-                                              'Seç',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                letterSpacing: 0.5,
-                                              ),
+                                          child: const Text(
+                                            'Seç',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
                                             ),
                                           ),
                                         ),
