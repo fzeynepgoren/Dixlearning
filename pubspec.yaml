@@ -49,11 +49,7 @@ flutter:
     
     # Karşılaştırma Road Map Resimleri
     - assets/karsilastirma_road_map/
-
-    # Sınıflandırma Roadmap Resimleri
-    - assets/roadmap_siniflama.png
-
-
+    
     # Az-Çok Karşılaştırma
     - assets/az_cok_asa1/soru1/
     - assets/az_cok_asa1/soru2/
@@ -85,6 +81,9 @@ flutter:
     - assets/buyuk_kucuk/soru7/Resim7.png
     - assets/buyuk_kucuk/soru8/Resim8.png
     - assets/buyuk_kucuk/soru9/Resim9.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru1/aksam.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru1/gun_dogumu.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru1/gunes_tepede.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/tohum.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/filiz.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/cicekli_agac.png
@@ -128,6 +127,9 @@ flutter:
     - assets/kalin_ince_asa1/soru9/Resim17.png
     - assets/kalin_ince_asa1/soru9/Resim18.png
     - assets/kalin_ince_asa1/
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru1/aksam.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru1/gunes_tepede.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru1/gun_dogumu.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/tohum.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/filiz.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/cicekli_agac.png

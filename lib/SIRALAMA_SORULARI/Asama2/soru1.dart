@@ -31,16 +31,13 @@ class _Asama2Soru1State extends State<Asama2Soru1>
     stages = [
       _TimeStage(
         'Sabah',
-        'assets/SIRALAMA_RESIMLERI/Asama2/soru1/gunesin_dogusu.jpg',
+        'assets/SIRALAMA_RESIMLERI/Asama2/soru1/gun_dogumu.png',
       ),
       _TimeStage(
         'Öğle',
-        'assets/SIRALAMA_RESIMLERI/Asama2/soru1/gunes_tam_tepede.jpg',
+        'assets/SIRALAMA_RESIMLERI/Asama2/soru1/gunes_tepede.png',
       ),
-      _TimeStage(
-        'Akşam',
-        'assets/SIRALAMA_RESIMLERI/Asama2/soru1/gun_batimi.jpg',
-      ),
+      _TimeStage('Akşam', 'assets/SIRALAMA_RESIMLERI/Asama2/soru1/aksam.png'),
     ];
     dragSources = List.from(stages)..shuffle();
     _feedbackController = AnimationController(
