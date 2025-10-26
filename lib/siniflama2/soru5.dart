@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
-import '../screens/home_screen.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
 
 class ParaSinifla extends StatefulWidget {
@@ -96,9 +95,9 @@ class _ParaSiniflaState extends State<ParaSinifla>
 
   void _checkCompletion() async {
     if (eslesenler.length == suruklenecekOgeler.length) {
-      // Aşama 2'yi tamamlandı olarak kaydet
+      // Level 2'yi tamamlandı olarak kaydet
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('stage_2_completed', true);
+      await prefs.setInt('siniflama_completed_level', 2);
 
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted && !_dialogShown) {
@@ -560,8 +559,8 @@ class _ParaSiniflaState extends State<ParaSinifla>
             ? Colors.deepPurple.shade300
             : Colors.blue.shade400;
     return DragTarget<String>(
-      onWillAcceptWithDetails: (data) => !eslesenler.contains(data.data!),
-      onAcceptWithDetails: (data) => _handleDrag(data.data!, kategori),
+      onWillAcceptWithDetails: (data) => !eslesenler.contains(data.data),
+      onAcceptWithDetails: (data) => _handleDrag(data.data, kategori),
       builder: (context, candidateData, rejectedData) {
         return Container(
           width: double.infinity,
