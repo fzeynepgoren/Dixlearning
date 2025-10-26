@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/matching_questions_screen.dart'; // Ana menü ekranının yolu
 
 class HayvanEsle extends StatefulWidget {
@@ -36,6 +37,11 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  Future<void> _saveStageCompletion() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('asama1_completed', true);
+  }
+
   void _handleTap(int index, bool isLeft) {
     if (showFeedback) return;
     setState(() {
@@ -59,6 +65,7 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
           matchedRight[selectedRightIndex!] = true;
 
           if (matchedLeft.every((element) => element)) {
+            _saveStageCompletion();
             Future.delayed(const Duration(seconds: 2), () {
               if (mounted) {
                 showDialog(
