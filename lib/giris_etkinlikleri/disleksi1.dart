@@ -88,7 +88,26 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
         if (currentQuestionIndex == questions.length - 1) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const Disleksi2()),
+            PageRouteBuilder(
+              pageBuilder:
+                  (context, animation, secondaryAnimation) => const Disleksi2(),
+              transitionsBuilder: (
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+              ) {
+                const begin = Offset(1.0, 0.0);
+                const end = Offset.zero;
+                const curve = Curves.ease;
+                var tween = Tween(
+                  begin: begin,
+                  end: end,
+                ).chain(CurveTween(curve: curve));
+                var offsetAnimation = animation.drive(tween);
+                return SlideTransition(position: offsetAnimation, child: child);
+              },
+            ),
           );
         } else {
           setState(() {
@@ -197,7 +216,7 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                               ),
                               child: Text(
                                 question.emoji,
-                                style: const TextStyle(fontSize: 80),
+                                style: const TextStyle(fontSize: 60),
                               ),
                             ),
                             const SizedBox(height: 12),
@@ -252,8 +271,8 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                                               : () => checkAnswer(option),
                                       style: ElevatedButton.styleFrom(
                                         padding: const EdgeInsets.symmetric(
-                                          horizontal: 40,
-                                          vertical: 24,
+                                          horizontal: 30,
+                                          vertical: 20,
                                         ),
                                         backgroundColor: getButtonColor(),
                                         foregroundColor: Colors.white,
@@ -266,7 +285,7 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                                       child: Text(
                                         option,
                                         style: const TextStyle(
-                                          fontSize: 36,
+                                          fontSize: 28,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.white,
                                         ),
@@ -299,7 +318,7 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                                 horizontal: 20,
                               ),
                               decoration: BoxDecoration(
-                                color: isCorrect ? Colors.green : Colors.red,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: const [
                                   BoxShadow(
@@ -316,7 +335,8 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                                     isCorrect
                                         ? Icons.check_circle
                                         : Icons.cancel,
-                                    color: Colors.white,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
                                     size: 28,
                                   ),
                                   const SizedBox(width: 10),
@@ -328,9 +348,10 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
                                         : (isEnglish
                                             ? "Here's the right one! 🧐"
                                             : 'İşte doğrusu! 🧐'),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 18,
-                                      color: Colors.white,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

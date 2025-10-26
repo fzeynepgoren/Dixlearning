@@ -7,7 +7,6 @@ import '../../providers/language_provider.dart';
 import '../../screens/home_screen.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
 
-
 class MeyveSebzeEsleme extends StatefulWidget {
   const MeyveSebzeEsleme({super.key});
 
@@ -145,7 +144,9 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const ClassificationQuestionsScreen(),
+                            builder:
+                                (context) =>
+                                    const ClassificationQuestionsScreen(),
                           ),
                           (route) => false,
                         );
@@ -323,8 +324,8 @@ class _MeyveSebzeEslemeState extends State<MeyveSebzeEsleme>
         kategori == 'Meyve' ? Colors.deepPurple.shade300 : Colors.blue.shade400;
 
     return DragTarget<String>(
-      onWillAccept: (data) => !eslesenler.contains(data!),
-      onAccept: (data) => _handleDrag(data!, kategori),
+      onWillAcceptWithDetails: (data) => !eslesenler.contains(data.data!),
+      onAcceptWithDetails: (data) => _handleDrag(data.data!, kategori),
       builder: (context, candidateData, rejectedData) {
         return Container(
           width: double.infinity,

@@ -3,7 +3,6 @@ import '../utils/activity_tracker.dart';
 import 'soru4.dart'; // TasitSinifla sınıfının olduğu dosya
 import '../screens/siniflandirma_sorulari_screen.dart';
 
-
 class BoyutSinifla extends StatefulWidget {
   const BoyutSinifla({super.key});
 
@@ -316,8 +315,8 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
     Color borderColor,
   ) {
     return DragTarget<Map<String, dynamic>>(
-      onWillAccept: (data) => true,
-      onAccept: (data) => _handleDrag(data, sizeType),
+      onWillAcceptWithDetails: (data) => true,
+      onAcceptWithDetails: (data) => _handleDrag(data.data, sizeType),
       builder: (context, candidateData, rejectedData) {
         return Container(
           width: double.infinity,

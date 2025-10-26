@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import '../screens/home_screen.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
@@ -93,8 +94,12 @@ class _ParaSiniflaState extends State<ParaSinifla>
     });
   }
 
-  void _checkCompletion() {
+  void _checkCompletion() async {
     if (eslesenler.length == suruklenecekOgeler.length) {
+      // Aşama 2'yi tamamlandı olarak kaydet
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('stage_2_completed', true);
+
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted && !_dialogShown) {
           _dialogShown = true;
@@ -128,7 +133,7 @@ class _ParaSiniflaState extends State<ParaSinifla>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Custom Golden Trophy Icon
-                        Container(
+                        SizedBox(
                           width: 120,
                           height: 120,
                           child: Stack(
@@ -555,8 +560,8 @@ class _ParaSiniflaState extends State<ParaSinifla>
             ? Colors.deepPurple.shade300
             : Colors.blue.shade400;
     return DragTarget<String>(
-      onWillAccept: (data) => !eslesenler.contains(data!),
-      onAccept: (data) => _handleDrag(data!, kategori),
+      onWillAcceptWithDetails: (data) => !eslesenler.contains(data.data!),
+      onAcceptWithDetails: (data) => _handleDrag(data.data!, kategori),
       builder: (context, candidateData, rejectedData) {
         return Container(
           width: double.infinity,
@@ -606,12 +611,8 @@ class _ParaSiniflaState extends State<ParaSinifla>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Center(child: _buildItemDisplay(item)),

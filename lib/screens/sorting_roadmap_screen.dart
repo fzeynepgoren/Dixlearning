@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:confetti/confetti.dart';
 // Lütfen bu importların projenizde doğru yollara sahip olduğundan emin olun
 import '../providers/language_provider.dart';
 import '../../SIRALAMA_SORULARI/Asama3/soru1.dart';
@@ -23,7 +24,16 @@ class SortingRoadmapScreen extends StatefulWidget {
 class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
     with TickerProviderStateMixin {
   // Aşama numaraları: 1-2-3-4-5
-  List<bool> completedStages = [false, false, false, false, false];
+  List<bool> completedStages = [
+    true,
+    true,
+    false,
+    false,
+    false,
+  ]; // Temporarily unlock stages 1 and 2
+
+  // Yıldız sistemi: Her aşama için 0-3 yıldız
+  List<int> starCounts = [0, 0, 0, 0, 0]; // Her aşama için yıldız sayısı
 
   // Gezegen etkileşimleri için Controller
   late AnimationController _planetHoverController;
@@ -36,14 +46,20 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
   late AnimationController _shootingStarController2;
   late Animation<Offset> _shootingStarAnimation2;
 
+  // Konfeti Controller'ı
+  late ConfettiController _confettiController;
+
+  // İlk yükleme bayrağı
+  bool _isInitialLoad = true;
+
   // Gezegen konumları (Ekran Yüksekliği oranları)
   // [stageNumber, x_ratio, y_ratio, emoji]
   final List<List<dynamic>> _planetPositions = [
-    [1, 0.35, 0.85, "🪐"], // En altta
-    [2, 0.75, 0.66, "🔴"],
-    [3, 0.28, 0.51, "🌍"],
-    [4, 0.65, 0.34, "🟡"],
-    [5, 0.38, 0.19, "🔵"], // En üstte
+    [1, 0.35, 0.85, "🌍"], // En altta - Dünya
+    [2, 0.75, 0.66, "🌕"], // Dolunay
+    [3, 0.28, 0.51, "🪐"], // Satürn
+    [4, 0.65, 0.34, "🌑"], // Yeni ay
+    [5, 0.38, 0.19, "🛸"], // En üstte - Uzay aracı
   ];
 
   @override
@@ -94,6 +110,11 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
       CurvedAnimation(parent: _shootingStarController2, curve: Curves.linear),
     );
 
+    // Konfeti Controller'ını initialize et
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 3),
+    );
+
     _loadCompletedStages();
   }
 
@@ -102,18 +123,98 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
     _planetHoverController.dispose();
     _shootingStarController1.dispose();
     _shootingStarController2.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
   Future<void> _loadCompletedStages() async {
     final prefs = await SharedPreferences.getInstance();
+
+    // Önceki durumu sakla
+    List<bool> previousCompletedStages = List.from(completedStages);
+    // Önceki yıldız sayılarını da sakla
+    List<int> previousStarCounts = List.from(starCounts);
+
     setState(() {
-      completedStages[0] = prefs.getBool('sorting_stage_1_completed') ?? false;
-      completedStages[1] = prefs.getBool('sorting_stage_2_completed') ?? false;
+      completedStages[0] =
+          prefs.getBool('sorting_stage_1_completed') ??
+          true; // Temporarily unlocked
+      completedStages[1] =
+          prefs.getBool('sorting_stage_2_completed') ??
+          true; // Temporarily unlocked
       completedStages[2] = prefs.getBool('sorting_stage_3_completed') ?? false;
       completedStages[3] = prefs.getBool('sorting_stage_4_completed') ?? false;
       completedStages[4] = prefs.getBool('sorting_stage_5_completed') ?? false;
+
+      // Yıldız sayılarını yükle
+      starCounts[0] = prefs.getInt('sorting_stage_1_stars') ?? 0;
+      starCounts[1] = prefs.getInt('sorting_stage_2_stars') ?? 0;
+      starCounts[2] = prefs.getInt('sorting_stage_3_stars') ?? 0;
+      starCounts[3] = prefs.getInt('sorting_stage_4_stars') ?? 0;
+      starCounts[4] = prefs.getInt('sorting_stage_5_stars') ?? 0;
     });
+
+    // Yeni tamamlanan aşama veya yıldız sayısı artışı kontrol et
+    // Ancak ilk yüklemede konfeti patlamasın
+    if (!_isInitialLoad) {
+      print('=== Konfeti Kontrolü ===');
+      print('Previous stars: $previousStarCounts');
+      print('Current stars: $starCounts');
+
+      bool shouldTriggerConfetti = false;
+
+      // Yeni aşama tamamlandı mı?
+      for (int i = 2; i < completedStages.length; i++) {
+        // Sadece 3, 4, 5. aşamalar için
+        if (!previousCompletedStages[i] && completedStages[i]) {
+          print('Yeni aşama tamamlandı: $i');
+          // Yeni bir aşama tamamlandı!
+          shouldTriggerConfetti = true;
+          break; // Sadece bir kez konfeti patlat
+        }
+      }
+
+      // Yıldız sayısı değişti mi? (herhangi bir değişiklikte konfeti patlat)
+      if (!shouldTriggerConfetti) {
+        for (int i = 0; i < starCounts.length; i++) {
+          if (previousStarCounts[i] != starCounts[i]) {
+            print(
+              'Yıldız sayısı değişti: aşama $i, ${previousStarCounts[i]} -> ${starCounts[i]}',
+            );
+            // Yıldız sayısı değişti - her türlü değişiklikte konfeti patlat
+            shouldTriggerConfetti = true;
+            break;
+          }
+        }
+      }
+
+      // Özel kontrol: Asama3 için "just completed" bayrağı
+      if (!shouldTriggerConfetti) {
+        bool asama3JustCompleted =
+            prefs.getBool('asama3_just_completed') ?? false;
+        if (asama3JustCompleted && starCounts[2] == 3) {
+          print('Asama3 just completed ve 3 yıldız var!');
+          shouldTriggerConfetti = true;
+          // Bayrağı kaldır
+          await prefs.setBool('asama3_just_completed', false);
+        }
+      }
+
+      if (shouldTriggerConfetti) {
+        print('Konfeti patlıyor!');
+        _triggerConfetti();
+      } else {
+        print('Konfeti patlamadı');
+      }
+    }
+
+    // İlk yüklemeyi tamamlandı olarak işaretle
+    _isInitialLoad = false;
+  }
+
+  // Konfeti tetikleme metodu
+  void _triggerConfetti() {
+    _confettiController.play();
   }
 
   @override
@@ -235,44 +336,7 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
                 )
                 .toList(),
 
-            // Başlık - SADELEŞTİRİLDİ
-            Positioned(
-              top: screenSize.height * 0.05,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 16,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.4),
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.purple.withOpacity(0.3),
-                        blurRadius: 20,
-                        spreadRadius: 5,
-                      ),
-                    ],
-                  ),
-                  child: const Text(
-                    '🚀 Sıralama Soruları', // "Roadmap" kaldırıldı
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            // Başlık kaldırıldı
 
             // Geri tuşu
             Positioned(
@@ -309,6 +373,29 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
                     size: 32,
                   ),
                 ),
+              ),
+            ),
+
+            // 🎉 Konfeti efekti
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirection: pi / 2, // Aşağı doğru
+                blastDirectionality: BlastDirectionality.explosive,
+                shouldLoop: false,
+                colors: const [
+                  Colors.amber,
+                  Colors.yellow,
+                  Colors.orange,
+                  Colors.deepOrange,
+                ],
+                emissionFrequency: 0.05,
+                numberOfParticles: 50,
+                gravity: 0.3,
+                maxBlastForce: 20,
+                minBlastForce: 5,
+                particleDrag: 0.05,
               ),
             ),
           ],
@@ -415,12 +502,37 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
                             emoji,
                             style: TextStyle(
                               fontSize:
-                                  isHovered
-                                      ? 65
-                                      : 55, // Gezegen boyutları küçültüldü
-                              shadows: const [
-                                Shadow(color: Colors.white38, blurRadius: 8),
-                              ],
+                                  emoji == "🪐"
+                                      ? (isHovered
+                                          ? 75
+                                          : 65) // Satürn daha büyük
+                                      : (isHovered
+                                          ? 65
+                                          : 55), // Diğer gezegenler normal
+                              color:
+                                  emoji == "🌑"
+                                      ? Colors
+                                          .blue
+                                          .shade300 // Yeni ay için mavi renk
+                                      : null, // Diğerleri için varsayılan renk
+                              shadows:
+                                  emoji == "🌑"
+                                      ? [
+                                        Shadow(
+                                          color: Colors.blue.shade200,
+                                          blurRadius: 12,
+                                        ),
+                                        Shadow(
+                                          color: Colors.white38,
+                                          blurRadius: 8,
+                                        ),
+                                      ]
+                                      : const [
+                                        Shadow(
+                                          color: Colors.white38,
+                                          blurRadius: 8,
+                                        ),
+                                      ],
                             ),
                           ),
                           if (isLocked) // Kilit simgesi (SİYAH)
@@ -449,18 +561,44 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
                         ],
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      stageNumber.toString(), // Numara
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: isHovered ? 22 : 18,
-                        fontWeight: FontWeight.bold,
-                        shadows: const [
-                          Shadow(color: Colors.black54, blurRadius: 4),
-                        ],
+                    // Yıldızlar
+                    if (isCompleted &&
+                        !isLocked) // Sadece tamamlanmış aşamalarda yıldızları göster
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: List.generate(3, (index) {
+                            final starIndex = index;
+                            final isStarEarned =
+                                starIndex < starCounts[stageNumber - 1];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 2.0,
+                              ),
+                              child: Icon(
+                                Icons.star,
+                                color:
+                                    isStarEarned
+                                        ? Colors.amber
+                                        : Colors.grey.shade400,
+                                size: 16,
+                                shadows:
+                                    isStarEarned
+                                        ? [
+                                          Shadow(
+                                            color: Colors.amber.withOpacity(
+                                              0.5,
+                                            ),
+                                            blurRadius: 4,
+                                          ),
+                                        ]
+                                        : null,
+                              ),
+                            );
+                          }),
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -497,7 +635,8 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
         // targetWidget = const SortingStage1();
         break;
       case 2:
-        // targetWidget = const SortingStage2();
+        print('Navigating to Asama2Soru1');
+        targetWidget = const Asama2Soru1();
         break;
       case 3:
         targetWidget = const Asama3Soru1();
@@ -976,7 +1115,9 @@ class _ShootingStarState extends State<ShootingStar>
         directionAngle: widget.directionAngle,
         trailDots: _trailDots, // İz noktalarını painter'a gönder
         trailOffset:
-            -starGlobalPosition!, // İz noktalarını yıldızın konumuna göre ayarla
+            starGlobalPosition != null
+                ? -starGlobalPosition
+                : Offset.zero, // Null check eklendi
       ),
     );
   }

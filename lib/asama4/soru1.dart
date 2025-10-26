@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'package:dixlearning/asama4/soru2.dart';
 import '../screens/matching_questions_screen.dart';
-import 'package:dixlearning/asama2/soru2.dart';
 import 'package:provider/provider.dart';
 import '../providers/progress_provider.dart';
 
@@ -114,7 +113,10 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
               // Etkinlik tamamlandı
 
               ActivityTracker.completeActivity();
-              Provider.of<ProgressProvider>(context, listen: false).completeStage4();
+              Provider.of<ProgressProvider>(
+                context,
+                listen: false,
+              ).completeStage4();
 
               Navigator.pushReplacement(
                 context,
@@ -291,6 +293,7 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
                                 ),
                                 Container(
                                   width: 4,
+                                  height: 475,
                                   margin: const EdgeInsets.symmetric(
                                     horizontal: 10,
                                   ),
