@@ -642,7 +642,7 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
         targetWidget = const Asama3Soru1();
         break;
       case 4:
-        // targetWidget = const SortingStage4();
+        targetWidget = const Asama4Soru1();
         break;
       case 5:
         // targetWidget = const SortingStage5();
