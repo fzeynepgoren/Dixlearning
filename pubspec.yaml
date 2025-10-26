@@ -20,6 +20,7 @@ dependencies:
   shared_preferences: ^2.2.2
   cupertino_icons: ^1.0.8
   flutter_tts: ^3.7.0 # <-- TTS paketi eklendi
+  confetti: ^0.7.0 # <-- Konfeti efekti için
 
 dev_dependencies:
   flutter_test:
@@ -47,13 +48,6 @@ flutter:
     - assets/konusma_balonu.png
     - assets/SIRALAMA_RESIMLERI/
     
-    # Karşılaştırma Road Map Resimleri
-    - assets/karsilastirma_road_map/
-
-    # Sınıflandırma Roadmap Resimleri
-    - assets/roadmap_siniflama.png
-
-
     # Az-Çok Karşılaştırma
     - assets/az_cok_asa1/soru1/
     - assets/az_cok_asa1/soru2/
@@ -85,6 +79,12 @@ flutter:
     - assets/buyuk_kucuk/soru7/Resim7.png
     - assets/buyuk_kucuk/soru8/Resim8.png
     - assets/buyuk_kucuk/soru9/Resim9.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru1/aksam.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru1/gun_dogumu.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru1/gunes_tepede.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru2/corba.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru2/kurabiye.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru2/dondurma.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/tohum.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/filiz.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/cicekli_agac.png
@@ -128,6 +128,21 @@ flutter:
     - assets/kalin_ince_asa1/soru9/Resim17.png
     - assets/kalin_ince_asa1/soru9/Resim18.png
     - assets/kalin_ince_asa1/
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru1/aksam.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru1/gunes_tepede.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru1/gun_dogumu.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru2/corba.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru2/kurabiye.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru2/dondurma.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru3/eve_yakın.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru3/evden_uzak.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru3/evden_en_uzak.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru4/ucak_pistte.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru4/ucak_kalkısta.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru4/ucan_ucak.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru5/rüzgar.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru5/ucan_sapka.png
+    - assets/SIRALAMA_RESIMLERI/Asama2/soru5/sapka_yakalama.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/tohum.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/filiz.png
     - assets/SIRALAMA_RESIMLERI/Asama3/soru1/cicekli_agac.png
