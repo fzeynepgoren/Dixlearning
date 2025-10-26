@@ -116,9 +116,9 @@ class _OlaySiniflaState extends State<OlaySinifla>
     if (allPlaced && !_dialogShown) {
       _dialogShown = true;
 
-      // Aşama 4'ü tamamlandı olarak kaydet
+      // Level 4'ü tamamlandı olarak kaydet
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('stage_4_completed', true);
+      await prefs.setInt('siniflama_completed_level', 4);
 
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {

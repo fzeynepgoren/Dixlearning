@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
-import '../screens/home_screen.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
-import 'soru4.dart';
 
 class HayvanBacakSinifla extends StatefulWidget {
   const HayvanBacakSinifla({super.key});
@@ -84,9 +82,9 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
         true,
       ); // Tüm doğru eşleşmeler bittiğinde pozitif geri bildirim
 
-      // Aşama 1'i tamamlandı olarak kaydet
+      // Level 1'i tamamlandı olarak kaydet
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('stage_1_completed', true);
+      await prefs.setInt('siniflama_completed_level', 1);
 
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
