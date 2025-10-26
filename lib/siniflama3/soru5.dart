@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
-import '../screens/home_screen.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
 
 class HayvanYasamSinifla extends StatefulWidget {
@@ -102,9 +101,9 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
     if (allPlaced && !_dialogShown) {
       _dialogShown = true;
 
-      // Aşama 3'ü tamamlandı olarak kaydet
+      // Level 3'ü tamamlandı olarak kaydet
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('stage_3_completed', true);
+      await prefs.setInt('siniflama_completed_level', 3);
 
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {

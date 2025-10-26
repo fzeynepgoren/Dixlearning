@@ -5,8 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:confetti/confetti.dart';
 // Lütfen bu importların projenizde doğru yollara sahip olduğundan emin olun
 import '../providers/language_provider.dart';
-import '../../SIRALAMA_SORULARI/Asama3/soru1.dart';
-import '../../SIRALAMA_SORULARI/Asama2/soru1.dart';
+import '../SIRALAMA_SORULARI/Asama3/soru1.dart';
+import '../SIRALAMA_SORULARI/Asama2/soru1.dart';
 import 'home_screen.dart';
 
 // Gezegen ve yol renklerini kontrol etmek için yeni sabitler
