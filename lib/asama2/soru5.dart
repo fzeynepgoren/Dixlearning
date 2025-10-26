@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/matching_questions_screen.dart';
 import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
@@ -66,6 +67,11 @@ class _SeninWidgetState extends State<SeninWidget>
     super.dispose();
   }
 
+  Future<void> _saveStageCompletion() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('asama2_completed', true);
+  }
+
   void _handleTap(int index, bool isLeft) {
     if (allMatched) return;
 
@@ -99,6 +105,7 @@ class _SeninWidgetState extends State<SeninWidget>
 
       if (matchedLeft.every((element) => element)) {
         allMatched = true;
+        _saveStageCompletion();
         if (!_dialogShown) {
           _dialogShown = true;
           Future.delayed(const Duration(seconds: 1), () {

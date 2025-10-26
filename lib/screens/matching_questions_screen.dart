@@ -126,11 +126,11 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                     _buildLevelButton(
                       context,
                       level: 1,
-                      leftFactor: 0.50,
+                      leftFactor: 0.74,
                       topFactor: 0.82,
                       emoji: '🍎',
                       title: isEnglish ? 'Fruits' : 'Meyveler',
-                      color: const Color(0xFFE74C3C), // Canlı kırmızı
+                      color: const Color(0xFFE5A2BE), // Canlı kırmızı
                       onTap: () async {
                         await Navigator.push(
                           context,
@@ -148,11 +148,11 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                     _buildLevelButton(
                       context,
                       level: 2,
-                      leftFactor: 0.25,
-                      topFactor: 0.62,
+                      leftFactor: 0.32,
+                      topFactor: 0.67,
                       emoji: '🔤',
                       title: isEnglish ? 'Letters' : 'Harfler',
-                      color: const Color(0xFF27AE60), // Canlı yeşil
+                      color: const Color(0xFF5D4695), // Canlı yeşil
                       onTap: () async {
                         await Navigator.push(
                           context,
@@ -170,11 +170,11 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                     _buildLevelButton(
                       context,
                       level: 3,
-                      leftFactor: 0.75,
-                      topFactor: 0.42,
+                      leftFactor: 0.7,
+                      topFactor: 0.49,
                       emoji: '🏛️',
                       title: isEnglish ? 'Objects' : 'Nesneler',
-                      color: const Color(0xFF8E44AD), // Canlı mor
+                      color: const Color(0xFFC99470), // Canlı mor
                       onTap: () async {
                         await Navigator.push(
                           context,
@@ -192,11 +192,11 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                     _buildLevelButton(
                       context,
                       level: 4,
-                      leftFactor: 0.50,
-                      topFactor: 0.22,
+                      leftFactor: 0.36,
+                      topFactor: 0.36,
                       emoji: '🌦️',
                       title: isEnglish ? 'Weather' : 'Hava Durumu',
-                      color: const Color(0xFFF39C12), // Canlı turuncu
+                      color: const Color(0xFF469DBC), // Canlı turuncu
                       onTap: () async {
                         await Navigator.push(
                           context,
@@ -248,7 +248,7 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF6C63FF).withOpacity(0.5),
+                            color: const Color(0xFF64BDD2).withOpacity(0.5),
                             blurRadius: 20,
                             spreadRadius: 2,
                             offset: const Offset(0, 6),
@@ -379,8 +379,8 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
 
             // Level butonu - Canlı ve sevimli
             Container(
-              width: 100,
-              height: 100,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: [

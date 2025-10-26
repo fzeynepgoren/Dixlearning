@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/activity_tracker.dart';
 import '../screens/matching_questions_screen.dart';
 import 'package:provider/provider.dart';
@@ -70,6 +71,11 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
     super.dispose();
   }
 
+  Future<void> _saveStageCompletion() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('asama3_completed', true);
+  }
+
   void _handleTap(int index, bool isLeft) {
     if (isLeft && matchedLeft[index]) return;
     if (!isLeft && matchedRight[index]) return;
@@ -103,12 +109,15 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
 
         // Tüm eşleşmeler tamamlandıysa
         if (matchedLeft.every((e) => e)) {
+          _saveStageCompletion();
           ActivityTracker.completeActivity();
           Future.delayed(const Duration(milliseconds: 800), () {
             if (mounted) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const MatchingQuestionsScreen()),
+                MaterialPageRoute(
+                  builder: (_) => const MatchingQuestionsScreen(),
+                ),
               );
             }
           });
