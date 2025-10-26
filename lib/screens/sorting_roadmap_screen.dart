@@ -6,7 +6,7 @@ import 'package:confetti/confetti.dart';
 // Lütfen bu importların projenizde doğru yollara sahip olduğundan emin olun
 import '../providers/language_provider.dart';
 import '../../SIRALAMA_SORULARI/Asama3/soru1.dart';
-import '../../SIRALAMA_SORULARI/Asama2/soru1.dart';
+import '../../SIRALAMA_SORULARI/Asama4/soru1.dart';
 import 'home_screen.dart';
 
 // Gezegen ve yol renklerini kontrol etmek için yeni sabitler
@@ -642,7 +642,7 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
         targetWidget = const Asama3Soru1();
         break;
       case 4:
-        // targetWidget = const SortingStage4();
+        targetWidget = const Asama4Soru1();
         break;
       case 5:
         // targetWidget = const SortingStage5();
