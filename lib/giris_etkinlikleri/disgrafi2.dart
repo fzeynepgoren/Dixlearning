@@ -16,6 +16,7 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
   final _controller = TextEditingController();
   bool _isCorrect = false;
   bool _showFeedback = false;
+  int _attemptCount = 0; // Deneme sayacı
 
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -58,12 +59,14 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
     setState(() {
       _isCorrect = isAnswerCorrect;
       _showFeedback = true;
+      _attemptCount++; // Deneme sayısını artır
     });
 
     _feedbackController.forward(from: 0);
 
-    if (isAnswerCorrect) {
-      Future.delayed(const Duration(seconds: 2), () {
+    // İlk deneme doğruysa veya ikinci deneme sonrası Disgrafi3'e geç
+    if (isAnswerCorrect || _attemptCount >= 2) {
+      Future.delayed(const Duration(seconds: 3), () {
         if (!mounted) return;
         ActivityTracker.completeActivity();
         Navigator.pushReplacement(
@@ -72,11 +75,13 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
         );
       });
     } else {
-      // İstersen feedback’in ekranda kalma süresini kısaca sınırlayabilirsin:
-      // Future.delayed(const Duration(seconds: 2), () {
-      //   if (!mounted) return;
-      //   setState(() => _showFeedback = false);
-      // });
+      // İlk deneme yanlışsa, 3 saniye sonra feedback'i gizle ve tekrar deneme imkanı ver
+      Future.delayed(const Duration(seconds: 3), () {
+        if (!mounted) return;
+        setState(() {
+          _showFeedback = false;
+        });
+      });
     }
   }
 
@@ -110,13 +115,17 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back,
-                          color: Colors.black, size: iconSize),
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                              builder: (context) => const HomeScreen()),
-                              (route) => false,
+                            builder: (context) => const HomeScreen(),
+                          ),
+                          (route) => false,
                         );
                       },
                     ),
@@ -179,87 +188,171 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
                           // 📝 Cevap yazma alanı
                           TextField(
                             controller: _controller,
-                            maxLines: 2,
+                            maxLines: 3,
+                            style: TextStyle(
+                              fontSize: screenSize.width * 0.045,
+                            ),
                             decoration: InputDecoration(
-                              hintText: isEnglish
-                                  ? 'Write the sentence here...'
-                                  : 'Cümleyi buraya yazınız...',
+                              hintText:
+                                  isEnglish
+                                      ? 'Write the sentence here...'
+                                      : 'Cümleyi buraya yazınız...',
+                              hintStyle: TextStyle(
+                                fontSize: screenSize.width * 0.04,
+                              ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
                               fillColor: Colors.grey.shade50,
+                              contentPadding: EdgeInsets.all(
+                                screenSize.width * 0.03,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 20),
 
                           // ✔️ Buton
-                          ElevatedButton(
-                            onPressed: _checkPoem,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue.shade200,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 48, vertical: 16),
-                              shape: RoundedRectangleBorder(
+                          if (!_showFeedback)
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.blue.shade400,
+                                    Colors.blue.shade600,
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
                                 borderRadius: BorderRadius.circular(16),
                               ),
+                              child: ElevatedButton(
+                                onPressed: _checkPoem,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 48,
+                                    vertical: 20,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: Text(
+                                  isEnglish ? 'Check' : 'Kontrol Et',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
                             ),
-                            child: Text(
-                              isEnglish ? 'Check' : 'Kontrol Et',
-                              style: const TextStyle(fontSize: 20),
-                            ),
-                          ),
                         ],
                       ),
                     ),
                   ),
                 ),
 
-
                 Container(
-                  height: 80,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
-                  child: _showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          _isCorrect
-                              ? Icons.check_circle
-                              : Icons.cancel,
-                          color: _isCorrect
-                              ? Colors.green
-                              : Colors.red,
-                          size: 28,
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          _isCorrect
-                              ? (isEnglish
-                              ? 'Well done! 🎉'
-                              : 'Aferin! 🎉')
-                              : (isEnglish
-                              ? 'Try again! 😔'
-                              : 'Tekrar dene! 😔'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: _isCorrect
-                                ? Colors.green
-                                : Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      _showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 20,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        _isCorrect
+                                            ? Icons.check_circle
+                                            : Icons.cancel,
+                                        color:
+                                            _isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        size: 28,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        _isCorrect
+                                            ? (isEnglish
+                                                ? 'Well done! 🎉'
+                                                : 'Aferin! 🎉')
+                                            : (_attemptCount == 1
+                                                ? (isEnglish
+                                                    ? 'Try again! 😔'
+                                                    : 'Tekrar dene! 😔')
+                                                : (isEnglish
+                                                    ? 'Here\'s the right one! 🧐'
+                                                    : 'İşte doğrusu! 🧐')),
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color:
+                                              _isCorrect
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Doğru cümleyi göster (sadece ikinci deneme yanlışsa)
+                                if (!_isCorrect && _attemptCount >= 2) ...[
+                                  const SizedBox(height: 10),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                      horizontal: 16,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Ailemle birlikte tiyatroya gittik.',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),

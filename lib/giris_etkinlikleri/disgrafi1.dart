@@ -15,10 +15,11 @@ class Disgrafi1 extends StatefulWidget {
 
 class _Disgrafi1State extends State<Disgrafi1> with TickerProviderStateMixin {
   final FlutterTts flutterTts = FlutterTts();
-  int _currentQuestionIndex = 0;
+  final int _currentQuestionIndex = 0;
   bool _isPlaying = false;
   bool _showFeedback = false;
   bool _isCorrect = false;
+  int _attemptCount = 0; // Yeni: deneme sayacı
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -105,19 +106,30 @@ class _Disgrafi1State extends State<Disgrafi1> with TickerProviderStateMixin {
     setState(() {
       _showFeedback = true;
       _isCorrect = allCorrect;
+      _attemptCount++; // Deneme sayısını artır
     });
 
     _feedbackController.forward();
 
-    // 3 saniye bekle → Disgrafi2'ye geç
-    Future.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
-      ActivityTracker.completeActivity();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Disgrafi2()),
-      );
-    });
+    // İlk deneme doğruysa veya ikinci deneme sonrası Disgrafi2'ye geç
+    if (allCorrect || _attemptCount >= 2) {
+      Future.delayed(const Duration(seconds: 3), () {
+        if (!mounted) return;
+        ActivityTracker.completeActivity();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Disgrafi2()),
+        );
+      });
+    } else {
+      // İlk deneme yanlışsa, 3 saniye sonra feedback'i gizle ve tekrar deneme imkanı ver
+      Future.delayed(const Duration(seconds: 3), () {
+        if (!mounted) return;
+        setState(() {
+          _showFeedback = false;
+        });
+      });
+    }
   }
 
   @override
@@ -223,6 +235,7 @@ class _Disgrafi1State extends State<Disgrafi1> with TickerProviderStateMixin {
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: () {
                               int blankCounter = 0;
                               return current['sentence'].map<Widget>((word) {
@@ -231,13 +244,15 @@ class _Disgrafi1State extends State<Disgrafi1> with TickerProviderStateMixin {
                                       current['controllers'][blankCounter];
                                   blankCounter++;
                                   return Container(
-                                    width: 100,
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 4,
+                                    width: screenSize.width * 0.25,
+                                    margin: EdgeInsets.symmetric(
+                                      horizontal: screenSize.width * 0.01,
                                     ),
                                     child: TextField(
                                       controller: controller,
-                                      style: const TextStyle(fontSize: 18),
+                                      style: TextStyle(
+                                        fontSize: screenSize.width * 0.045,
+                                      ),
                                       decoration: InputDecoration(
                                         hintText: isEnglish ? 'Word' : 'Kelime',
                                         border: OutlineInputBorder(
@@ -252,16 +267,17 @@ class _Disgrafi1State extends State<Disgrafi1> with TickerProviderStateMixin {
                                   );
                                 } else {
                                   return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 4,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: screenSize.width * 0.01,
                                     ),
                                     child: Text(
                                       word,
-                                      style: const TextStyle(
-                                        fontSize: 24,
+                                      style: TextStyle(
+                                        fontSize: screenSize.width * 0.06,
                                         fontWeight: FontWeight.bold,
                                         color: Color(0xFF37474F),
                                       ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   );
                                 }
@@ -274,22 +290,38 @@ class _Disgrafi1State extends State<Disgrafi1> with TickerProviderStateMixin {
 
                         // Confirm Button
                         if (!_showFeedback)
-                          ElevatedButton(
-                            onPressed: _checkAnswers,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue.shade200,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 48,
-                                vertical: 20,
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.blue.shade400,
+                                  Colors.blue.shade600,
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            child: Text(
-                              isEnglish ? 'Confirm' : 'Onayla',
-                              style: const TextStyle(fontSize: 20),
+                            child: ElevatedButton(
+                              onPressed: _checkAnswers,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 48,
+                                  vertical: 20,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              child: Text(
+                                isEnglish ? 'Check' : 'Kontrol Et',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
                           ),
                       ],
@@ -300,7 +332,6 @@ class _Disgrafi1State extends State<Disgrafi1> with TickerProviderStateMixin {
 
               // Feedback Area
               Container(
-                height: 80,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 10,
@@ -312,50 +343,92 @@ class _Disgrafi1State extends State<Disgrafi1> with TickerProviderStateMixin {
                             parent: _feedbackController,
                             curve: Curves.elasticOut,
                           ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 20,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _isCorrect ? Colors.green : Colors.red,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 5),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 20,
                                 ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  _isCorrect
-                                      ? Icons.check_circle
-                                      : Icons.cancel,
+                                decoration: BoxDecoration(
                                   color: Colors.white,
-                                  size: 28,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  _isCorrect
-                                      ? (isEnglish
-                                          ? 'Well done! 🎉'
-                                          : 'Aferin! 🎉')
-                                      : (isEnglish
-                                          ? 'Here\'s the right one! 🧐\nDoktor durakta taksi bekledi.'
-                                          : 'İşte doğrusu! 🧐\nDoktor durakta taksi bekledi.'),
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      _isCorrect
+                                          ? Icons.check_circle
+                                          : Icons.cancel,
+                                      color:
+                                          _isCorrect
+                                              ? Colors.green
+                                              : Colors.red,
+                                      size: 28,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      _isCorrect
+                                          ? (isEnglish
+                                              ? 'Well done! 🎉'
+                                              : 'Aferin! 🎉')
+                                          : (_attemptCount == 1
+                                              ? (isEnglish
+                                                  ? 'Try again! 😔'
+                                                  : 'Tekrar dene! 😔')
+                                              : (isEnglish
+                                                  ? 'Here\'s the right one! 🧐'
+                                                  : 'İşte doğrusu! 🧐')),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color:
+                                            _isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Doğru cümleyi göster (sadece ikinci deneme yanlışsa)
+                              if (!_isCorrect && _attemptCount >= 2) ...[
+                                const SizedBox(height: 10),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                    horizontal: 16,
                                   ),
-                                  textAlign: TextAlign.center,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.grey.shade300,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    _currentQuestionIndex == 0
+                                        ? 'Doktor durakta taksi bekledi.'
+                                        : 'Baris sutu ocakta tasirdi.',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
                               ],
-                            ),
+                            ],
                           ),
                         )
                         : const SizedBox.shrink(),

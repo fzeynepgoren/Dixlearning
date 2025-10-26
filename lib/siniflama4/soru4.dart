@@ -4,7 +4,6 @@ import '../providers/language_provider.dart';
 import 'soru5.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
 
-
 class AtikSinifla extends StatefulWidget {
   const AtikSinifla({super.key});
 
@@ -52,10 +51,9 @@ class _AtikSiniflaState extends State<AtikSinifla>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
     _slideController.forward();
   }
 
@@ -221,11 +219,13 @@ class _AtikSiniflaState extends State<AtikSinifla>
                                   child: Column(
                                     children: [
                                       _buildGroup(
-                                        isEnglish ? 'Paper Bin' : 'Kağıt Kutusu',
+                                        isEnglish
+                                            ? 'Paper Bin'
+                                            : 'Kağıt Kutusu',
                                         paperGroup,
                                         'kagit',
-                                        Colors.blue.shade50,
-                                        Colors.blue,
+                                        Colors.purple.shade100,
+                                        Colors.purple.shade300,
                                       ),
                                       _buildGroup(
                                         isEnglish
@@ -233,15 +233,15 @@ class _AtikSiniflaState extends State<AtikSinifla>
                                             : 'Plastik Kutusu',
                                         plasticGroup,
                                         'plastik',
-                                        Colors.green.shade50,
-                                        Colors.green,
+                                        Colors.blue.shade100,
+                                        Colors.blue.shade400,
                                       ),
                                       _buildGroup(
                                         isEnglish ? 'Glass Bin' : 'Cam Kutusu',
                                         glassGroup,
                                         'cam',
-                                        Colors.purple.shade50,
-                                        Colors.purple,
+                                        Colors.yellow.shade100,
+                                        Colors.yellow.shade400,
                                       ),
                                     ],
                                   ),
@@ -251,23 +251,36 @@ class _AtikSiniflaState extends State<AtikSinifla>
                                   flex: 2,
                                   child: SingleChildScrollView(
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: items
-                                          .where((item) => !item['isPlaced'])
-                                          .map((item) {
-                                        return Draggable<Map<String, dynamic>>(
-                                          data: item,
-                                          feedback: Material(
-                                            color: Colors.transparent,
-                                            child: _buildDraggableItem(item),
-                                          ),
-                                          childWhenDragging: Opacity(
-                                            opacity: 0.3,
-                                            child: _buildDraggableItem(item),
-                                          ),
-                                          child: _buildDraggableItem(item),
-                                        );
-                                      }).toList(),
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children:
+                                          items
+                                              .where(
+                                                (item) => !item['isPlaced'],
+                                              )
+                                              .map((item) {
+                                                return Draggable<
+                                                  Map<String, dynamic>
+                                                >(
+                                                  data: item,
+                                                  feedback: Material(
+                                                    color: Colors.transparent,
+                                                    child: _buildDraggableItem(
+                                                      item,
+                                                    ),
+                                                  ),
+                                                  childWhenDragging: Opacity(
+                                                    opacity: 0.3,
+                                                    child: _buildDraggableItem(
+                                                      item,
+                                                    ),
+                                                  ),
+                                                  child: _buildDraggableItem(
+                                                    item,
+                                                  ),
+                                                );
+                                              })
+                                              .toList(),
                                     ),
                                   ),
                                 ),
@@ -282,54 +295,65 @@ class _AtikSiniflaState extends State<AtikSinifla>
                 Container(
                   height: 80,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                : (isEnglish
-                                ? 'Try again! 😔'
-                                : 'Tekrar dene! 😔'),
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
@@ -352,20 +376,18 @@ class _AtikSiniflaState extends State<AtikSinifla>
 
     return Expanded(
       child: DragTarget<Map<String, dynamic>>(
-        onWillAccept: (data) => !data!['isPlaced'],
-        onAccept: (data) => _handleDrag(data, type),
+        onWillAcceptWithDetails: (details) => !details.data['isPlaced'],
+        onAcceptWithDetails: (details) => _handleDrag(details.data, type),
         builder: (context, candidateData, rejectedData) {
           return Container(
             width: double.infinity,
             margin: EdgeInsets.symmetric(
-                vertical: screenSize.height * 0.01,
-                horizontal: screenSize.width * 0.04),
+              vertical: screenSize.height * 0.01,
+              horizontal: screenSize.width * 0.04,
+            ),
             decoration: BoxDecoration(
               color: boxColor,
-              border: Border.all(
-                color: borderColor,
-                width: 2,
-              ),
+              border: Border.all(color: borderColor, width: 2),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -384,14 +406,15 @@ class _AtikSiniflaState extends State<AtikSinifla>
                 Wrap(
                   alignment: WrapAlignment.center,
                   spacing: screenSize.width * 0.02,
-                  children: group
-                      .map(
-                        (item) => Text(
-                          item['emoji'],
-                          style: TextStyle(fontSize: emojiSize),
-                        ),
-                      )
-                      .toList(),
+                  children:
+                      group
+                          .map(
+                            (item) => Text(
+                              item['emoji'],
+                              style: TextStyle(fontSize: emojiSize),
+                            ),
+                          )
+                          .toList(),
                 ),
               ],
             ),
@@ -414,18 +437,11 @@ class _AtikSiniflaState extends State<AtikSinifla>
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Center(
-        child: Text(
-          item['emoji'],
-          style: TextStyle(fontSize: emojiSize),
-        ),
+        child: Text(item['emoji'], style: TextStyle(fontSize: emojiSize)),
       ),
     );
   }

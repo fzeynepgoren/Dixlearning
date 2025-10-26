@@ -11,7 +11,8 @@ class Diskalkuli2 extends StatefulWidget {
   State<Diskalkuli2> createState() => _Diskalkuli2State();
 }
 
-class _Diskalkuli2State extends State<Diskalkuli2> {
+class _Diskalkuli2State extends State<Diskalkuli2>
+    with TickerProviderStateMixin {
   final Map<int, int> fixedFloors = {1: 1, 3: 3, 6: 6, 8: 8, 10: 10};
   final Map<int, TextEditingController> controllers = {
     2: TextEditingController(),
@@ -23,12 +24,38 @@ class _Diskalkuli2State extends State<Diskalkuli2> {
 
   bool showFeedback = false;
   Map<int, bool> isCorrect = {};
+  int _attemptCount = 0; // Deneme sayacı
+  late AnimationController _slideController;
+  late AnimationController _feedbackController;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _feedbackController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+    );
+    _slideController.forward();
+  }
 
   @override
   void dispose() {
     for (var c in controllers.values) {
       c.dispose();
     }
+    _slideController.dispose();
+    _feedbackController.dispose();
     super.dispose();
   }
 
@@ -38,229 +65,441 @@ class _Diskalkuli2State extends State<Diskalkuli2> {
       for (var entry in controllers.entries) {
         final kat = entry.key;
         final controller = entry.value;
-        isCorrect[kat] = int.tryParse(controller.text) == kat;
+        bool isCorrectAnswer = int.tryParse(controller.text) == kat;
+        isCorrect[kat] = isCorrectAnswer;
       }
       showFeedback = true;
+      _attemptCount++; // Deneme sayısını artır
     });
 
-    Future.delayed(const Duration(seconds: 1), () {
-      if (isCorrect.values.every((v) => v == true)) {
-        ActivityTracker.completeActivity();
+    _feedbackController.forward();
+
+    // İlk deneme doğruysa veya ikinci deneme sonrası Diskalkuli3'e geç
+    bool allCorrect = isCorrect.values.every((v) => v == true);
+    if (allCorrect || _attemptCount >= 2) {
+      Future.delayed(const Duration(seconds: 3), () {
         if (mounted) {
+          ActivityTracker.completeActivity();
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const Diskalkuli3()),
           );
         }
-      } else {
-        setState(() {
-          showFeedback = false;
-        });
-      }
-    });
+      });
+    } else {
+      // İlk deneme yanlışsa, 3 saniye sonra feedback'i gizle ve tekrar deneme imkanı ver
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) {
+          setState(() {
+            showFeedback = false;
+          });
+        }
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFE1F5FE),
-      body: Center(
-        child: SingleChildScrollView(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue.shade200,
+              Colors.blue.shade200,
+              const Color(0xffffffff),
+            ],
+            stops: const [0.0, 0.5, 1.0],
+          ),
+        ),
+        child: SafeArea(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Soru kutusu
-              Padding(
-                padding: const EdgeInsets.only(top: 32, bottom: 24),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 18,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.blue.withOpacity(0.10),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    "Aşağıdaki örüntüyü doğru şekilde tamamla",
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0288D1),
+              // Geri butonu
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: Colors.black,
+                      size: screenSize.width * 0.065,
                     ),
-                    textAlign: TextAlign.center,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // Flashcard - Disgrafi1 tarzında
+              Expanded(
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.95),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Soru metni
+                        Text(
+                          isEnglish
+                              ? "Complete the pattern correctly!"
+                              : "Aşağıdaki örüntüyü doğru şekilde tamamla",
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Bina görseli - Büyütülmüş ve güzelleştirilmiş
+                        Container(
+                          width: 140,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300, // Gri renk
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: Colors.brown.shade300,
+                              width: 2,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              // Çatı - Açık kahverengi
+                              Container(
+                                height: 35,
+                                decoration: BoxDecoration(
+                                  color:
+                                      Colors.brown.shade300, // Açık kahverengi
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    topRight: Radius.circular(15),
+                                  ),
+                                ),
+                              ),
+                              // Bina gövdesi
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 8,
+                                ),
+                                child: Column(
+                                  children: List.generate(10, (i) {
+                                    int floor = 10 - i;
+                                    bool isFixed = fixedFloors.containsKey(
+                                      floor,
+                                    );
+                                    bool isInput = controllers.containsKey(
+                                      floor,
+                                    );
+                                    bool isShowFeedback =
+                                        showFeedback && isInput;
+                                    bool isAnswerCorrect =
+                                        isCorrect[floor] == true;
+
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 3,
+                                      ),
+                                      child: Container(
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors
+                                                  .lightBlue
+                                                  .shade100, // Daha açık mavi
+                                              Colors.lightBlue.shade200,
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                          border: Border.all(
+                                            color:
+                                                isShowFeedback
+                                                    ? (isAnswerCorrect
+                                                        ? Colors
+                                                            .green
+                                                            .shade600 // Belirgin yeşil
+                                                        : Colors
+                                                            .red
+                                                            .shade600) // Belirgin kırmızı
+                                                    : Colors.blue.shade400,
+                                            width:
+                                                isShowFeedback
+                                                    ? 3.0
+                                                    : 1.5, // Feedback'te daha kalın
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.1,
+                                              ),
+                                              blurRadius: 2,
+                                              offset: const Offset(0, 1),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child:
+                                              isFixed
+                                                  ? Text(
+                                                    floor.toString(),
+                                                    style: const TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color:
+                                                          Colors
+                                                              .black, // Siyah rakamlar
+                                                    ),
+                                                  )
+                                                  : SizedBox(
+                                                    width: 35,
+                                                    child: TextField(
+                                                      controller:
+                                                          controllers[floor],
+                                                      enabled: !showFeedback,
+                                                      keyboardType:
+                                                          TextInputType.number,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            isShowFeedback
+                                                                ? (isAnswerCorrect
+                                                                    ? Colors
+                                                                        .green
+                                                                        .shade600 // Belirgin yeşil
+                                                                    : Colors
+                                                                        .red
+                                                                        .shade600) // Belirgin kırmızı
+                                                                : Colors.black,
+                                                      ),
+                                                      decoration: InputDecoration(
+                                                        contentPadding:
+                                                            EdgeInsets.zero,
+                                                        filled: true,
+                                                        fillColor:
+                                                            Colors.transparent,
+                                                        hintText:
+                                                            _attemptCount >=
+                                                                        2 &&
+                                                                    !isAnswerCorrect
+                                                                ? floor
+                                                                    .toString() // İkinci denemede doğru cevabı göster
+                                                                : "?",
+                                                        hintStyle: TextStyle(
+                                                          fontSize: 16,
+                                                          color:
+                                                              _attemptCount >=
+                                                                          2 &&
+                                                                      !isAnswerCorrect
+                                                                  ? Colors
+                                                                      .green
+                                                                      .shade600 // Belirgin yeşil
+                                                                  : Colors.grey,
+                                                        ),
+                                                        border: OutlineInputBorder(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                Radius.circular(
+                                                                  8,
+                                                                ),
+                                                              ),
+                                                          borderSide:
+                                                              BorderSide.none,
+                                                        ),
+                                                        enabledBorder:
+                                                            OutlineInputBorder(
+                                                              borderRadius:
+                                                                  BorderRadius.all(
+                                                                    Radius.circular(
+                                                                      8,
+                                                                    ),
+                                                                  ),
+                                                              borderSide:
+                                                                  BorderSide
+                                                                      .none,
+                                                            ),
+                                                        focusedBorder:
+                                                            OutlineInputBorder(
+                                                              borderRadius:
+                                                                  BorderRadius.all(
+                                                                    Radius.circular(
+                                                                      8,
+                                                                    ),
+                                                                  ),
+                                                              borderSide:
+                                                                  BorderSide
+                                                                      .none,
+                                                            ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-              // Bina görseli
-              Container(
-                width: 140,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(22),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.blue.withOpacity(0.10),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
+
+              // Kontrol butonu - Flashcard altında
+              if (!showFeedback)
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.blue.shade400, Colors.blue.shade600],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blue.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                  ],
-                  border: Border.all(
-                    color: Colors.blueAccent.withOpacity(0.18),
-                    width: 2,
+                    child: ElevatedButton(
+                      onPressed: checkAnswers,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 50,
+                          vertical: 20,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                      ),
+                      child: Text(
+                        isEnglish ? 'Check' : 'Kontrol Et',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          color: Colors.black, // Siyah yazı
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(10, (i) {
-                    int floor = 10 - i;
-                    bool isFixed = fixedFloors.containsKey(floor);
-                    bool isInput = controllers.containsKey(floor);
-                    bool isShowFeedback = showFeedback && isInput;
-                    bool isAnswerCorrect = isCorrect[floor] == true;
-                    bool isAnswerWrong = isCorrect[floor] == false;
 
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: Stack(
-                        alignment: Alignment.centerRight,
-                        children: [
-                          Container(
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color:
-                                    isShowFeedback
-                                        ? (isAnswerCorrect
-                                            ? Colors.green
-                                            : Colors.red)
-                                        : Colors.blueAccent.withOpacity(0.4),
-                                width: 2.2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12.withOpacity(0.04),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Center(
-                              child:
-                                  isFixed
-                                      ? Text(
-                                        floor.toString(),
-                                        style: const TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF0288D1),
-                                        ),
-                                      )
-                                      : SizedBox(
-                                        width: 38,
-                                        child: TextField(
-                                          controller: controllers[floor],
-                                          enabled: !showFeedback,
-                                          keyboardType: TextInputType.number,
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF0288D1),
-                                          ),
-                                          decoration: const InputDecoration(
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                  vertical: 2,
-                                                ),
-                                            filled: true,
-                                            fillColor: Colors.white,
-                                            border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(8),
-                                              ),
-                                              borderSide: BorderSide.none,
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(8),
-                                              ),
-                                              borderSide: BorderSide.none,
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(8),
-                                              ),
-                                              borderSide: BorderSide.none,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                            ),
+              // Feedback Area - Disgrafi1 tarzında
+              if (showFeedback)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child: ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: _feedbackController,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 20,
                           ),
-                          if (isShowFeedback)
-                            Positioned(
-                              right: 8,
-                              child: Icon(
-                                isAnswerCorrect
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 10,
+                                offset: Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isCorrect.values.every((v) => v == true)
                                     ? Icons.check_circle
                                     : Icons.cancel,
                                 color:
-                                    isAnswerCorrect ? Colors.green : Colors.red,
-                                size: 22,
+                                    isCorrect.values.every((v) => v == true)
+                                        ? Colors.green
+                                        : Colors.red,
+                                size: 28,
                               ),
-                            ),
-                        ],
-                      ),
-                    );
-                  }),
-                ),
-              ),
-              const SizedBox(height: 36),
-              ElevatedButton(
-                onPressed: showFeedback ? null : checkAnswers,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 18,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  elevation: 2,
-                ),
-                child: Text(
-                  isEnglish ? 'Check' : 'Kontrol Et',
-                  style: const TextStyle(fontSize: 24, color: Colors.white),
-                ),
-              ),
-              if (showFeedback && isCorrect.values.any((v) => v == false))
-                Padding(
-                  padding: const EdgeInsets.only(top: 18.0),
-                  child: Text(
-                    isEnglish
-                        ? 'Please fill in all floors correctly!'
-                        : 'Lütfen tüm katları doğru doldurun!',
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                              const SizedBox(width: 10),
+                              Text(
+                                isCorrect.values.every((v) => v == true)
+                                    ? (isEnglish
+                                        ? 'Well done! 🎉'
+                                        : 'Aferin! 🎉')
+                                    : (_attemptCount == 1
+                                        ? (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔')
+                                        : (isEnglish
+                                            ? 'Here\'s the right one! 🧐'
+                                            : 'İşte doğrusu! 🧐')),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      isCorrect.values.every((v) => v == true)
+                                          ? Colors.green
+                                          : Colors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

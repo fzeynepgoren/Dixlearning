@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import 'package:dixlearning/screens/sorting_roadmap_screen.dart';
 import 'package:dixlearning/SIRALAMA_SORULARI/Asama3/soru3.dart';
@@ -58,7 +59,51 @@ class _Asama3Soru2State extends State<Asama3Soru2>
     super.dispose();
   }
 
-  void checkOrder() {
+  // Yıldız sistemi için doğruluk takibi
+  Future<void> _saveQuestionResult(bool isCorrect) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Bu deneme için doğru ve yanlış sayılarını al
+    int correctCount = prefs.getInt('asama3_session_correct_count') ?? 0;
+    int wrongCount = prefs.getInt('asama3_session_wrong_count') ?? 0;
+
+    if (isCorrect) {
+      correctCount++;
+    } else {
+      wrongCount++;
+    }
+
+    // Kaydet
+    await prefs.setInt('asama3_session_correct_count', correctCount);
+    await prefs.setInt('asama3_session_wrong_count', wrongCount);
+
+    // Yıldız hesaplama: Birkaç denemede doğru = 2 yıldız, %100 doğru = 3 yıldız
+    int totalQuestions = correctCount + wrongCount;
+    if (totalQuestions >= 5) {
+      // 5 soru tamamlandığında
+      double accuracy = correctCount / totalQuestions;
+      int stars = 0;
+
+      if (accuracy == 1.0) {
+        // %100 doğru
+        stars = 3;
+      } else if (accuracy >= 0.6) {
+        // %60+ doğru (birkaç denemede doğru)
+        stars = 2;
+      } else if (accuracy >= 0.4) {
+        // %40+ doğru
+        stars = 1;
+      }
+
+      await prefs.setInt('sorting_stage_3_stars', stars);
+
+      // Session'ı sıfırla
+      await prefs.setInt('asama3_session_correct_count', 0);
+      await prefs.setInt('asama3_session_wrong_count', 0);
+    }
+  }
+
+  void checkOrder() async {
     setState(() {
       isCorrect = true;
       for (int i = 0; i < stages.length; i++) {
@@ -70,6 +115,10 @@ class _Asama3Soru2State extends State<Asama3Soru2>
       showFeedback = true;
     });
     _feedbackController.forward(from: 0);
+
+    // Doğruluk sonucunu kaydet
+    await _saveQuestionResult(isCorrect);
+
     if (isCorrect) {
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {

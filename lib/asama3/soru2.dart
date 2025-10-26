@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'soru3.dart';
 import '../screens/matching_questions_screen.dart';
-import 'package:provider/provider.dart';
-import '../providers/language_provider.dart';
 
 class HarfHayvanEsle extends StatefulWidget {
   const HarfHayvanEsle({super.key});
@@ -208,7 +206,7 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
             style: const TextStyle(
               fontSize: 42,
               fontWeight: FontWeight.bold,
-              color: Colors.deepPurple,
+              color: Colors.black,
             ),
           ),
         ),

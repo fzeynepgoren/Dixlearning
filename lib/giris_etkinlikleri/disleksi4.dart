@@ -88,7 +88,7 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
     final iconSize = screenSize.width * 0.065;
 
     // 🔹 Dinamik boyutlar
-    final bubbleSize = screenSize.width * 0.15; // harflerin boyutu
+    final bubbleSize = screenSize.width * 0.12; // harflerin boyutu küçültüldü
     final gridSpacing = screenSize.width * 0.04; // grid aralığı
 
     return WillPopScope(
@@ -168,7 +168,7 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                               textAlign: TextAlign.center,
                             ),
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
                           // 🔹 Üstteki draggable harfler
                           GridView.count(
@@ -213,7 +213,7 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                                   );
                                 }).toList(),
                           ),
-                          SizedBox(height: 30),
+                          const SizedBox(height: 30),
 
                           // 🔹 Alt target grid
                           Expanded(
@@ -403,7 +403,10 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                 ),
                 Container(
                   height: 80,
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child:
                       showFeedback
                           ? ScaleTransition(
@@ -417,7 +420,7 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                                 horizontal: 20,
                               ),
                               decoration: BoxDecoration(
-                                color: isCorrect ? Colors.green : Colors.red,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: const [
                                   BoxShadow(
@@ -434,7 +437,8 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                                     isCorrect
                                         ? Icons.check_circle
                                         : Icons.cancel,
-                                    color: Colors.white,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
                                     size: 28,
                                   ),
                                   const SizedBox(width: 10),
@@ -446,9 +450,10 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                                         : (isEnglish
                                             ? 'Try again! 😔'
                                             : 'Tekrar dene! 😔'),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 18,
-                                      color: Colors.white,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -480,10 +485,10 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
         boxShadow:
             dragging
                 ? [
-                  BoxShadow(
+                  const BoxShadow(
                     color: Colors.black26,
                     blurRadius: 12,
-                    offset: const Offset(4, 4),
+                    offset: Offset(4, 4),
                   ),
                 ]
                 : [],

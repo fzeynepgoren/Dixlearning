@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import '../screens/home_screen.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
@@ -77,11 +78,16 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
     });
   }
 
-  void _checkCompletion() {
+  void _checkCompletion() async {
     if (fourLegsGroup.length == 2 && twoLegsGroup.length == 2) {
       _handleDragFeedback(
         true,
       ); // Tüm doğru eşleşmeler bittiğinde pozitif geri bildirim
+
+      // Aşama 1'i tamamlandı olarak kaydet
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('stage_1_completed', true);
+
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
           showDialog(
@@ -114,7 +120,7 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Custom Golden Trophy Icon
-                        Container(
+                        SizedBox(
                           width: 120,
                           height: 120,
                           child: Stack(

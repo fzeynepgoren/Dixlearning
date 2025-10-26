@@ -136,7 +136,7 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
     final screenSize = MediaQuery.of(context).size;
     final iconSize = screenSize.width * 0.065;
 
-    Color _cardColor({
+    Color cardColor({
       required bool matched,
       required bool isSelected,
       required bool isWrong,
@@ -147,7 +147,7 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
       return Colors.white;
     }
 
-    Widget _imageCard({
+    Widget imageCard({
       required int index,
       required bool isLeft,
       required String asset,
@@ -169,7 +169,7 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
           height: 120,
           margin: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: _cardColor(
+            color: cardColor(
               matched: matched,
               isSelected: isSelected,
               isWrong: isWrongSelection,
@@ -277,7 +277,7 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
                                         MainAxisAlignment.spaceAround,
                                     children: List.generate(
                                       shuffledLeftAssets.length,
-                                      (index) => _imageCard(
+                                      (index) => imageCard(
                                         index: index,
                                         isLeft: true,
                                         asset: shuffledLeftAssets[index],
@@ -310,7 +310,7 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
                                         MainAxisAlignment.spaceAround,
                                     children: List.generate(
                                       shuffledRightAssets.length,
-                                      (index) => _imageCard(
+                                      (index) => imageCard(
                                         index: index,
                                         isLeft: false,
                                         asset: shuffledRightAssets[index],

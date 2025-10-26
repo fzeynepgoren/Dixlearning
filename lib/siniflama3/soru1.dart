@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
 
-
 class SekilSiniflama extends StatefulWidget {
   const SekilSiniflama({super.key});
 
@@ -146,7 +145,9 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const ClassificationQuestionsScreen(),
+                            builder:
+                                (context) =>
+                                    const ClassificationQuestionsScreen(),
                           ),
                           (route) => false,
                         );
@@ -333,8 +334,8 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
     }
 
     return DragTarget<String>(
-      onWillAccept: (data) => !eslesenler.contains(data!),
-      onAccept: (data) => _handleDrag(data!, kategori),
+      onWillAcceptWithDetails: (data) => !eslesenler.contains(data.data!),
+      onAcceptWithDetails: (data) => _handleDrag(data.data!, kategori),
       builder: (context, candidateData, rejectedData) {
         return Container(
           width: double.infinity,

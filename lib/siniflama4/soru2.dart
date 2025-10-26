@@ -4,7 +4,6 @@ import '../providers/language_provider.dart';
 import 'soru4.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
 
-
 class DuyuOrganlariSinifla extends StatefulWidget {
   const DuyuOrganlariSinifla({super.key});
 
@@ -198,8 +197,8 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
                                         isEnglish ? 'Nose' : 'Burun',
                                         organGroups['burun']!,
                                         'burun',
-                                        Colors.green.shade100,
-                                        Colors.green.shade400,
+                                        Colors.purple.shade100,
+                                        Colors.purple.shade400,
                                       ),
                                       _buildGroupContainer(
                                         isEnglish ? 'Ear' : 'Kulak',
@@ -212,8 +211,8 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
                                         isEnglish ? 'Tongue' : 'Dil',
                                         organGroups['dil']!,
                                         'dil',
-                                        Colors.purple.shade100,
-                                        Colors.purple.shade400,
+                                        Colors.yellow.shade100,
+                                        Colors.yellow.shade400,
                                       ),
                                     ],
                                   ),
@@ -223,23 +222,28 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
                                   flex: 2,
                                   child: SingleChildScrollView(
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: items.map((item) {
-                                        return Draggable<Map<String, dynamic>>(
-                                          data: item,
-                                          feedback: Material(
-                                            color: Colors.transparent,
-                                            child: _buildItemBox(item),
-                                          ),
-                                          childWhenDragging: Opacity(
-                                            opacity: 0.5,
-                                            child: _buildItemBox(item),
-                                          ),
-                                          child: item['isPlaced']
-                                              ? const SizedBox.shrink()
-                                              : _buildItemBox(item),
-                                        );
-                                      }).toList(),
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children:
+                                          items.map((item) {
+                                            return Draggable<
+                                              Map<String, dynamic>
+                                            >(
+                                              data: item,
+                                              feedback: Material(
+                                                color: Colors.transparent,
+                                                child: _buildItemBox(item),
+                                              ),
+                                              childWhenDragging: Opacity(
+                                                opacity: 0.5,
+                                                child: _buildItemBox(item),
+                                              ),
+                                              child:
+                                                  item['isPlaced']
+                                                      ? const SizedBox.shrink()
+                                                      : _buildItemBox(item),
+                                            );
+                                          }).toList(),
                                     ),
                                   ),
                                 ),
@@ -254,54 +258,65 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
                 Container(
                   height: 80,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
-                  child: showFeedback
-                      ? ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _feedbackController,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            isCorrect ? Icons.check_circle : Icons.cancel,
-                            color: isCorrect ? Colors.green : Colors.red,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            isCorrect
-                                ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                : (isEnglish
-                                ? 'Try again! 😔'
-                                : 'Tekrar dene! 😔'),
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isCorrect ? Colors.green : Colors.red,
-                              fontWeight: FontWeight.bold,
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                      : const SizedBox.shrink(),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          : const SizedBox.shrink(),
                 ),
               ],
             ),
@@ -312,28 +327,29 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
   }
 
   Widget _buildGroupContainer(
-      String title,
-      List<Map<String, dynamic>> group,
-      String organType,
-      Color boxColor,
-      Color borderColor) {
+    String title,
+    List<Map<String, dynamic>> group,
+    String organType,
+    Color boxColor,
+    Color borderColor,
+  ) {
     final screenSize = MediaQuery.of(context).size;
     final emojiSize = screenSize.width * 0.12;
 
     return Expanded(
       child: DragTarget<Map<String, dynamic>>(
-        onWillAccept: (data) => !data!['isPlaced'],
-        onAccept: (data) => _handleDrag(data, organType),
+        onWillAcceptWithDetails: (details) => !details.data['isPlaced'],
+        onAcceptWithDetails: (details) => _handleDrag(details.data, organType),
         builder: (context, candidateData, rejectedData) {
           return Container(
             width: double.infinity,
-            margin: EdgeInsets.symmetric(vertical: screenSize.height * 0.01, horizontal: screenSize.width * 0.04),
+            margin: EdgeInsets.symmetric(
+              vertical: screenSize.height * 0.01,
+              horizontal: screenSize.width * 0.04,
+            ),
             decoration: BoxDecoration(
               color: boxColor,
-              border: Border.all(
-                color: borderColor,
-                width: 2,
-              ),
+              border: Border.all(color: borderColor, width: 2),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -351,14 +367,15 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
                 Wrap(
                   alignment: WrapAlignment.center,
                   spacing: screenSize.width * 0.02,
-                  children: group
-                      .map(
-                        (item) => Text(
-                      item['emoji'],
-                      style: TextStyle(fontSize: emojiSize),
-                    ),
-                  )
-                      .toList(),
+                  children:
+                      group
+                          .map(
+                            (item) => Text(
+                              item['emoji'],
+                              style: TextStyle(fontSize: emojiSize),
+                            ),
+                          )
+                          .toList(),
                 ),
               ],
             ),
@@ -381,18 +398,11 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Center(
-        child: Text(
-          item['emoji'],
-          style: TextStyle(fontSize: emojiSize),
-        ),
+        child: Text(item['emoji'], style: TextStyle(fontSize: emojiSize)),
       ),
     );
   }

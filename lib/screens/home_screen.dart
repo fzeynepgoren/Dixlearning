@@ -224,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         'emoji': '🎲',
         'icon': Icons.casino,
         'title': isEnglish ? 'Entry Activities' : 'Giriş Etkinlikleri',
-        'color': Color(0xFFFFD700), // Altın sarı
+        'color': const Color(0xFFFFD700), // Altın sarı
         'textColor': Colors.white,
         'desc':
             isEnglish
@@ -238,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         'emoji': '🔗',
         'icon': Icons.link,
         'title': isEnglish ? 'Matching Questions' : 'Eşleme Soruları',
-        'color': Color(0xFF8C64F0), // Orta mor
+        'color': const Color(0xFF8C64F0), // Orta mor
         'textColor': Colors.white,
         'desc':
             isEnglish
@@ -252,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         'emoji': '🧩',
         'icon': Icons.extension,
         'title': isEnglish ? 'Classification Questions' : 'Sınıflama Soruları',
-        'color': Color(0xFF4ECDC4), // Turkuaz
+        'color': const Color(0xFF4ECDC4), // Turkuaz
         'textColor': Colors.white,
         'desc':
             isEnglish
@@ -267,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         'icon': Icons.balance,
         'title':
             isEnglish ? 'Comparison Activities' : 'Karşılaştırma Etkinlikleri',
-        'color': Color(0xFFFF8C3C), // Turuncu
+        'color': const Color(0xFFFF8C3C), // Turuncu
         'textColor': Colors.white,
         'desc':
             isEnglish
@@ -281,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         'emoji': '⏫',
         'icon': Icons.sort,
         'title': isEnglish ? 'Sorting Activities' : 'Sıralama Etkinlikleri',
-        'color': Color(0xFFF06491), // Pembe
+        'color': const Color(0xFFF06491), // Pembe
         'textColor': Colors.white,
         'desc':
             isEnglish
@@ -539,7 +539,7 @@ class _AnimatedActivityCardState extends State<_AnimatedActivityCard>
   double _scale = 1.0;
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
-  bool _isHovered = false;
+  final bool _isHovered = false;
 
   @override
   void initState() {
