@@ -85,7 +85,7 @@ class _ClassificationQuestionsScreenState
           // Arka plan resmi - Su altı kalesi
           Positioned.fill(
             child: Image.asset(
-              'assets/screensphoto/underwater_castle.png',
+              'assets/screensphoto/sualtiback.png',
               fit: BoxFit.cover,
               alignment: Alignment.center,
               errorBuilder: (context, error, stackTrace) {
