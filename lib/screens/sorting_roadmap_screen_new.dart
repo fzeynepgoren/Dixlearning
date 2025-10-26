@@ -1,22 +1,21 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../karsilastirma_az_cok/az_cok_asama1/soru1.dart';
-import '../karsilastirma_kalin_ince/kalin_ince_asama1/soru1.dart';
-import '../karsilastirma_uzun_kisa/soru1.dart';
-import '../karsilastirma_buyuk_kucuk/soru1.dart';
+import '../providers/language_provider.dart';
+import '../../SIRALAMA_SORULARI/Asama3/soru1.dart';
+import '../../SIRALAMA_SORULARI/Asama4/soru1.dart';
 import 'home_screen.dart';
 
-class KarsilastirmaSorulariScreen extends StatefulWidget {
-  const KarsilastirmaSorulariScreen({super.key});
+class SortingRoadmapScreenNew extends StatefulWidget {
+  const SortingRoadmapScreenNew({super.key});
 
   @override
-  State<KarsilastirmaSorulariScreen> createState() =>
-      _KarsilastirmaSorulariScreenState();
+  State<SortingRoadmapScreenNew> createState() =>
+      _SortingRoadmapScreenNewState();
 }
 
-class _KarsilastirmaSorulariScreenState
-    extends State<KarsilastirmaSorulariScreen>
+class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
     with TickerProviderStateMixin {
   int completedLevel = 0;
   late AnimationController _starController1;
@@ -52,7 +51,14 @@ class _KarsilastirmaSorulariScreenState
   Future<void> _loadProgress() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      completedLevel = prefs.getInt('karsilastirma_completed_level') ?? 0;
+      // Kaç stage tamamlanmış?
+      int completed = 0;
+      if (prefs.getBool('sorting_stage_1_completed') ?? false) completed = 1;
+      if (prefs.getBool('sorting_stage_2_completed') ?? false) completed = 2;
+      if (prefs.getBool('sorting_stage_3_completed') ?? false) completed = 3;
+      if (prefs.getBool('sorting_stage_4_completed') ?? false) completed = 4;
+      if (prefs.getBool('sorting_stage_5_completed') ?? false) completed = 5;
+      completedLevel = completed;
     });
 
     // Tamamlanan leveller için yıldız animasyonunu başlat
@@ -75,28 +81,30 @@ class _KarsilastirmaSorulariScreenState
 
   @override
   Widget build(BuildContext context) {
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+
     return Scaffold(
       body: Stack(
         children: [
-          // Arka plan - Tam ekran kaplayan yol tasarımı
+          // Arka plan - Gradient
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  const Color(0xFF87CEEB), // Açık mavi gökyüzü
-                  const Color(0xFF90D5FF), // Orta mavi
-                  const Color(0xFFA8E6CF), // Yeşilimsi
+                  const Color(0xFFFFB6C1), // Açık pembe
+                  const Color(0xFFFFD1DC), // Orta pembe
+                  const Color(0xFFFFF0F5), // Açık lavanta
                 ],
               ),
             ),
           ),
 
-          // Arka plan resmi - Tam ekran (Çöl/Renkli Tema)
+          // Arka plan resmi - Şeker Tema
           Positioned.fill(
             child: Image.asset(
-              'assets/screensphoto/colback.png',
+              'assets/screensphoto/sekerback.png',
               fit: BoxFit.cover,
               alignment: Alignment.center,
               errorBuilder: (context, error, stackTrace) {
@@ -113,64 +121,64 @@ class _KarsilastirmaSorulariScreenState
                 height: MediaQuery.of(context).size.height,
                 child: Stack(
                   children: [
-                    // Level 1: Az-Çok (En alt - ortada başlangıç)
+                    // Level 1: 2 Resimli Sıralama (En alt - ortada)
                     _buildLevelButton(
                       context,
                       level: 1,
                       leftFactor: 0.50,
                       topFactor: 0.82,
                       emoji: '🎯',
-                      title: 'Az-Çok',
-                      color: const Color(0xFFE74C3C), // Canlı kırmızı
+                      title: isEnglish ? '2 Pictures' : '2 Resim',
+                      color: const Color(0xFFE74C3C), // Kırmızı
                       onTap: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AzCokSoru1(),
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              isEnglish ? 'Coming soon!' : 'Yakında eklenecek!',
+                            ),
                           ),
                         );
-                        _loadProgress();
                       },
                       isUnlocked: _isLevelUnlocked(1),
                       isCompleted: completedLevel >= 1,
                     ),
 
-                    // Level 2: Büyük-Küçük (Orta-alt - solda)
+                    // Level 2: 3 Resimli Sıralama (Orta-alt - solda)
                     _buildLevelButton(
                       context,
                       level: 2,
                       leftFactor: 0.25,
-                      topFactor: 0.62,
+                      topFactor: 0.64,
                       emoji: '🎨',
-                      title: 'Büyük-Küçük',
-                      color: const Color(0xFF27AE60), // Canlı yeşil
+                      title: isEnglish ? '3 Pictures' : '3 Resim',
+                      color: const Color(0xFF27AE60), // Yeşil
                       onTap: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const BuyukKucukSoru1(),
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              isEnglish ? 'Coming soon!' : 'Yakında eklenecek!',
+                            ),
                           ),
                         );
-                        _loadProgress();
                       },
                       isUnlocked: _isLevelUnlocked(2),
                       isCompleted: completedLevel >= 2,
                     ),
 
-                    // Level 3: Kalın-İnce (Orta - sağda)
+                    // Level 3: 4 Resimli Sıralama (Orta - sağda)
                     _buildLevelButton(
                       context,
                       level: 3,
                       leftFactor: 0.75,
-                      topFactor: 0.42,
-                      emoji: '🎪',
-                      title: 'Kalın-İnce',
-                      color: const Color(0xFF8E44AD), // Canlı mor
+                      topFactor: 0.47,
+                      emoji: '🌟',
+                      title: isEnglish ? '4 Pictures' : '4 Resim',
+                      color: const Color(0xFF3498DB), // Mavi
                       onTap: () async {
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const KalinInceSoru1(),
+                            builder: (context) => const Asama3Soru1(),
                           ),
                         );
                         _loadProgress();
@@ -179,20 +187,20 @@ class _KarsilastirmaSorulariScreenState
                       isCompleted: completedLevel >= 3,
                     ),
 
-                    // Level 4: Uzun-Kısa (Üst - ortada)
+                    // Level 4: 3 Fotoğraf (Günlük Rutinler) (Orta-üst - solda)
                     _buildLevelButton(
                       context,
                       level: 4,
-                      leftFactor: 0.50,
-                      topFactor: 0.22,
-                      emoji: '🎁',
-                      title: 'Uzun-Kısa',
-                      color: const Color(0xFFF39C12), // Canlı turuncu
+                      leftFactor: 0.25,
+                      topFactor: 0.30,
+                      emoji: '🧼',
+                      title: isEnglish ? 'Daily Routines' : 'Günlük Rutinler',
+                      color: const Color(0xFF8E44AD), // Mor
                       onTap: () async {
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const UzunKisaAgacSorusu(),
+                            builder: (context) => const Asama4Soru1(),
                           ),
                         );
                         _loadProgress();
@@ -201,8 +209,30 @@ class _KarsilastirmaSorulariScreenState
                       isCompleted: completedLevel >= 4,
                     ),
 
-                    // 4 seviye tamamlandıysa kayan yıldızlar
-                    if (completedLevel >= 4)
+                    // Level 5: İleri Seviye (En üst - ortada)
+                    _buildLevelButton(
+                      context,
+                      level: 5,
+                      leftFactor: 0.50,
+                      topFactor: 0.13,
+                      emoji: '🏆',
+                      title: isEnglish ? 'Advanced' : 'İleri Seviye',
+                      color: const Color(0xFFF39C12), // Turuncu
+                      onTap: () async {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              isEnglish ? 'Coming soon!' : 'Yakında eklenecek!',
+                            ),
+                          ),
+                        );
+                      },
+                      isUnlocked: _isLevelUnlocked(5),
+                      isCompleted: completedLevel >= 5,
+                    ),
+
+                    // 5 seviye tamamlandıysa kayan yıldızlar
+                    if (completedLevel >= 5)
                       ...List.generate(15, (index) {
                         return _buildFallingStars(context, index);
                       }),
@@ -210,7 +240,7 @@ class _KarsilastirmaSorulariScreenState
                 ),
               ),
 
-              // Sevimli geri butonu - Çöl Teması (Güneş Şekli)
+              // Sevimli geri butonu - Şeker Teması (Kalp Şekli)
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -230,12 +260,12 @@ class _KarsilastirmaSorulariScreenState
                         gradient: const LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [Color(0xFFFFB347), Color(0xFFFF8C3C)],
+                          colors: [Color(0xFFF06491), Color(0xFFE55D87)],
                         ),
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.orange.withOpacity(0.5),
+                            color: const Color(0xFFF06491).withOpacity(0.5),
                             blurRadius: 20,
                             spreadRadius: 2,
                             offset: const Offset(0, 6),
@@ -245,9 +275,18 @@ class _KarsilastirmaSorulariScreenState
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          // Güneş ışınları efekti
-                          Positioned.fill(
-                            child: CustomPaint(painter: SunRaysPainter()),
+                          // Parlama efekti
+                          Positioned(
+                            top: 10,
+                            left: 12,
+                            child: Container(
+                              width: 15,
+                              height: 15,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.4),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
                           ),
                           const Icon(
                             Icons.arrow_back_rounded,
@@ -358,7 +397,6 @@ class _KarsilastirmaSorulariScreenState
               height: 100,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                // Renkli yumuşak gölgeler
                 boxShadow: [
                   if (isUnlocked) ...[
                     BoxShadow(
@@ -385,7 +423,7 @@ class _KarsilastirmaSorulariScreenState
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Alt gölge - yumuşak
+                  // Alt gölge
                   Positioned(
                     bottom: 2,
                     child: Container(
@@ -404,7 +442,7 @@ class _KarsilastirmaSorulariScreenState
                     ),
                   ),
 
-                  // Ana buton - Tam boyut, çerçeve yok
+                  // Ana buton
                   Container(
                     width: 100,
                     height: 100,
@@ -450,7 +488,7 @@ class _KarsilastirmaSorulariScreenState
                     ),
                     child: Stack(
                       children: [
-                        // Ana parlama efekti - yumuşak
+                        // Parlama efektleri
                         Positioned(
                           top: 10,
                           left: 18,
@@ -466,37 +504,6 @@ class _KarsilastirmaSorulariScreenState
                                   Colors.white.withOpacity(0.0),
                                 ],
                               ),
-                            ),
-                          ),
-                        ),
-                        // Yan parlama
-                        Positioned(
-                          top: 28,
-                          right: 20,
-                          child: Container(
-                            width: 18,
-                            height: 18,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: RadialGradient(
-                                colors: [
-                                  Colors.white.withOpacity(0.4),
-                                  Colors.white.withOpacity(0.0),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        // Alt ışık yansıması
-                        Positioned(
-                          bottom: 28,
-                          left: 28,
-                          child: Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.25),
                             ),
                           ),
                         ),
@@ -567,7 +574,6 @@ class _KarsilastirmaSorulariScreenState
       tween: Tween(begin: -100, end: MediaQuery.of(context).size.height + 100),
       duration: Duration(seconds: duration.toInt()),
       onEnd: () {
-        // Animasyon bitince yeniden başlat
         setState(() {});
       },
       builder: (context, value, child) {
@@ -601,52 +607,4 @@ class _KarsilastirmaSorulariScreenState
       },
     );
   }
-}
-
-// Güneş ışınları painter (Çöl teması için)
-class SunRaysPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = Colors.white.withOpacity(0.2)
-          ..strokeWidth = 2
-          ..style = PaintingStyle.stroke;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2.5;
-
-    // 8 ışın çiz
-    for (int i = 0; i < 8; i++) {
-      final angle = (i * 45) * 3.14159 / 180;
-      final startX = center.dx + radius * 0.7 * cos(angle);
-      final startY = center.dy + radius * 0.7 * sin(angle);
-      final endX = center.dx + radius * cos(angle);
-      final endY = center.dy + radius * sin(angle);
-
-      canvas.drawLine(Offset(startX, startY), Offset(endX, endY), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-
-  double cos(double angle) =>
-      angle == 0
-          ? 1.0
-          : angle == 90
-          ? 0.0
-          : angle == 180
-          ? -1.0
-          : angle == 270
-          ? 0.0
-          : (angle < 90
-              ? 1 - (angle / 90)
-              : angle < 180
-              ? -(angle - 90) / 90
-              : angle < 270
-              ? -1 + (angle - 180) / 90
-              : (angle - 270) / 90);
-
-  double sin(double angle) => cos(angle - 90);
 }

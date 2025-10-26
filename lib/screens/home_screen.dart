@@ -9,11 +9,9 @@ import 'login_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import 'sorting_roadmap_screen.dart';
+import 'sorting_roadmap_screen_new.dart';
 import 'dart:convert';
 import 'siniflandirma_sorulari_screen.dart';
-
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -288,7 +286,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 ? 'Test your sorting skills!'
                 : 'Sıralama becerilerini test et!',
         'onTap': () {
-          _navigateToActivity(const SortingRoadmapScreen());
+          _navigateToActivity(const SortingRoadmapScreenNew());
         },
       },
     ];

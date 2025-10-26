@@ -1,382 +1,596 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:math' as math;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
-import '../providers/progress_provider.dart';
 import '../asama1/soru1.dart';
 import '../asama2/soru1.dart';
 import '../asama3/soru1.dart';
 import '../asama4/soru1.dart';
 import 'home_screen.dart';
 
-class MatchingQuestionsScreen extends StatelessWidget {
+class MatchingQuestionsScreen extends StatefulWidget {
   const MatchingQuestionsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer2<LanguageProvider, ProgressProvider>(
-      builder: (context, languageProvider, progressProvider, child) {
-        final isEnglish = languageProvider.isEnglish;
-        final progress = _calculateProgress(progressProvider);
+  State<MatchingQuestionsScreen> createState() =>
+      _MatchingQuestionsScreenState();
+}
 
-        return Scaffold(
-          body: Container(
+class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
+    with TickerProviderStateMixin {
+  int completedLevel = 0;
+  late AnimationController _starController1;
+  late AnimationController _starController2;
+  late AnimationController _starController3;
+
+  @override
+  void initState() {
+    super.initState();
+    _starController1 = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _starController2 = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _starController3 = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _loadProgress();
+  }
+
+  @override
+  void dispose() {
+    _starController1.dispose();
+    _starController2.dispose();
+    _starController3.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      // Kaç aşama tamamlanmış?
+      int completed = 0;
+      if (prefs.getBool('asama1_completed') ?? false) completed = 1;
+      if (prefs.getBool('asama2_completed') ?? false) completed = 2;
+      if (prefs.getBool('asama3_completed') ?? false) completed = 3;
+      if (prefs.getBool('asama4_completed') ?? false) completed = 4;
+      completedLevel = completed;
+    });
+
+    // Tamamlanan leveller için yıldız animasyonunu başlat
+    if (completedLevel > 0) {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted) _starController1.forward(from: 0);
+      });
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) _starController2.forward(from: 0);
+      });
+      Future.delayed(const Duration(milliseconds: 700), () {
+        if (mounted) _starController3.forward(from: 0);
+      });
+    }
+  }
+
+  bool _isLevelUnlocked(int level) {
+    return level <= completedLevel + 1;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Arka plan - Gradient
+          Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors:
-                    Theme.of(context).brightness == Brightness.dark
-                        ? [
-                          const Color(0xFF0D1117), // GitHub dark
-                          const Color(0xFF161B22), // Darker
-                          const Color(0xFF21262D), // Darkest
-                        ]
-                        : [
-                          Colors.blue.shade100,
-                          Colors.blue.shade200,
-                          Colors.blue.shade300,
-                        ],
+                colors: [
+                  const Color(0xFFFFE5B4), // Açık turuncu-sarı
+                  const Color(0xFFFFD1A1), // Orta turuncu
+                  const Color(0xFFFFC897), // Koyu turuncu
+                ],
               ),
             ),
-            child: Stack(
-              children: [
-                // Yıldızlı arka plan
-                CustomPaint(
-                  painter: StarBackgroundPainter(
-                    progress: progress,
-                    context: context,
-                  ),
-                  size: Size.infinite,
-                ),
+          ),
 
-                // Başlık
-                Positioned(
-                  top: 100,
-                  left: 20,
-                  right: 20,
-                  child: Center(
-                    child: Text(
-                      isEnglish
-                          ? 'Matching Questions Roadmap'
-                          : 'Eşleme Soruları Yol Haritası',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black.withOpacity(0.3),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+          // Arka plan resmi - Uzay Teması
+          Positioned.fill(
+            child: Image.asset(
+              'assets/screensphoto/uzayback.png',
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+              errorBuilder: (context, error, stackTrace) {
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+
+          // İçerik
+          Stack(
+            children: [
+              // Seviye düğmeleri
+              SizedBox(
+                height: MediaQuery.of(context).size.height,
+                child: Stack(
+                  children: [
+                    // Level 1: Meyve Eşleme (En alt - ortada)
+                    _buildLevelButton(
+                      context,
+                      level: 1,
+                      leftFactor: 0.50,
+                      topFactor: 0.82,
+                      emoji: '🍎',
+                      title: isEnglish ? 'Fruits' : 'Meyveler',
+                      color: const Color(0xFFE74C3C), // Canlı kırmızı
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MeyveEsle(),
+                          ),
+                        );
+                        _loadProgress();
+                      },
+                      isUnlocked: _isLevelUnlocked(1),
+                      isCompleted: completedLevel >= 1,
+                    ),
+
+                    // Level 2: Harf Oyunları (Orta-alt - solda)
+                    _buildLevelButton(
+                      context,
+                      level: 2,
+                      leftFactor: 0.25,
+                      topFactor: 0.62,
+                      emoji: '🔤',
+                      title: isEnglish ? 'Letters' : 'Harfler',
+                      color: const Color(0xFF27AE60), // Canlı yeşil
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Soru1(),
+                          ),
+                        );
+                        _loadProgress();
+                      },
+                      isUnlocked: _isLevelUnlocked(2),
+                      isCompleted: completedLevel >= 2,
+                    ),
+
+                    // Level 3: Yapı ve Nesne (Orta - sağda)
+                    _buildLevelButton(
+                      context,
+                      level: 3,
+                      leftFactor: 0.75,
+                      topFactor: 0.42,
+                      emoji: '🏛️',
+                      title: isEnglish ? 'Objects' : 'Nesneler',
+                      color: const Color(0xFF8E44AD), // Canlı mor
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ActivityMatching(),
+                          ),
+                        );
+                        _loadProgress();
+                      },
+                      isUnlocked: _isLevelUnlocked(3),
+                      isCompleted: completedLevel >= 3,
+                    ),
+
+                    // Level 4: Mevsim ve Hava (Üst - ortada)
+                    _buildLevelButton(
+                      context,
+                      level: 4,
+                      leftFactor: 0.50,
+                      topFactor: 0.22,
+                      emoji: '🌦️',
+                      title: isEnglish ? 'Weather' : 'Hava Durumu',
+                      color: const Color(0xFFF39C12), // Canlı turuncu
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const DuyguYuzEsle(),
+                          ),
+                        );
+                        _loadProgress();
+                      },
+                      isUnlocked: _isLevelUnlocked(4),
+                      isCompleted: completedLevel >= 4,
+                    ),
+
+                    // 4 seviye tamamlandıysa kayan yıldızlar
+                    if (completedLevel >= 4)
+                      ...List.generate(15, (index) {
+                        return _buildFallingStars(context, index);
+                      }),
+                  ],
+                ),
+              ),
+
+              // Sevimli geri butonu - Uzay Teması (Yıldız/Roket)
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => const HomeScreen(),
+                        ),
+                        (route) => false,
+                      );
+                    },
+                    child: Container(
+                      width: 55,
+                      height: 55,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFF6C63FF), Color(0xFF5A52D5)],
+                        ),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.yellow.withOpacity(0.4),
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF6C63FF).withOpacity(0.5),
+                            blurRadius: 20,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 6),
+                          ),
+                          // Yıldız parlama efekti
+                          BoxShadow(
+                            color: Colors.yellow.withOpacity(0.3),
+                            blurRadius: 15,
+                            spreadRadius: 1,
                           ),
                         ],
                       ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Yıldız parlaması
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: Icon(
+                              Icons.star,
+                              color: Colors.yellow.withOpacity(0.6),
+                              size: 12,
+                            ),
+                          ),
+                          const Icon(
+                            Icons.arrow_back_rounded,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
-                // Kıvrımlı yol
-                CustomPaint(
-                  painter: CurvedPathPainter(
-                    progress: progress,
-                    context: context,
-                  ),
-                  size: Size.infinite,
-                ),
+  Widget _buildLevelButton(
+    BuildContext context, {
+    required int level,
+    required double leftFactor,
+    required double topFactor,
+    required String emoji,
+    required String title,
+    required Color color,
+    required VoidCallback onTap,
+    required bool isUnlocked,
+    required bool isCompleted,
+  }) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-                // Aşama kutucukları
-                ..._buildStageBoxes(context, isEnglish, progressProvider),
-
-                // Geri dönüş butonu (en üstte)
-                Positioned(
-                  top: 50,
-                  left: 20,
-                  child: GestureDetector(
-                    onTap: () {
-                      print('Back butonu tıklandı!');
-                      Navigator.pop(context);
-                    },
+    return Positioned(
+      left: screenWidth * leftFactor - 58,
+      top: screenHeight * topFactor,
+      child: GestureDetector(
+        onTap: isUnlocked ? onTap : null,
+        child: Column(
+          children: [
+            // Yıldızlar (level tamamlandıysa) - Animasyonlu
+            if (isCompleted)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: _starController1,
+                      curve: Curves.elasticOut,
+                    ),
                     child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.3),
-                        shape: BoxShape.circle,
-                      ),
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
                       child: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                        size: 28,
+                        Icons.star_rounded,
+                        color: Colors.amber,
+                        size: 22,
+                        shadows: [
+                          Shadow(color: Colors.orange, blurRadius: 6),
+                          Shadow(color: Colors.amber, blurRadius: 12),
+                        ],
                       ),
                     ),
                   ),
-                ),
-              ],
+                  ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: _starController2,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      child: const Icon(
+                        Icons.star_rounded,
+                        color: Colors.amber,
+                        size: 22,
+                        shadows: [
+                          Shadow(color: Colors.orange, blurRadius: 6),
+                          Shadow(color: Colors.amber, blurRadius: 12),
+                        ],
+                      ),
+                    ),
+                  ),
+                  ScaleTransition(
+                    scale: CurvedAnimation(
+                      parent: _starController3,
+                      curve: Curves.elasticOut,
+                    ),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                      child: const Icon(
+                        Icons.star_rounded,
+                        color: Colors.amber,
+                        size: 22,
+                        shadows: [
+                          Shadow(color: Colors.orange, blurRadius: 6),
+                          Shadow(color: Colors.amber, blurRadius: 12),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            if (isCompleted) const SizedBox(height: 8),
+
+            // Level butonu - Canlı ve sevimli
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  if (isUnlocked) ...[
+                    BoxShadow(
+                      color: color.withOpacity(0.4),
+                      blurRadius: 25,
+                      spreadRadius: 3,
+                      offset: const Offset(0, 4),
+                    ),
+                    BoxShadow(
+                      color: color.withOpacity(0.2),
+                      blurRadius: 40,
+                      spreadRadius: 8,
+                    ),
+                  ] else ...[
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.25),
+                      blurRadius: 18,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ],
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Alt gölge
+                  Positioned(
+                    bottom: 2,
+                    child: Container(
+                      width: 80,
+                      height: 15,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.35),
+                            blurRadius: 20,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Ana buton
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient:
+                          isUnlocked
+                              ? RadialGradient(
+                                center: const Alignment(-0.2, -0.3),
+                                radius: 1.2,
+                                colors: [
+                                  Colors.white.withOpacity(0.85),
+                                  color.withOpacity(0.95),
+                                  color,
+                                  color.withOpacity(0.9),
+                                ],
+                                stops: const [0.0, 0.3, 0.7, 1.0],
+                              )
+                              : RadialGradient(
+                                center: const Alignment(-0.2, -0.3),
+                                radius: 1.2,
+                                colors: [
+                                  const Color(0xFF9E9288),
+                                  const Color(0xFF8A7A6E),
+                                  const Color(0xFF6E5E52),
+                                  const Color(0xFF5A4D42),
+                                ],
+                                stops: const [0.0, 0.3, 0.7, 1.0],
+                              ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 5),
+                        ),
+                        if (isUnlocked)
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.25),
+                            blurRadius: 8,
+                            offset: const Offset(-2, -2),
+                          ),
+                      ],
+                    ),
+                    child: Stack(
+                      children: [
+                        // Parlama efektleri
+                        Positioned(
+                          top: 10,
+                          left: 18,
+                          child: Container(
+                            width: 35,
+                            height: 35,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  Colors.white.withOpacity(0.6),
+                                  Colors.white.withOpacity(0.25),
+                                  Colors.white.withOpacity(0.0),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Sayı - Tam ortada
+                        Center(
+                          child:
+                              isUnlocked
+                                  ? Text(
+                                    '$level',
+                                    style: TextStyle(
+                                      fontSize: 52,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white,
+                                      height: 1.0,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black.withOpacity(0.6),
+                                          blurRadius: 15,
+                                          offset: const Offset(0, 5),
+                                        ),
+                                        Shadow(
+                                          color: color.withOpacity(0.5),
+                                          blurRadius: 30,
+                                          offset: const Offset(0, 0),
+                                        ),
+                                        Shadow(
+                                          color: Colors.white.withOpacity(0.4),
+                                          blurRadius: 5,
+                                          offset: const Offset(-2, -2),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                  : Icon(
+                                    Icons.lock_rounded,
+                                    color: Colors.white.withOpacity(0.9),
+                                    size: 45,
+                                    shadows: const [
+                                      Shadow(
+                                        color: Colors.black54,
+                                        blurRadius: 15,
+                                        offset: Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Kayan yıldızlar animasyonu
+  Widget _buildFallingStars(BuildContext context, int index) {
+    final random = (index * 123) % 100;
+    final delay = (random % 5) * 0.5;
+    final leftPosition = (random % 80 + 10).toDouble();
+    final size = (random % 20 + 15).toDouble();
+    final duration = (random % 3 + 3).toDouble();
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: -100, end: MediaQuery.of(context).size.height + 100),
+      duration: Duration(seconds: duration.toInt()),
+      onEnd: () {
+        if (mounted) setState(() {});
+      },
+      builder: (context, value, child) {
+        return Positioned(
+          left: leftPosition * MediaQuery.of(context).size.width / 100,
+          top: value - (delay * 100),
+          child: Opacity(
+            opacity:
+                (value > -50 && value < MediaQuery.of(context).size.height + 50)
+                    ? 1.0
+                    : 0.0,
+            child: Transform.rotate(
+              angle: (value / 100) * 3.14,
+              child: Icon(
+                Icons.star,
+                size: size,
+                color:
+                    [
+                      const Color(0xFFFFD700),
+                      const Color(0xFFFFA500),
+                      const Color(0xFFFFE55C),
+                      const Color(0xFFFFFF00),
+                    ][index % 4],
+                shadows: [
+                  Shadow(color: Colors.amber.withOpacity(0.8), blurRadius: 10),
+                ],
+              ),
             ),
           ),
         );
       },
     );
-  }
-
-  double _calculateProgress(ProgressProvider progressProvider) {
-    int completedStages = 0;
-    if (progressProvider.stage1Completed) completedStages++;
-    if (progressProvider.stage2Completed) completedStages++;
-    if (progressProvider.stage3Completed) completedStages++;
-    if (progressProvider.stage4Completed) completedStages++;
-    return completedStages / 4.0;
-  }
-
-  List<Widget> _buildStageBoxes(
-    BuildContext context,
-    bool isEnglish,
-    ProgressProvider progressProvider,
-  ) {
-    return [
-      // Aşama 1
-      Positioned(
-        left: 50,
-        top: 700,
-        child: _buildStageBox(
-          context: context,
-          stageNumber: 1,
-          isUnlocked: true,
-          isCompleted: progressProvider.stage1Completed,
-          isEnglish: isEnglish,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const MeyveEsle()),
-            );
-          },
-        ),
-      ),
-
-      // Aşama 2
-      Positioned(
-        left: 70,
-        top: 480,
-        child: _buildStageBox(
-          context: context,
-          stageNumber: 2,
-          isUnlocked: progressProvider.stage2Unlocked,
-          isCompleted: progressProvider.stage2Completed,
-          isEnglish: isEnglish,
-          onTap: () {
-            if (progressProvider.stage2Unlocked) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Soru1()),
-              );
-            }
-          },
-        ),
-      ),
-
-      // Aşama 3
-      Positioned(
-        left: 250,
-        top: 380,
-        child: _buildStageBox(
-          context: context,
-          stageNumber: 3,
-          isUnlocked: progressProvider.stage3Unlocked,
-          isCompleted: progressProvider.stage3Completed,
-          isEnglish: isEnglish,
-          onTap: () {
-            if (progressProvider.stage3Unlocked) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ActivityMatching(),
-                ),
-              );
-            }
-          },
-        ),
-      ),
-
-      // Aşama 4
-      Positioned(
-        left: 150,
-        top: 160,
-        child: _buildStageBox(
-          context: context,
-          stageNumber: 4,
-          isUnlocked: progressProvider.stage4Unlocked,
-          isCompleted: progressProvider.stage4Completed,
-          isEnglish: isEnglish,
-          onTap: () {
-            if (progressProvider.stage4Unlocked) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const DuyguYuzEsle()),
-              );
-            }
-          },
-        ),
-      ),
-    ];
-  }
-
-  Widget _buildStageBox({
-    required BuildContext context,
-    required int stageNumber,
-    required bool isUnlocked,
-    required bool isCompleted,
-    required bool isEnglish,
-    required VoidCallback onTap,
-  }) {
-    Color boxColor;
-    Widget? icon;
-
-    if (isCompleted) {
-      boxColor = Colors.green.shade400;
-      icon = const Icon(Icons.check, color: Colors.white, size: 30);
-    } else if (isUnlocked) {
-      boxColor = Colors.blue.shade400;
-      icon = Text(
-        '$stageNumber',
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
-      );
-    } else {
-      boxColor = Colors.grey.shade400;
-      icon = const Text('🔒', style: TextStyle(fontSize: 30));
-    }
-
-    return GestureDetector(
-      onTap: isUnlocked ? onTap : null,
-      child: Container(
-        width: 80,
-        height: 80,
-        decoration: BoxDecoration(
-          color: boxColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white, width: 3),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Center(child: icon),
-      ),
-    );
-  }
-}
-
-class StarBackgroundPainter extends CustomPainter {
-  final double progress;
-  final BuildContext context;
-
-  StarBackgroundPainter({required this.progress, required this.context});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final random = math.Random(42);
-    for (int i = 0; i < 150; i++) {
-      final x = random.nextDouble() * size.width;
-      final y = random.nextDouble() * size.height;
-      final radius = random.nextDouble() * 2 + 0.5;
-
-      final starPaint =
-          Paint()
-            ..color =
-                progress > 0.25
-                    ? Colors.yellow.shade400
-                    : Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white.withOpacity(0.6)
-                    : Colors.white.withOpacity(0.8)
-            ..style = PaintingStyle.fill;
-
-      canvas.drawCircle(Offset(x, y), radius, starPaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
-}
-
-class CurvedPathPainter extends CustomPainter {
-  final double progress;
-  final BuildContext context;
-
-  CurvedPathPainter({required this.progress, required this.context});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color =
-              Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white.withOpacity(0.6)
-                  : Colors.white.withOpacity(0.8)
-          ..strokeWidth = 12
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round;
-
-    final path = Path();
-    path.moveTo(100, 720); // Sol alt - çok daha aşağıda
-    path.quadraticBezierTo(110, 610, 120, 500); // İlk geniş kıvrım - uzatıldı
-    path.quadraticBezierTo(
-      200,
-      450,
-      280,
-      400,
-    ); // İkinci geniş kıvrım - uzatıldı
-    path.quadraticBezierTo(
-      240,
-      290,
-      200,
-      180,
-    ); // Üçüncü geniş kıvrım - yolun sonunda
-
-    final completedPaint =
-        Paint()
-          ..color = Colors.green.shade400
-          ..strokeWidth = 12
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round;
-
-    final completedPath = Path();
-    completedPath.moveTo(100, 720);
-    if (progress > 0.25) {
-      completedPath.quadraticBezierTo(110, 610, 120, 500);
-    }
-    if (progress > 0.5) {
-      completedPath.quadraticBezierTo(200, 450, 280, 400);
-    }
-    if (progress > 0.75) {
-      completedPath.quadraticBezierTo(240, 290, 200, 180);
-    }
-
-    final glowPaint =
-        Paint()
-          ..color = Colors.white.withOpacity(0.3)
-          ..strokeWidth = 20
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round;
-
-    canvas.drawPath(path, glowPaint);
-    canvas.drawPath(completedPath, completedPaint);
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
   }
 }

@@ -54,7 +54,13 @@ class _ClassificationQuestionsScreenState
   Future<void> _loadProgress() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      completedLevel = prefs.getInt('siniflama_completed_level') ?? 0;
+      // Kaç stage tamamlanmış?
+      int completed = 0;
+      if (prefs.getBool('stage_1_completed') ?? false) completed = 1;
+      if (prefs.getBool('stage_2_completed') ?? false) completed = 2;
+      if (prefs.getBool('stage_3_completed') ?? false) completed = 3;
+      if (prefs.getBool('stage_4_completed') ?? false) completed = 4;
+      completedLevel = completed;
     });
 
     // Tamamlanan leveller için yıldız animasyonunu başlat
@@ -82,52 +88,50 @@ class _ClassificationQuestionsScreenState
     return Scaffold(
       body: Stack(
         children: [
-          // Arka plan resmi - Su altı kalesi
+          // Arka plan - Gradient
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  const Color(0xFF87CEEB), // Açık mavi gökyüzü
+                  const Color(0xFF90D5FF), // Orta mavi
+                  const Color(0xFFA8E6CF), // Yeşilimsi
+                ],
+              ),
+            ),
+          ),
+
+          // Arka plan resmi - Sualtı Tema
           Positioned.fill(
             child: Image.asset(
-              'assets/screensphoto/underwater_castle.png',
+              'assets/screensphoto/sualtiback.png',
               fit: BoxFit.cover,
               alignment: Alignment.center,
               errorBuilder: (context, error, stackTrace) {
-                // Hata durumunda gradyan göster
-                return Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        const Color(0xFF006994), // Derin mavi
-                        const Color(0xFF0080B3), // Orta mavi
-                        const Color(0xFF0099CC), // Açık mavi
-                        const Color(0xFF87CEEB), // Çok açık mavi
-                      ],
-                    ),
-                  ),
-                );
+                return const SizedBox.shrink();
               },
             ),
           ),
 
-          // Su altı baloncukları animasyonu
-          ...List.generate(20, (index) => _buildBubble(context, index)),
-
           // İçerik
           Stack(
             children: [
-              // Seviye düğmeleri - Su altı kalesi yolunda
+              // Seviye düğmeleri
               SizedBox(
                 height: MediaQuery.of(context).size.height,
                 child: Stack(
                   children: [
-                    // Level 1: Cinsiyet Eşleme (En alt - yolun başlangıcı)
+                    // Level 1: Cinsiyet (En alt - ortada başlangıç)
                     _buildLevelButton(
                       context,
                       level: 1,
-                      leftFactor: 0.71,
-                      topFactor: 0.84,
-                      emoji: '👦👧',
-                      title: isEnglish ? 'Gender Match' : 'Cinsiyet Eşleme',
-                      color: const Color(0xFF793F7F), // Canlı kırmızı
+                      leftFactor: 0.50,
+                      topFactor: 0.82,
+                      emoji: '👫',
+                      title: isEnglish ? 'Gender' : 'Cinsiyet',
+                      color: const Color(0xFFE74C3C), // Canlı kırmızı
                       onTap: () async {
                         await Navigator.push(
                           context,
@@ -141,14 +145,14 @@ class _ClassificationQuestionsScreenState
                       isCompleted: completedLevel >= 1,
                     ),
 
-                    // Level 2: Meyve Sebze Eşleme (Orta-alt kıvrım - solda)
+                    // Level 2: Meyve-Sebze (Orta-alt - solda)
                     _buildLevelButton(
                       context,
                       level: 2,
-                      leftFactor: 0.42,
-                      topFactor: 0.74,
-                      emoji: '🍎🥕',
-                      title: isEnglish ? 'Fruit-Vegetable' : 'Meyve-Sebze',
+                      leftFactor: 0.25,
+                      topFactor: 0.62,
+                      emoji: '🍎',
+                      title: isEnglish ? 'Fruit-Veggie' : 'Meyve-Sebze',
                       color: const Color(0xFF27AE60), // Canlı yeşil
                       onTap: () async {
                         await Navigator.push(
@@ -163,15 +167,15 @@ class _ClassificationQuestionsScreenState
                       isCompleted: completedLevel >= 2,
                     ),
 
-                    // Level 3: Şekil Sınıflama (Orta-üst kıvrım - sağda)
+                    // Level 3: Şekil (Orta - sağda)
                     _buildLevelButton(
                       context,
                       level: 3,
-                      leftFactor: 0.72,
-                      topFactor: 0.6,
-                      emoji: '🔷🔶',
-                      title: isEnglish ? 'Shape Class' : 'Şekil Sınıflama',
-                      color: const Color(0xFFD37A9E), // Canlı mor
+                      leftFactor: 0.75,
+                      topFactor: 0.42,
+                      emoji: '🔷',
+                      title: isEnglish ? 'Shapes' : 'Şekiller',
+                      color: const Color(0xFF8E44AD), // Canlı mor
                       onTap: () async {
                         await Navigator.push(
                           context,
@@ -185,15 +189,15 @@ class _ClassificationQuestionsScreenState
                       isCompleted: completedLevel >= 3,
                     ),
 
-                    // Level 4: Duygu Sınıflama (Üst - kale)
+                    // Level 4: Duyu Organları (Üst - ortada)
                     _buildLevelButton(
                       context,
                       level: 4,
-                      leftFactor: 0.35,
-                      topFactor: 0.46,
-                      emoji: '😊😢',
-                      title: isEnglish ? 'Emotion Class' : 'Duygu Sınıflama',
-                      color: const Color(0xFF2C9498), // Canlı turuncu
+                      leftFactor: 0.50,
+                      topFactor: 0.22,
+                      emoji: '👃',
+                      title: isEnglish ? 'Senses' : 'Duyu Organları',
+                      color: const Color(0xFFF39C12), // Canlı turuncu
                       onTap: () async {
                         await Navigator.push(
                           context,
@@ -216,7 +220,7 @@ class _ClassificationQuestionsScreenState
                 ),
               ),
 
-              // Sevimli geri butonu
+              // Sevimli geri butonu - Sualtı Teması (Balık Kabarcık)
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -230,23 +234,32 @@ class _ClassificationQuestionsScreenState
                       );
                     },
                     child: Container(
-                      width: 40,
-                      height: 40,
+                      width: 55,
+                      height: 55,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFF4ECDC4), Color(0xFF44A9A6)],
+                        ),
                         shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 3,
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+                            color: const Color(0xFF4ECDC4).withOpacity(0.5),
+                            blurRadius: 20,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 6),
                           ),
                         ],
                       ),
                       child: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: Color(0xFF006994),
-                        size: 30,
+                        Icons.arrow_back_rounded,
+                        color: Colors.white,
+                        size: 28,
                       ),
                     ),
                   ),
@@ -344,10 +357,10 @@ class _ClassificationQuestionsScreenState
               ),
             if (isCompleted) const SizedBox(height: 8),
 
-            // Level butonu - Su altı teması
+            // Level butonu - Canlı ve sevimli
             Container(
-              width: 80,
-              height: 80,
+              width: 100,
+              height: 100,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 // Renkli yumuşak gölgeler
@@ -396,10 +409,10 @@ class _ClassificationQuestionsScreenState
                     ),
                   ),
 
-                  // Ana buton - Su altı teması
+                  // Ana buton
                   Container(
-                    width: 80,
-                    height: 80,
+                    width: 100,
+                    height: 100,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient:
@@ -442,7 +455,7 @@ class _ClassificationQuestionsScreenState
                     ),
                     child: Stack(
                       children: [
-                        // Ana parlama efekti - yumuşak
+                        // Parlama efektleri
                         Positioned(
                           top: 10,
                           left: 18,
@@ -458,37 +471,6 @@ class _ClassificationQuestionsScreenState
                                   Colors.white.withOpacity(0.0),
                                 ],
                               ),
-                            ),
-                          ),
-                        ),
-                        // Yan parlama
-                        Positioned(
-                          top: 28,
-                          right: 20,
-                          child: Container(
-                            width: 18,
-                            height: 18,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: RadialGradient(
-                                colors: [
-                                  Colors.white.withOpacity(0.4),
-                                  Colors.white.withOpacity(0.0),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        // Alt ışık yansıması
-                        Positioned(
-                          bottom: 28,
-                          left: 28,
-                          child: Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.25),
                             ),
                           ),
                         ),
@@ -547,55 +529,6 @@ class _ClassificationQuestionsScreenState
     );
   }
 
-  // Su altı baloncukları animasyonu
-  Widget _buildBubble(BuildContext context, int index) {
-    final random = (index * 137) % 100;
-    final delay = (random % 8) * 0.3;
-    final leftPosition = (random % 90 + 5).toDouble();
-    final size = (random % 15 + 8).toDouble();
-    final duration = (random % 4 + 6).toDouble();
-
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: MediaQuery.of(context).size.height + 50, end: -50),
-      duration: Duration(seconds: duration.toInt()),
-      onEnd: () {
-        // Animasyon bitince yeniden başlat
-        setState(() {});
-      },
-      builder: (context, value, child) {
-        return Positioned(
-          left: leftPosition * MediaQuery.of(context).size.width / 100,
-          top: value - (delay * 100),
-          child: Opacity(
-            opacity:
-                (value > -50 && value < MediaQuery.of(context).size.height + 50)
-                    ? 0.6
-                    : 0.0,
-            child: Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.3),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.5),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.white.withOpacity(0.2),
-                    blurRadius: 8,
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   // Kayan yıldızlar animasyonu
   Widget _buildFallingStars(BuildContext context, int index) {
     final random = (index * 123) % 100;
@@ -608,7 +541,6 @@ class _ClassificationQuestionsScreenState
       tween: Tween(begin: -100, end: MediaQuery.of(context).size.height + 100),
       duration: Duration(seconds: duration.toInt()),
       onEnd: () {
-        // Animasyon bitince yeniden başlat
         setState(() {});
       },
       builder: (context, value, child) {
