@@ -7,7 +7,6 @@ import 'package:confetti/confetti.dart';
 import '../providers/language_provider.dart';
 import '../../SIRALAMA_SORULARI/Asama3/soru1.dart';
 import '../../SIRALAMA_SORULARI/Asama2/soru1.dart';
-import '../../SIRALAMA_SORULARI/Asama2/soru2.dart';
 import 'home_screen.dart';
 
 // Gezegen ve yol renklerini kontrol etmek için yeni sabitler
@@ -49,6 +48,9 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
 
   // Konfeti Controller'ı
   late ConfettiController _confettiController;
+
+  // İlk yükleme bayrağı
+  bool _isInitialLoad = true;
 
   // Gezegen konumları (Ekran Yüksekliği oranları)
   // [stageNumber, x_ratio, y_ratio, emoji]
@@ -130,6 +132,8 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
 
     // Önceki durumu sakla
     List<bool> previousCompletedStages = List.from(completedStages);
+    // Önceki yıldız sayılarını da sakla
+    List<int> previousStarCounts = List.from(starCounts);
 
     setState(() {
       completedStages[0] =
@@ -150,15 +154,62 @@ class _SortingRoadmapScreenState extends State<SortingRoadmapScreen>
       starCounts[4] = prefs.getInt('sorting_stage_5_stars') ?? 0;
     });
 
-    // Yeni tamamlanan aşama var mı kontrol et (sadece gerçek aşamalar için)
-    for (int i = 2; i < completedStages.length; i++) {
-      // Sadece 3, 4, 5. aşamalar için
-      if (!previousCompletedStages[i] && completedStages[i]) {
-        // Yeni bir aşama tamamlandı!
+    // Yeni tamamlanan aşama veya yıldız sayısı artışı kontrol et
+    // Ancak ilk yüklemede konfeti patlamasın
+    if (!_isInitialLoad) {
+      print('=== Konfeti Kontrolü ===');
+      print('Previous stars: $previousStarCounts');
+      print('Current stars: $starCounts');
+
+      bool shouldTriggerConfetti = false;
+
+      // Yeni aşama tamamlandı mı?
+      for (int i = 2; i < completedStages.length; i++) {
+        // Sadece 3, 4, 5. aşamalar için
+        if (!previousCompletedStages[i] && completedStages[i]) {
+          print('Yeni aşama tamamlandı: $i');
+          // Yeni bir aşama tamamlandı!
+          shouldTriggerConfetti = true;
+          break; // Sadece bir kez konfeti patlat
+        }
+      }
+
+      // Yıldız sayısı değişti mi? (herhangi bir değişiklikte konfeti patlat)
+      if (!shouldTriggerConfetti) {
+        for (int i = 0; i < starCounts.length; i++) {
+          if (previousStarCounts[i] != starCounts[i]) {
+            print(
+              'Yıldız sayısı değişti: aşama $i, ${previousStarCounts[i]} -> ${starCounts[i]}',
+            );
+            // Yıldız sayısı değişti - her türlü değişiklikte konfeti patlat
+            shouldTriggerConfetti = true;
+            break;
+          }
+        }
+      }
+
+      // Özel kontrol: Asama3 için "just completed" bayrağı
+      if (!shouldTriggerConfetti) {
+        bool asama3JustCompleted =
+            prefs.getBool('asama3_just_completed') ?? false;
+        if (asama3JustCompleted && starCounts[2] == 3) {
+          print('Asama3 just completed ve 3 yıldız var!');
+          shouldTriggerConfetti = true;
+          // Bayrağı kaldır
+          await prefs.setBool('asama3_just_completed', false);
+        }
+      }
+
+      if (shouldTriggerConfetti) {
+        print('Konfeti patlıyor!');
         _triggerConfetti();
-        break; // Sadece bir kez konfeti patlat
+      } else {
+        print('Konfeti patlamadı');
       }
     }
+
+    // İlk yüklemeyi tamamlandı olarak işaretle
+    _isInitialLoad = false;
   }
 
   // Konfeti tetikleme metodu

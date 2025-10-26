@@ -60,9 +60,9 @@ class _Asama3Soru1State extends State<Asama3Soru1>
   Future<void> _saveQuestionResult(bool isCorrect) async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Mevcut doğru ve yanlış sayılarını al
-    int correctCount = prefs.getInt('asama3_correct_count') ?? 0;
-    int wrongCount = prefs.getInt('asama3_wrong_count') ?? 0;
+    // Bu deneme için doğru ve yanlış sayılarını al
+    int correctCount = prefs.getInt('asama3_session_correct_count') ?? 0;
+    int wrongCount = prefs.getInt('asama3_session_wrong_count') ?? 0;
 
     if (isCorrect) {
       correctCount++;
@@ -71,8 +71,8 @@ class _Asama3Soru1State extends State<Asama3Soru1>
     }
 
     // Kaydet
-    await prefs.setInt('asama3_correct_count', correctCount);
-    await prefs.setInt('asama3_wrong_count', wrongCount);
+    await prefs.setInt('asama3_session_correct_count', correctCount);
+    await prefs.setInt('asama3_session_wrong_count', wrongCount);
 
     // Yıldız hesaplama: Birkaç denemede doğru = 2 yıldız, %100 doğru = 3 yıldız
     int totalQuestions = correctCount + wrongCount;
@@ -93,6 +93,10 @@ class _Asama3Soru1State extends State<Asama3Soru1>
       }
 
       await prefs.setInt('sorting_stage_3_stars', stars);
+
+      // Session'ı sıfırla
+      await prefs.setInt('asama3_session_correct_count', 0);
+      await prefs.setInt('asama3_session_wrong_count', 0);
     }
   }
 
