@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import 'soru2.dart';
-import 'package:dixlearning/screens/sorting_roadmap_screen.dart';
+import 'package:dixlearning/screens/sorting_roadmap_screen_new.dart';
 
 class Asama2Soru1 extends StatefulWidget {
   const Asama2Soru1({super.key});
@@ -142,10 +142,6 @@ class _Asama2Soru1State extends State<Asama2Soru1>
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
-    final screenHeight = screenSize.height;
-    final imageSize = MediaQuery.of(context).size.width * 0.26;
-    final dropSize = screenWidth * 0.28;
-    final gap = screenWidth * 0.04;
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -179,7 +175,8 @@ class _Asama2Soru1State extends State<Asama2Soru1>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const SortingRoadmapScreen(),
+                            builder:
+                                (context) => const SortingRoadmapScreenNew(),
                           ),
                           (route) => false,
                         );
@@ -298,7 +295,9 @@ class _Asama2Soru1State extends State<Asama2Soru1>
                             child: ElevatedButton(
                               onPressed: !showFeedback ? checkOrder : null,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFF0C329),
+                                backgroundColor: const Color(
+                                  0xFFFFF59D,
+                                ), // Çok Açık Sarı (Güneş teması)
                                 foregroundColor: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -339,8 +338,15 @@ class _Asama2Soru1State extends State<Asama2Soru1>
                                 horizontal: 20,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,

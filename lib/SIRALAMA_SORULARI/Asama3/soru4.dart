@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import 'package:dixlearning/SIRALAMA_SORULARI/Asama3/soru5.dart';
-import 'package:dixlearning/screens/sorting_roadmap_screen.dart';
+import 'package:dixlearning/screens/sorting_roadmap_screen_new.dart';
 
 class Asama3Soru4 extends StatefulWidget {
   const Asama3Soru4({super.key});
@@ -187,7 +187,8 @@ class _Asama3Soru4State extends State<Asama3Soru4>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const SortingRoadmapScreen(),
+                            builder:
+                                (context) => const SortingRoadmapScreenNew(),
                           ),
                           (route) => false,
                         );
@@ -306,7 +307,9 @@ class _Asama3Soru4State extends State<Asama3Soru4>
                             child: ElevatedButton(
                               onPressed: !showFeedback ? checkOrder : null,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF7ED0C0),
+                                backgroundColor: const Color(
+                                  0xFFFF6F00,
+                                ), // Turuncu (Kek teması)
                                 foregroundColor: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -347,8 +350,15 @@ class _Asama3Soru4State extends State<Asama3Soru4>
                                 horizontal: 20,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,

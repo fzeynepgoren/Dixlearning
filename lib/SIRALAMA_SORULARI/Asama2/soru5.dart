@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
-import 'package:dixlearning/screens/sorting_roadmap_screen.dart';
+import 'package:dixlearning/screens/sorting_roadmap_screen_new.dart';
 
 class Asama2Soru5 extends StatefulWidget {
   const Asama2Soru5({super.key});
@@ -122,7 +122,7 @@ class _Asama2Soru5State extends State<Asama2Soru5>
         if (mounted) {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-              builder: (context) => const SortingRoadmapScreen(),
+              builder: (context) => const SortingRoadmapScreenNew(),
             ),
             (route) => false,
           );
@@ -177,7 +177,8 @@ class _Asama2Soru5State extends State<Asama2Soru5>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const SortingRoadmapScreen(),
+                            builder:
+                                (context) => const SortingRoadmapScreenNew(),
                           ),
                           (route) => false,
                         );
@@ -296,7 +297,9 @@ class _Asama2Soru5State extends State<Asama2Soru5>
                             child: ElevatedButton(
                               onPressed: !showFeedback ? checkOrder : null,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFF0C329),
+                                backgroundColor: const Color(
+                                  0xFF90CAF9,
+                                ), // Açık Mavi (Eğlenceli tema)
                                 foregroundColor: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -337,8 +340,15 @@ class _Asama2Soru5State extends State<Asama2Soru5>
                                 horizontal: 20,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,

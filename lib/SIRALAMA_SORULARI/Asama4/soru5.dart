@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
-import 'package:dixlearning/screens/sorting_roadmap_screen.dart';
+import 'package:dixlearning/screens/sorting_roadmap_screen_new.dart';
 
 class Asama4Soru5 extends StatefulWidget {
   const Asama4Soru5({super.key});
@@ -64,7 +64,7 @@ class _Asama4Soru5State extends State<Asama4Soru5>
         if (mounted) {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-              builder: (context) => const SortingRoadmapScreen(),
+              builder: (context) => const SortingRoadmapScreenNew(),
             ),
             (route) => false,
           );
@@ -118,7 +118,8 @@ class _Asama4Soru5State extends State<Asama4Soru5>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const SortingRoadmapScreen(),
+                            builder:
+                                (context) => const SortingRoadmapScreenNew(),
                           ),
                           (route) => false,
                         );
@@ -182,35 +183,35 @@ class _Asama4Soru5State extends State<Asama4Soru5>
                                     key: ValueKey(dragSources[i].label),
                                     duration: const Duration(milliseconds: 200),
                                     margin: const EdgeInsets.symmetric(
-                                      vertical: 2,
+                                      vertical: 6,
                                     ),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius: BorderRadius.circular(20),
                                       boxShadow: const [
                                         BoxShadow(
                                           color: Colors.black12,
-                                          blurRadius: 8,
-                                          offset: Offset(0, 4),
+                                          blurRadius: 12,
+                                          offset: Offset(0, 6),
                                         ),
                                       ],
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
-                                        vertical: 4,
-                                        horizontal: 12,
+                                        vertical: 12,
+                                        horizontal: 20,
                                       ),
                                       child: Row(
                                         children: [
                                           ClipRRect(
                                             borderRadius: BorderRadius.circular(
-                                              12,
+                                              50,
                                             ),
                                             child: Image.asset(
                                               dragSources[i].assetPath,
-                                              width: screenWidth * 0.26,
-                                              height: screenWidth * 0.26,
-                                              fit: BoxFit.contain,
+                                              width: screenWidth * 0.32,
+                                              height: screenWidth * 0.32,
+                                              fit: BoxFit.cover,
                                             ),
                                           ),
                                           const Spacer(),
@@ -219,7 +220,7 @@ class _Asama4Soru5State extends State<Asama4Soru5>
                                             child: const Icon(
                                               Icons.drag_handle,
                                               color: Colors.grey,
-                                              size: 28,
+                                              size: 32,
                                             ),
                                           ),
                                         ],
@@ -278,8 +279,15 @@ class _Asama4Soru5State extends State<Asama4Soru5>
                                 horizontal: 20,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,

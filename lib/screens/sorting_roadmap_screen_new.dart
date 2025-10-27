@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
+import '../../SIRALAMA_SORULARI/Asama2/soru1.dart';
 import '../../SIRALAMA_SORULARI/Asama3/soru1.dart';
 import '../../SIRALAMA_SORULARI/Asama4/soru1.dart';
 import 'home_screen.dart';
@@ -153,13 +154,13 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
                       title: isEnglish ? '3 Pictures' : '3 Resim',
                       color: const Color(0xFF27AE60), // Yeşil
                       onTap: () async {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              isEnglish ? 'Coming soon!' : 'Yakında eklenecek!',
-                            ),
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Asama2Soru1(),
                           ),
                         );
+                        _loadProgress();
                       },
                       isUnlocked: _isLevelUnlocked(2),
                       isCompleted: completedLevel >= 2,
