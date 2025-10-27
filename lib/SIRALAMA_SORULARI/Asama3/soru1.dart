@@ -43,6 +43,19 @@ class _Asama3Soru1State extends State<Asama3Soru1>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
+    _initializeSession();
+  }
+
+  Future<void> _initializeSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Her aşama başında session sayacını sıfırla
+    await prefs.setInt('asama3_session_correct_count', 0);
+    await prefs.setInt('asama3_session_wrong_count', 0);
+    // Son tamamlanma zamanını kaydet
+    await prefs.setString(
+      'asama3_last_session_time',
+      DateTime.now().toIso8601String(),
+    );
   }
 
   @override
@@ -93,10 +106,6 @@ class _Asama3Soru1State extends State<Asama3Soru1>
       }
 
       await prefs.setInt('sorting_stage_3_stars', stars);
-
-      // Session'ı sıfırla
-      await prefs.setInt('asama3_session_correct_count', 0);
-      await prefs.setInt('asama3_session_wrong_count', 0);
     }
   }
 

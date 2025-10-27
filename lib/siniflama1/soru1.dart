@@ -2,6 +2,7 @@ import 'package:dixlearning/siniflama1/soru2.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
 
@@ -73,6 +74,13 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
       CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
     );
     _slideController.forward();
+    _initializeSession();
+  }
+
+  Future<void> _initializeSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('siniflama1_session_correct_count', 0);
+    await prefs.setInt('siniflama1_session_wrong_count', 0);
   }
 
   @override
@@ -126,8 +134,9 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
     }
   }
 
-  void _checkCompletion() {
+  void _checkCompletion() async {
     if (placedGirlItems.length + placedBoyItems.length == dragItems.length) {
+      await _saveQuestionResult(true);
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
           Navigator.pushReplacement(
@@ -137,6 +146,21 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
         }
       });
     }
+  }
+
+  Future<void> _saveQuestionResult(bool isCorrect) async {
+    final prefs = await SharedPreferences.getInstance();
+    int correctCount = prefs.getInt('siniflama1_session_correct_count') ?? 0;
+    int wrongCount = prefs.getInt('siniflama1_session_wrong_count') ?? 0;
+
+    if (isCorrect) {
+      correctCount++;
+    } else {
+      wrongCount++;
+    }
+
+    await prefs.setInt('siniflama1_session_correct_count', correctCount);
+    await prefs.setInt('siniflama1_session_wrong_count', wrongCount);
   }
 
   // ÖRNEK TASARIM: Grup Kutusu (DragTarget) yapısı
@@ -260,7 +284,9 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const ClassificationQuestionsScreen(),
+                            builder:
+                                (context) =>
+                                    const ClassificationQuestionsScreen(),
                           ),
                           (route) => false,
                         );

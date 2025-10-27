@@ -232,9 +232,9 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
                       isCompleted: completedLevel >= 5,
                     ),
 
-                    // 5 seviye tamamlandıysa kayan yıldızlar
-                    if (completedLevel >= 5)
-                      ...List.generate(15, (index) {
+                    // Tamamlanan her aşama için şekerler dökülür
+                    if (completedLevel >= 1)
+                      ...List.generate(30, (index) {
                         return _buildFallingStars(context, index);
                       }),
                   ],
@@ -571,6 +571,18 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
     final size = (random % 20 + 15).toDouble();
     final duration = (random % 3 + 3).toDouble();
 
+    // Şeker emojileri listesi
+    final List<String> candies = [
+      '🍬',
+      '🍭',
+      '🍫',
+      '🍰',
+      '🧁',
+      '🍪',
+      '🍩',
+      '🍯',
+    ];
+
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: -100, end: MediaQuery.of(context).size.height + 100),
       duration: Duration(seconds: duration.toInt()),
@@ -581,31 +593,23 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
         return Positioned(
           left: leftPosition * MediaQuery.of(context).size.width / 100,
           top: value - (delay * 100),
-          child: Opacity(
-            opacity:
-                (value > -50 && value < MediaQuery.of(context).size.height + 50)
-                    ? 1.0
-                    : 0.0,
-            child: Transform.rotate(
-              angle: (value / 100) * 3.14,
-              child: Icon(
-                Icons.star,
-                size: size,
-                color:
-                    [
-                      const Color(0xFFFFD700),
-                      const Color(0xFFFFA500),
-                      const Color(0xFFFFE55C),
-                      const Color(0xFFFFFF00),
-                    ][index % 4],
-                shadows: [
-                  Shadow(color: Colors.amber.withOpacity(0.8), blurRadius: 10),
-                ],
-              ),
+          child: Transform.rotate(
+            angle: (value / 100) * 0.5, // Şekerler dönerken düşer
+            child: Opacity(
+              opacity:
+                  (value > -50 &&
+                          value < MediaQuery.of(context).size.height + 50)
+                      ? 1.0
+                      : 0.0,
+              child: child,
             ),
           ),
         );
       },
+      child: Text(
+        candies[random % candies.length],
+        style: TextStyle(fontSize: size),
+      ),
     );
   }
 }

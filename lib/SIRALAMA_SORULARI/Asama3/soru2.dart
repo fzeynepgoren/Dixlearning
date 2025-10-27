@@ -59,6 +59,11 @@ class _Asama3Soru2State extends State<Asama3Soru2>
     super.dispose();
   }
 
+  Future<void> _saveStageCompletion() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('sorting_stage_3_completed', true);
+  }
+
   // Yıldız sistemi için doğruluk takibi
   Future<void> _saveQuestionResult(bool isCorrect) async {
     final prefs = await SharedPreferences.getInstance();
@@ -96,10 +101,6 @@ class _Asama3Soru2State extends State<Asama3Soru2>
       }
 
       await prefs.setInt('sorting_stage_3_stars', stars);
-
-      // Session'ı sıfırla
-      await prefs.setInt('asama3_session_correct_count', 0);
-      await prefs.setInt('asama3_session_wrong_count', 0);
     }
   }
 
@@ -120,6 +121,9 @@ class _Asama3Soru2State extends State<Asama3Soru2>
     await _saveQuestionResult(isCorrect);
 
     if (isCorrect) {
+      // Save completion status
+      await _saveStageCompletion();
+
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushReplacement(

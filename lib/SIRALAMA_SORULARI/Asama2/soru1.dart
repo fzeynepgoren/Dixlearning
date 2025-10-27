@@ -45,6 +45,19 @@ class _Asama2Soru1State extends State<Asama2Soru1>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
+    _initializeSession();
+  }
+
+  Future<void> _initializeSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Her aşama başında session sayacını sıfırla
+    await prefs.setInt('asama2_session_correct_count', 0);
+    await prefs.setInt('asama2_session_wrong_count', 0);
+    // Son tamamlanma zamanını kaydet
+    await prefs.setString(
+      'asama2_last_session_time',
+      DateTime.now().toIso8601String(),
+    );
   }
 
   @override
@@ -53,18 +66,13 @@ class _Asama2Soru1State extends State<Asama2Soru1>
     super.dispose();
   }
 
-  Future<void> _saveStageCompletion() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('sorting_stage_2_completed', true);
-  }
-
   // Yıldız sistemi için doğruluk takibi
   Future<void> _saveQuestionResult(bool isCorrect) async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Mevcut doğru ve yanlış sayılarını al
-    int correctCount = prefs.getInt('asama2_correct_count') ?? 0;
-    int wrongCount = prefs.getInt('asama2_wrong_count') ?? 0;
+    // Bu deneme için doğru ve yanlış sayılarını al
+    int correctCount = prefs.getInt('asama2_session_correct_count') ?? 0;
+    int wrongCount = prefs.getInt('asama2_session_wrong_count') ?? 0;
 
     if (isCorrect) {
       correctCount++;
@@ -73,29 +81,8 @@ class _Asama2Soru1State extends State<Asama2Soru1>
     }
 
     // Kaydet
-    await prefs.setInt('asama2_correct_count', correctCount);
-    await prefs.setInt('asama2_wrong_count', wrongCount);
-
-    // Yıldız hesaplama: Birkaç denemede doğru = 2 yıldız, %100 doğru = 3 yıldız
-    int totalQuestions = correctCount + wrongCount;
-    if (totalQuestions >= 5) {
-      // 5 soru tamamlandığında
-      double accuracy = correctCount / totalQuestions;
-      int stars = 0;
-
-      if (accuracy == 1.0) {
-        // %100 doğru
-        stars = 3;
-      } else if (accuracy >= 0.6) {
-        // %60+ doğru (birkaç denemede doğru)
-        stars = 2;
-      } else if (accuracy >= 0.4) {
-        // %40+ doğru
-        stars = 1;
-      }
-
-      await prefs.setInt('sorting_stage_2_stars', stars);
-    }
+    await prefs.setInt('asama2_session_correct_count', correctCount);
+    await prefs.setInt('asama2_session_wrong_count', wrongCount);
   }
 
   void checkOrder() async {
@@ -116,9 +103,6 @@ class _Asama2Soru1State extends State<Asama2Soru1>
     await _saveQuestionResult(isCorrect);
 
     if (isCorrect) {
-      // Save completion status
-      await _saveStageCompletion();
-
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushReplacement(
