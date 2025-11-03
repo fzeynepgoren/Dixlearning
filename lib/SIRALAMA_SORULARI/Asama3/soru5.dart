@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
-import 'package:dixlearning/screens/sorting_roadmap_screen.dart';
+import 'package:dixlearning/screens/sorting_roadmap_screen_new.dart';
 
 class Asama3Soru5 extends StatefulWidget {
   const Asama3Soru5({super.key});
@@ -55,6 +55,29 @@ class _Asama3Soru5State extends State<Asama3Soru5>
   Future<void> _saveStageCompletion() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('sorting_stage_3_completed', true);
+  }
+
+  Future<void> _finalizeStars() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Son soruya kadar birikmiş doğru ve yanlış sayıları al
+    int correctCount = prefs.getInt('asama3_session_correct_count') ?? 0;
+    int wrongCount = prefs.getInt('asama3_session_wrong_count') ?? 0;
+
+    // Yıldız hesaplama
+    if (correctCount + wrongCount == 5) {
+      double accuracy = correctCount / 5;
+      int stars = 0;
+
+      if (accuracy == 1.0) {
+        stars = 3;
+      } else if (accuracy >= 0.6) {
+        stars = 2;
+      } else if (accuracy >= 0.4) {
+        stars = 1;
+      }
+
+      await prefs.setInt('sorting_stage_3_stars', stars);
+    }
   }
 
   // Yıldız sistemi için doğruluk takibi
@@ -123,12 +146,13 @@ class _Asama3Soru5State extends State<Asama3Soru5>
     if (isCorrect) {
       // Save completion status
       await _saveStageCompletion();
+      await _finalizeStars();
 
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-              builder: (context) => const SortingRoadmapScreen(),
+              builder: (context) => const SortingRoadmapScreenNew(),
             ),
             (route) => false,
           );
@@ -200,7 +224,8 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const SortingRoadmapScreen(),
+                            builder:
+                                (context) => const SortingRoadmapScreenNew(),
                           ),
                           (route) => false,
                         );
@@ -319,7 +344,9 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                             child: ElevatedButton(
                               onPressed: !showFeedback ? checkOrder : null,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFD9BD8D),
+                                backgroundColor: const Color(
+                                  0xFFE91E63,
+                                ), // Pembe (Yaş teması)
                                 foregroundColor: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -360,8 +387,15 @@ class _Asama3Soru5State extends State<Asama3Soru5>
                                 horizontal: 20,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,

@@ -47,6 +47,49 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
       CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
     );
     _slideController.forward();
+    _initializeSession();
+  }
+
+  Future<void> _initializeSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('siniflama1_session_correct_count', 0);
+    await prefs.setInt('siniflama1_session_wrong_count', 0);
+  }
+
+  Future<void> _saveQuestionResult(bool isCorrect) async {
+    final prefs = await SharedPreferences.getInstance();
+    int correctCount = prefs.getInt('siniflama1_session_correct_count') ?? 0;
+    int wrongCount = prefs.getInt('siniflama1_session_wrong_count') ?? 0;
+
+    if (isCorrect) {
+      correctCount++;
+    } else {
+      wrongCount++;
+    }
+
+    await prefs.setInt('siniflama1_session_correct_count', correctCount);
+    await prefs.setInt('siniflama1_session_wrong_count', wrongCount);
+  }
+
+  Future<void> _finalizeStars() async {
+    final prefs = await SharedPreferences.getInstance();
+    int correctCount = prefs.getInt('siniflama1_session_correct_count') ?? 0;
+    int wrongCount = prefs.getInt('siniflama1_session_wrong_count') ?? 0;
+
+    if (correctCount + wrongCount == 5) {
+      double accuracy = correctCount / 5;
+      int stars = 0;
+
+      if (accuracy == 1.0) {
+        stars = 3;
+      } else if (accuracy >= 0.6) {
+        stars = 2;
+      } else if (accuracy >= 0.4) {
+        stars = 1;
+      }
+
+      await prefs.setInt('siniflama1_stars', stars);
+    }
   }
 
   @override
@@ -84,7 +127,8 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
 
       // Level 1'i tamamlandı olarak kaydet
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('siniflama_completed_level', 1);
+      await prefs.setBool('siniflama1_completed', true);
+      await _finalizeStars();
 
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {

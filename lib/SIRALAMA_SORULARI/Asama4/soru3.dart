@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
-import 'package:dixlearning/screens/sorting_roadmap_screen.dart';
+import 'package:dixlearning/screens/sorting_roadmap_screen_new.dart';
 import 'soru4.dart';
 
 class Asama4Soru3 extends StatefulWidget {
@@ -46,7 +47,52 @@ class _Asama4Soru3State extends State<Asama4Soru3>
     super.dispose();
   }
 
-  void checkOrder() {
+  Future<void> _saveStageCompletion() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('sorting_stage_4_completed', true);
+  }
+
+  // Yıldız sistemi için doğruluk takibi
+  Future<void> _saveQuestionResult(bool isCorrect) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Bu deneme için doğru ve yanlış sayılarını al
+    int correctCount = prefs.getInt('asama4_session_correct_count') ?? 0;
+    int wrongCount = prefs.getInt('asama4_session_wrong_count') ?? 0;
+
+    if (isCorrect) {
+      correctCount++;
+    } else {
+      wrongCount++;
+    }
+
+    // Kaydet
+    await prefs.setInt('asama4_session_correct_count', correctCount);
+    await prefs.setInt('asama4_session_wrong_count', wrongCount);
+
+    // Yıldız hesaplama: Birkaç denemede doğru = 2 yıldız, %100 doğru = 3 yıldız
+    int totalQuestions = correctCount + wrongCount;
+    if (totalQuestions >= 5) {
+      // 5 soru tamamlandığında
+      double accuracy = correctCount / totalQuestions;
+      int stars = 0;
+
+      if (accuracy == 1.0) {
+        // %100 doğru
+        stars = 3;
+      } else if (accuracy >= 0.6) {
+        // %60+ doğru (birkaç denemede doğru)
+        stars = 2;
+      } else if (accuracy >= 0.4) {
+        // %40+ doğru
+        stars = 1;
+      }
+
+      await prefs.setInt('sorting_stage_4_stars', stars);
+    }
+  }
+
+  void checkOrder() async {
     setState(() {
       isCorrect = true;
       for (int i = 0; i < stages.length; i++) {
@@ -60,7 +106,13 @@ class _Asama4Soru3State extends State<Asama4Soru3>
 
     _feedbackController.forward(from: 0);
 
+    // Doğruluk sonucunu kaydet
+    await _saveQuestionResult(isCorrect);
+
     if (isCorrect) {
+      // Save completion status
+      await _saveStageCompletion();
+
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushReplacement(
@@ -116,7 +168,8 @@ class _Asama4Soru3State extends State<Asama4Soru3>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const SortingRoadmapScreen(),
+                            builder:
+                                (context) => const SortingRoadmapScreenNew(),
                           ),
                           (route) => false,
                         );
@@ -180,35 +233,35 @@ class _Asama4Soru3State extends State<Asama4Soru3>
                                     key: ValueKey(dragSources[i].label),
                                     duration: const Duration(milliseconds: 200),
                                     margin: const EdgeInsets.symmetric(
-                                      vertical: 2,
+                                      vertical: 6,
                                     ),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius: BorderRadius.circular(20),
                                       boxShadow: const [
                                         BoxShadow(
                                           color: Colors.black12,
-                                          blurRadius: 8,
-                                          offset: Offset(0, 4),
+                                          blurRadius: 12,
+                                          offset: Offset(0, 6),
                                         ),
                                       ],
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
-                                        vertical: 4,
-                                        horizontal: 12,
+                                        vertical: 12,
+                                        horizontal: 20,
                                       ),
                                       child: Row(
                                         children: [
                                           ClipRRect(
                                             borderRadius: BorderRadius.circular(
-                                              12,
+                                              50,
                                             ),
                                             child: Image.asset(
                                               dragSources[i].assetPath,
-                                              width: screenWidth * 0.26,
-                                              height: screenWidth * 0.26,
-                                              fit: BoxFit.contain,
+                                              width: screenWidth * 0.32,
+                                              height: screenWidth * 0.32,
+                                              fit: BoxFit.cover,
                                             ),
                                           ),
                                           const Spacer(),
@@ -217,7 +270,7 @@ class _Asama4Soru3State extends State<Asama4Soru3>
                                             child: const Icon(
                                               Icons.drag_handle,
                                               color: Colors.grey,
-                                              size: 28,
+                                              size: 32,
                                             ),
                                           ),
                                         ],
@@ -276,8 +329,15 @@ class _Asama4Soru3State extends State<Asama4Soru3>
                                 horizontal: 20,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,

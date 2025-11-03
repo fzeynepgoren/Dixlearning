@@ -201,9 +201,9 @@ class _KarsilastirmaSorulariScreenState
                       isCompleted: completedLevel >= 4,
                     ),
 
-                    // 4 seviye tamamlandıysa kayan yıldızlar
-                    if (completedLevel >= 4)
-                      ...List.generate(15, (index) {
+                    // Tamamlanan her aşama için güneşler dökülür
+                    if (completedLevel >= 1)
+                      ...List.generate(30, (index) {
                         return _buildFallingStars(context, index);
                       }),
                   ],
@@ -574,31 +574,20 @@ class _KarsilastirmaSorulariScreenState
         return Positioned(
           left: leftPosition * MediaQuery.of(context).size.width / 100,
           top: value - (delay * 100),
-          child: Opacity(
-            opacity:
-                (value > -50 && value < MediaQuery.of(context).size.height + 50)
-                    ? 1.0
-                    : 0.0,
-            child: Transform.rotate(
-              angle: (value / 100) * 3.14,
-              child: Icon(
-                Icons.star,
-                size: size,
-                color:
-                    [
-                      const Color(0xFFFFD700),
-                      const Color(0xFFFFA500),
-                      const Color(0xFFFFE55C),
-                      const Color(0xFFFFFF00),
-                    ][index % 4],
-                shadows: [
-                  Shadow(color: Colors.amber.withOpacity(0.8), blurRadius: 10),
-                ],
-              ),
+          child: Transform.rotate(
+            angle: (value / 100) * 0.5, // Güneşler dönerken düşer
+            child: Opacity(
+              opacity:
+                  (value > -50 &&
+                          value < MediaQuery.of(context).size.height + 50)
+                      ? 1.0
+                      : 0.0,
+              child: child,
             ),
           ),
         );
       },
+      child: Text('☀️', style: TextStyle(fontSize: size)),
     );
   }
 }

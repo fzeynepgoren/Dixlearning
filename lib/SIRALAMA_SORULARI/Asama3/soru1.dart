@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
-import 'package:dixlearning/screens/sorting_roadmap_screen.dart';
+import 'package:dixlearning/screens/sorting_roadmap_screen_new.dart';
 import 'soru2.dart';
 
 class Asama3Soru1 extends StatefulWidget {
@@ -42,6 +42,19 @@ class _Asama3Soru1State extends State<Asama3Soru1>
     _feedbackController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
+    );
+    _initializeSession();
+  }
+
+  Future<void> _initializeSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Her aşama başında session sayacını sıfırla
+    await prefs.setInt('asama3_session_correct_count', 0);
+    await prefs.setInt('asama3_session_wrong_count', 0);
+    // Son tamamlanma zamanını kaydet
+    await prefs.setString(
+      'asama3_last_session_time',
+      DateTime.now().toIso8601String(),
     );
   }
 
@@ -93,10 +106,6 @@ class _Asama3Soru1State extends State<Asama3Soru1>
       }
 
       await prefs.setInt('sorting_stage_3_stars', stars);
-
-      // Session'ı sıfırla
-      await prefs.setInt('asama3_session_correct_count', 0);
-      await prefs.setInt('asama3_session_wrong_count', 0);
     }
   }
 
@@ -176,7 +185,8 @@ class _Asama3Soru1State extends State<Asama3Soru1>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const SortingRoadmapScreen(),
+                            builder:
+                                (context) => const SortingRoadmapScreenNew(),
                           ),
                           (route) => false,
                         );
@@ -295,7 +305,9 @@ class _Asama3Soru1State extends State<Asama3Soru1>
                             child: ElevatedButton(
                               onPressed: checkOrder,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFF1E6A4),
+                                backgroundColor: const Color(
+                                  0xFF8E6A3B,
+                                ), // Kahverengi (Ağaç teması)
                                 foregroundColor: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -336,8 +348,15 @@ class _Asama3Soru1State extends State<Asama3Soru1>
                                 horizontal: 20,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
