@@ -196,6 +196,17 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
               );
             }
           });
+        } else {
+          // Tüm eşleşmeler bitmediyse, feedback'i kısa süre sonra kapatıp seçimleri sıfırla
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) {
+              setState(() {
+                showFeedback = false;
+                selectedLeftIndex = null;
+                selectedRightIndex = null;
+              });
+            }
+          });
         }
       } else {
         // Yanlış cevap için feedback'i 2 saniye sonra gizle

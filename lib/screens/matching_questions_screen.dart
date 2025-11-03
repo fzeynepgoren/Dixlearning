@@ -210,11 +210,10 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                       isCompleted: completedLevel >= 4,
                     ),
 
-                    // 4 seviye tamamlandıysa kayan yıldızlar
-                    if (completedLevel >= 4)
-                      ...List.generate(15, (index) {
-                        return _buildFallingStars(context, index);
-                      }),
+                    // Kayan yıldızlar (her zaman göster)
+                    ...List.generate(15, (index) {
+                      return _buildFallingStars(context, index);
+                    }),
                   ],
                 ),
               ),
