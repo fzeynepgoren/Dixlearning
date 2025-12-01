@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'package:dixlearning/asama4/soru2.dart';
 import '../screens/matching_questions_screen.dart';
+import '../screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/progress_provider.dart';
+import '../providers/language_provider.dart';
+import '../widgets/matching_pause_menu.dart';
 
 class DuyguYuzEsle extends StatefulWidget {
   const DuyguYuzEsle({super.key});
@@ -27,6 +30,8 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
   bool _dialogShown = false;
+  bool _showPauseMenu = false;
+  bool _isSoundOn = true;
 
   final Map<String, String> itemToName = {
     '😊': 'Mutlu',
@@ -147,43 +152,92 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
 
   @override
   Widget build(BuildContext context) {
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async {
+        if (_showPauseMenu) {
+          // Menü açıksa, geri tuşu ile kapat
+          setState(() {
+            _showPauseMenu = false;
+          });
+        } else {
+          // Menü kapalıysa, geri tuşu ile aç
+          setState(() {
+            _showPauseMenu = true;
+          });
+        }
+        return false;
+      },
       child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.blue.shade200,
-                Colors.blue.shade200,
-                const Color(0xffffffff),
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.black),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) => const MatchingQuestionsScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blue.shade200,
+                    Colors.blue.shade200,
+                    const Color(0xffffffff),
                   ],
+                  stops: const [0.0, 0.5, 1.0],
                 ),
-                Expanded(
+              ),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _showPauseMenu = true;
+                              });
+                            },
+                            child: Container(
+                              width: 64,
+                              height: 64,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Colors.purple.shade300,
+                                    Colors.purple.shade600,
+                                    Colors.deepPurple.shade700,
+                                  ],
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.purple.shade800.withOpacity(0.5),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                    spreadRadius: 1,
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.3),
+                                    blurRadius: 4,
+                                    offset: const Offset(-2, -2),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.home_rounded,
+                                color: Colors.black,
+                                size: 36,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
                     child: Container(
@@ -330,31 +384,20 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
                                             vertical: 8,
                                           ),
                                           decoration: BoxDecoration(
-                                            // 1) Doğru eşleşmişse yeşil
-                                            // 2) Yanlış eşleşmede kırmızı
-                                            // 3) Seçiliyse mavi
-                                            // 4) Diğer durumlarda beyaz
-                                            color:
-                                                matchedRight[index]
-                                                    ? Colors.green.shade400
-                                                    : (showFeedback
-                                                        ? ((selectedRightIndex ==
-                                                                    index &&
-                                                                !isCorrect)
-                                                            ? Colors
-                                                                .red
-                                                                .shade400
-                                                            : Colors.white)
-                                                        : (selectedRightIndex ==
-                                                                index
-                                                            ? Colors
-                                                                .blue
-                                                                .shade200
-                                                            : Colors.white)),
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            // border’ı tamamen kaldırıyoruz
+                                            color: matchedRight[index]
+                                                ? Colors.green.shade400
+                                                : (showFeedback
+                                                    ? ((selectedRightIndex ==
+                                                                index &&
+                                                            !isCorrect)
+                                                        ? Colors.red.shade400
+                                                        : Colors.white)
+                                                    : (selectedRightIndex ==
+                                                            index
+                                                        ? Colors.blue.shade200
+                                                        : Colors.white)),
+                                            borderRadius:
+                                                BorderRadius.circular(20),
                                             boxShadow: [
                                               BoxShadow(
                                                 color: Colors.black.withOpacity(
@@ -365,7 +408,6 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
                                               ),
                                             ],
                                           ),
-
                                           child: Center(
                                             child: Text(
                                               shuffledRightItems[index],
@@ -388,68 +430,97 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
                       ),
                     ),
                   ),
-                ),
-                Container(
-                  height: 80,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child:
-                      showFeedback
+                    ),
+                    Container(
+                      height: 80,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child: showFeedback
                           ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
+                              scale: CurvedAnimation(
+                                parent: _feedbackController,
+                                curve: Curves.elasticOut,
                               ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? 'Aferin! 🎉'
-                                        : 'Tekrar dene! 😔',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color:
-                                          isCorrect ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 20,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 5),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      isCorrect
+                                          ? Icons.check_circle
+                                          : Icons.cancel,
+                                      color: isCorrect
+                                          ? Colors.green
+                                          : Colors.red,
+                                      size: 28,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      isCorrect
+                                          ? 'Aferin! 🎉'
+                                          : 'Tekrar dene! 😔',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: isCorrect
+                                            ? Colors.green
+                                            : Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          )
+                            )
                           : const SizedBox.shrink(),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+            if (_showPauseMenu)
+              MatchingPauseMenu(
+                isEnglish: isEnglish,
+                isSoundOn: _isSoundOn,
+                onResume: () => setState(() => _showPauseMenu = false),
+                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+                onHome: () {
+                  setState(() => _showPauseMenu = false);
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const MatchingQuestionsScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                onEntryScreen: () {
+                  setState(() => _showPauseMenu = false);
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const HomeScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                onDismiss: () => setState(() => _showPauseMenu = false),
+              ),
+          ],
         ),
       ),
     );

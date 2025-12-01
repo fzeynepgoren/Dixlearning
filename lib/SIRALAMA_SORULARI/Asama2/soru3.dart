@@ -148,21 +148,53 @@ class _Asama2Soru3State extends State<Asama2Soru3>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: 28,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) => const SortingRoadmapScreenNew(),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => const SortingRoadmapScreenNew(),
+                            ),
+                            (route) => false,
+                          );
+                        },
+                        child: Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.purple.shade300,
+                                Colors.purple.shade600,
+                                Colors.deepPurple.shade700,
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.purple.shade800.withOpacity(0.5),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                                spreadRadius: 1,
+                              ),
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(-2, -2),
+                              ),
+                            ],
                           ),
-                          (route) => false,
-                        );
-                      },
+                          child: const Icon(
+                            Icons.home_rounded,
+                            color: Colors.black,
+                            size: 36,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),

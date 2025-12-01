@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'soru3.dart';
 import '../screens/matching_questions_screen.dart';
+import '../screens/home_screen.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
+import '../widgets/matching_pause_menu.dart';
 
 class HarfHayvanEsle extends StatefulWidget {
   const HarfHayvanEsle({super.key});
@@ -21,6 +25,8 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
   List<bool> matchedRight = [false, false, false];
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _showPauseMenu = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -219,10 +225,27 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
     final screenSize = MediaQuery.of(context).size;
     final iconSize = screenSize.width * 0.065;
 
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async {
+        if (_showPauseMenu) {
+          // Menü açıksa, geri tuşu ile kapat
+          setState(() {
+            _showPauseMenu = false;
+          });
+        } else {
+          // Menü kapalıysa, geri tuşu ile aç
+          setState(() {
+            _showPauseMenu = true;
+          });
+        }
+        return false;
+      },
       child: Scaffold(
-        body: Container(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -241,21 +264,49 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) => const MatchingQuestionsScreen(),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _showPauseMenu = true;
+                          });
+                        },
+                        child: Container(
+                          width: iconSize * 1.6,
+                          height: iconSize * 1.6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.purple.shade300,
+                                Colors.purple.shade600,
+                                Colors.deepPurple.shade700,
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.purple.shade800.withOpacity(0.5),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                                spreadRadius: 1,
+                              ),
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(-2, -2),
+                              ),
+                            ],
                           ),
-                          (route) => false,
-                        );
-                      },
+                          child: Icon(
+                            Icons.home_rounded,
+                            color: Colors.black,
+                            size: iconSize * 0.9,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -405,6 +456,34 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
               ],
             ),
           ),
+        ),
+            if (_showPauseMenu)
+              MatchingPauseMenu(
+                isEnglish: isEnglish,
+                isSoundOn: _isSoundOn,
+                onResume: () => setState(() => _showPauseMenu = false),
+                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+                onHome: () {
+                  setState(() => _showPauseMenu = false);
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const MatchingQuestionsScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                onEntryScreen: () {
+                  setState(() => _showPauseMenu = false);
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const HomeScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                onDismiss: () => setState(() => _showPauseMenu = false),
+              ),
+          ],
         ),
       ),
     );
