@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/activity_tracker.dart';
 import 'soru4.dart'; // TasitSinifla sınıfının olduğu dosya
-import '../screens/siniflandirma_sorulari_screen.dart';
 
 class BoyutSinifla extends StatefulWidget {
   const BoyutSinifla({super.key});
@@ -67,6 +67,13 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('siniflama3_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('siniflama3_wrong_count', wrongCount);
+  }
+
   void _handleDrag(Map<String, dynamic> item, String targetSize) {
     setState(() {
       isCorrect = item['size'] == targetSize;
@@ -80,6 +87,9 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
       groupList?.add(item);
       item['isPlaced'] = true;
       _checkCompletion();
+    } else if (!isCorrect) {
+      // Yanlış eşleşme
+      _trackWrongAnswer();
     }
 
     Future.delayed(const Duration(seconds: 1), () {

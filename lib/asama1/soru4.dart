@@ -3,6 +3,7 @@ import 'dart:async';
 import 'soru5.dart';
 import '../utils/activity_tracker.dart';
 import '../screens/matching_questions_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Soru4 extends StatefulWidget {
   const Soru4({super.key});
@@ -36,6 +37,13 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
   void dispose() {
     _feedbackController.dispose();
     super.dispose();
+  }
+
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama1_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('asama1_wrong_count', wrongCount);
   }
 
   void _handleTap(int index, bool isLeft) {
@@ -83,6 +91,7 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
           }
         } else {
           // Yanlış cevap için feedback'i 2 saniye sonra gizle
+          _trackWrongAnswer();
           Future.delayed(const Duration(seconds: 2), () {
             if (mounted) {
               setState(() {

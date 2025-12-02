@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'soru2.dart';
 import '../screens/matching_questions_screen.dart';
 import 'package:provider/provider.dart';
@@ -65,6 +66,7 @@ class _ActivityMatchingState extends State<ActivityMatching>
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
+  bool _wrongCountReset = false;
 
   void _shuffleDescriptions() {
     shuffledDescriptions = List.from(
@@ -98,6 +100,27 @@ class _ActivityMatchingState extends State<ActivityMatching>
     _feedbackController.dispose();
     _slideController.dispose();
     super.dispose();
+  }
+
+  Future<void> _resetWrongCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('asama3_wrong_count', 0);
+    _wrongCountReset = true;
+  }
+
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama3_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('asama3_wrong_count', wrongCount);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_wrongCountReset) {
+      _resetWrongCount();
+    }
   }
 
   void _handleTap(int index, bool isLeft) {

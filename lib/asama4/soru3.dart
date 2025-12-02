@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import '../screens/matching_questions_screen.dart';
 import 'soru4.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Soru3 extends StatefulWidget {
   const Soru3({super.key});
@@ -87,6 +88,13 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama4_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('asama4_wrong_count', wrongCount);
+  }
+
   void _handleLeftTap(int index) {
     if (matchedLeft[index]) return;
     setState(() => selectedLeftIndex = index);
@@ -134,7 +142,7 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
         });
       }
     } else {
-      // Yanlış eşleşme durumunda herhangi bir state kilidi yok; sadece geri bildirim gösteriyoruz
+      _trackWrongAnswer();
       setState(() {
         matchedLeft[selectedLeftIndex!] = false;
         matchedRight[selectedRightIndex!] = false;
