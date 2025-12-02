@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'soru2.dart';
 import '../screens/matching_questions_screen.dart';
 import '../utils/activity_tracker.dart';
@@ -68,6 +69,28 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
     );
 
     _slideController.forward();
+    _initializeSession();
+  }
+
+  Future<void> _initializeSession() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('esleme1_session_correct_count', 0);
+    await prefs.setInt('esleme1_session_wrong_count', 0);
+  }
+
+  Future<void> _saveQuestionResult(bool isCorrect) async {
+    final prefs = await SharedPreferences.getInstance();
+    int correctCount = prefs.getInt('esleme1_session_correct_count') ?? 0;
+    int wrongCount = prefs.getInt('esleme1_session_wrong_count') ?? 0;
+
+    if (isCorrect) {
+      correctCount++;
+    } else {
+      wrongCount++;
+    }
+
+    await prefs.setInt('esleme1_session_correct_count', correctCount);
+    await prefs.setInt('esleme1_session_wrong_count', wrongCount);
   }
 
   @override
@@ -123,7 +146,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
     _checkMatch();
   }
 
-  void _checkMatch() {
+  void _checkMatch() async {
     if (selectedLeftIndex != null && selectedRightIndex != null) {
       setState(() {
         isCorrect =
@@ -132,6 +155,9 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
         showFeedback = true;
       });
       _feedbackController.forward(from: 0);
+
+      // Doğruluk sonucunu kaydet
+      await _saveQuestionResult(isCorrect);
 
       if (isCorrect) {
         matchedLeft[currentPage][selectedLeftIndex!] = true;

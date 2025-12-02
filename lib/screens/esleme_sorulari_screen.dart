@@ -51,26 +51,28 @@ class _EslemeSorulariScreenState extends State<EslemeSorulariScreen>
 
   Future<void> _loadProgress() async {
     final prefs = await SharedPreferences.getInstance();
+
+    // Kaç aşama tamamlanmış?
+    int completed = 0;
+    if (prefs.getBool('asama1_completed') ?? false) completed = 1;
+    if (prefs.getBool('asama2_completed') ?? false) completed = 2;
+    if (prefs.getBool('asama3_completed') ?? false) completed = 3;
+    if (prefs.getBool('asama4_completed') ?? false) completed = 4;
+
     setState(() {
-      // Kaç aşama tamamlanmış?
-      int completed = 0;
-      if (prefs.getBool('asama1_completed') ?? false) completed = 1;
-      if (prefs.getBool('asama2_completed') ?? false) completed = 2;
-      if (prefs.getBool('asama3_completed') ?? false) completed = 3;
-      if (prefs.getBool('asama4_completed') ?? false) completed = 4;
       completedLevel = completed;
     });
 
-    // Tamamlanan leveller için yıldız animasyonunu başlat
+    // Yıldız animasyonlarını başlat (tamamlanmış level varsa)
     if (completedLevel > 0) {
       Future.delayed(const Duration(milliseconds: 300), () {
-        _starController1.forward(from: 0);
+        if (mounted) _starController1.forward(from: 0);
       });
       Future.delayed(const Duration(milliseconds: 500), () {
-        _starController2.forward(from: 0);
+        if (mounted) _starController2.forward(from: 0);
       });
       Future.delayed(const Duration(milliseconds: 700), () {
-        _starController3.forward(from: 0);
+        if (mounted) _starController3.forward(from: 0);
       });
     }
   }
@@ -209,11 +211,10 @@ class _EslemeSorulariScreenState extends State<EslemeSorulariScreen>
                       isCompleted: completedLevel >= 4,
                     ),
 
-                    // 4 seviye tamamlandıysa kayan yıldızlar
-                    if (completedLevel >= 4)
-                      ...List.generate(15, (index) {
-                        return _buildFallingStars(context, index);
-                      }),
+                    // Test için her zaman yıldızlar dökülür
+                    ...List.generate(30, (index) {
+                      return _buildFallingStars(context, index);
+                    }),
                   ],
                 ),
               ),
@@ -531,6 +532,9 @@ class _EslemeSorulariScreenState extends State<EslemeSorulariScreen>
     final size = (random % 20 + 15).toDouble();
     final duration = (random % 3 + 3).toDouble();
 
+    // Yıldız emojileri listesi
+    final List<String> stars = ['⭐', '🌟', '✨', '💫'];
+
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: -100, end: MediaQuery.of(context).size.height + 100),
       duration: Duration(seconds: duration.toInt()),
@@ -541,31 +545,23 @@ class _EslemeSorulariScreenState extends State<EslemeSorulariScreen>
         return Positioned(
           left: leftPosition * MediaQuery.of(context).size.width / 100,
           top: value - (delay * 100),
-          child: Opacity(
-            opacity:
-                (value > -50 && value < MediaQuery.of(context).size.height + 50)
-                    ? 1.0
-                    : 0.0,
-            child: Transform.rotate(
-              angle: (value / 100) * 3.14,
-              child: Icon(
-                Icons.star,
-                size: size,
-                color:
-                    [
-                      const Color(0xFFFFD700),
-                      const Color(0xFFFFA500),
-                      const Color(0xFFFFE55C),
-                      const Color(0xFFFFFF00),
-                    ][index % 4],
-                shadows: [
-                  Shadow(color: Colors.amber.withOpacity(0.8), blurRadius: 10),
-                ],
-              ),
+          child: Transform.rotate(
+            angle: (value / 100) * 0.5, // Yıldızlar dönerken düşer
+            child: Opacity(
+              opacity:
+                  (value > -50 &&
+                          value < MediaQuery.of(context).size.height + 50)
+                      ? 1.0
+                      : 0.0,
+              child: child,
             ),
           ),
         );
       },
+      child: Text(
+        stars[random % stars.length],
+        style: TextStyle(fontSize: size),
+      ),
     );
   }
 }

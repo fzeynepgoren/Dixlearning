@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
-import 'package:dixlearning/screens/sorting_roadmap_screen.dart';
+import 'package:dixlearning/screens/sorting_roadmap_screen_new.dart';
 
 class Asama2Soru5 extends StatefulWidget {
   const Asama2Soru5({super.key});
@@ -57,13 +57,36 @@ class _Asama2Soru5State extends State<Asama2Soru5>
     await prefs.setBool('sorting_stage_2_completed', true);
   }
 
+  Future<void> _finalizeStars() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Son soruya kadar birikmiş doğru ve yanlış sayıları al
+    int correctCount = prefs.getInt('asama2_session_correct_count') ?? 0;
+    int wrongCount = prefs.getInt('asama2_session_wrong_count') ?? 0;
+
+    // Yıldız hesaplama
+    if (correctCount + wrongCount == 5) {
+      double accuracy = correctCount / 5;
+      int stars = 0;
+
+      if (accuracy == 1.0) {
+        stars = 3;
+      } else if (accuracy >= 0.6) {
+        stars = 2;
+      } else if (accuracy >= 0.4) {
+        stars = 1;
+      }
+
+      await prefs.setInt('sorting_stage_2_stars', stars);
+    }
+  }
+
   // Yıldız sistemi için doğruluk takibi
   Future<void> _saveQuestionResult(bool isCorrect) async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Mevcut doğru ve yanlış sayılarını al
-    int correctCount = prefs.getInt('asama2_correct_count') ?? 0;
-    int wrongCount = prefs.getInt('asama2_wrong_count') ?? 0;
+    // Bu deneme için doğru ve yanlış sayılarını al
+    int correctCount = prefs.getInt('asama2_session_correct_count') ?? 0;
+    int wrongCount = prefs.getInt('asama2_session_wrong_count') ?? 0;
 
     if (isCorrect) {
       correctCount++;
@@ -72,32 +95,12 @@ class _Asama2Soru5State extends State<Asama2Soru5>
     }
 
     // Kaydet
-    await prefs.setInt('asama2_correct_count', correctCount);
-    await prefs.setInt('asama2_wrong_count', wrongCount);
-
-    // Yıldız hesaplama: Birkaç denemede doğru = 2 yıldız, %100 doğru = 3 yıldız
-    int totalQuestions = correctCount + wrongCount;
-    if (totalQuestions >= 5) {
-      // 5 soru tamamlandığında
-      double accuracy = correctCount / totalQuestions;
-      int stars = 0;
-
-      if (accuracy == 1.0) {
-        // %100 doğru
-        stars = 3;
-      } else if (accuracy >= 0.6) {
-        // %60+ doğru (birkaç denemede doğru)
-        stars = 2;
-      } else if (accuracy >= 0.4) {
-        // %40+ doğru
-        stars = 1;
-      }
-
-      await prefs.setInt('sorting_stage_2_stars', stars);
-    }
+    await prefs.setInt('asama2_session_correct_count', correctCount);
+    await prefs.setInt('asama2_session_wrong_count', wrongCount);
   }
 
   void checkOrder() async {
+    // Bu son soru, yıldız hesaplamayı burada yapacağız
     setState(() {
       isCorrect = true;
       for (int i = 0; i < stages.length; i++) {
@@ -114,15 +117,18 @@ class _Asama2Soru5State extends State<Asama2Soru5>
     // Doğruluk sonucunu kaydet
     await _saveQuestionResult(isCorrect);
 
+    // Son soru olduğu için yıldızları hesapla
     if (isCorrect) {
-      // Save completion status
       await _saveStageCompletion();
+      await _finalizeStars();
+    }
 
+    if (isCorrect) {
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-              builder: (context) => const SortingRoadmapScreen(),
+              builder: (context) => const SortingRoadmapScreenNew(),
             ),
             (route) => false,
           );
@@ -177,7 +183,8 @@ class _Asama2Soru5State extends State<Asama2Soru5>
                       onPressed: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const SortingRoadmapScreen(),
+                            builder:
+                                (context) => const SortingRoadmapScreenNew(),
                           ),
                           (route) => false,
                         );
@@ -296,7 +303,9 @@ class _Asama2Soru5State extends State<Asama2Soru5>
                             child: ElevatedButton(
                               onPressed: !showFeedback ? checkOrder : null,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFF0C329),
+                                backgroundColor: const Color(
+                                  0xFF90CAF9,
+                                ), // Açık Mavi (Eğlenceli tema)
                                 foregroundColor: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -337,8 +346,15 @@ class _Asama2Soru5State extends State<Asama2Soru5>
                                 horizontal: 20,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
