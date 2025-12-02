@@ -354,8 +354,8 @@ class _KarsilastirmaSorulariScreenState
 
             // Level butonu - Canlı ve sevimli
             Container(
-              width: 100,
-              height: 100,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 // Renkli yumuşak gölgeler
