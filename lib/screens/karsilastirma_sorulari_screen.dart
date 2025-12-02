@@ -113,11 +113,11 @@ class _KarsilastirmaSorulariScreenState
                 height: MediaQuery.of(context).size.height,
                 child: Stack(
                   children: [
-                    // Level 1: Az-Çok (En alt - ortada başlangıç)
+                    // Level 1: Az-Çok (Alt orta - başlangıç)
                     _buildLevelButton(
                       context,
                       level: 1,
-                      leftFactor: 0.50,
+                      leftFactor: 0.55,
                       topFactor: 0.82,
                       emoji: '🎯',
                       title: 'Az-Çok',
@@ -135,12 +135,12 @@ class _KarsilastirmaSorulariScreenState
                       isCompleted: completedLevel >= 1,
                     ),
 
-                    // Level 2: Büyük-Küçük (Orta-alt - solda)
+                    // Level 2: Büyük-Küçük (Sağ kıvrım)
                     _buildLevelButton(
                       context,
                       level: 2,
-                      leftFactor: 0.25,
-                      topFactor: 0.62,
+                      leftFactor: 0.75,
+                      topFactor: 0.60,
                       emoji: '🎨',
                       title: 'Büyük-Küçük',
                       color: const Color(0xFF27AE60), // Canlı yeşil
@@ -157,11 +157,11 @@ class _KarsilastirmaSorulariScreenState
                       isCompleted: completedLevel >= 2,
                     ),
 
-                    // Level 3: Kalın-İnce (Orta - sağda)
+                    // Level 3: Kalın-İnce (Sol kıvrım)
                     _buildLevelButton(
                       context,
                       level: 3,
-                      leftFactor: 0.75,
+                      leftFactor: 0.35,
                       topFactor: 0.42,
                       emoji: '🎪',
                       title: 'Kalın-İnce',
@@ -179,11 +179,11 @@ class _KarsilastirmaSorulariScreenState
                       isCompleted: completedLevel >= 3,
                     ),
 
-                    // Level 4: Uzun-Kısa (Üst - ortada)
+                    // Level 4: Uzun-Kısa (Üst kıvrım)
                     _buildLevelButton(
                       context,
                       level: 4,
-                      leftFactor: 0.50,
+                      leftFactor: 0.45,
                       topFactor: 0.22,
                       emoji: '🎁',
                       title: 'Uzun-Kısa',
