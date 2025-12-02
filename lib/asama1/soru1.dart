@@ -5,6 +5,7 @@ import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import '../providers/progress_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MeyveEsle extends StatefulWidget {
   const MeyveEsle({super.key});
@@ -31,6 +32,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
   int currentPage = 0;
+  bool _wrongCountReset = false;
 
   @override
   void initState() {
@@ -69,6 +71,15 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Aşama başında yanlış sayısını kesinlikle sıfırla (sadece bir kez)
+    if (!_wrongCountReset) {
+      _resetWrongCount();
+    }
+  }
+
+  @override
   void dispose() {
     _feedbackController.dispose();
     _slideController.dispose();
@@ -81,6 +92,19 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
       if (a[i] != b[i]) return false;
     }
     return true;
+  }
+
+  Future<void> _resetWrongCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('asama1_wrong_count', 0);
+    _wrongCountReset = true;
+  }
+
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama1_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('asama1_wrong_count', wrongCount);
   }
 
   void _handleLeftTap(int index) {
@@ -127,7 +151,10 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
               _slideController.forward(from: 0); // Reset animation for new page
             } else {
               ActivityTracker.completeActivity();
-              Provider.of<ProgressProvider>(context, listen: false).completeStage1();
+              Provider.of<ProgressProvider>(
+                context,
+                listen: false,
+              ).completeStage1();
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const GDisgrafi1()),
@@ -148,6 +175,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
         }
       } else {
         // Yanlış cevap için feedback'i 2 saniye sonra gizle
+        _trackWrongAnswer();
         Future.delayed(const Duration(seconds: 2), () {
           if (mounted) {
             setState(() {

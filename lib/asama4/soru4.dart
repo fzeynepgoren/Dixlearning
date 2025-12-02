@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import '../screens/matching_questions_screen.dart';
 import 'soru5.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MevsimHavaEsle extends StatefulWidget {
   const MevsimHavaEsle({super.key});
@@ -85,6 +86,13 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama4_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('asama4_wrong_count', wrongCount);
+  }
+
   void _handleLeftTap(int index) {
     if (matchedLeft[index]) return;
     setState(() => selectedLeftIndex = index);
@@ -134,7 +142,7 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
         });
       }
     } else {
-      // Yanlış eşleşmede state kilidi yok; yalnızca geri bildirim gösteriliyor
+      _trackWrongAnswer();
       setState(() {
         matchedLeft[selectedLeftIndex!] = false;
         matchedRight[selectedRightIndex!] = false;

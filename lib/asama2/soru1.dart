@@ -6,6 +6,7 @@ import '../utils/activity_tracker.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import '../providers/progress_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Soru1 extends StatefulWidget {
   const Soru1({super.key});
@@ -27,6 +28,7 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
+  bool _wrongCountReset = false;
 
   @override
   void initState() {
@@ -51,10 +53,32 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Aşama başında yanlış sayısını kesinlikle sıfırla (sadece bir kez)
+    if (!_wrongCountReset) {
+      _resetWrongCount();
+    }
+  }
+
+  @override
   void dispose() {
     _feedbackController.dispose();
     _slideController.dispose();
     super.dispose();
+  }
+
+  Future<void> _resetWrongCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('asama2_wrong_count', 0);
+    _wrongCountReset = true;
+  }
+
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama2_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('asama2_wrong_count', wrongCount);
   }
 
   void _handleTap(int index, bool isLeft) {
@@ -85,7 +109,10 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
 
           if (matchedLeft.every((element) => element)) {
             ActivityTracker.completeActivity();
-            Provider.of<ProgressProvider>(context, listen: false).completeStage2();
+            Provider.of<ProgressProvider>(
+              context,
+              listen: false,
+            ).completeStage2();
 
             Future.delayed(const Duration(seconds: 2), () {
               if (mounted) {
@@ -95,6 +122,8 @@ class _Soru1State extends State<Soru1> with TickerProviderStateMixin {
               }
             });
           }
+        } else {
+          _trackWrongAnswer();
         }
 
         Future.delayed(const Duration(seconds: 2), () {
