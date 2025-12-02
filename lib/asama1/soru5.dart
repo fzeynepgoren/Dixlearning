@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/matching_questions_screen.dart'; // Ana menü ekranının yolu
 
 class HayvanEsle extends StatefulWidget {
@@ -36,8 +37,51 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void _handleTap(int index, bool isLeft) {
+  Future<void> _saveStageCompletion() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('asama1_completed', true);
+  }
+
+  Future<void> _saveQuestionResult(bool isCorrect) async {
+    final prefs = await SharedPreferences.getInstance();
+    int correctCount = prefs.getInt('esleme1_session_correct_count') ?? 0;
+    int wrongCount = prefs.getInt('esleme1_session_wrong_count') ?? 0;
+
+    if (isCorrect) {
+      correctCount++;
+    } else {
+      wrongCount++;
+    }
+
+    await prefs.setInt('esleme1_session_correct_count', correctCount);
+    await prefs.setInt('esleme1_session_wrong_count', wrongCount);
+  }
+
+  Future<void> _finalizeStars() async {
+    final prefs = await SharedPreferences.getInstance();
+    int correctCount = prefs.getInt('esleme1_session_correct_count') ?? 0;
+    int wrongCount = prefs.getInt('esleme1_session_wrong_count') ?? 0;
+
+    if (correctCount + wrongCount == 5) {
+      double accuracy = correctCount / 5;
+      int stars = 0;
+
+      if (accuracy == 1.0) {
+        stars = 3;
+      } else if (accuracy >= 0.6) {
+        stars = 2;
+      } else if (accuracy >= 0.4) {
+        stars = 1;
+      }
+
+      await prefs.setInt('esleme1_stars', stars);
+    }
+  }
+
+  void _handleTap(int index, bool isLeft) async {
     if (showFeedback) return;
+
+    // Seçim işlemini yap
     setState(() {
       if (isLeft) {
         if (matchedLeft[index]) return;
@@ -46,116 +90,114 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
         if (matchedRight[index]) return;
         selectedRightIndex = index;
       }
+    });
 
-      if (selectedLeftIndex != null && selectedRightIndex != null) {
-        isCorrect =
-            leftAnimals[selectedLeftIndex!] ==
-            rightAnimals[selectedRightIndex!];
+    // Eşleşme kontrolü
+    if (selectedLeftIndex != null && selectedRightIndex != null) {
+      final isCorrectValue =
+          leftAnimals[selectedLeftIndex!] == rightAnimals[selectedRightIndex!];
+
+      setState(() {
+        isCorrect = isCorrectValue;
         showFeedback = true;
-        _feedbackController.forward(from: 0);
+      });
 
-        if (isCorrect) {
+      _feedbackController.forward(from: 0);
+
+      // Doğruluk sonucunu kaydet
+      await _saveQuestionResult(isCorrectValue);
+
+      if (isCorrectValue) {
+        setState(() {
           matchedLeft[selectedLeftIndex!] = true;
           matchedRight[selectedRightIndex!] = true;
+        });
 
-          if (matchedLeft.every((element) => element)) {
-            Future.delayed(const Duration(seconds: 2), () {
-              if (mounted) {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder:
-                      (context) => Dialog(
-                        shape: RoundedRectangleBorder(
+        if (matchedLeft.every((element) => element)) {
+          await _saveStageCompletion();
+          await _finalizeStars();
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder:
+                    (context) => Dialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Colors.blue.shade100, Colors.blue.shade50],
+                          ),
                         ),
-                        child: Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.blue.shade100,
-                                Colors.blue.shade50,
-                              ],
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.emoji_events,
+                              size: 80,
+                              color: Colors.amber,
                             ),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.emoji_events,
-                                size: 80,
-                                color: Colors.amber,
+                            const SizedBox(height: 20),
+                            const Text(
+                              'Tebrikler! 🎉',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
                               ),
-                              const SizedBox(height: 20),
-                              const Text(
-                                'Tebrikler! 🎉',
+                            ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              '1. aşamayı tamamladınız!',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            const SizedBox(height: 30),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) =>
+                                            const MatchingQuestionsScreen(),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue.shade200,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 40,
+                                  vertical: 15,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                              ),
+                              child: const Text(
+                                'Ana Menüye Dön',
                                 style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Colors.white,
                                 ),
                               ),
-                              const SizedBox(height: 10),
-                              const Text(
-                                '1. aşamayı tamamladınız!',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              const SizedBox(height: 30),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) =>
-                                              const MatchingQuestionsScreen(),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue.shade200,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 40,
-                                    vertical: 15,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Ana Menüye Dön',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                );
-              }
-            });
-          } else {
-            // Feedback'i 2 saniye sonra gizle
-            Future.delayed(const Duration(seconds: 2), () {
-              if (mounted) {
-                setState(() {
-                  showFeedback = false;
-                  selectedLeftIndex = null;
-                  selectedRightIndex = null;
-                });
-              }
-            });
-          }
+                    ),
+              );
+            }
+          });
         } else {
-          // Yanlış cevap için feedback'i 2 saniye sonra gizle
+          // Tüm eşleşmeler bitmediyse, feedback'i kısa süre sonra kapatıp seçimleri sıfırla
           Future.delayed(const Duration(seconds: 2), () {
             if (mounted) {
               setState(() {
@@ -166,8 +208,32 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
             }
           });
         }
+      } else {
+        // Yanlış cevap için feedback'i 2 saniye sonra gizle
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) {
+            setState(() {
+              showFeedback = false;
+              selectedLeftIndex = null;
+              selectedRightIndex = null;
+            });
+          }
+        });
       }
-    });
+
+      // Feedback'i 2 saniye sonra gizle (doğru cevap için)
+      if (isCorrectValue && matchedLeft.every((element) => !element)) {
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) {
+            setState(() {
+              showFeedback = false;
+              selectedLeftIndex = null;
+              selectedRightIndex = null;
+            });
+          }
+        });
+      }
+    }
   }
 
   Widget buildItem({

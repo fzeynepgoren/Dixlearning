@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/matching_questions_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
@@ -85,6 +86,11 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
     super.dispose();
   }
 
+  Future<void> _saveStageCompletion() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('asama4_completed', true);
+  }
+
   void _handleLeftTap(int index) {
     if (matchedLeft[index]) return;
     setState(() => selectedLeftIndex = index);
@@ -118,6 +124,7 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
 
       // Tüm eşleşmeler tamamlanınca tebrik diyaloğu
       if (matchedLeft.every((e) => e) && !_dialogShown) {
+        _saveStageCompletion();
         _dialogShown = true;
         Future.delayed(const Duration(milliseconds: 500), () {
           if (!mounted) return;
@@ -168,7 +175,9 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const MatchingQuestionsScreen(),
+                                builder:
+                                    (context) =>
+                                        const MatchingQuestionsScreen(),
                               ),
                             );
                           },
