@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/karsilastirma_sorulari_screen.dart';
 import 'package:dixlearning/karsilastirma_az_cok/az_cok_asama1/soru2.dart';
@@ -37,6 +38,20 @@ class _AzCokSoru1State extends State<AzCokSoru1> with TickerProviderStateMixin {
       CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
     );
     _slideController.forward();
+    _resetWrongCountSync();
+  }
+
+  void _resetWrongCountSync() {
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setInt('az_cok_asama1_wrong_count', 0);
+    });
+  }
+
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('az_cok_asama1_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('az_cok_asama1_wrong_count', wrongCount);
   }
 
   @override
@@ -63,6 +78,7 @@ class _AzCokSoru1State extends State<AzCokSoru1> with TickerProviderStateMixin {
         }
       });
     } else {
+      _trackWrongAnswer();
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           setState(() {

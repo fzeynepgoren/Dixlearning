@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/karsilastirma_sorulari_screen.dart';
 import 'soru7.dart';
@@ -46,6 +47,13 @@ class _AzCokSoru6State extends State<AzCokSoru6> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('az_cok_asama1_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('az_cok_asama1_wrong_count', wrongCount);
+  }
+
   void checkAnswer(bool isCokYildiz) {
     setState(() {
       selectedAnswer = isCokYildiz;
@@ -63,6 +71,7 @@ class _AzCokSoru6State extends State<AzCokSoru6> with TickerProviderStateMixin {
         }
       });
     } else {
+      _trackWrongAnswer();
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           setState(() {

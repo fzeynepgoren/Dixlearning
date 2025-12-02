@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/karsilastirma_sorulari_screen.dart';
 import 'soru2.dart';
 
@@ -36,6 +37,20 @@ class _UzunKisaAgacSorusuState extends State<UzunKisaAgacSorusu>
       CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
     );
     _slideController.forward();
+    _resetWrongCountSync();
+  }
+
+  void _resetWrongCountSync() {
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setInt('uzun_kisa_wrong_count', 0);
+    });
+  }
+
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('uzun_kisa_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('uzun_kisa_wrong_count', wrongCount);
   }
 
   @override
@@ -60,6 +75,7 @@ class _UzunKisaAgacSorusuState extends State<UzunKisaAgacSorusu>
         );
       });
     } else {
+      _trackWrongAnswer();
       Future.delayed(const Duration(seconds: 2), () {
         if (!mounted) return;
         setState(() {
