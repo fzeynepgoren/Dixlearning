@@ -4,6 +4,7 @@ import 'package:dixlearning/asama4/soru2.dart';
 import '../screens/matching_questions_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/progress_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DuyguYuzEsle extends StatefulWidget {
   const DuyguYuzEsle({super.key});
@@ -27,6 +28,7 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
   bool _dialogShown = false;
+  bool _wrongCountReset = false;
 
   final Map<String, String> itemToName = {
     '😊': 'Mutlu',
@@ -73,6 +75,28 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
     _feedbackController.dispose();
     _slideController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Aşama başında yanlış sayısını kesinlikle sıfırla (sadece bir kez)
+    if (!_wrongCountReset) {
+      _resetWrongCount();
+    }
+  }
+
+  Future<void> _resetWrongCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('asama4_wrong_count', 0);
+    _wrongCountReset = true;
+  }
+
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama4_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('asama4_wrong_count', wrongCount);
   }
 
   void _handleLeftTap(int index) {
@@ -126,7 +150,8 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
           });
         }
       } else {
-        // Yanlış eşleşme durumunda kutuları kırmızı yap
+        // Yanlış eşleşme
+        _trackWrongAnswer();
         setState(() {
           matchedLeft[selectedLeftIndex!] = false;
           matchedRight[selectedRightIndex!] = false;

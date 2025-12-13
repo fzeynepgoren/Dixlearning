@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import 'soru5.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
@@ -65,6 +66,13 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
     emojiler = tumEmojiler;
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('siniflama2_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('siniflama2_wrong_count', wrongCount);
+  }
+
   void _handleDrag(String draggedEmoji, String targetCategory) {
     bool isCorrectMatch = dogruEslesmeler[draggedEmoji] == targetCategory;
 
@@ -82,6 +90,9 @@ class _TeknolojikSiniflaState extends State<TeknolojikSinifla>
         }
       });
       _checkCompletion();
+    } else {
+      // Yanlış eşleşme
+      _trackWrongAnswer();
     }
 
     Future.delayed(const Duration(seconds: 1), () {

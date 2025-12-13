@@ -178,6 +178,14 @@ flutter:
     - assets/siniflama2/
     - assets/kalin_ince_asa1/
     - assets/screensphoto/
+    - assets/popup/uzay_popup.png
+    - assets/popup/sualti_popup.png
+    - assets/popup/denizyildizi.png
+    - assets/popup/yildiz.png
+    - assets/popup/beyazyildiz.png
+    - assets/popup/col_popup.png
+    - assets/popup/seker_yildiz.png
+    - assets/popup/seker_popup.png
   
 
     

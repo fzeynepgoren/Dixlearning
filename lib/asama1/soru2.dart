@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../screens/matching_questions_screen.dart';
 import '../utils/activity_tracker.dart';
 import 'soru3.dart'; // GeometricMatching burada tanımlı
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GDisgrafi1 extends StatefulWidget {
   const GDisgrafi1({super.key});
@@ -68,6 +69,13 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
     return true;
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama1_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('asama1_wrong_count', wrongCount);
+  }
+
   void _handleLeftTap(int index) {
     if (matchedLeft[index] || showFeedback) return;
     setState(() => selectedLeftIndex = index);
@@ -123,6 +131,7 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
         }
       } else {
         // Yanlış cevap için feedback'i 2 saniye sonra gizle
+        _trackWrongAnswer();
         Future.delayed(const Duration(seconds: 2), () {
           if (mounted) {
             setState(() {

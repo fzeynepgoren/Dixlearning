@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'soru3.dart';
 import '../screens/matching_questions_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DuyuOrganEsle extends StatefulWidget {
   const DuyuOrganEsle({super.key});
@@ -78,6 +79,13 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama4_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('asama4_wrong_count', wrongCount);
+  }
+
   void _handleLeftTap(int index) {
     if (matchedLeft[index]) return;
     setState(() {
@@ -123,7 +131,7 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
           });
         }
       } else {
-        // yanlışta explicit bir şey yapmana gerek yok; renkler showFeedback/isCorrect ile yönetiliyor
+        _trackWrongAnswer();
       }
 
       Future.delayed(const Duration(seconds: 1), () {

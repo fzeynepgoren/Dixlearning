@@ -47,49 +47,6 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
       CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
     );
     _slideController.forward();
-    _initializeSession();
-  }
-
-  Future<void> _initializeSession() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('siniflama1_session_correct_count', 0);
-    await prefs.setInt('siniflama1_session_wrong_count', 0);
-  }
-
-  Future<void> _saveQuestionResult(bool isCorrect) async {
-    final prefs = await SharedPreferences.getInstance();
-    int correctCount = prefs.getInt('siniflama1_session_correct_count') ?? 0;
-    int wrongCount = prefs.getInt('siniflama1_session_wrong_count') ?? 0;
-
-    if (isCorrect) {
-      correctCount++;
-    } else {
-      wrongCount++;
-    }
-
-    await prefs.setInt('siniflama1_session_correct_count', correctCount);
-    await prefs.setInt('siniflama1_session_wrong_count', wrongCount);
-  }
-
-  Future<void> _finalizeStars() async {
-    final prefs = await SharedPreferences.getInstance();
-    int correctCount = prefs.getInt('siniflama1_session_correct_count') ?? 0;
-    int wrongCount = prefs.getInt('siniflama1_session_wrong_count') ?? 0;
-
-    if (correctCount + wrongCount == 5) {
-      double accuracy = correctCount / 5;
-      int stars = 0;
-
-      if (accuracy == 1.0) {
-        stars = 3;
-      } else if (accuracy >= 0.6) {
-        stars = 2;
-      } else if (accuracy >= 0.4) {
-        stars = 1;
-      }
-
-      await prefs.setInt('siniflama1_stars', stars);
-    }
   }
 
   @override
@@ -119,263 +76,168 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
     });
   }
 
+  Future<int> _calculateStars() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('siniflama1_wrong_count') ?? 0;
+
+    if (wrongCount >= 0 && wrongCount <= 4) {
+      return 3;
+    } else if (wrongCount >= 5 && wrongCount <= 8) {
+      return 2;
+    } else {
+      // 9 ve üzeri
+      return 1;
+    }
+  }
+
   void _checkCompletion() async {
     if (fourLegsGroup.length == 2 && twoLegsGroup.length == 2) {
       _handleDragFeedback(
         true,
       ); // Tüm doğru eşleşmeler bittiğinde pozitif geri bildirim
 
-      // Level 1'i tamamlandı olarak kaydet
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('siniflama1_completed', true);
-      await _finalizeStars();
+      try {
+        // Level 1'i tamamlandı olarak kaydet
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt('siniflama_completed_level', 1);
 
-      Future.delayed(const Duration(milliseconds: 1500), () {
+        await Future.delayed(const Duration(milliseconds: 1500));
+        
+        if (!mounted) return;
+        
+        final prefs2 = await SharedPreferences.getInstance();
+        int stars = await _calculateStars();
+        int wrongCount = prefs2.getInt('siniflama1_wrong_count') ?? 0;
+        await prefs2.setInt('siniflama1_final_wrong_count', wrongCount);
+        await prefs2.setInt('siniflama1_wrong_count', 0); // Reset for next playthrough
+
         if (mounted) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder:
-                (context) => Dialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  elevation: 25,
-                  child: Container(
-                    padding: const EdgeInsets.all(40),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Colors.white, Colors.blue.shade50],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 25,
-                          offset: const Offset(0, 15),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Custom Golden Trophy Icon
-                        SizedBox(
-                          width: 120,
-                          height: 120,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              // Trophy Cup
-                              Container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  color: Colors.amber.shade300,
-                                  borderRadius: BorderRadius.circular(40),
-                                  border: Border.all(
-                                    color: Colors.blue.shade800,
-                                    width: 2,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.amber.withOpacity(0.3),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 5),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    Icons.star,
-                                    color: Colors.amber.shade600,
-                                    size: 40,
-                                  ),
-                                ),
-                              ),
-                              // Trophy Handles
-                              Positioned(
-                                left: 10,
-                                top: 25,
-                                child: Container(
-                                  width: 20,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    color: Colors.amber.shade300,
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: Colors.blue.shade800,
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                right: 10,
-                                top: 25,
-                                child: Container(
-                                  width: 20,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    color: Colors.amber.shade300,
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: Colors.blue.shade800,
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Trophy Base
-                              Positioned(
-                                bottom: 0,
-                                child: Container(
-                                  width: 100,
-                                  height: 25,
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue.shade800,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.blue.shade800,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Container(
-                                      width: 60,
-                                      height: 8,
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue.shade400,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Decorative Stars
-                              Positioned(
-                                top: 5,
-                                left: 20,
-                                child: Icon(
-                                  Icons.star,
-                                  color: Colors.amber.shade400,
-                                  size: 12,
-                                ),
-                              ),
-                              Positioned(
-                                top: 5,
-                                right: 20,
-                                child: Icon(
-                                  Icons.star,
-                                  color: Colors.amber.shade400,
-                                  size: 12,
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 30,
-                                left: 15,
-                                child: Icon(
-                                  Icons.star,
-                                  color: Colors.amber.shade400,
-                                  size: 10,
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 30,
-                                right: 15,
-                                child: Icon(
-                                  Icons.star,
-                                  color: Colors.amber.shade400,
-                                  size: 10,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-                        Text(
-                          Provider.of<LanguageProvider>(
-                                context,
-                                listen: false,
-                              ).isEnglish
-                              ? 'CONGRATULATIONS!'
-                              : 'TEBRİKLER',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.blue.shade800,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          Provider.of<LanguageProvider>(
-                                context,
-                                listen: false,
-                              ).isEnglish
-                              ? 'You have completed the activity!'
-                              : 'Etkinliği tamamladınız!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey.shade600,
-                            height: 1.5,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 35),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) =>
-                                          const ClassificationQuestionsScreen(),
-                                ),
-                                (route) => false,
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.blue.shade600,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 40,
-                                vertical: 18,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              elevation: 12,
-                              shadowColor: Colors.blue.withOpacity(0.4),
-                            ),
-                            child: Text(
-                              Provider.of<LanguageProvider>(
-                                    context,
-                                    listen: false,
-                                  ).isEnglish
-                                  ? 'GO TO MENU'
-                                  : 'MENÜYE GİT',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-          );
+          _showCompletionDialog(stars);
         }
-      });
+      } catch (e) {
+        // Hata durumunda sessizce devam et veya logla
+        if (mounted) {
+          // Hata olsa bile popup'ı göster
+          int stars = await _calculateStars();
+          _showCompletionDialog(stars);
+        }
+      }
     }
+  }
+
+  void _showCompletionDialog(int stars) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(20),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final screenHeight = MediaQuery.of(context).size.height;
+            // Ekrana sığdır - dinamik boyut
+            final popupWidth = screenWidth * 0.9;
+            final popupHeight = screenHeight * 0.75;
+
+            return TweenAnimationBuilder<double>(
+              duration: const Duration(milliseconds: 600),
+              tween: Tween(begin: 0.0, end: 1.0),
+              curve: Curves.easeOutBack,
+              builder: (context, value, child) {
+                return Transform.scale(
+                  scale: 0.8 + (value * 0.2),
+                  child: Opacity(
+                    opacity: value,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Sualtı popup görseli - ekranın ortasına
+                        Image.asset(
+                          'assets/popup/sualti_popup.png',
+                          width: popupWidth,
+                          height: popupHeight,
+                          fit: BoxFit.contain,
+                        ),
+                        // Deniz yıldızı görseli - popup'ın ortasındaki dikdörtgene
+                        // Yıldız sayısına göre göster (yan yana)
+                        if (stars > 0)
+                          Positioned(
+                            // Popup'ın ortasına yerleştir - popup görselinin ortasındaki dikdörtgen alanına
+                            top: popupHeight * 0.45,
+                            left: 0,
+                            right: 0,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: List.generate(stars, (index) {
+                                // Her deniz yıldızı için boyut - popup genişliğine göre dinamik
+                                // Popup'ın ortasındaki dikdörtgene sığacak şekilde
+                                final individualSize = (popupWidth * 0.15).clamp(40.0, 80.0);
+                                return TweenAnimationBuilder<double>(
+                                  duration: Duration(milliseconds: 400 + (index * 200)),
+                                  tween: Tween(begin: 0.0, end: 1.0),
+                                  curve: Curves.elasticOut,
+                                  builder: (context, scaleValue, child) {
+                                    return Transform.scale(
+                                      scale: scaleValue,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: popupWidth * 0.02,
+                                        ),
+                                        child: Image.asset(
+                                          'assets/popup/denizyildizi.png',
+                                          width: individualSize,
+                                          height: individualSize,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }),
+                            ),
+                          ),
+                        // MENÜYE GİT butonu - popup'ın alt kısmına transparan buton
+                        Positioned(
+                          bottom: popupHeight * 0.28,
+                          left: popupWidth * 0.15,
+                          right: popupWidth * 0.15,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ClassificationQuestionsScreen(),
+                                  ),
+                                  (route) => false,
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                width: double.infinity,
+                                height: (popupHeight * 0.1).clamp(45.0, 65.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
   }
 
   // ÖRNEK TASARIM: Sürüklenen Öğenin Kutusu

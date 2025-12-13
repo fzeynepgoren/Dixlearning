@@ -3,6 +3,7 @@ import 'soru5.dart';
 import '../screens/matching_questions_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Soru4 extends StatefulWidget {
   const Soru4({super.key});
@@ -53,6 +54,13 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama2_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('asama2_wrong_count', wrongCount);
+  }
+
   void _handleTap(int index, bool isLeft) {
     if (allMatched) return;
 
@@ -99,6 +107,8 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
           }
         });
       }
+    } else {
+      _trackWrongAnswer();
     }
 
     Future.delayed(const Duration(seconds: 1), () {
