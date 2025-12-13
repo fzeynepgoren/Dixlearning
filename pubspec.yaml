@@ -47,6 +47,12 @@ flutter:
     - assets/kiz_maskot.png
     - assets/konusma_balonu.png
     - assets/SIRALAMA_RESIMLERI/
+    - assets/SIRALAMA_RESIMLERI/Asama5/
+    - assets/SIRALAMA_RESIMLERI/Asama5/soru1/
+    - assets/SIRALAMA_RESIMLERI/Asama5/soru2/
+    - assets/SIRALAMA_RESIMLERI/Asama5/soru3/
+    - assets/SIRALAMA_RESIMLERI/Asama5/soru4/
+    - assets/SIRALAMA_RESIMLERI/Asama5/soru5/
     
     # Az-Çok Karşılaştırma
     - assets/az_cok_asa1/soru1/

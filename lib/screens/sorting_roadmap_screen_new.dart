@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
-import '../../SIRALAMA_SORULARI/Asama2/soru1.dart';
-import '../../SIRALAMA_SORULARI/Asama3/soru1.dart';
-import '../../SIRALAMA_SORULARI/Asama4/soru1.dart';
+import '../SIRALAMA_SORULARI/Asama1/soru1.dart';
+import '../SIRALAMA_SORULARI/Asama2/soru1.dart';
+import '../SIRALAMA_SORULARI/Asama3/soru1.dart';
+import '../SIRALAMA_SORULARI/Asama4/soru1.dart';
+import '../SIRALAMA_SORULARI/Asama5/soru1.dart';
 import 'home_screen.dart';
 
 class SortingRoadmapScreenNew extends StatefulWidget {
@@ -77,6 +79,10 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
   }
 
   bool _isLevelUnlocked(int level) {
+    // Level 5 (İleri Seviye) her zaman açık
+    if (level == 5) {
+      return true;
+    }
     return level <= completedLevel + 1;
   }
 
@@ -132,13 +138,13 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
                       title: isEnglish ? '2 Pictures' : '2 Resim',
                       color: const Color(0xFFE74C3C), // Kırmızı
                       onTap: () async {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              isEnglish ? 'Coming soon!' : 'Yakında eklenecek!',
-                            ),
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Asama1Soru1(),
                           ),
                         );
+                        _loadProgress();
                       },
                       isUnlocked: _isLevelUnlocked(1),
                       isCompleted: completedLevel >= 1,
@@ -220,13 +226,13 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
                       title: isEnglish ? 'Advanced' : 'İleri Seviye',
                       color: const Color(0xFFF39C12), // Turuncu
                       onTap: () async {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              isEnglish ? 'Coming soon!' : 'Yakında eklenecek!',
-                            ),
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Asama5Soru1(),
                           ),
                         );
+                        _loadProgress();
                       },
                       isUnlocked: _isLevelUnlocked(5),
                       isCompleted: completedLevel >= 5,
