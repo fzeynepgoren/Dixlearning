@@ -210,7 +210,7 @@ class _KarsilastirmaSorulariScreenState
                 ),
               ),
 
-              // Sevimli geri butonu - Çöl Teması (Güneş Şekli)
+              // Sevimli geri butonu
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -230,12 +230,12 @@ class _KarsilastirmaSorulariScreenState
                         gradient: const LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [Color(0xFFFFB347), Color(0xFFFF8C3C)],
+                          colors: [Color(0xFFC1825D), Color(0xFFC1825D)],
                         ),
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.orange.withOpacity(0.5),
+                            color: const Color(0xFFF06491).withOpacity(0.5),
                             blurRadius: 20,
                             spreadRadius: 2,
                             offset: const Offset(0, 6),
@@ -245,9 +245,18 @@ class _KarsilastirmaSorulariScreenState
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          // Güneş ışınları efekti
-                          Positioned.fill(
-                            child: CustomPaint(painter: SunRaysPainter()),
+                          // Parlama efekti
+                          Positioned(
+                            top: 10,
+                            left: 12,
+                            child: Container(
+                              width: 15,
+                              height: 15,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.4),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
                           ),
                           const Icon(
                             Icons.arrow_back_rounded,
