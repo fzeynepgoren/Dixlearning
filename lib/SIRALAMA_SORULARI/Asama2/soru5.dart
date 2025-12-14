@@ -63,21 +63,129 @@ class _Asama2Soru5State extends State<Asama2Soru5>
     int correctCount = prefs.getInt('asama2_session_correct_count') ?? 0;
     int wrongCount = prefs.getInt('asama2_session_wrong_count') ?? 0;
 
-    // Yıldız hesaplama
+    // Yıldız hesaplama - yanlış oranına göre
     if (correctCount + wrongCount == 5) {
-      double accuracy = correctCount / 5;
+      double wrongRatio = wrongCount / 5;
       int stars = 0;
 
-      if (accuracy == 1.0) {
+      if (wrongRatio <= 0.25) {
         stars = 3;
-      } else if (accuracy >= 0.6) {
+      } else if (wrongRatio <= 0.50) {
         stars = 2;
-      } else if (accuracy >= 0.4) {
+      } else {
         stars = 1;
       }
 
       await prefs.setInt('sorting_stage_2_stars', stars);
     }
+  }
+
+  void _showCompletionDialog(int stars) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.all(20),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final screenWidth = MediaQuery.of(context).size.width;
+                final screenHeight = MediaQuery.of(context).size.height;
+                final popupWidth = screenWidth * 0.9;
+                final popupHeight = screenHeight * 0.75;
+
+                return TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 600),
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  curve: Curves.easeOutBack,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: 0.8 + (value * 0.2),
+                      child: Opacity(
+                        opacity: value.clamp(0.0, 1.0),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Şeker popup görseli
+                            Image.asset(
+                              'assets/popup/seker_popup.png',
+                              width: popupWidth,
+                              height: popupHeight,
+                              fit: BoxFit.contain,
+                            ),
+                            // Yıldız sayısına göre göster
+                            if (stars > 0)
+                              Positioned(
+                                top: popupHeight * 0.45,
+                                left: 0,
+                                right: 0,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: List.generate(stars, (index) {
+                                    final individualSize = (popupWidth * 0.15)
+                                        .clamp(40.0, 80.0);
+                                    return TweenAnimationBuilder<double>(
+                                      duration: Duration(
+                                        milliseconds: 400 + (index * 200),
+                                      ),
+                                      tween: Tween(begin: 0.0, end: 1.0),
+                                      curve: Curves.elasticOut,
+                                      builder: (context, scaleValue, child) {
+                                        return Transform.scale(
+                                          scale: scaleValue,
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: popupWidth * 0.02,
+                                            ),
+                                            child: Image.asset(
+                                              'assets/popup/lolipop.png',
+                                              width: individualSize,
+                                              height: individualSize,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }),
+                                ),
+                              ),
+                            // MENÜYE GİT butonu - görünmez
+                            Positioned(
+                              bottom: popupHeight * 0.28,
+                              left: popupWidth * 0.15,
+                              right: popupWidth * 0.15,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              const SortingRoadmapScreenNew(),
+                                    ),
+                                    (route) => false,
+                                  );
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  height: (popupHeight * 0.1).clamp(45.0, 65.0),
+                                  color: Colors.transparent,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+    );
   }
 
   // Yıldız sistemi için doğruluk takibi
@@ -124,14 +232,14 @@ class _Asama2Soru5State extends State<Asama2Soru5>
     }
 
     if (isCorrect) {
-      Future.delayed(const Duration(seconds: 2), () {
+      Future.delayed(const Duration(seconds: 2), () async {
         if (mounted) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (context) => const SortingRoadmapScreenNew(),
-            ),
-            (route) => false,
-          );
+          setState(() {
+            showFeedback = false;
+          });
+          final prefs = await SharedPreferences.getInstance();
+          int stars = prefs.getInt('sorting_stage_2_stars') ?? 0;
+          _showCompletionDialog(stars);
         }
       });
     } else {

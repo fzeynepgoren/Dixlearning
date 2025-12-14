@@ -19,6 +19,7 @@ class SortingRoadmapScreenNew extends StatefulWidget {
 class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
     with TickerProviderStateMixin {
   int completedLevel = 0;
+  Map<int, int> levelStars = {}; // Her level için yıldız sayısı
   late AnimationController _starController1;
   late AnimationController _starController2;
   late AnimationController _starController3;
@@ -60,6 +61,11 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
       if (prefs.getBool('sorting_stage_4_completed') ?? false) completed = 4;
       if (prefs.getBool('sorting_stage_5_completed') ?? false) completed = 5;
       completedLevel = completed;
+
+      // Her level için yıldız sayısını yükle
+      for (int i = 1; i <= 5; i++) {
+        levelStars[i] = prefs.getInt('sorting_stage_${i}_stars') ?? 0;
+      }
     });
 
     // Tamamlanan leveller için yıldız animasyonunu başlat
@@ -142,6 +148,7 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
                       },
                       isUnlocked: _isLevelUnlocked(1),
                       isCompleted: completedLevel >= 1,
+                      starCount: levelStars[1] ?? 0,
                     ),
 
                     // Level 2: 3 Resimli Sıralama (Sağ kıvrım - 1'in sağ üstü)
@@ -164,6 +171,7 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
                       },
                       isUnlocked: _isLevelUnlocked(2),
                       isCompleted: completedLevel >= 2,
+                      starCount: levelStars[2] ?? 0,
                     ),
 
                     // Level 3: 4 Resimli Sıralama (Sol kıvrım)
@@ -186,6 +194,7 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
                       },
                       isUnlocked: _isLevelUnlocked(3),
                       isCompleted: completedLevel >= 3,
+                      starCount: levelStars[3] ?? 0,
                     ),
 
                     // Level 4: 3 Fotoğraf (Günlük Rutinler) (Sağ üst kıvrım)
@@ -208,6 +217,7 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
                       },
                       isUnlocked: _isLevelUnlocked(4),
                       isCompleted: completedLevel >= 4,
+                      starCount: levelStars[4] ?? 0,
                     ),
 
                     // Level 5: İleri Seviye (Şato önü)
@@ -230,6 +240,7 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
                       },
                       isUnlocked: _isLevelUnlocked(5),
                       isCompleted: completedLevel >= 5,
+                      starCount: levelStars[5] ?? 0,
                     ),
 
                     // Tamamlanan her aşama için şekerler dökülür
@@ -318,6 +329,7 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
     required VoidCallback onTap,
     required bool isUnlocked,
     required bool isCompleted,
+    required int starCount,
   }) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -329,65 +341,68 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
         onTap: isUnlocked ? onTap : null,
         child: Column(
           children: [
-            // Yıldızlar (level tamamlandıysa) - Animasyonlu
-            if (isCompleted)
+            // Yıldızlar (level tamamlandıysa) - Animasyonlu, yanlış sayısına göre
+            if (isCompleted && starCount > 0)
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _starController1,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      child: const Icon(
-                        Icons.star_rounded,
-                        color: Colors.amber,
-                        size: 22,
-                        shadows: [
-                          Shadow(color: Colors.orange, blurRadius: 6),
-                          Shadow(color: Colors.amber, blurRadius: 12),
-                        ],
+                  if (starCount >= 1)
+                    ScaleTransition(
+                      scale: CurvedAnimation(
+                        parent: _starController1,
+                        curve: Curves.elasticOut,
+                      ),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 3),
+                        child: const Icon(
+                          Icons.star_rounded,
+                          color: Colors.amber,
+                          size: 22,
+                          shadows: [
+                            Shadow(color: Colors.orange, blurRadius: 6),
+                            Shadow(color: Colors.amber, blurRadius: 12),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _starController2,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      child: const Icon(
-                        Icons.star_rounded,
-                        color: Colors.amber,
-                        size: 22,
-                        shadows: [
-                          Shadow(color: Colors.orange, blurRadius: 6),
-                          Shadow(color: Colors.amber, blurRadius: 12),
-                        ],
+                  if (starCount >= 2)
+                    ScaleTransition(
+                      scale: CurvedAnimation(
+                        parent: _starController2,
+                        curve: Curves.elasticOut,
+                      ),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 3),
+                        child: const Icon(
+                          Icons.star_rounded,
+                          color: Colors.amber,
+                          size: 22,
+                          shadows: [
+                            Shadow(color: Colors.orange, blurRadius: 6),
+                            Shadow(color: Colors.amber, blurRadius: 12),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  ScaleTransition(
-                    scale: CurvedAnimation(
-                      parent: _starController3,
-                      curve: Curves.elasticOut,
-                    ),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      child: const Icon(
-                        Icons.star_rounded,
-                        color: Colors.amber,
-                        size: 22,
-                        shadows: [
-                          Shadow(color: Colors.orange, blurRadius: 6),
-                          Shadow(color: Colors.amber, blurRadius: 12),
-                        ],
+                  if (starCount >= 3)
+                    ScaleTransition(
+                      scale: CurvedAnimation(
+                        parent: _starController3,
+                        curve: Curves.elasticOut,
+                      ),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 3),
+                        child: const Icon(
+                          Icons.star_rounded,
+                          color: Colors.amber,
+                          size: 22,
+                          shadows: [
+                            Shadow(color: Colors.orange, blurRadius: 6),
+                            Shadow(color: Colors.amber, blurRadius: 12),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             if (isCompleted) const SizedBox(height: 8),

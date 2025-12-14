@@ -93,15 +93,65 @@ class _ParaSiniflaState extends State<ParaSinifla>
     });
   }
 
+<<<<<<< Updated upstream
   void _checkCompletion() async {
     if (eslesenler.length == suruklenecekOgeler.length) {
       // Level 2'yi tamamlandı olarak kaydet
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('siniflama_completed_level', 2);
+=======
+  Future<int> _calculateStars() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('siniflama2_wrong_count') ?? 0;
+
+    // Toplam doğru cevap sayısı (soru1: 4, soru2: 4, soru4: 4, soru5: 4)
+    const int totalCorrect = 16;
+    // Toplam deneme = doğru + yanlış
+    int totalAttempts = totalCorrect + wrongCount;
+    // Yanlış oranı
+    double wrongRatio = wrongCount / totalAttempts;
+
+    int stars;
+    if (wrongRatio <= 0.25) {
+      stars = 3;
+    } else if (wrongRatio <= 0.50) {
+      stars = 2;
+    } else {
+      // %75 ve üzeri
+      stars = 1;
+    }
+
+    // Yıldız sayısını kaydet
+    await prefs.setInt('siniflama_level_2_stars', stars);
+
+    return stars;
+  }
+
+  void _checkCompletion() async {
+    if (eslesenler.length == suruklenecekOgeler.length) {
+      try {
+        // Level 2'yi tamamlandı olarak kaydet
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt('siniflama_completed_level', 2);
+
+        await Future.delayed(const Duration(milliseconds: 1500));
+
+        if (!mounted) return;
+
+        final prefs2 = await SharedPreferences.getInstance();
+        int stars = await _calculateStars();
+        int wrongCount = prefs2.getInt('siniflama2_wrong_count') ?? 0;
+        await prefs2.setInt('siniflama2_final_wrong_count', wrongCount);
+        await prefs2.setInt(
+          'siniflama2_wrong_count',
+          0,
+        ); // Reset for next playthrough
+>>>>>>> Stashed changes
 
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted && !_dialogShown) {
           _dialogShown = true;
+<<<<<<< Updated upstream
           showDialog(
             context: context,
             barrierDismissible: false,
@@ -156,6 +206,118 @@ class _ParaSiniflaState extends State<ParaSinifla>
                                       offset: const Offset(0, 5),
                                     ),
                                   ],
+=======
+          _showCompletionDialog(stars);
+        }
+      } catch (e) {
+        // Hata durumunda sessizce devam et veya logla
+        if (mounted && !_dialogShown) {
+          int stars = await _calculateStars();
+          _showCompletionDialog(stars);
+        }
+      }
+    }
+  }
+
+  void _showCompletionDialog(int stars) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.all(20),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final screenWidth = MediaQuery.of(context).size.width;
+                final screenHeight = MediaQuery.of(context).size.height;
+                // Ekrana sığdır - dinamik boyut
+                final popupWidth = screenWidth * 0.9;
+                final popupHeight = screenHeight * 0.75;
+
+                return TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 600),
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  curve: Curves.easeOutBack,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: 0.8 + (value * 0.2),
+                      child: Opacity(
+                        opacity: value.clamp(0.0, 1.0),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Sualtı popup görseli - ekranın ortasına
+                            Image.asset(
+                              'assets/popup/sualti_popup.png',
+                              width: popupWidth,
+                              height: popupHeight,
+                              fit: BoxFit.contain,
+                            ),
+                            // Deniz yıldızı görseli - popup'ın ortasındaki dikdörtgene
+                            // Yıldız sayısına göre göster (yan yana)
+                            if (stars > 0)
+                              Positioned(
+                                // Popup'ın ortasına yerleştir - popup görselinin ortasındaki dikdörtgen alanına
+                                top: popupHeight * 0.45,
+                                left: 0,
+                                right: 0,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: List.generate(stars, (index) {
+                                    // Her deniz yıldızı için boyut - popup genişliğine göre dinamik
+                                    // Popup'ın ortasındaki dikdörtgene sığacak şekilde
+                                    final individualSize = (popupWidth * 0.15)
+                                        .clamp(40.0, 80.0);
+                                    return TweenAnimationBuilder<double>(
+                                      duration: Duration(
+                                        milliseconds: 400 + (index * 200),
+                                      ),
+                                      tween: Tween(begin: 0.0, end: 1.0),
+                                      curve: Curves.elasticOut,
+                                      builder: (context, scaleValue, child) {
+                                        return Transform.scale(
+                                          scale: scaleValue,
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: popupWidth * 0.02,
+                                            ),
+                                            child: Image.asset(
+                                              'assets/popup/denizyildizi.png',
+                                              width: individualSize,
+                                              height: individualSize,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }),
+                                ),
+                              ),
+                            // MENÜYE GİT butonu - popup'ın alt kısmına transparan buton
+                            Positioned(
+                              bottom: popupHeight * 0.28,
+                              left: popupWidth * 0.15,
+                              right: popupWidth * 0.15,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              const ClassificationQuestionsScreen(),
+                                    ),
+                                    (route) => false,
+                                  );
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  height: (popupHeight * 0.1).clamp(45.0, 65.0),
+                                  color: Colors.transparent,
+>>>>>>> Stashed changes
                                 ),
                                 child: Center(
                                   child: Icon(
@@ -336,8 +498,9 @@ class _ParaSiniflaState extends State<ParaSinifla>
                                 letterSpacing: 0.8,
                               ),
                             ),
-                          ),
+                          ],
                         ),
+<<<<<<< Updated upstream
                       ],
                     ),
                   ),
@@ -346,6 +509,16 @@ class _ParaSiniflaState extends State<ParaSinifla>
         }
       });
     }
+=======
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+    );
+>>>>>>> Stashed changes
   }
 
   @override

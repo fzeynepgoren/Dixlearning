@@ -76,6 +76,43 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
     await prefs.setBool('asama3_completed', true);
   }
 
+<<<<<<< Updated upstream
+=======
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama3_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('asama3_wrong_count', wrongCount);
+  }
+
+  Future<int> _calculateStars() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama3_wrong_count') ?? 0;
+
+    // Toplam doğru cevap sayısı (5 soru × 3 eşleşme = 15)
+    const int totalCorrect = 15;
+    // Toplam deneme = doğru + yanlış
+    int totalAttempts = totalCorrect + wrongCount;
+    // Yanlış oranı
+    double wrongRatio = wrongCount / totalAttempts;
+
+    int stars;
+    if (wrongRatio <= 0.25) {
+      stars = 3;
+    } else if (wrongRatio <= 0.50) {
+      stars = 2;
+    } else {
+      // %50 üzeri
+      stars = 1;
+    }
+
+    // Yıldız sayısını kaydet
+    await prefs.setInt('esleme_level_3_stars', stars);
+
+    return stars;
+  }
+
+>>>>>>> Stashed changes
   void _handleTap(int index, bool isLeft) {
     if (isLeft && matchedLeft[index]) return;
     if (!isLeft && matchedRight[index]) return;
@@ -113,12 +150,23 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
           ActivityTracker.completeActivity();
           Future.delayed(const Duration(milliseconds: 800), () {
             if (mounted) {
+<<<<<<< Updated upstream
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (_) => const MatchingQuestionsScreen(),
                 ),
               );
+=======
+              final prefs = await SharedPreferences.getInstance();
+              int wrongCount = prefs.getInt('asama3_wrong_count') ?? 0;
+              await prefs.setInt('asama3_final_wrong_count', wrongCount);
+
+              int stars = await _calculateStars();
+              await prefs.setInt('asama3_wrong_count', 0);
+
+              _showCompletionDialog(stars);
+>>>>>>> Stashed changes
             }
           });
         }
@@ -402,4 +450,120 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
       ),
     );
   }
+<<<<<<< Updated upstream
+=======
+
+  void _showCompletionDialog(int stars) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.all(20),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final screenWidth = MediaQuery.of(context).size.width;
+                final screenHeight = MediaQuery.of(context).size.height;
+                // Ekrana sığdır - dinamik boyut
+                final popupWidth = screenWidth * 0.9;
+                final popupHeight = screenHeight * 0.75;
+
+                return TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 600),
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  curve: Curves.easeOutBack,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: 0.8 + (value * 0.2),
+                      child: Opacity(
+                        opacity: value,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Uzay popup görseli - ekranın ortasına
+                            Image.asset(
+                              'assets/popup/uzay_popup.png',
+                              width: popupWidth,
+                              height: popupHeight,
+                              fit: BoxFit.contain,
+                            ),
+                            // Yıldız görseli - popup'ın ortasındaki dikdörtgene
+                            // Yıldız sayısına göre göster (yan yana)
+                            if (stars > 0)
+                              Positioned(
+                                // Popup'ın ortasına yerleştir - popup görselinin ortasındaki dikdörtgen alanına
+                                top: popupHeight * 0.45,
+                                left: 0,
+                                right: 0,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: List.generate(stars, (index) {
+                                    // Her yıldız için boyut - popup genişliğine göre dinamik
+                                    // Popup'ın ortasındaki dikdörtgene sığacak şekilde
+                                    final individualSize = (popupWidth * 0.15)
+                                        .clamp(40.0, 80.0);
+                                    return TweenAnimationBuilder<double>(
+                                      duration: Duration(
+                                        milliseconds: 400 + (index * 200),
+                                      ),
+                                      tween: Tween(begin: 0.0, end: 1.0),
+                                      curve: Curves.elasticOut,
+                                      builder: (context, scaleValue, child) {
+                                        return Transform.scale(
+                                          scale: scaleValue,
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: popupWidth * 0.02,
+                                            ),
+                                            child: Image.asset(
+                                              'assets/popup/yildiz.png',
+                                              width: individualSize,
+                                              height: individualSize,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }),
+                                ),
+                              ),
+                            // MENÜYE GİT butonu - popup'ın alt kısmına transparan buton
+                            Positioned(
+                              bottom: popupHeight * 0.28,
+                              left: popupWidth * 0.15,
+                              right: popupWidth * 0.15,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              const MatchingQuestionsScreen(),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  height: (popupHeight * 0.1).clamp(45.0, 65.0),
+                                  color: Colors.transparent,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+    );
+  }
+>>>>>>> Stashed changes
 }

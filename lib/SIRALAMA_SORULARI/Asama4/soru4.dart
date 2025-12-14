@@ -73,18 +73,18 @@ class _Asama4Soru4State extends State<Asama4Soru4>
     // Yıldız hesaplama: Birkaç denemede doğru = 2 yıldız, %100 doğru = 3 yıldız
     int totalQuestions = correctCount + wrongCount;
     if (totalQuestions >= 5) {
-      // 5 soru tamamlandığında
-      double accuracy = correctCount / totalQuestions;
+      // 5 soru tamamlandığında - yanlış oranına göre yıldız hesapla
+      double wrongRatio = wrongCount / totalQuestions;
       int stars = 0;
 
-      if (accuracy == 1.0) {
-        // %100 doğru
+      if (wrongRatio <= 0.25) {
+        // %25 veya daha az yanlış
         stars = 3;
-      } else if (accuracy >= 0.6) {
-        // %60+ doğru (birkaç denemede doğru)
+      } else if (wrongRatio <= 0.50) {
+        // %50 veya daha az yanlış
         stars = 2;
-      } else if (accuracy >= 0.4) {
-        // %40+ doğru
+      } else {
+        // %50 üzeri yanlış
         stars = 1;
       }
 
