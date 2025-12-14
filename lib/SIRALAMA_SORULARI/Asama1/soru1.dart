@@ -31,20 +31,37 @@ class _Asama1Soru1State extends State<Asama1Soru1>
     super.initState();
     stages = [
       _ItemStage(
-        'İlk',
-        'assets/SIRALAMA_RESIMLERI/Asama1/soru1/resim1.png',
+        'Kısa',
+        'assets/SIRALAMA_RESIMLERI/Asama1/soru1/kisa.png',
       ),
       _ItemStage(
-        'İkinci',
-        'assets/SIRALAMA_RESIMLERI/Asama1/soru1/resim2.png',
+        'Orta',
+        'assets/SIRALAMA_RESIMLERI/Asama1/soru1/orta.png',
+      ),
+      _ItemStage(
+        'Uzun',
+        'assets/SIRALAMA_RESIMLERI/Asama1/soru1/uzun.png',
       ),
     ];
-    dragSources = List.from(stages)..shuffle();
+    dragSources = List.from(stages);
+    // Doğru sırada başlamaması için karıştır
+    do {
+      dragSources.shuffle();
+    } while (_isInCorrectOrder());
     _feedbackController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
     _initializeSession();
+  }
+
+  bool _isInCorrectOrder() {
+    for (int i = 0; i < stages.length; i++) {
+      if (dragSources[i].label != stages[i].label) {
+        return false;
+      }
+    }
+    return true;
   }
 
   Future<void> _initializeSession() async {
@@ -169,9 +186,10 @@ class _Asama1Soru1State extends State<Asama1Soru1>
                 ),
                 // Sıralama Alanı Kartı (Başlık ve buton da içinde)
                 Expanded(
-                  child: Center(
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
                     child: Container(
-                      margin: const EdgeInsets.fromLTRB(8, 6, 8, 6),
+                      margin: const EdgeInsets.fromLTRB(8, 6, 8, 16),
                       padding: const EdgeInsets.symmetric(
                         vertical: 12,
                         horizontal: 20,
@@ -195,8 +213,8 @@ class _Asama1Soru1State extends State<Asama1Soru1>
                             padding: const EdgeInsets.only(bottom: 6.0),
                             child: Text(
                               isEnglish
-                                  ? 'Sort the items in the correct order.'
-                                  : 'Nesneleri doğru sıraya koy.',
+                                  ? 'Sort the pencils from shortest to longest.'
+                                  : 'Kalemleri kısadan uzuna doğru sırala.',
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -223,7 +241,7 @@ class _Asama1Soru1State extends State<Asama1Soru1>
                                     key: ValueKey(dragSources[i].label),
                                     duration: const Duration(milliseconds: 200),
                                     margin: const EdgeInsets.symmetric(
-                                      vertical: 6,
+                                      vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
@@ -239,28 +257,27 @@ class _Asama1Soru1State extends State<Asama1Soru1>
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
                                         vertical: 12,
-                                        horizontal: 20,
+                                        horizontal: 16,
                                       ),
                                       child: Row(
                                         children: [
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              50,
-                                            ),
-                                            child: Image.asset(
-                                              dragSources[i].assetPath,
-                                              width: screenWidth * 0.32,
-                                              height: screenWidth * 0.32,
-                                              fit: BoxFit.cover,
+                                          Expanded(
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(12),
+                                              child: Image.asset(
+                                                dragSources[i].assetPath,
+                                                height: screenWidth * 0.28,
+                                                fit: BoxFit.contain,
+                                              ),
                                             ),
                                           ),
-                                          const Spacer(),
+                                          const SizedBox(width: 12),
                                           ReorderableDragStartListener(
                                             index: i,
                                             child: const Icon(
                                               Icons.drag_handle,
                                               color: Colors.grey,
-                                              size: 32,
+                                              size: 40,
                                             ),
                                           ),
                                         ],
@@ -270,7 +287,7 @@ class _Asama1Soru1State extends State<Asama1Soru1>
                               ],
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 6),
                           // Kontrol Butonu
                           SizedBox(
                             width: double.infinity,
@@ -303,10 +320,10 @@ class _Asama1Soru1State extends State<Asama1Soru1>
                 ),
                 // Geri Bildirim Alanı
                 Container(
-                  height: 80,
+                  height: 50,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
-                    vertical: 10,
+                    vertical: 4,
                   ),
                   child:
                       showFeedback
