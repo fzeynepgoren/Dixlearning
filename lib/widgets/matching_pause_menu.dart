@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -349,100 +350,160 @@ class _WavyTopClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    final waveHeight = 18.0;
+    // Estetik oran: dalga yüksekliği buton yüksekliğinin %5'i (daha yumuşak)
+    final waveAmplitude = size.height * 0.05;
+    // 2.5 dalga - estetik ve düzenli görünüm için
+    const waveCount = 2.5;
+    // Sol ve sağ kenarlar için oval radius (buton yüksekliğinin yarısı)
+    final verticalRadius = size.height / 2;
+    const totalPoints = 500; // Smooth geçiş için nokta sayısı
 
-    // Yuvarlak köşeler için radius - buton yüksekliğine göre ayarlanmış (yüksekliğin %30'u)
-    final cornerRadius = (size.height * 0.30).clamp(12.0, 18.0);
+    // Sol kenar - oval (sağ kenarla tam aynı şekil, simetrik)
+    // Alttan üste oval geçiş - sağ kenarla aynı formül
+    // Sol kenar alt kenarın sol ucundan başlamalı (verticalRadius, size.height)
+    path.moveTo(verticalRadius, size.height);
 
-    // Üst sol köşeden başla
-    path.moveTo(cornerRadius, 0);
+    // Sol kenar için oval noktalar - sağ kenarla tam aynı formül (simetrik, ters sırada)
+    final leftArcPoints = <Offset>[];
+    for (int i = 200; i >= 0; i--) {
+      final angle =
+          -math.pi / 2 +
+          (i / 200) * math.pi; // 90°'den -90°'ye (ters sırada, alttan üste)
+      // Sol kenar için x: verticalRadius'dan başlayıp 0'a gidip tekrar verticalRadius'a
+      // Sağ kenar: size.width - verticalRadius + verticalRadius * cos(angle)
+      // Sol kenar (simetrik): verticalRadius - verticalRadius * cos(angle)
+      final x = verticalRadius - verticalRadius * math.cos(angle);
+      final y = size.height / 2 + verticalRadius * math.sin(angle);
+      leftArcPoints.add(Offset(x, y));
+    }
 
-    // Üst kenar - 3 geniş, yayvan dalga (köşelere kadar)
-    final usableWidth = size.width - 2 * cornerRadius;
-    final waveAmplitude = waveHeight * 0.12; // Dalga yüksekliği
+    // Sol kenarı smooth cubic bezier ile çiz
+    for (int i = 1; i < leftArcPoints.length; i++) {
+      final current = leftArcPoints[i];
+      final previous = leftArcPoints[i - 1];
 
-    // 1. Dalga (sol)
-    final wave1StartX = cornerRadius;
-    final wave1EndX = cornerRadius + usableWidth / 3;
-    final wave1MidX = (wave1StartX + wave1EndX) / 2;
-    final wave1Y = waveAmplitude * 0.6;
+      if (i == 1) {
+        path.lineTo(current.dx, current.dy);
+      } else if (i == leftArcPoints.length - 1) {
+        path.lineTo(current.dx, current.dy);
+      } else {
+        final prevPrev = leftArcPoints[i - 2];
+        final dx1 = previous.dx - (previous.dx - prevPrev.dx) * 0.3;
+        final dy1 = previous.dy - (previous.dy - prevPrev.dy) * 0.3;
+        final dx2 = previous.dx + (current.dx - previous.dx) * 0.3;
+        final dy2 = previous.dy + (current.dy - previous.dy) * 0.3;
+        path.cubicTo(dx1, dy1, dx2, dy2, current.dx, current.dy);
+      }
+    }
 
-    path.quadraticBezierTo(wave1MidX, wave1Y, wave1EndX, 0);
+    // Üst kenar - sinüs dalgaları
+    final usableWidth = size.width - 2 * verticalRadius;
+    final topPoints = <Offset>[];
 
-    // 2. Dalga (orta)
-    final wave2StartX = wave1EndX;
-    final wave2EndX = cornerRadius + (usableWidth * 2 / 3);
-    final wave2MidX = (wave2StartX + wave2EndX) / 2;
-    final wave2Y = waveAmplitude;
+    for (int i = 0; i <= totalPoints; i++) {
+      final t = i / totalPoints;
+      final x = verticalRadius + t * usableWidth;
 
-    path.quadraticBezierTo(wave2MidX, wave2Y, wave2EndX, 0);
+      if (x > size.width - verticalRadius) {
+        topPoints.add(Offset(size.width - verticalRadius, 0));
+        break;
+      }
 
-    // 3. Dalga (sağ)
-    final wave3StartX = wave2EndX;
-    final wave3EndX = size.width - cornerRadius;
-    final wave3MidX = (wave3StartX + wave3EndX) / 2;
-    final wave3Y = waveAmplitude * 0.5;
+      // Sinüs dalgası - buton sınırları içinde kalması garanti
+      final wavePhase = t * waveCount * 2 * math.pi;
+      final y = waveAmplitude * math.sin(wavePhase);
+      // Taşmayı önle: y değeri 0 ile waveAmplitude arasında olmalı
+      final clampedY = y.clamp(-waveAmplitude, waveAmplitude);
+      topPoints.add(Offset(x, clampedY));
+    }
 
-    path.quadraticBezierTo(wave3MidX, wave3Y, wave3EndX, 0);
+    // Üst kenarı çiz - smooth cubic bezier ile
+    for (int i = 1; i < topPoints.length; i++) {
+      final current = topPoints[i];
+      final previous = topPoints[i - 1];
 
-    // Üst sağ köşe yuvarlatma
-    path.lineTo(size.width - cornerRadius, 0);
-    path.quadraticBezierTo(size.width, 0, size.width, cornerRadius);
+      if (i == 1) {
+        path.lineTo(current.dx, current.dy);
+      } else if (i == topPoints.length - 1) {
+        path.lineTo(current.dx, current.dy);
+      } else {
+        final prevPrev = topPoints[i - 2];
+        final dx1 = previous.dx - (previous.dx - prevPrev.dx) * 0.3;
+        final dy1 = previous.dy - (previous.dy - prevPrev.dy) * 0.3;
+        final dx2 = previous.dx + (current.dx - previous.dx) * 0.3;
+        final dy2 = previous.dy + (current.dy - previous.dy) * 0.3;
+        path.cubicTo(dx1, dy1, dx2, dy2, current.dx, current.dy);
+      }
+    }
 
-    // Sağ kenar (düz)
-    path.lineTo(size.width, size.height - cornerRadius);
+    // Sağ kenar - oval (smooth elips yayı ile)
+    // Üstten alta oval geçiş - smooth cubic bezier ile
+    final rightArcPoints = <Offset>[];
+    for (int i = 0; i <= 200; i++) {
+      final angle = -math.pi / 2 + (i / 200) * math.pi; // -90°'den 90°'ye
+      final x = size.width - verticalRadius + verticalRadius * math.cos(angle);
+      final y = size.height / 2 + verticalRadius * math.sin(angle);
+      rightArcPoints.add(Offset(x, y));
+    }
 
-    // Alt sağ köşe yuvarlatma
-    path.quadraticBezierTo(
-      size.width,
-      size.height,
-      size.width - cornerRadius,
-      size.height,
-    );
+    // Sağ kenarı smooth cubic bezier ile çiz
+    for (int i = 1; i < rightArcPoints.length; i++) {
+      final current = rightArcPoints[i];
+      final previous = rightArcPoints[i - 1];
 
-    // Alt kenar - soldan başlayan geniş dalga, üstteki 2. dalganın ortasına denk geliyor
-    // Sonra küçük dalga ve düz bitiyor
-    // Path sağdan sola gidiyor, bu yüzden ters sırada çiziyoruz
+      if (i == 1) {
+        path.lineTo(current.dx, current.dy);
+      } else if (i == rightArcPoints.length - 1) {
+        path.lineTo(current.dx, current.dy);
+      } else {
+        final prevPrev = rightArcPoints[i - 2];
+        final dx1 = previous.dx - (previous.dx - prevPrev.dx) * 0.3;
+        final dy1 = previous.dy - (previous.dy - prevPrev.dy) * 0.3;
+        final dx2 = previous.dx + (current.dx - previous.dx) * 0.3;
+        final dy2 = previous.dy + (current.dy - previous.dy) * 0.3;
+        path.cubicTo(dx1, dy1, dx2, dy2, current.dx, current.dy);
+      }
+    }
 
-    // Önce düz kısım (sağdan başlayıp küçük dalgaya kadar)
-    final bottomStraightEndX = size.width - cornerRadius - usableWidth * 0.15;
-    path.lineTo(bottomStraightEndX, size.height);
+    // Alt kenar - sinüs dalgaları (ters, simetrik)
+    final bottomPoints = <Offset>[];
 
-    // Küçük dalga (sağdan sola)
-    final bottomWave2EndX = bottomStraightEndX;
-    final bottomWave2StartX = wave2MidX; // Üstteki 2. dalganın ortası
-    final bottomWave2MidX = (bottomWave2StartX + bottomWave2EndX) / 2;
-    final bottomWave2Y = size.height - waveAmplitude * 0.3;
+    for (int i = 0; i <= totalPoints; i++) {
+      final t = i / totalPoints;
+      final x = size.width - verticalRadius - t * usableWidth;
 
-    path.quadraticBezierTo(
-      bottomWave2MidX,
-      bottomWave2Y,
-      bottomWave2StartX,
-      size.height,
-    );
+      if (x < verticalRadius) {
+        bottomPoints.add(Offset(verticalRadius, size.height));
+        break;
+      }
 
-    // Büyük dalga (soldan başlıyor, üstteki 2. dalganın ortasına denk geliyor)
-    final bottomWave1StartX = cornerRadius;
-    final bottomWave1EndX = wave2MidX; // Üstteki 2. dalganın ortası
-    final bottomWave1MidX = (bottomWave1StartX + bottomWave1EndX) / 2;
-    final bottomWave1Y = size.height - waveAmplitude * 0.8;
+      // Sinüs dalgası (ters) - üsttekiyle simetrik, taşma yok
+      final wavePhase = t * waveCount * 2 * math.pi;
+      final waveY = waveAmplitude * math.sin(wavePhase);
+      // Taşmayı önle: y değeri size.height - waveAmplitude ile size.height + waveAmplitude arasında
+      final clampedWaveY = waveY.clamp(-waveAmplitude, waveAmplitude);
+      final y = size.height - clampedWaveY;
+      bottomPoints.add(Offset(x, y));
+    }
 
-    path.quadraticBezierTo(
-      bottomWave1MidX,
-      bottomWave1Y,
-      bottomWave1StartX,
-      size.height,
-    );
+    // Alt kenarı çiz - smooth cubic bezier ile
+    for (int i = 1; i < bottomPoints.length; i++) {
+      final current = bottomPoints[i];
+      final previous = bottomPoints[i - 1];
 
-    // Alt sol köşe yuvarlatma
-    path.lineTo(cornerRadius, size.height);
-    path.quadraticBezierTo(0, size.height, 0, size.height - cornerRadius);
-
-    // Sol kenar (düz)
-    path.lineTo(0, cornerRadius);
-
-    // Üst sol köşe yuvarlatma
-    path.quadraticBezierTo(0, 0, cornerRadius, 0);
+      if (i == 1) {
+        path.lineTo(current.dx, current.dy);
+      } else if (i == bottomPoints.length - 1) {
+        path.lineTo(current.dx, current.dy);
+      } else {
+        final prevPrev = bottomPoints[i - 2];
+        final dx1 = previous.dx - (previous.dx - prevPrev.dx) * 0.3;
+        final dy1 = previous.dy - (previous.dy - prevPrev.dy) * 0.3;
+        final dx2 = previous.dx + (current.dx - previous.dx) * 0.3;
+        final dy2 = previous.dy + (current.dy - previous.dy) * 0.3;
+        path.cubicTo(dx1, dy1, dx2, dy2, current.dx, current.dy);
+      }
+    }
 
     path.close();
 
@@ -470,29 +531,57 @@ class _MenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Renge göre gradyan tonları
+    // Renge göre gradyan tonları (üstte açık, altta koyu - 3 boyutlu görünüm için)
     List<Color> gradientColors;
     if (color == Colors.red) {
       gradientColors = [
-        Colors.red.shade700,
-        Colors.red.shade500,
         Colors.red.shade400,
+        Colors.red.shade500,
+        Colors.red.shade700,
       ];
     } else if (color == Colors.green) {
       gradientColors = [
-        Colors.green.shade700,
-        Colors.green.shade500,
         Colors.green.shade400,
+        Colors.green.shade500,
+        Colors.green.shade700,
       ];
     } else if (color == Colors.orange) {
       gradientColors = [
-        Colors.orange.shade700,
-        Colors.orange.shade500,
         Colors.orange.shade400,
+        Colors.orange.shade500,
+        Colors.orange.shade700,
+      ];
+    } else if (color == const Color(0xFF4FC3F7)) {
+      // Mavi (ses butonu)
+      gradientColors = [
+        const Color(0xFF81D4FA), // Açık mavi
+        const Color(0xFF4FC3F7), // Orta mavi
+        const Color(0xFF0288D1), // Koyu mavi
+      ];
+    } else if (color == const Color(0xFF9C27B0)) {
+      // Mor (tema butonu)
+      gradientColors = [
+        const Color(0xFFBA68C8), // Açık mor
+        const Color(0xFF9C27B0), // Orta mor
+        const Color(0xFF6A1B9A), // Koyu mor
+      ];
+    } else if (color == const Color(0xFF00BCD4)) {
+      // Cyan (dil butonu)
+      gradientColors = [
+        const Color(0xFF4DD0E1), // Açık cyan
+        const Color(0xFF00BCD4), // Orta cyan
+        const Color(0xFF00838F), // Koyu cyan
+      ];
+    } else if (color == const Color(0xFF757575)) {
+      // Gri (geri butonu)
+      gradientColors = [
+        const Color(0xFF9E9E9E), // Açık gri
+        const Color(0xFF757575), // Orta gri
+        const Color(0xFF424242), // Koyu gri
       ];
     } else {
-      // Diğer renkler için varsayılan
-      gradientColors = [color, color, color];
+      // Diğer renkler için üstte açık, altta koyu gradient
+      gradientColors = [color.withOpacity(0.6), color, color.withOpacity(0.9)];
     }
 
     return SizedBox(
@@ -503,8 +592,8 @@ class _MenuButton extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: gradientColors,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
             boxShadow: [
               BoxShadow(
