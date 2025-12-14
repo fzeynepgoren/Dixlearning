@@ -273,7 +273,7 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                             ),
                           ),
                           const Icon(
-                            Icons.arrow_back_rounded,
+                            Icons.home_rounded,
                             color: Colors.white,
                             size: 28,
                           ),

@@ -1,11 +1,11 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'soru4.dart';
 import '../screens/matching_questions_screen.dart';
 import '../screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import '../widgets/matching_pause_menu.dart';
+import '../widgets/in_game_menu.dart';
 
 class Soru3 extends StatefulWidget {
   const Soru3({super.key});
@@ -24,7 +24,6 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
   List<bool> matchedRight = [false, false, false];
   bool showFeedback = false;
   bool isCorrect = false;
-  bool _showPauseMenu = false;
   bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -133,22 +132,7 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
     final screenSize = MediaQuery.of(context).size;
     final iconSize = screenSize.width * 0.065;
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (_showPauseMenu) {
-          // Menü açıksa, geri tuşu ile kapat
-          setState(() {
-            _showPauseMenu = false;
-          });
-        } else {
-          // Menü kapalıysa, geri tuşu ile aç
-          setState(() {
-            _showPauseMenu = true;
-          });
-        }
-        return false;
-      },
-      child: Scaffold(
+    return Scaffold(
         body: Stack(
           children: [
             Container(
@@ -167,57 +151,6 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
               child: SafeArea(
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _showPauseMenu = true;
-                              });
-                            },
-                            child: Container(
-                              width: iconSize * 1.6,
-                              height: iconSize * 1.6,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    Colors.purple.shade300,
-                                    Colors.purple.shade600,
-                                    Colors.deepPurple.shade700,
-                                  ],
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.purple.shade800.withOpacity(
-                                      0.5,
-                                    ),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                    spreadRadius: 1,
-                                  ),
-                                  BoxShadow(
-                                    color: Colors.white.withOpacity(0.3),
-                                    blurRadius: 4,
-                                    offset: const Offset(-2, -2),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                Icons.home_rounded,
-                                color: Colors.black,
-                                size: iconSize * 0.9,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                     Expanded(
                       child: SlideTransition(
                         position: _slideAnimation,
@@ -488,33 +421,27 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                 ),
               ),
             ),
-            if (_showPauseMenu)
-              MatchingPauseMenu(
-                isEnglish: isEnglish,
-                isSoundOn: _isSoundOn,
-                onResume: () => setState(() => _showPauseMenu = false),
-                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
-                onHome: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const MatchingQuestionsScreen(),
-                    ),
-                    (route) => false,
-                  );
-                },
-                onEntryScreen: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
-                onDismiss: () => setState(() => _showPauseMenu = false),
-              ),
+          InGameMenu(
+            isSoundOn: _isSoundOn,
+            onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+            onHome: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const MatchingQuestionsScreen(),
+                ),
+                (route) => false,
+              );
+            },
+            onEntryScreen: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+            iconSize: iconSize,
+          ),
           ],
         ),
-      ),
-    );
+      );
   }
 }

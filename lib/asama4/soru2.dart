@@ -5,7 +5,7 @@ import '../screens/matching_questions_screen.dart';
 import '../screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import '../widgets/matching_pause_menu.dart';
+import '../widgets/in_game_menu.dart';
 
 class DuyuOrganEsle extends StatefulWidget {
   const DuyuOrganEsle({super.key});
@@ -29,7 +29,6 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
   bool showFeedback = false;
   bool isCorrect = false;
   bool _dialogShown = false;
-  bool _showPauseMenu = false;
   bool _isSoundOn = true;
 
   late AnimationController _feedbackController;
@@ -148,22 +147,10 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
   Widget build(BuildContext context) {
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     
-    return WillPopScope(
-      onWillPop: () async {
-        if (_showPauseMenu) {
-          // Menü açıksa, geri tuşu ile kapat
-          setState(() {
-            _showPauseMenu = false;
-          });
-        } else {
-          // Menü kapalıysa, geri tuşu ile aç
-          setState(() {
-            _showPauseMenu = true;
-          });
-        }
-        return false;
-      },
-      child: Scaffold(
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+    
+    return Scaffold(
         body: Stack(
           children: [
             Container(
@@ -182,55 +169,6 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
           child: SafeArea(
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _showPauseMenu = true;
-                          });
-                        },
-                        child: Container(
-                          width: 64,
-                          height: 64,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.purple.shade300,
-                                Colors.purple.shade600,
-                                Colors.deepPurple.shade700,
-                              ],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.purple.shade800.withOpacity(0.5),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                                spreadRadius: 1,
-                              ),
-                              BoxShadow(
-                                color: Colors.white.withOpacity(0.3),
-                                blurRadius: 4,
-                                offset: const Offset(-2, -2),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.home_rounded,
-                            color: Colors.black,
-                            size: 36,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
@@ -488,35 +426,27 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
             ),
           ),
         ),
-            if (_showPauseMenu)
-              MatchingPauseMenu(
-                isEnglish: isEnglish,
-                isSoundOn: _isSoundOn,
-                onResume: () => setState(() => _showPauseMenu = false),
-                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
-                onHome: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const MatchingQuestionsScreen(),
-                    ),
-                    (route) => false,
-                  );
-                },
-                onEntryScreen: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const HomeScreen(),
-                    ),
-                    (route) => false,
-                  );
-                },
-                onDismiss: () => setState(() => _showPauseMenu = false),
-              ),
+          InGameMenu(
+            isSoundOn: _isSoundOn,
+            onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+            onHome: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const MatchingQuestionsScreen(),
+                ),
+                (route) => false,
+              );
+            },
+            onEntryScreen: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+            iconSize: iconSize,
+          ),
           ],
         ),
-      ),
-    );
+      );
   }
 }

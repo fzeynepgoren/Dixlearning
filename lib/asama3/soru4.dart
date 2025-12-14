@@ -6,7 +6,7 @@ import '../screens/matching_questions_screen.dart';
 import '../screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import '../widgets/matching_pause_menu.dart';
+import '../widgets/in_game_menu.dart';
 
 class YapiNesneEsle extends StatefulWidget {
   const YapiNesneEsle({super.key});
@@ -30,7 +30,6 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
   List<bool> matchedLeft = [false, false, false];
   List<bool> matchedRight = [false, false, false];
   bool showFeedback = false;
-  bool _showPauseMenu = false;
   bool _isSoundOn = true;
   bool isCorrect = false;
   late AnimationController _feedbackController;
@@ -181,22 +180,7 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
     final screenSize = MediaQuery.of(context).size;
     final iconSize = screenSize.width * 0.065;
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (_showPauseMenu) {
-          // Menü açıksa, geri tuşu ile kapat
-          setState(() {
-            _showPauseMenu = false;
-          });
-        } else {
-          // Menü kapalıysa, geri tuşu ile aç
-          setState(() {
-            _showPauseMenu = true;
-          });
-        }
-        return false;
-      },
-      child: Scaffold(
+    return Scaffold(
         body: Stack(
           children: [
             Container(
@@ -443,35 +427,27 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
             ),
           ),
         ),
-            if (_showPauseMenu)
-              MatchingPauseMenu(
-                isEnglish: isEnglish,
-                isSoundOn: _isSoundOn,
-                onResume: () => setState(() => _showPauseMenu = false),
-                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
-                onHome: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const MatchingQuestionsScreen(),
-                    ),
-                    (route) => false,
-                  );
-                },
-                onEntryScreen: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const HomeScreen(),
-                    ),
-                    (route) => false,
-                  );
-                },
-                onDismiss: () => setState(() => _showPauseMenu = false),
-              ),
+          InGameMenu(
+            isSoundOn: _isSoundOn,
+            onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+            onHome: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const MatchingQuestionsScreen(),
+                ),
+                (route) => false,
+              );
+            },
+            onEntryScreen: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+            iconSize: iconSize,
+          ),
           ],
         ),
-      ),
-    );
+      );
   }
 }

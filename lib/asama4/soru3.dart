@@ -5,7 +5,7 @@ import '../screens/home_screen.dart';
 import 'soru4.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import '../widgets/matching_pause_menu.dart';
+import '../widgets/in_game_menu.dart';
 
 class Soru3 extends StatefulWidget {
   const Soru3({super.key});

@@ -4,7 +4,7 @@ import '../screens/matching_questions_screen.dart';
 import '../screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
-import '../widgets/matching_pause_menu.dart';
+import '../widgets/in_game_menu.dart';
 
 class EmojiAnimalMatching extends StatefulWidget {
   const EmojiAnimalMatching({super.key});
