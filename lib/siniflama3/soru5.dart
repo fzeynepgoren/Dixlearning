@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
+import '../../screens/home_screen.dart';
+import '../../widgets/matching_pause_menu.dart';
 
 class HayvanYasamSinifla extends StatefulWidget {
   const HayvanYasamSinifla({super.key});
@@ -31,6 +33,8 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
   bool showFeedback = false;
   bool isCorrect = false;
   bool _dialogShown = false;
+  bool _showPauseMenu = false;
+  bool _isSoundOn = true;
 
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -360,215 +364,302 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
     final iconSize = screenSize.width * 0.065;
 
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async {
+        if (_showPauseMenu) {
+          setState(() {
+            _showPauseMenu = false;
+          });
+        } else {
+          setState(() {
+            _showPauseMenu = true;
+          });
+        }
+        return false;
+      },
       child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.blue.shade200,
-                Colors.blue.shade200,
-                Colors.white,
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blue.shade200,
+                    Colors.blue.shade200,
+                    Colors.white,
                   ],
+                  stops: const [0.0, 0.5, 1.0],
                 ),
-                Expanded(
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 1,
-                            ),
-                            child: Text(
-                              isEnglish
-                                  ? 'Drag the animals to their habitats!'
-                                  : 'Hayvanları yaşam alanlarına sürükle!',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+              ),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _showPauseMenu = true;
+                              });
+                            },
+                            child: Container(
+                              width: iconSize * 1.6,
+                              height: iconSize * 1.6,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Colors.blue.shade200,
+                                    Colors.blue.shade200,
+                                    const Color(0xffffffff),
+                                  ],
+                                  stops: const [0.0, 0.5, 1.0],
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.blue.shade800.withOpacity(0.5),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                    spreadRadius: 1,
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.3),
+                                    blurRadius: 4,
+                                    offset: const Offset(-2, -2),
+                                  ),
+                                ],
                               ),
-                              textAlign: TextAlign.center,
+                              child: Icon(
+                                Icons.home_rounded,
+                                color: Colors.black,
+                                size: iconSize * 0.9,
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 15),
-                          Expanded(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.95),
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 1,
+                                ),
+                                child: Text(
+                                  isEnglish
+                                      ? 'Drag the animals to their habitats!'
+                                      : 'Hayvanları yaşam alanlarına sürükle!',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                              Expanded(
+                                child: Row(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          _buildGroup(
+                                            'water',
+                                            isEnglish ? 'Water' : 'Su',
+                                            Colors.purple.shade100,
+                                            Colors.purple.shade300,
+                                            habitatGroups['water']!,
+                                          ),
+                                          _buildGroup(
+                                            'air',
+                                            isEnglish ? 'Air' : 'Hava',
+                                            Colors.blue.shade100,
+                                            Colors.blue.shade400,
+                                            habitatGroups['air']!,
+                                          ),
+                                          _buildGroup(
+                                            'land',
+                                            isEnglish ? 'Land' : 'Kara',
+                                            Colors.yellow.shade100,
+                                            Colors.yellow.shade600,
+                                            habitatGroups['land']!,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children:
+                                            items
+                                                .where(
+                                                  (item) => !item['isPlaced'],
+                                                )
+                                                .map(
+                                                  (item) => Draggable<
+                                                    Map<String, dynamic>
+                                                  >(
+                                                    data: item,
+                                                    feedback: Material(
+                                                      color: Colors.transparent,
+                                                      child:
+                                                          _buildDraggableItem(
+                                                            item,
+                                                          ),
+                                                    ),
+                                                    childWhenDragging: Opacity(
+                                                      opacity: 0.3,
+                                                      child:
+                                                          _buildDraggableItem(
+                                                            item,
+                                                          ),
+                                                    ),
+                                                    child: _buildDraggableItem(
+                                                      item,
+                                                    ),
+                                                  ),
+                                                )
+                                                .toList(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: 80,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child:
+                          showFeedback
+                              ? ScaleTransition(
+                                scale: CurvedAnimation(
+                                  parent: _feedbackController,
+                                  curve: Curves.elasticOut,
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 20,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      _buildGroup(
-                                        'water',
-                                        isEnglish ? 'Water' : 'Su',
-                                        Colors.purple.shade100,
-                                        Colors.purple.shade300,
-                                        habitatGroups['water']!,
+                                      Icon(
+                                        isCorrect
+                                            ? Icons.check_circle
+                                            : Icons.cancel,
+                                        color:
+                                            isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        size: 28,
                                       ),
-                                      _buildGroup(
-                                        'air',
-                                        isEnglish ? 'Air' : 'Hava',
-                                        Colors.blue.shade100,
-                                        Colors.blue.shade400,
-                                        habitatGroups['air']!,
-                                      ),
-                                      _buildGroup(
-                                        'land',
-                                        isEnglish ? 'Land' : 'Kara',
-                                        Colors.yellow.shade100,
-                                        Colors.yellow.shade600,
-                                        habitatGroups['land']!,
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        isCorrect
+                                            ? (isEnglish
+                                                ? 'Well done! 🎉'
+                                                : 'Aferin! 🎉')
+                                            : (isEnglish
+                                                ? 'Try again! 😔'
+                                                : 'Tekrar dene! 😔'),
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color:
+                                              isCorrect
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  flex: 2,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children:
-                                        items
-                                            .where((item) => !item['isPlaced'])
-                                            .map(
-                                              (item) => Draggable<
-                                                Map<String, dynamic>
-                                              >(
-                                                data: item,
-                                                feedback: Material(
-                                                  color: Colors.transparent,
-                                                  child: _buildDraggableItem(
-                                                    item,
-                                                  ),
-                                                ),
-                                                childWhenDragging: Opacity(
-                                                  opacity: 0.3,
-                                                  child: _buildDraggableItem(
-                                                    item,
-                                                  ),
-                                                ),
-                                                child: _buildDraggableItem(
-                                                  item,
-                                                ),
-                                              ),
-                                            )
-                                            .toList(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                              )
+                              : const SizedBox.shrink(),
                     ),
-                  ),
+                  ],
                 ),
-                Container(
-                  height: 80,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? (isEnglish
-                                            ? 'Well done! 🎉'
-                                            : 'Aferin! 🎉')
-                                        : (isEnglish
-                                            ? 'Try again! 😔'
-                                            : 'Tekrar dene! 😔'),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color:
-                                          isCorrect ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                          : const SizedBox.shrink(),
-                ),
-              ],
+              ),
             ),
-          ),
+            if (_showPauseMenu)
+              MatchingPauseMenu(
+                isEnglish: isEnglish,
+                isSoundOn: _isSoundOn,
+                onResume: () => setState(() => _showPauseMenu = false),
+                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+                onHome: () {
+                  setState(() => _showPauseMenu = false);
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder:
+                          (context) => const ClassificationQuestionsScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                onEntryScreen: () {
+                  setState(() => _showPauseMenu = false);
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
+                onDismiss: () => setState(() => _showPauseMenu = false),
+              ),
+          ],
         ),
       ),
     );

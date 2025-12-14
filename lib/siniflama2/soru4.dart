@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import 'soru5.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
+import '../../screens/home_screen.dart';
+import '../../widgets/matching_pause_menu.dart';
 
 class TeknolojikSinifla extends StatefulWidget {
   const TeknolojikSinifla({super.key});

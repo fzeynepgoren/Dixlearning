@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../screens/karsilastirma_sorulari_screen.dart';
 import 'soru3.dart'; // 3. sorunun dosyası
+import '../screens/home_screen.dart';
+import '../widgets/matching_pause_menu.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 
 class BuyukKucukKarpuzSorusu extends StatefulWidget {
   const BuyukKucukKarpuzSorusu({super.key});
@@ -14,6 +18,8 @@ class _BuyukKucukKarpuzSorusuState extends State<BuyukKucukKarpuzSorusu>
   int? selectedIndex;
   bool? isCorrect;
   bool showFeedback = false;
+  bool _showPauseMenu = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -83,246 +89,321 @@ class _BuyukKucukKarpuzSorusuState extends State<BuyukKucukKarpuzSorusu>
     const double buttonHeight = 50;
     final double buttonWidth = screenWidth * 0.28;
 
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async {
+        if (_showPauseMenu) {
+          setState(() {
+            _showPauseMenu = false;
+          });
+        } else {
+          setState(() {
+            _showPauseMenu = true;
+          });
+        }
+        return false;
+      },
       child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.blue.shade200,
-                Colors.blue.shade200,
-                const Color(0xffffffff),
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const KarsilastirmaSorulariScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    SizedBox(width: iconSize),
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blue.shade200,
+                    Colors.blue.shade200,
+                    const Color(0xffffffff),
                   ],
+                  stops: const [0.0, 0.5, 1.0],
                 ),
-                Expanded(
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Center(
-                      child: Container(
-                        margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.95),
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        child: SingleChildScrollView(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxHeight: screenHeight * 0.98,
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const SizedBox(height: 8),
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 6),
-                                  child: Text(
-                                    'Karpuzlardan büyük olanı işaretle.',
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
+              ),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _showPauseMenu = true;
+                              });
+                            },
+                            child: Container(
+                              width: iconSize * 1.6,
+                              height: iconSize * 1.6,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Colors.purple.shade300,
+                                    Colors.purple.shade600,
+                                    Colors.deepPurple.shade700,
+                                  ],
                                 ),
-                                const SizedBox(height: 16),
-                                Container(
-                                  width: double.infinity,
-                                  height: imageHeight,
-                                  margin: EdgeInsets.symmetric(
-                                    horizontal: screenWidth * 0.04,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.purple.shade800.withOpacity(
+                                      0.5,
+                                    ),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                    spreadRadius: 1,
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(0.3),
+                                    blurRadius: 4,
+                                    offset: const Offset(-2, -2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.home_rounded,
+                                color: Colors.black,
+                                size: iconSize * 0.9,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Center(
+                          child: Container(
+                            margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.95),
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: SingleChildScrollView(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxHeight: screenHeight * 0.98,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const SizedBox(height: 8),
+                                    const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                      ),
+                                      child: Text(
+                                        'Karpuzlardan büyük olanı işaretle.',
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Container(
+                                      width: double.infinity,
+                                      height: imageHeight,
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal: screenWidth * 0.04,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(24),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                              0.10,
+                                            ),
+                                            blurRadius: 20,
+                                            offset: const Offset(0, 10),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(24),
+                                        child: Image.asset(
+                                          'assets/buyuk_kucuk/soru2/Resim2.png', // Soru 2 resmi
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: List.generate(2, (i) {
+                                        final isSelected = selectedIndex == i;
+                                        Color btnColor = defaultBtnColor;
+                                        if (isSelected) {
+                                          if (isCorrect == true) {
+                                            btnColor = Colors.green.shade500;
+                                          } else if (isCorrect == false) {
+                                            btnColor = Colors.red.shade500;
+                                          }
+                                        }
+                                        return SizedBox(
+                                          width: buttonWidth,
+                                          height: buttonHeight,
+                                          child: ElevatedButton(
+                                            onPressed:
+                                                showFeedback
+                                                    ? null
+                                                    : () => _handleSelect(i),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  isSelected
+                                                      ? (isCorrect == true
+                                                          ? Colors.green
+                                                          : Colors.red)
+                                                      : Colors.purple.shade400,
+                                              foregroundColor: Colors.black,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                              ),
+                                              elevation: isSelected ? 8 : 4,
+                                              shadowColor:
+                                                  isSelected
+                                                      ? (isCorrect == true
+                                                          ? Colors
+                                                              .green
+                                                              .shade300
+                                                          : Colors.red.shade300)
+                                                      : Colors.purple.shade300,
+                                            ),
+                                            child: const Text(
+                                              'Seç',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }),
+                                    ),
+                                    const SizedBox(height: 20),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Feedback Kutusu - Asama1 gibi basit
+                    Container(
+                      height: 80,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child:
+                          showFeedback
+                              ? ScaleTransition(
+                                scale: CurvedAnimation(
+                                  parent: _feedbackController,
+                                  curve: Curves.elasticOut,
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 20,
                                   ),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(24),
-                                    boxShadow: [
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: const [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.10),
-                                        blurRadius: 20,
-                                        offset: const Offset(0, 10),
+                                        color: Colors.black12,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 5),
                                       ),
                                     ],
                                   ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(24),
-                                    child: Image.asset(
-                                      'assets/buyuk_kucuk/soru2/Resim2.png', // Soru 2 resmi
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: List.generate(2, (i) {
-                                    final isSelected = selectedIndex == i;
-                                    Color btnColor = defaultBtnColor;
-                                    if (isSelected) {
-                                      if (isCorrect == true) {
-                                        btnColor = Colors.green.shade500;
-                                      } else if (isCorrect == false) {
-                                        btnColor = Colors.red.shade500;
-                                      }
-                                    }
-                                    return SizedBox(
-                                      width: buttonWidth,
-                                      height: buttonHeight,
-                                      child: ElevatedButton(
-                                        onPressed:
-                                            showFeedback
-                                                ? null
-                                                : () => _handleSelect(i),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              isSelected
-                                                  ? (isCorrect == true
-                                                      ? Colors.green
-                                                      : Colors.red)
-                                                  : Colors.purple.shade400,
-                                          foregroundColor: Colors.black,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              16,
-                                            ),
-                                          ),
-                                          elevation: isSelected ? 8 : 4,
-                                          shadowColor:
-                                              isSelected
-                                                  ? (isCorrect == true
-                                                      ? Colors.green.shade300
-                                                      : Colors.red.shade300)
-                                                  : Colors.purple.shade300,
-                                        ),
-                                        child: const Text(
-                                          'Seç',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                          ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        isCorrect == true
+                                            ? Icons.check_circle
+                                            : Icons.cancel,
+                                        color:
+                                            isCorrect == true
+                                                ? Colors.green
+                                                : Colors.red,
+                                        size: 28,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        isCorrect == true
+                                            ? 'Aferin! 🎉'
+                                            : 'Tekrar dene! 😔',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color:
+                                              isCorrect == true
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                    );
-                                  }),
+                                    ],
+                                  ),
                                 ),
-                                const SizedBox(height: 20),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                              )
+                              : const SizedBox.shrink(),
                     ),
-                  ),
+                  ],
                 ),
-                // Feedback Kutusu - Asama1 gibi basit
-                Container(
-                  height: 80,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    isCorrect == true
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect == true
-                                            ? Colors.green
-                                            : Colors.red,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect == true
-                                        ? 'Aferin! 🎉'
-                                        : 'Tekrar dene! 😔',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color:
-                                          isCorrect == true
-                                              ? Colors.green
-                                              : Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                          : const SizedBox.shrink(),
-                ),
-              ],
+              ),
             ),
-          ),
+            if (_showPauseMenu)
+              MatchingPauseMenu(
+                isEnglish: isEnglish,
+                isSoundOn: _isSoundOn,
+                onResume: () => setState(() => _showPauseMenu = false),
+                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+                onHome: () {
+                  setState(() => _showPauseMenu = false);
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const KarsilastirmaSorulariScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                onEntryScreen: () {
+                  setState(() => _showPauseMenu = false);
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
+                onDismiss: () => setState(() => _showPauseMenu = false),
+              ),
+          ],
         ),
       ),
     );

@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import 'soru4.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
+import '../../screens/home_screen.dart';
+import '../../widgets/matching_pause_menu.dart';
 
 
 class UzunKisaSinifla extends StatefulWidget {
@@ -46,6 +48,8 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
 
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _showPauseMenu = false;
+  bool _isSoundOn = true;
 
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -279,10 +283,23 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final iconSize = MediaQuery.of(context).size.width * 0.065;
 
-    return PopScope(
-      canPop: false,
+    return WillPopScope(
+      onWillPop: () async {
+        if (_showPauseMenu) {
+          setState(() {
+            _showPauseMenu = false;
+          });
+        } else {
+          setState(() {
+            _showPauseMenu = true;
+          });
+        }
+        return false;
+      },
       child: Scaffold(
-        body: Container(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -299,22 +316,52 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
             child: Column(
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder: (context) => const ClassificationQuestionsScreen(),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _showPauseMenu = true;
+                          });
+                        },
+                        child: Container(
+                          width: iconSize * 1.6,
+                          height: iconSize * 1.6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.blue.shade200,
+                                Colors.blue.shade200,
+                                const Color(0xffffffff),
+                              ],
+                              stops: const [0.0, 0.5, 1.0],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.blue.shade800.withOpacity(0.5),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                                spreadRadius: 1,
+                              ),
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(-2, -2),
+                              ),
+                            ],
                           ),
-                          (route) => false,
-                        );
-                      },
+                          child: Icon(
+                            Icons.home_rounded,
+                            color: Colors.black,
+                            size: iconSize * 0.9,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -478,6 +525,34 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
               ],
             ),
           ),
+            ),
+            if (_showPauseMenu)
+              MatchingPauseMenu(
+                isEnglish: isEnglish,
+                isSoundOn: _isSoundOn,
+                onResume: () => setState(() => _showPauseMenu = false),
+                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+                onHome: () {
+                  setState(() => _showPauseMenu = false);
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const ClassificationQuestionsScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                onEntryScreen: () {
+                  setState(() => _showPauseMenu = false);
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const HomeScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                onDismiss: () => setState(() => _showPauseMenu = false),
+              ),
+          ],
         ),
       ),
     );

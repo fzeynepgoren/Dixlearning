@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../screens/karsilastirma_sorulari_screen.dart';
 import 'soru9.dart';
+import '../screens/home_screen.dart';
+import '../widgets/matching_pause_menu.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 
 class UzunKisaPalmiyeSupurgeSorusu extends StatefulWidget {
   const UzunKisaPalmiyeSupurgeSorusu({super.key});
@@ -16,6 +20,8 @@ class _UzunKisaPalmiyeSupurgeSorusuState
   int? selectedIndex;
   bool? isCorrect;
   bool showFeedback = false;
+  bool _showPauseMenu = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -84,10 +90,25 @@ class _UzunKisaPalmiyeSupurgeSorusuState
     const double buttonHeight = 50;
     final double buttonWidth = screenWidth * 0.28;
 
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async {
+        if (_showPauseMenu) {
+          setState(() {
+            _showPauseMenu = false;
+          });
+        } else {
+          setState(() {
+            _showPauseMenu = true;
+          });
+        }
+        return false;
+      },
       child: Scaffold(
-        body: Container(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -107,22 +128,49 @@ class _UzunKisaPalmiyeSupurgeSorusuState
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const KarsilastirmaSorulariScreen(),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _showPauseMenu = true;
+                          });
+                        },
+                        child: Container(
+                          width: iconSize * 1.6,
+                          height: iconSize * 1.6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.purple.shade300,
+                                Colors.purple.shade600,
+                                Colors.deepPurple.shade700,
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.purple.shade800.withOpacity(0.5),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                                spreadRadius: 1,
+                              ),
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(-2, -2),
+                              ),
+                            ],
                           ),
-                          (route) => false,
-                        );
-                      },
+                          child: Icon(
+                            Icons.home_rounded,
+                            color: Colors.black,
+                            size: iconSize * 0.9,
+                          ),
+                        ),
+                      ),
                     ),
                     SizedBox(width: iconSize),
                   ],
@@ -333,6 +381,34 @@ class _UzunKisaPalmiyeSupurgeSorusuState
               ],
             ),
           ),
+            ),
+            if (_showPauseMenu)
+              MatchingPauseMenu(
+                isEnglish: isEnglish,
+                isSoundOn: _isSoundOn,
+                onResume: () => setState(() => _showPauseMenu = false),
+                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+                onHome: () {
+                  setState(() => _showPauseMenu = false);
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const KarsilastirmaSorulariScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                onEntryScreen: () {
+                  setState(() => _showPauseMenu = false);
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const HomeScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                onDismiss: () => setState(() => _showPauseMenu = false),
+              ),
+          ],
         ),
       ),
     );

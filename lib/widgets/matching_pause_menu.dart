@@ -295,7 +295,11 @@ class _MatchingPauseMenuState extends State<MatchingPauseMenu> {
                             onPressed: widget.onToggleSound,
                             isSoundOn: widget.isSoundOn,
                           ),
+<<<<<<< Updated upstream
                           const SizedBox(height: 14),
+=======
+                          const SizedBox(height: 10),
+>>>>>>> Stashed changes
                           _MenuButton(
                             icon:
                                 themeProvider.isDark
@@ -308,7 +312,11 @@ class _MatchingPauseMenuState extends State<MatchingPauseMenu> {
                             },
                             isSoundOn: widget.isSoundOn,
                           ),
+<<<<<<< Updated upstream
                           const SizedBox(height: 14),
+=======
+                          const SizedBox(height: 10),
+>>>>>>> Stashed changes
                           _MenuButton(
                             icon: Icons.language_rounded,
                             label: languageLabel,
@@ -320,7 +328,11 @@ class _MatchingPauseMenuState extends State<MatchingPauseMenu> {
                             },
                             isSoundOn: widget.isSoundOn,
                           ),
+<<<<<<< Updated upstream
                           const SizedBox(height: 14),
+=======
+                          const SizedBox(height: 10),
+>>>>>>> Stashed changes
                           _MenuButton(
                             icon: Icons.arrow_back_rounded,
                             label: backLabel,
@@ -351,7 +363,10 @@ class _WavyTopClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     final path = Path();
     final waveHeight = 18.0;
+<<<<<<< Updated upstream
     final waveCount = 5.0;
+=======
+>>>>>>> Stashed changes
 
     // Yuvarlak köşeler için radius - buton yüksekliğine göre ayarlanmış (yüksekliğin %30'u)
     final cornerRadius = (size.height * 0.30).clamp(12.0, 18.0);
@@ -359,6 +374,7 @@ class _WavyTopClipper extends CustomClipper<Path> {
     // Üst sol köşeden başla
     path.moveTo(cornerRadius, 0);
 
+<<<<<<< Updated upstream
     // Üst kenar - pürüzsüz sinüs dalgaları
     final usableWidth = size.width - 2 * cornerRadius;
     final totalPoints = 100; // Pürüzsüz geçiş için yeterli nokta
@@ -390,6 +406,35 @@ class _WavyTopClipper extends CustomClipper<Path> {
         path.cubicTo(controlX1, controlY1, controlX2, controlY2, x, y);
       }
     }
+=======
+    // Üst kenar - 3 geniş, yayvan dalga (köşelere kadar)
+    final usableWidth = size.width - 2 * cornerRadius;
+    final waveAmplitude = waveHeight * 0.12; // Dalga yüksekliği
+
+    // 1. Dalga (sol)
+    final wave1StartX = cornerRadius;
+    final wave1EndX = cornerRadius + usableWidth / 3;
+    final wave1MidX = (wave1StartX + wave1EndX) / 2;
+    final wave1Y = waveAmplitude * 0.6;
+
+    path.quadraticBezierTo(wave1MidX, wave1Y, wave1EndX, 0);
+
+    // 2. Dalga (orta)
+    final wave2StartX = wave1EndX;
+    final wave2EndX = cornerRadius + (usableWidth * 2 / 3);
+    final wave2MidX = (wave2StartX + wave2EndX) / 2;
+    final wave2Y = waveAmplitude;
+
+    path.quadraticBezierTo(wave2MidX, wave2Y, wave2EndX, 0);
+
+    // 3. Dalga (sağ)
+    final wave3StartX = wave2EndX;
+    final wave3EndX = size.width - cornerRadius;
+    final wave3MidX = (wave3StartX + wave3EndX) / 2;
+    final wave3Y = waveAmplitude * 0.5;
+
+    path.quadraticBezierTo(wave3MidX, wave3Y, wave3EndX, 0);
+>>>>>>> Stashed changes
 
     // Üst sağ köşe yuvarlatma
     path.lineTo(size.width - cornerRadius, 0);
@@ -406,6 +451,7 @@ class _WavyTopClipper extends CustomClipper<Path> {
       size.height,
     );
 
+<<<<<<< Updated upstream
     // Alt kenar - pürüzsüz sinüs dalgaları (ters)
     for (int i = 0; i <= totalPoints; i++) {
       final t = i / totalPoints;
@@ -437,6 +483,41 @@ class _WavyTopClipper extends CustomClipper<Path> {
         path.cubicTo(controlX1, controlY1, controlX2, controlY2, x, y);
       }
     }
+=======
+    // Alt kenar - soldan başlayan geniş dalga, üstteki 2. dalganın ortasına denk geliyor
+    // Sonra küçük dalga ve düz bitiyor
+    // Path sağdan sola gidiyor, bu yüzden ters sırada çiziyoruz
+
+    // Önce düz kısım (sağdan başlayıp küçük dalgaya kadar)
+    final bottomStraightEndX = size.width - cornerRadius - usableWidth * 0.15;
+    path.lineTo(bottomStraightEndX, size.height);
+
+    // Küçük dalga (sağdan sola)
+    final bottomWave2EndX = bottomStraightEndX;
+    final bottomWave2StartX = wave2MidX; // Üstteki 2. dalganın ortası
+    final bottomWave2MidX = (bottomWave2StartX + bottomWave2EndX) / 2;
+    final bottomWave2Y = size.height - waveAmplitude * 0.3;
+
+    path.quadraticBezierTo(
+      bottomWave2MidX,
+      bottomWave2Y,
+      bottomWave2StartX,
+      size.height,
+    );
+
+    // Büyük dalga (soldan başlıyor, üstteki 2. dalganın ortasına denk geliyor)
+    final bottomWave1StartX = cornerRadius;
+    final bottomWave1EndX = wave2MidX; // Üstteki 2. dalganın ortası
+    final bottomWave1MidX = (bottomWave1StartX + bottomWave1EndX) / 2;
+    final bottomWave1Y = size.height - waveAmplitude * 0.8;
+
+    path.quadraticBezierTo(
+      bottomWave1MidX,
+      bottomWave1Y,
+      bottomWave1StartX,
+      size.height,
+    );
+>>>>>>> Stashed changes
 
     // Alt sol köşe yuvarlatma
     path.lineTo(cornerRadius, size.height);
@@ -476,6 +557,7 @@ class _MenuButton extends StatelessWidget {
   Widget build(BuildContext context) {
     // Renge göre gradyan tonları
     List<Color> gradientColors;
+<<<<<<< Updated upstream
     if (color == const Color(0xFFFFB74D)) {
       gradientColors = [
         const Color(0xFFFFB74D).withOpacity(0.9),
@@ -538,6 +620,25 @@ class _MenuButton extends StatelessWidget {
         Colors.red.shade400,
         Colors.red.shade500,
         Colors.red.shade700,
+=======
+    if (color == Colors.red) {
+      gradientColors = [
+        Colors.red.shade700,
+        Colors.red.shade500,
+        Colors.red.shade400,
+      ];
+    } else if (color == Colors.green) {
+      gradientColors = [
+        Colors.green.shade700,
+        Colors.green.shade500,
+        Colors.green.shade400,
+      ];
+    } else if (color == Colors.orange) {
+      gradientColors = [
+        Colors.orange.shade700,
+        Colors.orange.shade500,
+        Colors.orange.shade400,
+>>>>>>> Stashed changes
       ];
     } else {
       // Diğer renkler için varsayılan
@@ -552,8 +653,13 @@ class _MenuButton extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: gradientColors,
+<<<<<<< Updated upstream
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
+=======
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+>>>>>>> Stashed changes
             ),
             boxShadow: [
               BoxShadow(
