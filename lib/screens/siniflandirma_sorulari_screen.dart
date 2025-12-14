@@ -230,23 +230,46 @@ class _ClassificationQuestionsScreenState
                       );
                     },
                     child: Container(
-                      width: 40,
-                      height: 40,
+                      width: 55,
+                      height: 55,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFF8E44AD), Color(0xFF9B59B6)],
+                        ),
+                        borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+                            color: const Color(0xFF8E44AD).withOpacity(0.5),
+                            blurRadius: 20,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 6),
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: Color(0xFF006994),
-                        size: 30,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Parlama efekti
+                          Positioned(
+                            top: 10,
+                            left: 12,
+                            child: Container(
+                              width: 15,
+                              height: 15,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.4),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                          const Icon(
+                            Icons.arrow_back_rounded,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ],
                       ),
                     ),
                   ),

@@ -106,7 +106,7 @@ class _EslemeSorulariScreenState extends State<EslemeSorulariScreen>
           // Arka plan resmi - Renkli/Çöl Tema
           Positioned.fill(
             child: Image.asset(
-              'assets/screensphoto/colback.png',
+              'assets/screensphoto/uzayback.png',
               fit: BoxFit.cover,
               alignment: Alignment.center,
               errorBuilder: (context, error, stackTrace) {
@@ -219,7 +219,7 @@ class _EslemeSorulariScreenState extends State<EslemeSorulariScreen>
                 ),
               ),
 
-              // Sevimli geri butonu - Renkli/Çöl Teması (Altıgen)
+              // Sevimli geri butonu
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -239,22 +239,40 @@ class _EslemeSorulariScreenState extends State<EslemeSorulariScreen>
                         gradient: const LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [Color(0xFFFFB347), Color(0xFFFF8C3C)],
+                          colors: [Color(0xFFD6E4FF), Color(0xFFD6E4FF)],
                         ),
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.orange.withOpacity(0.5),
+                            color: const Color(0xFFD6E4FF).withOpacity(0.5),
                             blurRadius: 20,
                             spreadRadius: 2,
                             offset: const Offset(0, 6),
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.arrow_back_rounded,
-                        color: Colors.white,
-                        size: 28,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Parlama efekti
+                          Positioned(
+                            top: 10,
+                            left: 12,
+                            child: Container(
+                              width: 15,
+                              height: 15,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.4),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                          const Icon(
+                            Icons.arrow_back_rounded,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ],
                       ),
                     ),
                   ),
