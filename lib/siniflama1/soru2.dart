@@ -4,8 +4,7 @@ import '../providers/language_provider.dart';
 import 'soru4.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
 import '../../screens/home_screen.dart';
-import '../../widgets/matching_pause_menu.dart';
-
+import '../../widgets/in_game_menu.dart';
 
 class UzunKisaSinifla extends StatefulWidget {
   const UzunKisaSinifla({super.key});
@@ -48,7 +47,6 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
 
   bool showFeedback = false;
   bool isCorrect = false;
-  bool _showPauseMenu = false;
   bool _isSoundOn = true;
 
   late AnimationController _feedbackController;
@@ -283,277 +281,209 @@ class _UzunKisaSiniflaState extends State<UzunKisaSinifla>
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final iconSize = MediaQuery.of(context).size.width * 0.065;
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (_showPauseMenu) {
-          setState(() {
-            _showPauseMenu = false;
-          });
-        } else {
-          setState(() {
-            _showPauseMenu = true;
-          });
-        }
-        return false;
-      },
-      child: Scaffold(
-        body: Stack(
-          children: [
-            Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.blue.shade200,
-                Colors.blue.shade200,
-                const Color(0xffffffff),
-              ],
-              stops: const [0.0, 0.5, 1.0],
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.blue.shade200,
+                  Colors.blue.shade200,
+                  const Color(0xffffffff),
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
             ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _showPauseMenu = true;
-                          });
-                        },
-                        child: Container(
-                          width: iconSize * 1.6,
-                          height: iconSize * 1.6,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.blue.shade200,
-                                Colors.blue.shade200,
-                                const Color(0xffffffff),
-                              ],
-                              stops: const [0.0, 0.5, 1.0],
+            child: SafeArea(
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: Container(
+                        margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.blue.shade800.withOpacity(0.5),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                                spreadRadius: 1,
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 1,
                               ),
-                              BoxShadow(
-                                color: Colors.white.withOpacity(0.3),
-                                blurRadius: 4,
-                                offset: const Offset(-2, -2),
+                              child: Text(
+                                isEnglish
+                                    ? 'Drag the objects to the correct group!'
+                                    : 'Nesneleri doğru gruba sürükle!',
+                                style: const TextStyle(
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.home_rounded,
-                            color: Colors.black,
-                            size: iconSize * 0.9,
-                          ),
+                            ),
+                            const SizedBox(height: 15),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Column(
+                                      children: [
+                                        Expanded(
+                                          child: _buildGroup(
+                                            isEnglish ? 'Long' : 'Uzun',
+                                            longGroup,
+                                            true,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Expanded(
+                                          child: _buildGroup(
+                                            isEnglish ? 'Short' : 'Kısa',
+                                            shortGroup,
+                                            false,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    flex: 2,
+                                    // Sağ tarafta ayrı bir DragTarget kullanmaya gerek yok
+                                    // çünkü yanlış bırakma kontrolü _buildGroup içinde yapılıyor.
+                                    child: AbsorbPointer(
+                                      absorbing: showFeedback,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children:
+                                            items
+                                                .where(
+                                                  (item) => !item['isPlaced'],
+                                                )
+                                                .map((item) => _buildItem(item))
+                                                .toList(),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Container(
-                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 1,
-                            ),
-                            child: Text(
-                              isEnglish
-                                  ? 'Drag the objects to the correct group!'
-                                  : 'Nesneleri doğru gruba sürükle!',
-                              style: const TextStyle(
-                                fontSize: 23,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: Column(
-                                    children: [
-                                      Expanded(
-                                        child: _buildGroup(
-                                          isEnglish ? 'Long' : 'Uzun',
-                                          longGroup,
-                                          true,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Expanded(
-                                        child: _buildGroup(
-                                          isEnglish ? 'Short' : 'Kısa',
-                                          shortGroup,
-                                          false,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  flex: 2,
-                                  // Sağ tarafta ayrı bir DragTarget kullanmaya gerek yok
-                                  // çünkü yanlış bırakma kontrolü _buildGroup içinde yapılıyor.
-                                  child: AbsorbPointer(
-                                    absorbing: showFeedback,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children:
-                                          items
-                                              .where(
-                                                (item) => !item['isPlaced'],
-                                              )
-                                              .map((item) => _buildItem(item))
-                                              .toList(),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                  ),
+                  // Geri Bildirim Kutusu
+                  Container(
+                    height: 80,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
                     ),
-                  ),
-                ),
-                // Geri Bildirim Kutusu
-                Container(
-                  height: 80,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
+                    child:
+                        showFeedback
+                            ? ScaleTransition(
+                              scale: CurvedAnimation(
+                                parent: _feedbackController,
+                                curve: Curves.elasticOut,
                               ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? (isEnglish
-                                            ? 'Well done! 🎉'
-                                            : 'Aferin! 🎉')
-                                        : (isEnglish
-                                            ? 'Try again! 😔'
-                                            : 'Tekrar dene! 😔'),
-                                    style: TextStyle(
-                                      fontSize: 18,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 20,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      isCorrect
+                                          ? Icons.check_circle
+                                          : Icons.cancel,
                                       color:
                                           isCorrect ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
+                                      size: 28,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      isCorrect
+                                          ? (isEnglish
+                                              ? 'Well done! 🎉'
+                                              : 'Aferin! 🎉')
+                                          : (isEnglish
+                                              ? 'Try again! 😔'
+                                              : 'Tekrar dene! 😔'),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color:
+                                            isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          )
-                          : const SizedBox.shrink(),
-                ),
-              ],
+                            )
+                            : const SizedBox.shrink(),
+                  ),
+                ],
+              ),
             ),
           ),
-            ),
-            if (_showPauseMenu)
-              MatchingPauseMenu(
-                isEnglish: isEnglish,
-                isSoundOn: _isSoundOn,
-                onResume: () => setState(() => _showPauseMenu = false),
-                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
-                onHome: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const ClassificationQuestionsScreen(),
-                    ),
-                    (route) => false,
-                  );
-                },
-                onEntryScreen: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const HomeScreen(),
-                    ),
-                    (route) => false,
-                  );
-                },
-                onDismiss: () => setState(() => _showPauseMenu = false),
-              ),
-          ],
-        ),
+          InGameMenu(
+            isSoundOn: _isSoundOn,
+            onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+            onHome: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const ClassificationQuestionsScreen(),
+                ),
+                (route) => false,
+              );
+            },
+            onEntryScreen: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+            iconSize: iconSize,
+          ),
+        ],
       ),
     );
   }

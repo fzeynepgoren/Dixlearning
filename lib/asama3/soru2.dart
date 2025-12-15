@@ -393,26 +393,26 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
           ),
         ),
           InGameMenu(
-            isSoundOn: _isSoundOn,
-            onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
-            onHome: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (context) => const MatchingQuestionsScreen(),
-                ),
-                (route) => false,
-              );
-            },
-            onEntryScreen: () {
-              Navigator.of(context).pushAndRemoveUntil(
+                isSoundOn: _isSoundOn,
+                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+                onHome: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const MatchingQuestionsScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                onEntryScreen: () {
+                  Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
+                    (route) => false,
+                  );
+                },
             iconSize: iconSize,
-          ),
+              ),
           ],
-        ),
-      );
+      ),
+    );
   }
 }

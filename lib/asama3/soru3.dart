@@ -422,26 +422,26 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
               ),
             ),
           InGameMenu(
-            isSoundOn: _isSoundOn,
-            onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
-            onHome: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (context) => const MatchingQuestionsScreen(),
-                ),
-                (route) => false,
-              );
-            },
-            onEntryScreen: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
+                isSoundOn: _isSoundOn,
+                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+                onHome: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const MatchingQuestionsScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                onEntryScreen: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
             iconSize: iconSize,
-          ),
+              ),
           ],
-        ),
-      );
+      ),
+    );
   }
 }

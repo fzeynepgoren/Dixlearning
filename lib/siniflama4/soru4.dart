@@ -4,7 +4,7 @@ import '../providers/language_provider.dart';
 import 'soru5.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
 import '../../screens/home_screen.dart';
-import '../../widgets/matching_pause_menu.dart';
+import '../../widgets/in_game_menu.dart';
 
 class AtikSinifla extends StatefulWidget {
   const AtikSinifla({super.key});
@@ -34,9 +34,8 @@ class _AtikSiniflaState extends State<AtikSinifla>
   final List<Map<String, dynamic>> glassGroup = [];
   bool showFeedback = false;
   bool isCorrect = false;
-  bool _dialogShown = false;
-  bool _showPauseMenu = false;
   bool _isSoundOn = true;
+  bool _dialogShown = false;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -143,384 +142,255 @@ class _AtikSiniflaState extends State<AtikSinifla>
     final horizontalPadding = screenSize.width * 0.05;
     final verticalPadding = screenSize.height * 0.02;
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (_showPauseMenu) {
-          setState(() {
-            _showPauseMenu = false;
-          });
-        } else {
-          setState(() {
-            _showPauseMenu = true;
-          });
-        }
-        return false;
-      },
-      child: Scaffold(
-        body: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.blue.shade200,
-                    Colors.blue.shade200,
-                    const Color(0xffffffff),
-                  ],
-                  stops: const [0.0, 0.5, 1.0],
-                ),
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.blue.shade200,
+                  Colors.blue.shade200,
+                  const Color(0xffffffff),
+                ],
+                stops: const [0.0, 0.5, 1.0],
               ),
-              child: SafeArea(
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _showPauseMenu = true;
-                              });
-                            },
-                            child: Container(
-                              width: iconSize * 1.6,
-                              height: iconSize * 1.6,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    Colors.blue.shade200,
-                                    Colors.blue.shade200,
-                                    const Color(0xffffffff),
-                                  ],
-                                  stops: const [0.0, 0.5, 1.0],
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.blue.shade800.withOpacity(0.5),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                    spreadRadius: 1,
-                                  ),
-                                  BoxShadow(
-                                    color: Colors.white.withOpacity(0.3),
-                                    blurRadius: 4,
-                                    offset: const Offset(-2, -2),
-                                  ),
-                                ],
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                    ],
+                  ),
+                  Expanded(
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: Container(
+                        margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                        padding: EdgeInsets.all(screenSize.width * 0.025),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: horizontalPadding,
+                                vertical: verticalPadding * 0.5,
                               ),
-                              child: Icon(
-                                Icons.home_rounded,
-                                color: Colors.black,
-                                size: iconSize * 0.9,
+                              child: Text(
+                                isEnglish
+                                    ? 'Drag the waste to the correct bin!'
+                                    : 'Atıkları doğru kutuya sürükle!',
+                                style: TextStyle(
+                                  fontSize: screenSize.width * 0.05,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: SlideTransition(
-                        position: _slideAnimation,
-                        child: Container(
-                          margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-                          padding: EdgeInsets.all(screenSize.width * 0.025),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.95),
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: horizontalPadding,
-                                  vertical: verticalPadding * 0.5,
-                                ),
-                                child: Text(
-                                  isEnglish
-                                      ? 'Drag the waste to the correct bin!'
-                                      : 'Atıkları doğru kutuya sürükle!',
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.05,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              SizedBox(height: screenSize.height * 0.02),
-                              Expanded(
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Column(
-                                        children: [
-                                          _buildGroup(
-                                            isEnglish
-                                                ? 'Paper Bin'
-                                                : 'Kağıt Kutusu',
-                                            paperGroup,
-                                            'kagit',
-                                            Colors.purple.shade100,
-                                            Colors.purple.shade300,
-                                          ),
-                                          _buildGroup(
-                                            isEnglish
-                                                ? 'Plastic Bin'
-                                                : 'Plastik Kutusu',
-                                            plasticGroup,
-                                            'plastik',
-                                            Colors.blue.shade100,
-                                            Colors.blue.shade400,
-                                          ),
-                                          _buildGroup(
-                                            isEnglish
-                                                ? 'Glass Bin'
-                                                : 'Cam Kutusu',
-                                            glassGroup,
-                                            'cam',
-                                            Colors.yellow.shade100,
-                                            Colors.yellow.shade400,
-                                          ),
-                                        ],
-                                      ),
+                            SizedBox(height: screenSize.height * 0.02),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Column(
+                                      children: [
+                                        _buildGroup(
+                                          isEnglish
+                                              ? 'Paper Bin'
+                                              : 'Kağıt Kutusu',
+                                          paperGroup,
+                                          'kagit',
+                                          Colors.purple.shade100,
+                                          Colors.purple.shade300,
+                                        ),
+                                        _buildGroup(
+                                          isEnglish
+                                              ? 'Plastic Bin'
+                                              : 'Plastik Kutusu',
+                                          plasticGroup,
+                                          'plastik',
+                                          Colors.blue.shade100,
+                                          Colors.blue.shade400,
+                                        ),
+                                        _buildGroup(
+                                          isEnglish
+                                              ? 'Glass Bin'
+                                              : 'Cam Kutusu',
+                                          glassGroup,
+                                          'cam',
+                                          Colors.yellow.shade100,
+                                          Colors.yellow.shade400,
+                                        ),
+                                      ],
                                     ),
-                                    SizedBox(width: screenSize.width * 0.04),
-                                    Expanded(
-                                      flex: 2,
-                                      child: SingleChildScrollView(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children:
-                                              items
-                                                  .where(
-                                                    (item) => !item['isPlaced'],
-                                                  )
-                                                  .map((item) {
-                                                    return Draggable<
-                                                      Map<String, dynamic>
-                                                    >(
-                                                      data: item,
-                                                      feedback: Material(
-                                                        color:
-                                                            Colors.transparent,
-                                                        child:
-                                                            _buildDraggableItem(
-                                                              item,
-                                                            ),
-                                                      ),
-                                                      childWhenDragging: Opacity(
-                                                        opacity: 0.3,
-                                                        child:
-                                                            _buildDraggableItem(
-                                                              item,
-                                                            ),
-                                                      ),
+                                  ),
+                                  SizedBox(width: screenSize.width * 0.04),
+                                  Expanded(
+                                    flex: 2,
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children:
+                                            items
+                                                .where(
+                                                  (item) => !item['isPlaced'],
+                                                )
+                                                .map((item) {
+                                                  return Draggable<
+                                                    Map<String, dynamic>
+                                                  >(
+                                                    data: item,
+                                                    feedback: Material(
+                                                      color: Colors.transparent,
                                                       child:
                                                           _buildDraggableItem(
                                                             item,
                                                           ),
-                                                    );
-                                                  })
-                                                  .toList(),
-                                        ),
+                                                    ),
+                                                    childWhenDragging: Opacity(
+                                                      opacity: 0.3,
+                                                      child:
+                                                          _buildDraggableItem(
+                                                            item,
+                                                          ),
+                                                    ),
+                                                    child: _buildDraggableItem(
+                                                      item,
+                                                    ),
+                                                  );
+                                                })
+                                                .toList(),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 80,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    child:
+                        showFeedback
+                            ? ScaleTransition(
+                              scale: CurvedAnimation(
+                                parent: _feedbackController,
+                                curve: Curves.elasticOut,
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 20,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      isCorrect
+                                          ? Icons.check_circle
+                                          : Icons.cancel,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      size: 28,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      isCorrect
+                                          ? (isEnglish
+                                              ? 'Well done! 🎉'
+                                              : 'Aferin! 🎉')
+                                          : (isEnglish
+                                              ? 'Try again! 😔'
+                                              : 'Tekrar dene! 😔'),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color:
+                                            isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: 80,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      child:
-                          showFeedback
-                              ? ScaleTransition(
-                                scale: CurvedAnimation(
-                                  parent: _feedbackController,
-                                  curve: Curves.elasticOut,
-                                ),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 10,
-                                    horizontal: 20,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Colors.black12,
-                                        blurRadius: 10,
-                                        offset: Offset(0, 5),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        isCorrect
-                                            ? Icons.check_circle
-                                            : Icons.cancel,
-                                        color:
-                                            isCorrect
-                                                ? Colors.green
-                                                : Colors.red,
-                                        size: 28,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Text(
-                                        isCorrect
-                                            ? (isEnglish
-                                                ? 'Well done! 🎉'
-                                                : 'Aferin! 🎉')
-                                            : (isEnglish
-                                                ? 'Try again! 😔'
-                                                : 'Tekrar dene! 😔'),
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color:
-                                              isCorrect
-                                                  ? Colors.green
-                                                  : Colors.red,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                              : const SizedBox.shrink(),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (_showPauseMenu)
-              MatchingPauseMenu(
-                isEnglish: isEnglish,
-                isSoundOn: _isSoundOn,
-                onResume: () => setState(() => _showPauseMenu = false),
-                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
-                onHome: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder:
-                          (context) => const ClassificationQuestionsScreen(),
-                    ),
-                    (route) => false,
-                  );
-                },
-                onEntryScreen: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
-                onDismiss: () => setState(() => _showPauseMenu = false),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGroup(
-    String title,
-    List<Map<String, dynamic>> group,
-    String type,
-    Color boxColor,
-    Color borderColor,
-  ) {
-    final screenSize = MediaQuery.of(context).size;
-    final titleSize = screenSize.width * 0.05;
-    final emojiSize = screenSize.width * 0.1;
-
-    return Expanded(
-      child: DragTarget<Map<String, dynamic>>(
-        onWillAcceptWithDetails: (details) => !details.data['isPlaced'],
-        onAcceptWithDetails: (details) => _handleDrag(details.data, type),
-        builder: (context, candidateData, rejectedData) {
-          return Container(
-            width: double.infinity,
-            margin: EdgeInsets.symmetric(
-              vertical: screenSize.height * 0.01,
-              horizontal: screenSize.width * 0.04,
-            ),
-            decoration: BoxDecoration(
-              color: boxColor,
-              border: Border.all(color: borderColor, width: 2),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: titleSize,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                            )
+                            : const SizedBox.shrink(),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: screenSize.height * 0.01),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: screenSize.width * 0.02,
-                  children:
-                      group
-                          .map(
-                            (item) => Text(
-                              item['emoji'],
-                              style: TextStyle(fontSize: emojiSize),
-                            ),
-                          )
-                          .toList(),
-                ),
-              ],
+                ],
+              ),
             ),
-          );
-        },
+          ),
+          InGameMenu(
+            isSoundOn: _isSoundOn,
+            onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+            onHome: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const ClassificationQuestionsScreen(),
+                ),
+                (route) => false,
+              );
+            },
+            onEntryScreen: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+            iconSize: iconSize,
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildDraggableItem(Map<String, dynamic> item) {
+  Widget _buildItemBox(Map<String, dynamic> item) {
     final screenSize = MediaQuery.of(context).size;
     final itemSize = screenSize.width * 0.2;
     final emojiSize = screenSize.width * 0.1;
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: screenSize.height * 0.003),
       width: itemSize,
       height: itemSize,
       decoration: BoxDecoration(
@@ -534,5 +404,121 @@ class _AtikSiniflaState extends State<AtikSinifla>
         child: Text(item['emoji'], style: TextStyle(fontSize: emojiSize)),
       ),
     );
+  }
+
+  Widget _buildGroup(
+    String title,
+    List<Map<String, dynamic>> group,
+    String type,
+    Color boxColor,
+    Color borderColor,
+  ) {
+    return DragTarget<Map<String, dynamic>>(
+      onWillAccept: (data) => true,
+      onAccept: (data) {
+        bool isCorrectMatch = data['type'] == type;
+
+        if (isCorrectMatch) {
+          _handleDrag(data, type);
+        } else {
+          final isEnglish =
+              Provider.of<LanguageProvider>(context, listen: false).isEnglish;
+          setState(() {
+            isCorrect = false;
+            showFeedback = true;
+            feedbackMessage = isEnglish ? 'Try again! 😔' : 'Tekrar dene! 😔';
+          });
+          _feedbackController.forward(from: 0);
+
+          Future.delayed(const Duration(seconds: 1), () {
+            if (mounted) {
+              setState(() {
+                showFeedback = false;
+              });
+            }
+          });
+        }
+      },
+      builder: (context, candidateData, rejectedData) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          width: double.infinity,
+          height: 145,
+          margin: const EdgeInsets.symmetric(vertical: 7),
+          padding: const EdgeInsets.all(7),
+          decoration: BoxDecoration(
+            color: boxColor,
+            border: Border.all(
+              color: _getBorderColorForType(type, borderColor),
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 10,
+                    runSpacing: 4,
+                    children:
+                        group
+                            .map(
+                              (item) => Text(
+                                item['emoji'],
+                                style: const TextStyle(
+                                  fontSize: 50,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            )
+                            .toList(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDraggableItem(Map<String, dynamic> item) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      width: 70,
+      height: 60,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 3, offset: Offset(0, 1)),
+        ],
+      ),
+      child: Center(
+        child: Text(
+          item['emoji'],
+          style: const TextStyle(fontSize: 40, color: Colors.black),
+        ),
+      ),
+    );
+  }
+
+  Color _getBorderColorForType(String type, Color defaultColor) {
+    // Çerçeve rengi her zaman sabit kalacak, değişmeyecek
+    return defaultColor;
   }
 }

@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
 import '../../screens/home_screen.dart';
-import '../../widgets/matching_pause_menu.dart';
+import '../../widgets/in_game_menu.dart';
 
 class OlaySinifla extends StatefulWidget {
   const OlaySinifla({super.key});
@@ -44,9 +44,8 @@ class _OlaySiniflaState extends State<OlaySinifla>
 
   bool showFeedback = false;
   bool isCorrect = false;
-  bool _dialogShown = false;
-  bool _showPauseMenu = false;
   bool _isSoundOn = true;
+  bool _dialogShown = false;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -118,258 +117,168 @@ class _OlaySiniflaState extends State<OlaySinifla>
   void _checkCompletion() async {
     final allPlaced = sentenceItems.every((item) => item['isPlaced']);
     if (allPlaced && !_dialogShown) {
-      _dialogShown = true;
+      try {
+        // Level 4'ü tamamlandı olarak kaydet
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt('siniflama_completed_level', 4);
 
-      // Level 4'ü tamamlandı olarak kaydet
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('siniflama_completed_level', 4);
+        await Future.delayed(const Duration(milliseconds: 1500));
 
-      Future.delayed(const Duration(milliseconds: 500), () {
+        if (!mounted) return;
+
+        final prefs2 = await SharedPreferences.getInstance();
+        int stars = await _calculateStars();
+        int wrongCount = prefs2.getInt('siniflama4_wrong_count') ?? 0;
+        await prefs2.setInt('siniflama4_final_wrong_count', wrongCount);
+        await prefs2.setInt(
+          'siniflama4_wrong_count',
+          0,
+        ); // Reset for next playthrough
+
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (mounted) {
+            _showCompletionDialog(stars);
+          }
+        });
+      } catch (e) {
+        // Hata durumunda sessizce devam et veya logla
         if (mounted) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder:
-                (context) => Dialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  elevation: 25,
-                  child: Container(
-                    padding: const EdgeInsets.all(40),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Colors.white, Colors.blue.shade50],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 25,
-                          offset: const Offset(0, 15),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Custom Golden Trophy Icon
-                        SizedBox(
-                          width: 120,
-                          height: 120,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              // Trophy Cup
-                              Container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  color: Colors.amber.shade300,
-                                  borderRadius: BorderRadius.circular(40),
-                                  border: Border.all(
-                                    color: Colors.blue.shade800,
-                                    width: 2,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.amber.withOpacity(0.3),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 5),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    Icons.star,
-                                    color: Colors.amber.shade600,
-                                    size: 40,
-                                  ),
-                                ),
-                              ),
-                              // Trophy Handles
-                              Positioned(
-                                left: 10,
-                                top: 25,
-                                child: Container(
-                                  width: 20,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    color: Colors.amber.shade300,
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: Colors.blue.shade800,
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                right: 10,
-                                top: 25,
-                                child: Container(
-                                  width: 20,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    color: Colors.amber.shade300,
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: Colors.blue.shade800,
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Trophy Base
-                              Positioned(
-                                bottom: 0,
-                                child: Container(
-                                  width: 100,
-                                  height: 25,
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue.shade800,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.blue.shade800,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Container(
-                                      width: 60,
-                                      height: 8,
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue.shade400,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Decorative Stars
-                              Positioned(
-                                top: 5,
-                                left: 20,
-                                child: Icon(
-                                  Icons.star,
-                                  color: Colors.amber.shade400,
-                                  size: 12,
-                                ),
-                              ),
-                              Positioned(
-                                top: 5,
-                                right: 20,
-                                child: Icon(
-                                  Icons.star,
-                                  color: Colors.amber.shade400,
-                                  size: 12,
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 30,
-                                left: 15,
-                                child: Icon(
-                                  Icons.star,
-                                  color: Colors.amber.shade400,
-                                  size: 10,
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 30,
-                                right: 15,
-                                child: Icon(
-                                  Icons.star,
-                                  color: Colors.amber.shade400,
-                                  size: 10,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-                        Text(
-                          Provider.of<LanguageProvider>(
-                                context,
-                                listen: false,
-                              ).isEnglish
-                              ? 'CONGRATULATIONS!'
-                              : 'TEBRİKLER',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.blue.shade800,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          Provider.of<LanguageProvider>(
-                                context,
-                                listen: false,
-                              ).isEnglish
-                              ? 'You have completed the activity!'
-                              : 'Etkinliği tamamladınız!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey.shade600,
-                            height: 1.5,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 35),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) =>
-                                          const ClassificationQuestionsScreen(),
-                                ),
-                                (route) => false,
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.blue.shade600,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 40,
-                                vertical: 18,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              elevation: 12,
-                              shadowColor: Colors.blue.withOpacity(0.4),
-                            ),
-                            child: Text(
-                              Provider.of<LanguageProvider>(
-                                    context,
-                                    listen: false,
-                                  ).isEnglish
-                                  ? 'GO TO MENU'
-                                  : 'MENÜYE GİT',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-          );
+          int stars = await _calculateStars();
+          _showCompletionDialog(stars);
         }
-      });
+      }
     }
+  }
+
+  Future<int> _calculateStars() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('siniflama4_wrong_count') ?? 0;
+    if (wrongCount == 0) return 3;
+    if (wrongCount <= 2) return 2;
+    return 1;
+  }
+
+  void _showCompletionDialog(int stars) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.all(20),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final screenWidth = MediaQuery.of(context).size.width;
+                final screenHeight = MediaQuery.of(context).size.height;
+                // Ekrana sığdır - dinamik boyut
+                final popupWidth = screenWidth * 0.9;
+                final popupHeight = screenHeight * 0.75;
+
+                return TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 600),
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  curve: Curves.easeOutBack,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: 0.8 + (value * 0.2),
+                      child: Opacity(
+                        opacity: value,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Sualtı popup görseli - ekranın ortasına
+                            Image.asset(
+                              'assets/popup/sualti_popup.png',
+                              width: popupWidth,
+                              height: popupHeight,
+                              fit: BoxFit.contain,
+                            ),
+                            // Deniz yıldızı görseli - popup'ın ortasındaki dikdörtgene
+                            // Yıldız sayısına göre göster (yan yana)
+                            if (stars > 0)
+                              Positioned(
+                                // Popup'ın ortasına yerleştir - popup görselinin ortasındaki dikdörtgen alanına
+                                top: popupHeight * 0.45,
+                                left: 0,
+                                right: 0,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: List.generate(stars, (index) {
+                                    // Her deniz yıldızı için boyut - popup genişliğine göre dinamik
+                                    // Popup'ın ortasındaki dikdörtgene sığacak şekilde
+                                    final individualSize = (popupWidth * 0.15)
+                                        .clamp(40.0, 80.0);
+                                    return TweenAnimationBuilder<double>(
+                                      duration: Duration(
+                                        milliseconds: 400 + (index * 200),
+                                      ),
+                                      tween: Tween(begin: 0.0, end: 1.0),
+                                      curve: Curves.elasticOut,
+                                      builder: (context, scaleValue, child) {
+                                        return Transform.scale(
+                                          scale: scaleValue,
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: popupWidth * 0.02,
+                                            ),
+                                            child: Image.asset(
+                                              'assets/popup/denizyildizi.png',
+                                              width: individualSize,
+                                              height: individualSize,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }),
+                                ),
+                              ),
+                            // MENÜYE GİT butonu - popup'ın alt kısmına transparan buton
+                            Positioned(
+                              bottom: popupHeight * 0.28,
+                              left: popupWidth * 0.15,
+                              right: popupWidth * 0.15,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                const ClassificationQuestionsScreen(),
+                                      ),
+                                      (route) => false,
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: (popupHeight * 0.1).clamp(
+                                      45.0,
+                                      65.0,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+    );
   }
 
   @override
@@ -380,288 +289,213 @@ class _OlaySiniflaState extends State<OlaySinifla>
     final horizontalPadding = screenSize.width * 0.05;
     final verticalPadding = screenSize.height * 0.02;
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (_showPauseMenu) {
-          setState(() {
-            _showPauseMenu = false;
-          });
-        } else {
-          setState(() {
-            _showPauseMenu = true;
-          });
-        }
-        return false;
-      },
-      child: Scaffold(
-        body: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.blue.shade200,
-                    Colors.blue.shade200,
-                    const Color(0xffffffff),
-                  ],
-                  stops: const [0.0, 0.5, 1.0],
-                ),
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.blue.shade200,
+                  Colors.blue.shade200,
+                  const Color(0xffffffff),
+                ],
+                stops: const [0.0, 0.5, 1.0],
               ),
-              child: SafeArea(
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _showPauseMenu = true;
-                              });
-                            },
-                            child: Container(
-                              width: iconSize * 1.6,
-                              height: iconSize * 1.6,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    Colors.purple.shade300,
-                                    Colors.purple.shade600,
-                                    Colors.deepPurple.shade700,
-                                  ],
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.purple.shade800.withOpacity(
-                                      0.5,
-                                    ),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                    spreadRadius: 1,
-                                  ),
-                                  BoxShadow(
-                                    color: Colors.white.withOpacity(0.3),
-                                    blurRadius: 4,
-                                    offset: const Offset(-2, -2),
-                                  ),
-                                ],
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: Container(
+                        margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                        padding: EdgeInsets.all(screenSize.width * 0.025),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: horizontalPadding,
+                                vertical: verticalPadding * 0.5,
                               ),
-                              child: Icon(
-                                Icons.home_rounded,
-                                color: Colors.black,
-                                size: iconSize * 0.9,
+                              child: Text(
+                                isEnglish
+                                    ? 'Drag and drop the categories to the sentences!'
+                                    : 'Kategorileri cümlelerin üzerine sürükle!',
+                                style: TextStyle(
+                                  fontSize: screenSize.width * 0.05,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: SlideTransition(
-                        position: _slideAnimation,
-                        child: Container(
-                          margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-                          padding: EdgeInsets.all(screenSize.width * 0.025),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.95),
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: horizontalPadding,
-                                  vertical: verticalPadding * 0.5,
-                                ),
-                                child: Text(
-                                  isEnglish
-                                      ? 'Drag and drop the categories to the sentences!'
-                                      : 'Kategorileri cümlelerin üzerine sürükle!',
-                                  style: TextStyle(
-                                    fontSize: screenSize.width * 0.05,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                            SizedBox(height: screenSize.height * 0.02),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children:
+                                          sentenceItems.map((item) {
+                                            return _buildSentenceGroup(item);
+                                          }).toList(),
+                                    ),
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              SizedBox(height: screenSize.height * 0.02),
-                              Expanded(
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
+                                  SizedBox(width: screenSize.width * 0.04),
+                                  Expanded(
+                                    flex: 2,
+                                    child: SingleChildScrollView(
                                       child: Column(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
+                                            MainAxisAlignment.center,
                                         children:
-                                            sentenceItems.map((item) {
-                                              return _buildSentenceGroup(item);
-                                            }).toList(),
-                                      ),
-                                    ),
-                                    SizedBox(width: screenSize.width * 0.04),
-                                    Expanded(
-                                      flex: 2,
-                                      child: SingleChildScrollView(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children:
-                                              draggableItems
-                                                  .where(
-                                                    (item) => !item['isPlaced'],
-                                                  )
-                                                  .map((item) {
-                                                    return Draggable<
-                                                      Map<String, dynamic>
-                                                    >(
-                                                      data: item,
-                                                      feedback: Material(
-                                                        color:
-                                                            Colors.transparent,
-                                                        child:
-                                                            _buildDraggableItem(
-                                                              item,
-                                                            ),
-                                                      ),
-                                                      childWhenDragging: Opacity(
-                                                        opacity: 0.3,
-                                                        child:
-                                                            _buildDraggableItem(
-                                                              item,
-                                                            ),
-                                                      ),
+                                            draggableItems
+                                                .where(
+                                                  (item) => !item['isPlaced'],
+                                                )
+                                                .map((item) {
+                                                  return Draggable<
+                                                    Map<String, dynamic>
+                                                  >(
+                                                    data: item,
+                                                    feedback: Material(
+                                                      color: Colors.transparent,
                                                       child:
                                                           _buildDraggableItem(
                                                             item,
                                                           ),
-                                                    );
-                                                  })
-                                                  .toList(),
-                                        ),
+                                                    ),
+                                                    childWhenDragging: Opacity(
+                                                      opacity: 0.3,
+                                                      child:
+                                                          _buildDraggableItem(
+                                                            item,
+                                                          ),
+                                                    ),
+                                                    child: _buildDraggableItem(
+                                                      item,
+                                                    ),
+                                                  );
+                                                })
+                                                .toList(),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: screenSize.height * 0.1,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPadding,
+                      vertical: verticalPadding,
+                    ),
+                    child:
+                        showFeedback
+                            ? ScaleTransition(
+                              scale: CurvedAnimation(
+                                parent: _feedbackController,
+                                curve: Curves.elasticOut,
+                              ),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: screenSize.height * 0.01,
+                                  horizontal: screenSize.width * 0.04,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      isCorrect
+                                          ? Icons.check_circle
+                                          : Icons.cancel,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      size: screenSize.width * 0.07,
+                                    ),
+                                    SizedBox(width: screenSize.width * 0.025),
+                                    Text(
+                                      isCorrect
+                                          ? (isEnglish
+                                              ? 'Well done! 🎉'
+                                              : 'Aferin! 🎉')
+                                          : (isEnglish
+                                              ? 'Try again! 😔'
+                                              : 'Tekrar dene! 😔'),
+                                      style: TextStyle(
+                                        fontSize: screenSize.width * 0.045,
+                                        color:
+                                            isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: screenSize.height * 0.1,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding,
-                        vertical: verticalPadding,
-                      ),
-                      child:
-                          showFeedback
-                              ? ScaleTransition(
-                                scale: CurvedAnimation(
-                                  parent: _feedbackController,
-                                  curve: Curves.elasticOut,
-                                ),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: screenSize.height * 0.01,
-                                    horizontal: screenSize.width * 0.04,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Colors.black12,
-                                        blurRadius: 10,
-                                        offset: Offset(0, 5),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        isCorrect
-                                            ? Icons.check_circle
-                                            : Icons.cancel,
-                                        color:
-                                            isCorrect
-                                                ? Colors.green
-                                                : Colors.red,
-                                        size: screenSize.width * 0.07,
-                                      ),
-                                      SizedBox(width: screenSize.width * 0.025),
-                                      Text(
-                                        isCorrect
-                                            ? (isEnglish
-                                                ? 'Well done! 🎉'
-                                                : 'Aferin! 🎉')
-                                            : (isEnglish
-                                                ? 'Try again! 😔'
-                                                : 'Tekrar dene! 😔'),
-                                        style: TextStyle(
-                                          fontSize: screenSize.width * 0.045,
-                                          color:
-                                              isCorrect
-                                                  ? Colors.green
-                                                  : Colors.red,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                              : const SizedBox.shrink(),
-                    ),
-                  ],
-                ),
+                            )
+                            : const SizedBox.shrink(),
+                  ),
+                ],
               ),
             ),
-            if (_showPauseMenu)
-              MatchingPauseMenu(
-                isEnglish: isEnglish,
-                isSoundOn: _isSoundOn,
-                onResume: () => setState(() => _showPauseMenu = false),
-                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
-                onHome: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder:
-                          (context) => const ClassificationQuestionsScreen(),
-                    ),
-                    (route) => false,
-                  );
-                },
-                onEntryScreen: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
-                onDismiss: () => setState(() => _showPauseMenu = false),
-              ),
-          ],
-        ),
+          ),
+          InGameMenu(
+            isSoundOn: _isSoundOn,
+            onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+            onHome: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const ClassificationQuestionsScreen(),
+                ),
+                (route) => false,
+              );
+            },
+            onEntryScreen: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+            iconSize: iconSize,
+          ),
+        ],
       ),
     );
   }
