@@ -34,6 +34,7 @@ class _AtikSiniflaState extends State<AtikSinifla>
   final List<Map<String, dynamic>> glassGroup = [];
   bool showFeedback = false;
   bool isCorrect = false;
+  String feedbackMessage = '';
   bool _isSoundOn = true;
   bool _dialogShown = false;
   late AnimationController _feedbackController;
@@ -166,6 +167,8 @@ class _AtikSiniflaState extends State<AtikSinifla>
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
+                        child: const SizedBox.shrink(),
+                      ),
                     ],
                   ),
                   Expanded(

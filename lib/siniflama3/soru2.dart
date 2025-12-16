@@ -4,8 +4,6 @@ import 'soru4.dart'; // TasitSinifla sınıfının olduğu dosya
 import '../screens/siniflandirma_sorulari_screen.dart';
 import '../../screens/home_screen.dart';
 import '../../widgets/in_game_menu.dart';
-import 'package:provider/provider.dart';
-import '../../providers/language_provider.dart';
 
 class BoyutSinifla extends StatefulWidget {
   const BoyutSinifla({super.key});
@@ -138,39 +136,38 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
                 children: [
                   const SizedBox(height: 10),
                   Expanded(
-                      child: SlideTransition(
-                        position: _slideAnimation,
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.95),
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 10),
+                            const Text(
+                              'Nesneleri boyutlarına göre sınıfla!',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 10),
-                              const Text(
-                                'Nesneleri boyutlarına göre sınıfla!',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 15),
-                              Expanded(
-                                child: Row(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 15),
+                            Expanded(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
                                     Expanded(
                                       flex: 3,
                                       child: Column(
@@ -242,14 +239,14 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
                           ),
                         ),
                       ),
+                  ),
+                  Container(
+                    height: 80,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
                     ),
-                    Container(
-                      height: 80,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      child:
+                    child:
                           showFeedback
                               ? ScaleTransition(
                                 scale: CurvedAnimation(
@@ -310,7 +307,6 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
                 ),
               ),
             ),
-          ),
           InGameMenu(
             isSoundOn: _isSoundOn,
             onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),

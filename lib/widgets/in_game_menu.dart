@@ -76,15 +76,15 @@ class _InGameMenuState extends State<InGameMenu> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Colors.blue.shade200,
-                          Colors.blue.shade200,
+                          Colors.blue.shade400,
+                          Colors.blue.shade300,
                           const Color(0xffffffff),
                         ],
                         stops: const [0.0, 0.5, 1.0],
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.blue.shade800.withOpacity(0.5),
+                          color: Colors.blue.shade600.withOpacity(0.5),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                           spreadRadius: 1,
