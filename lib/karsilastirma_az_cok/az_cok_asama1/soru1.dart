@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/karsilastirma_sorulari_screen.dart';
+import '../../widgets/in_game_menu.dart';
+import '../../../screens/home_screen.dart';
 import 'package:dixlearning/karsilastirma_az_cok/az_cok_asama1/soru2.dart';
 
 class AzCokSoru1 extends StatefulWidget {
@@ -15,6 +17,7 @@ class _AzCokSoru1State extends State<AzCokSoru1> with TickerProviderStateMixin {
   bool? selectedAnswer;
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -84,290 +87,318 @@ class _AzCokSoru1State extends State<AzCokSoru1> with TickerProviderStateMixin {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.blue.shade200,
-                Colors.blue.shade200,
-                const Color(0xffffffff),
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                // Üst kısım - Geri butonu
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blue.shade200,
+                    Colors.blue.shade200,
+                    const Color(0xffffffff),
+                  ],
+                  stops: const [0.0, 0.5, 1.0],
+                ),
+              ),
+              child: SafeArea(
+                child: Column(
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const KarsilastirmaSorulariScreen(),
+                    // Üst kısım - Geri butonu
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.arrow_back,
+                            color: Colors.black,
+                            size: iconSize,
                           ),
-                          (route) => false,
-                        );
-                      },
+                          onPressed: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        const KarsilastirmaSorulariScreen(),
+                              ),
+                              (route) => false,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+
+                    // Main Content
+                    Expanded(
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Container(
+                          margin: const EdgeInsets.fromLTRB(
+                            4,
+                            0,
+                            4,
+                            0,
+                          ), // Sağdan ve soldan daha geniş
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.95),
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              // Başlık
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 1,
+                                ),
+                                child: Text(
+                                  isEnglish
+                                      ? 'Choose the one with fewer.'
+                                      : 'Az olanı işaretle.',
+                                  style: const TextStyle(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+
+                              // Az top görseli
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: Colors.grey.shade200,
+                                      width: 0,
+                                    ),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(18),
+                                    child: Image.asset(
+                                      'assets/az_cok_asa1/soru1/az_top.png',
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+
+                              // Az top buton
+                              Center(
+                                child: SizedBox(
+                                  width: screenWidth * 0.65,
+                                  height: 40,
+                                  child: ElevatedButton(
+                                    onPressed:
+                                        showFeedback
+                                            ? null
+                                            : () => checkAnswer(true),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          selectedAnswer == true
+                                              ? (isCorrect
+                                                  ? Colors.green
+                                                  : Colors.red)
+                                              : Colors.orange.shade400,
+                                      foregroundColor: Colors.black,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      elevation: selectedAnswer == true ? 8 : 4,
+                                      shadowColor:
+                                          selectedAnswer == true
+                                              ? (isCorrect
+                                                  ? Colors.green.shade300
+                                                  : Colors.red.shade300)
+                                              : Color(0xFFF5E733),
+                                    ),
+                                    child: const Text(
+                                      'Seç',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 70),
+
+                              // Çok top görseli
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: Colors.grey.shade200,
+                                      width: 0,
+                                    ),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(18),
+                                    child: Image.asset(
+                                      'assets/az_cok_asa1/soru1/cok_top.png',
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+
+                              // Çok top buton
+                              Center(
+                                child: SizedBox(
+                                  width: screenWidth * 0.65,
+                                  height: 40,
+                                  child: ElevatedButton(
+                                    onPressed:
+                                        showFeedback
+                                            ? null
+                                            : () => checkAnswer(false),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          selectedAnswer == false
+                                              ? (isCorrect
+                                                  ? Colors.green
+                                                  : Colors.red)
+                                              : Colors.orange.shade400,
+                                      foregroundColor: Colors.black,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      elevation:
+                                          selectedAnswer == false ? 8 : 4,
+                                      shadowColor:
+                                          selectedAnswer == false
+                                              ? (isCorrect
+                                                  ? Colors.green.shade300
+                                                  : Colors.red.shade300)
+                                              : Color(0xFFF5E733),
+                                    ),
+                                    child: const Text(
+                                      'Seç',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // Sabit Feedback Alanı - Alt kısımda sabit alan
+                    Container(
+                      height: 80, // Sabit yükseklik
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child:
+                          showFeedback
+                              ? ScaleTransition(
+                                scale: CurvedAnimation(
+                                  parent: _feedbackController,
+                                  curve: Curves.elasticOut,
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 20,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        isCorrect
+                                            ? Icons.check_circle
+                                            : Icons.cancel,
+                                        color:
+                                            isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        size: 28,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        isCorrect
+                                            ? (isEnglish
+                                                ? 'Well done! 🎉'
+                                                : 'Aferin! 🎉')
+                                            : (isEnglish
+                                                ? 'Try again! 😔'
+                                                : 'Tekrar dene! 😔'),
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color:
+                                              isCorrect
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                              : const SizedBox.shrink(), // Boş alan
                     ),
                   ],
                 ),
-
-                // Main Content
-                Expanded(
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Container(
-                      margin: const EdgeInsets.fromLTRB(
-                        4,
-                        0,
-                        4,
-                        0,
-                      ), // Sağdan ve soldan daha geniş
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          // Başlık
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 1,
-                            ),
-                            child: Text(
-                              isEnglish
-                                  ? 'Choose the one with fewer.'
-                                  : 'Az olanı işaretle.',
-                              style: const TextStyle(
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-
-                          // Az top görseli
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.grey.shade200,
-                                  width: 0,
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(18),
-                                child: Image.asset(
-                                  'assets/az_cok_asa1/soru1/az_top.png',
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-
-                          // Az top buton
-                          Center(
-                            child: SizedBox(
-                              width: screenWidth * 0.65,
-                              height: 40,
-                              child: ElevatedButton(
-                                onPressed:
-                                    showFeedback
-                                        ? null
-                                        : () => checkAnswer(true),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      selectedAnswer == true
-                                          ? (isCorrect
-                                              ? Colors.green
-                                              : Colors.red)
-                                          : Colors.orange.shade400,
-                                  foregroundColor: Colors.black,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  elevation: selectedAnswer == true ? 8 : 4,
-                                  shadowColor:
-                                      selectedAnswer == true
-                                          ? (isCorrect
-                                              ? Colors.green.shade300
-                                              : Colors.red.shade300)
-                                          : Color(0xFFF5E733),
-                                ),
-                                child: const Text(
-                                  'Seç',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 70),
-
-                          // Çok top görseli
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.grey.shade200,
-                                  width: 0,
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(18),
-                                child: Image.asset(
-                                  'assets/az_cok_asa1/soru1/cok_top.png',
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-
-                          // Çok top buton
-                          Center(
-                            child: SizedBox(
-                              width: screenWidth * 0.65,
-                              height: 40,
-                              child: ElevatedButton(
-                                onPressed:
-                                    showFeedback
-                                        ? null
-                                        : () => checkAnswer(false),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      selectedAnswer == false
-                                          ? (isCorrect
-                                              ? Colors.green
-                                              : Colors.red)
-                                          : Colors.orange.shade400,
-                                  foregroundColor: Colors.black,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  elevation: selectedAnswer == false ? 8 : 4,
-                                  shadowColor:
-                                      selectedAnswer == false
-                                          ? (isCorrect
-                                              ? Colors.green.shade300
-                                              : Colors.red.shade300)
-                                          : Color(0xFFF5E733),
-                                ),
-                                child: const Text(
-                                  'Seç',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Sabit Feedback Alanı - Alt kısımda sabit alan
-                Container(
-                  height: 80, // Sabit yükseklik
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? (isEnglish
-                                            ? 'Well done! 🎉'
-                                            : 'Aferin! 🎉')
-                                        : (isEnglish
-                                            ? 'Try again! 😔'
-                                            : 'Tekrar dene! 😔'),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color:
-                                          isCorrect ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                          : const SizedBox.shrink(), // Boş alan
-                ),
-              ],
+              ),
             ),
-          ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const KarsilastirmaSorulariScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );

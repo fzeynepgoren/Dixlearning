@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/karsilastirma_sorulari_screen.dart';
+import '../../widgets/in_game_menu.dart';
+import '../../../screens/home_screen.dart';
 
 class KalinInceSoru9 extends StatefulWidget {
   const KalinInceSoru9({super.key});
@@ -16,6 +18,7 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
   bool? selectedAnswer;
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -96,7 +99,9 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -383,6 +388,29 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
               ],
             ),
           ),
+            ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const KarsilastirmaSorulariScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const HomeScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );

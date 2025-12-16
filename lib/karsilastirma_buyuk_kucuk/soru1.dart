@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import '../screens/karsilastirma_sorulari_screen.dart';
 import 'soru2.dart'; // 2. sorunun dosyası
 import '../screens/home_screen.dart';
-import '../widgets/matching_pause_menu.dart';
-import 'package:provider/provider.dart';
-import '../providers/language_provider.dart';
+import '../widgets/in_game_menu.dart';
 
 class BuyukKucukSoru1 extends StatefulWidget {
   const BuyukKucukSoru1({super.key});
@@ -18,7 +16,6 @@ class _BuyukKucukSoru1State extends State<BuyukKucukSoru1>
   int? selectedIndex;
   bool? isCorrect;
   bool showFeedback = false;
-  bool _showPauseMenu = false;
   bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -88,21 +85,8 @@ class _BuyukKucukSoru1State extends State<BuyukKucukSoru1>
     const double buttonHeight = 50;
     final double buttonWidth = screenWidth * 0.28;
 
-    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-
     return WillPopScope(
-      onWillPop: () async {
-        if (_showPauseMenu) {
-          setState(() {
-            _showPauseMenu = false;
-          });
-        } else {
-          setState(() {
-            _showPauseMenu = true;
-          });
-        }
-        return false;
-      },
+      onWillPop: () async => false,
       child: Scaffold(
         body: Stack(
           children: [
@@ -122,58 +106,6 @@ class _BuyukKucukSoru1State extends State<BuyukKucukSoru1>
               child: SafeArea(
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _showPauseMenu = true;
-                              });
-                            },
-                            child: Container(
-                              width: iconSize * 1.6,
-                              height: iconSize * 1.6,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    Colors.purple.shade300,
-                                    Colors.purple.shade600,
-                                    Colors.deepPurple.shade700,
-                                  ],
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.purple.shade800.withOpacity(
-                                      0.5,
-                                    ),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                    spreadRadius: 1,
-                                  ),
-                                  BoxShadow(
-                                    color: Colors.white.withOpacity(0.3),
-                                    blurRadius: 4,
-                                    offset: const Offset(-2, -2),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                Icons.home_rounded,
-                                color: Colors.black,
-                                size: iconSize * 0.9,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: iconSize),
-                      ],
-                    ),
                     Expanded(
                       child: SlideTransition(
                         position: _slideAnimation,
@@ -371,30 +303,25 @@ class _BuyukKucukSoru1State extends State<BuyukKucukSoru1>
                 ),
               ),
             ),
-            if (_showPauseMenu)
-              MatchingPauseMenu(
-                isEnglish: isEnglish,
-                isSoundOn: _isSoundOn,
-                onResume: () => setState(() => _showPauseMenu = false),
-                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
-                onHome: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const KarsilastirmaSorulariScreen(),
-                    ),
-                    (route) => false,
-                  );
-                },
-                onEntryScreen: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
-                onDismiss: () => setState(() => _showPauseMenu = false),
-              ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const KarsilastirmaSorulariScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
           ],
         ),
       ),

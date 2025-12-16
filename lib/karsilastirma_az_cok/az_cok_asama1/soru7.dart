@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/karsilastirma_sorulari_screen.dart';
+import '../../widgets/in_game_menu.dart';
+import '../../../screens/home_screen.dart';
 import 'package:dixlearning/karsilastirma_az_cok/az_cok_asama1/soru8.dart'; // Gelecek soruyu buraya import et
 
 class AzCokSoru7 extends StatefulWidget {
@@ -15,7 +17,7 @@ class _AzCokSoru7State extends State<AzCokSoru7> with TickerProviderStateMixin {
   bool? selectedAnswer;
   bool showFeedback = false;
   bool isCorrect = false;
-
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -88,7 +90,9 @@ class _AzCokSoru7State extends State<AzCokSoru7> with TickerProviderStateMixin {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -326,6 +330,29 @@ class _AzCokSoru7State extends State<AzCokSoru7> with TickerProviderStateMixin {
               ],
             ),
           ),
+            ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const KarsilastirmaSorulariScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const HomeScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );
