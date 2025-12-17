@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import 'soru3.dart';
 import 'package:dixlearning/screens/sorting_roadmap_screen_new.dart';
+import '../../widgets/in_game_menu.dart';
+import '../../screens/home_screen.dart';
 
 class Asama2Soru2 extends StatefulWidget {
   const Asama2Soru2({super.key});
@@ -24,6 +26,7 @@ class _Asama2Soru2State extends State<Asama2Soru2>
   late List<_FoodStage> dragSources;
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
 
   @override
@@ -125,7 +128,9 @@ class _Asama2Soru2State extends State<Asama2Soru2>
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -141,60 +146,6 @@ class _Asama2Soru2State extends State<Asama2Soru2>
           child: SafeArea(
             child: Column(
               children: [
-                // Üst kısım - Geri butonu ve Aşama yazısı
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) => const SortingRoadmapScreenNew(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          width: 64,
-                          height: 64,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.purple.shade300,
-                                Colors.purple.shade600,
-                                Colors.deepPurple.shade700,
-                              ],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.purple.shade800.withOpacity(0.5),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                                spreadRadius: 1,
-                              ),
-                              BoxShadow(
-                                color: Colors.white.withOpacity(0.3),
-                                blurRadius: 4,
-                                offset: const Offset(-2, -2),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.home_rounded,
-                            color: Colors.black,
-                            size: 36,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
                 // Sıralama Alanı Kartı (Başlık ve buton da içinde)
                 Expanded(
                   child: Center(
@@ -396,6 +347,29 @@ class _Asama2Soru2State extends State<Asama2Soru2>
               ],
             ),
           ),
+            ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const SortingRoadmapScreenNew(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const HomeScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              iconSize: screenWidth * 0.065,
+            ),
+          ],
         ),
       ),
     );
