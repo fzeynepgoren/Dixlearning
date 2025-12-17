@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'package:dixlearning/asama4/soru2.dart';
 import '../screens/matching_questions_screen.dart';
+import '../screens/home_screen.dart';
+import '../widgets/in_game_menu.dart';
 import 'package:provider/provider.dart';
 import '../providers/progress_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,6 +26,7 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
   List<bool> matchedRight = [false, false, false, false];
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -172,10 +175,15 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
+    
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -475,6 +483,26 @@ class _DuyguYuzEsleState extends State<DuyguYuzEsle>
               ],
             ),
           ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const MatchingQuestionsScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );

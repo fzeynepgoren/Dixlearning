@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import '../screens/matching_questions_screen.dart';
+import '../screens/home_screen.dart';
+import '../widgets/in_game_menu.dart';
 import 'soru4.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,6 +27,7 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
 
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
 
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -174,8 +177,10 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
         return false;
       },
       child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -475,6 +480,26 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
               ],
             ),
           ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const MatchingQuestionsScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );

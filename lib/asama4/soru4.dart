@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import '../screens/matching_questions_screen.dart';
+import '../screens/home_screen.dart';
+import '../widgets/in_game_menu.dart';
 import 'soru5.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,6 +28,7 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
 
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   bool _dialogShown = false;
 
   late AnimationController _feedbackController;
@@ -174,8 +177,10 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
         return false;
       },
       child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -475,6 +480,26 @@ class _MevsimHavaEsleState extends State<MevsimHavaEsle>
               ],
             ),
           ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const MatchingQuestionsScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );

@@ -6,6 +6,7 @@ import '../asama1/soru1.dart';
 import '../asama2/soru1.dart';
 import '../asama3/soru1.dart';
 import '../asama4/soru1.dart';
+import '../widgets/in_game_menu.dart';
 import 'home_screen.dart';
 
 class MatchingQuestionsScreen extends StatefulWidget {
@@ -19,6 +20,7 @@ class MatchingQuestionsScreen extends StatefulWidget {
 class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
     with TickerProviderStateMixin {
   int completedLevel = 0;
+  bool _isSoundOn = true;
   late AnimationController _starController1;
   late AnimationController _starController2;
   late AnimationController _starController3;
@@ -217,71 +219,22 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                 ),
               ),
 
-              // Sevimli geri butonu - Uzay Teması (Yıldız/Roket)
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) => const HomeScreen(),
-                        ),
-                        (route) => false,
-                      );
-                    },
-                    child: Container(
-                      width: 55,
-                      height: 55,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Color(0xFF6C63FF), Color(0xFF5A52D5)],
-                        ),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.yellow.withOpacity(0.4),
-                          width: 2,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF64BDD2).withOpacity(0.5),
-                            blurRadius: 20,
-                            spreadRadius: 2,
-                            offset: const Offset(0, 6),
-                          ),
-                          // Yıldız parlama efekti
-                          BoxShadow(
-                            color: Colors.yellow.withOpacity(0.3),
-                            blurRadius: 15,
-                            spreadRadius: 1,
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // Yıldız parlaması
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: Icon(
-                              Icons.star,
-                              color: Colors.yellow.withOpacity(0.6),
-                              size: 12,
-                            ),
-                          ),
-                          const Icon(
-                            Icons.home_rounded,
-                            color: Colors.white,
-                            size: 28,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+              // Oyun içi menü butonu
+              InGameMenu(
+                isSoundOn: _isSoundOn,
+                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+                onHome: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
+                onEntryScreen: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
               ),
             ],
           ),

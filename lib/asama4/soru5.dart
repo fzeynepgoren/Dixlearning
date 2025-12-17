@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/matching_questions_screen.dart';
+import '../screens/home_screen.dart';
+import '../widgets/in_game_menu.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 
@@ -26,6 +28,7 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
 
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   bool _dialogShown = false;
 
   late AnimationController _feedbackController;
@@ -194,8 +197,10 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
         return false;
       },
       child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -501,6 +506,26 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
               ],
             ),
           ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const MatchingQuestionsScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );
