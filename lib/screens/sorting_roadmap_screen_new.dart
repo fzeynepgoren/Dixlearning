@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
-import '../../SIRALAMA_SORULARI/Asama2/soru1.dart';
-import '../../SIRALAMA_SORULARI/Asama3/soru1.dart';
-import '../../SIRALAMA_SORULARI/Asama4/soru1.dart';
+import '../SIRALAMA_SORULARI/Asama1/soru1.dart';
+import '../SIRALAMA_SORULARI/Asama2/soru1.dart';
+import '../SIRALAMA_SORULARI/Asama3/soru1.dart';
+import '../SIRALAMA_SORULARI/Asama4/soru1.dart';
+import '../SIRALAMA_SORULARI/Asama5/soru1.dart';
 import 'home_screen.dart';
 
 class SortingRoadmapScreenNew extends StatefulWidget {
@@ -77,6 +79,10 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
   }
 
   bool _isLevelUnlocked(int level) {
+    // Level 5 (İleri Seviye) her zaman açık
+    if (level == 5) {
+      return true;
+    }
     return level <= completedLevel + 1;
   }
 
@@ -127,29 +133,29 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
                       context,
                       level: 1,
                       leftFactor: 0.50,
-                      topFactor: 0.82,
+                      topFactor: 0.78,
                       emoji: '🎯',
                       title: isEnglish ? '2 Pictures' : '2 Resim',
                       color: const Color(0xFFE74C3C), // Kırmızı
                       onTap: () async {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              isEnglish ? 'Coming soon!' : 'Yakında eklenecek!',
-                            ),
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Asama1Soru1(),
                           ),
                         );
+                        _loadProgress();
                       },
                       isUnlocked: _isLevelUnlocked(1),
                       isCompleted: completedLevel >= 1,
                     ),
 
-                    // Level 2: 3 Resimli Sıralama (Orta-alt - solda)
+                    // Level 2: 3 Resimli Sıralama (Sağ kıvrım - 1'in sağ üstü)
                     _buildLevelButton(
                       context,
                       level: 2,
-                      leftFactor: 0.25,
-                      topFactor: 0.64,
+                      leftFactor: 0.75,
+                      topFactor: 0.60,
                       emoji: '🎨',
                       title: isEnglish ? '3 Pictures' : '3 Resim',
                       color: const Color(0xFF27AE60), // Yeşil
@@ -166,12 +172,12 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
                       isCompleted: completedLevel >= 2,
                     ),
 
-                    // Level 3: 4 Resimli Sıralama (Orta - sağda)
+                    // Level 3: 4 Resimli Sıralama (Sol kıvrım)
                     _buildLevelButton(
                       context,
                       level: 3,
-                      leftFactor: 0.75,
-                      topFactor: 0.47,
+                      leftFactor: 0.35,
+                      topFactor: 0.46,
                       emoji: '🌟',
                       title: isEnglish ? '4 Pictures' : '4 Resim',
                       color: const Color(0xFF3498DB), // Mavi
@@ -188,12 +194,12 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
                       isCompleted: completedLevel >= 3,
                     ),
 
-                    // Level 4: 3 Fotoğraf (Günlük Rutinler) (Orta-üst - solda)
+                    // Level 4: 3 Fotoğraf (Günlük Rutinler) (Sağ üst kıvrım)
                     _buildLevelButton(
                       context,
                       level: 4,
-                      leftFactor: 0.25,
-                      topFactor: 0.30,
+                      leftFactor: 0.75,
+                      topFactor: 0.35,
                       emoji: '🧼',
                       title: isEnglish ? 'Daily Routines' : 'Günlük Rutinler',
                       color: const Color(0xFF8E44AD), // Mor
@@ -210,23 +216,23 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
                       isCompleted: completedLevel >= 4,
                     ),
 
-                    // Level 5: İleri Seviye (En üst - ortada)
+                    // Level 5: İleri Seviye (Şato önü)
                     _buildLevelButton(
                       context,
                       level: 5,
                       leftFactor: 0.50,
-                      topFactor: 0.13,
+                      topFactor: 0.24,
                       emoji: '🏆',
                       title: isEnglish ? 'Advanced' : 'İleri Seviye',
                       color: const Color(0xFFF39C12), // Turuncu
                       onTap: () async {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              isEnglish ? 'Coming soon!' : 'Yakında eklenecek!',
-                            ),
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Asama5Soru1(),
                           ),
                         );
+                        _loadProgress();
                       },
                       isUnlocked: _isLevelUnlocked(5),
                       isCompleted: completedLevel >= 5,
@@ -394,8 +400,8 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
 
             // Level butonu - Canlı ve sevimli
             Container(
-              width: 100,
-              height: 100,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: [
