@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import 'soru5.dart'; // HayvanYasamSinifla sınıfının bulunduğu dosya
 import '../screens/siniflandirma_sorulari_screen.dart';
@@ -72,6 +73,13 @@ class _TasitSiniflaState extends State<TasitSinifla>
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('siniflama3_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('siniflama3_wrong_count', wrongCount);
+  }
+
   void _handleDrag(Map<String, dynamic> item, String targetType) {
     bool correct = item['type'] == targetType;
     final isEnglish =
@@ -103,6 +111,9 @@ class _TasitSiniflaState extends State<TasitSinifla>
 
     if (correct) {
       _checkCompletion();
+    } else {
+      // Yanlış eşleşme
+      _trackWrongAnswer();
     }
   }
 

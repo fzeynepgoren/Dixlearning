@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import 'soru4.dart'; // Corrected class name from Soru4 to TeknolojikSinifla
 import '../screens/siniflandirma_sorulari_screen.dart';
@@ -59,6 +60,13 @@ class _CanliCansizSiniflaState extends State<CanliCansizSinifla>
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('siniflama2_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('siniflama2_wrong_count', wrongCount);
+  }
+
   void _handleDrag(String draggedEmoji, String targetCategory) {
     final item = items.firstWhere((e) => e['emoji'] == draggedEmoji);
     bool isCorrectMatch = item['category'] == targetCategory;
@@ -81,6 +89,9 @@ class _CanliCansizSiniflaState extends State<CanliCansizSinifla>
         }
       });
       _checkCompletion();
+    } else {
+      // Yanlış eşleşme
+      _trackWrongAnswer();
     }
 
     Future.delayed(const Duration(seconds: 1), () {

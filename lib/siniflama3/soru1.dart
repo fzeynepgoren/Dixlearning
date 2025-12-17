@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:math';
 import 'soru2.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
 import '../../screens/home_screen.dart';
@@ -38,6 +39,22 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
+  bool _wrongCountReset = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_wrongCountReset) {
+      _resetWrongCountSync();
+      _wrongCountReset = true;
+    }
+  }
+
+  void _resetWrongCountSync() {
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setInt('siniflama3_wrong_count', 0);
+    });
+  }
 
   @override
   void initState() {
@@ -73,6 +90,13 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
     emojiler = tumEmojiler;
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('siniflama3_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('siniflama3_wrong_count', wrongCount);
+  }
+
   void _handleDrag(String draggedEmoji, String targetCategory) {
     bool isCorrectMatch = dogruEslesmeler[draggedEmoji] == targetCategory;
 
@@ -88,6 +112,9 @@ class _SekilSiniflamaState extends State<SekilSiniflama>
         eslesenler.add(draggedEmoji);
       });
       _checkCompletion();
+    } else {
+      // Yanlış eşleşme
+      _trackWrongAnswer();
     }
 
     Future.delayed(const Duration(seconds: 1), () {

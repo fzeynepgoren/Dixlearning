@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'soru3.dart';
 import '../screens/matching_questions_screen.dart';
-import '../screens/home_screen.dart';
-import 'package:provider/provider.dart';
-import '../providers/language_provider.dart';
-import '../widgets/in_game_menu.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DuyuOrganEsle extends StatefulWidget {
   const DuyuOrganEsle({super.key});
@@ -29,7 +26,6 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
   bool showFeedback = false;
   bool isCorrect = false;
   bool _dialogShown = false;
-  bool _isSoundOn = true;
 
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -83,6 +79,13 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama4_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('asama4_wrong_count', wrongCount);
+  }
+
   void _handleLeftTap(int index) {
     if (matchedLeft[index]) return;
     setState(() {
@@ -128,7 +131,7 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
           });
         }
       } else {
-        // yanlışta explicit bir şey yapmana gerek yok; renkler showFeedback/isCorrect ile yönetiliyor
+        _trackWrongAnswer();
       }
 
       Future.delayed(const Duration(seconds: 1), () {
@@ -145,15 +148,10 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
 
   @override
   Widget build(BuildContext context) {
-    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
-    
-    final screenSize = MediaQuery.of(context).size;
-    final iconSize = screenSize.width * 0.065;
-    
-    return Scaffold(
-        body: Stack(
-          children: [
-            Container(
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -169,6 +167,23 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
           child: SafeArea(
             child: Column(
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.black),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder:
+                                (context) => const MatchingQuestionsScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      },
+                    ),
+                  ],
+                ),
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
@@ -426,26 +441,6 @@ class _DuyuOrganEsleState extends State<DuyuOrganEsle>
             ),
           ),
         ),
-          InGameMenu(
-                isSoundOn: _isSoundOn,
-                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
-                onHome: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const MatchingQuestionsScreen(),
-                    ),
-                    (route) => false,
-                  );
-                },
-                onEntryScreen: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
-            iconSize: iconSize,
-              ),
-          ],
       ),
     );
   }

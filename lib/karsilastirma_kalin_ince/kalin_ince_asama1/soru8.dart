@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/karsilastirma_sorulari_screen.dart';
 import '../../widgets/in_game_menu.dart';
@@ -43,6 +44,13 @@ class _KalinInceSoru8State extends State<KalinInceSoru8>
     _slideController.forward();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('kalin_ince_asama1_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('kalin_ince_asama1_wrong_count', wrongCount);
+  }
+
   @override
   void dispose() {
     _feedbackController.dispose();
@@ -67,6 +75,7 @@ class _KalinInceSoru8State extends State<KalinInceSoru8>
         }
       });
     } else {
+      _trackWrongAnswer();
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
           setState(() {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/karsilastirma_sorulari_screen.dart';
 import 'soru6.dart'; // 6. soruya geçiş
 import '../screens/home_screen.dart';
@@ -50,6 +51,13 @@ class _ArabaKucukSoru6State extends State<ArabaKucukSoru6>
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('buyuk_kucuk_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('buyuk_kucuk_wrong_count', wrongCount);
+  }
+
   void _handleSelect(int index) {
     setState(() {
       selectedIndex = index;
@@ -65,6 +73,7 @@ class _ArabaKucukSoru6State extends State<ArabaKucukSoru6>
         );
       });
     } else {
+      _trackWrongAnswer();
       Future.delayed(const Duration(seconds: 2), () {
         if (!mounted) return;
         setState(() {

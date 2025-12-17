@@ -3,8 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
-import '../../screens/home_screen.dart';
-import '../../widgets/in_game_menu.dart';
 
 class HayvanYasamSinifla extends StatefulWidget {
   const HayvanYasamSinifla({super.key});
@@ -32,7 +30,6 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
 
   bool showFeedback = false;
   bool isCorrect = false;
-  bool _isSoundOn = true;
   bool _dialogShown = false;
 
   late AnimationController _feedbackController;
@@ -71,6 +68,13 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('siniflama3_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('siniflama3_wrong_count', wrongCount);
+  }
+
   void _handleDrag(Map<String, dynamic> item, String targetHabitat) {
     bool correct = item['habitat'] == targetHabitat;
 
@@ -96,35 +100,49 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
 
     if (correct) {
       _checkCompletion();
+    } else {
+      // Yanlış eşleşme
+      _trackWrongAnswer();
+    }
+  }
+
+  Future<int> _calculateStars() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('siniflama3_wrong_count') ?? 0;
+
+    if (wrongCount >= 0 && wrongCount <= 4) {
+      return 3;
+    } else if (wrongCount >= 5 && wrongCount <= 8) {
+      return 2;
+    } else {
+      // 9 ve üzeri
+      return 1;
     }
   }
 
   void _checkCompletion() async {
     final allPlaced = items.every((e) => e['isPlaced'] == true);
     if (allPlaced && !_dialogShown) {
+      _dialogShown = true;
+
       try {
         // Level 3'ü tamamlandı olarak kaydet
         final prefs = await SharedPreferences.getInstance();
         await prefs.setInt('siniflama_completed_level', 3);
 
         await Future.delayed(const Duration(milliseconds: 1500));
-
+        
         if (!mounted) return;
-
+        
         final prefs2 = await SharedPreferences.getInstance();
         int stars = await _calculateStars();
         int wrongCount = prefs2.getInt('siniflama3_wrong_count') ?? 0;
         await prefs2.setInt('siniflama3_final_wrong_count', wrongCount);
-        await prefs2.setInt(
-          'siniflama3_wrong_count',
-          0,
-        ); // Reset for next playthrough
+        await prefs2.setInt('siniflama3_wrong_count', 0); // Reset for next playthrough
 
-        Future.delayed(const Duration(milliseconds: 1500), () {
-          if (mounted) {
-            _showCompletionDialog(stars);
-          }
-        });
+        if (mounted) {
+          _showCompletionDialog(stars);
+        }
       } catch (e) {
         // Hata durumunda sessizce devam et veya logla
         if (mounted) {
@@ -135,262 +153,119 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
     }
   }
 
-  Future<int> _calculateStars() async {
-    final prefs = await SharedPreferences.getInstance();
-    int wrongCount = prefs.getInt('siniflama3_wrong_count') ?? 0;
-    if (wrongCount == 0) return 3;
-    if (wrongCount <= 2) return 2;
-    return 1;
-  }
-
   void _showCompletionDialog(int stars) {
-    if (!mounted) return;
-    try {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder:
-            (context) => Dialog(
-              backgroundColor: Colors.transparent,
-              insetPadding: const EdgeInsets.all(20),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final screenWidth = MediaQuery.of(context).size.width;
-                  final screenHeight = MediaQuery.of(context).size.height;
-                  // Ekrana sığdır - dinamik boyut
-                  final popupWidth = screenWidth * 0.9;
-                  final popupHeight = screenHeight * 0.75;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(20),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final screenHeight = MediaQuery.of(context).size.height;
+            // Ekrana sığdır - dinamik boyut
+            final popupWidth = screenWidth * 0.9;
+            final popupHeight = screenHeight * 0.75;
 
-                  return TweenAnimationBuilder<double>(
-                    duration: const Duration(milliseconds: 600),
-                    tween: Tween(begin: 0.0, end: 1.0),
-                    curve: Curves.easeOutBack,
-                    builder: (context, value, child) {
-                      return Transform.scale(
-                        scale: 0.8 + (value * 0.2),
-                        child: Opacity(
-                          opacity: value,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              // Sualtı popup görseli - ekranın ortasına
-                              Image.asset(
-                                'assets/popup/sualti_popup.png',
-                                width: popupWidth,
-                                height: popupHeight,
-                                fit: BoxFit.contain,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    width: popupWidth,
-                                    height: popupHeight,
-                                    color: Colors.grey.shade200,
-                                    child: const Center(
-                                      child: Icon(Icons.error, size: 50),
-                                    ),
-                                  );
-                                },
-                              ),
-                              // Deniz yıldızı görseli - popup'ın ortasındaki dikdörtgene
-                              // Yıldız sayısına göre göster (yan yana)
-                              if (stars > 0)
-                                Positioned(
-                                  // Popup'ın ortasına yerleştir - popup görselinin ortasındaki dikdörtgen alanına
-                                  top: popupHeight * 0.45,
-                                  left: 0,
-                                  right: 0,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: List.generate(stars, (index) {
-                                      // Her deniz yıldızı için boyut - popup genişliğine göre dinamik
-                                      // Popup'ın ortasındaki dikdörtgene sığacak şekilde
-                                      final individualSize = (popupWidth * 0.15)
-                                          .clamp(40.0, 80.0);
-                                      return TweenAnimationBuilder<double>(
-                                        duration: Duration(
-                                          milliseconds: 400 + (index * 200),
+            return TweenAnimationBuilder<double>(
+              duration: const Duration(milliseconds: 600),
+              tween: Tween(begin: 0.0, end: 1.0),
+              curve: Curves.easeOutBack,
+              builder: (context, value, child) {
+                return Transform.scale(
+                  scale: 0.8 + (value * 0.2),
+                  child: Opacity(
+                    opacity: value,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Sualtı popup görseli - ekranın ortasına
+                        Image.asset(
+                          'assets/popup/sualti_popup.png',
+                          width: popupWidth,
+                          height: popupHeight,
+                          fit: BoxFit.contain,
+                        ),
+                        // Deniz yıldızı görseli - popup'ın ortasındaki dikdörtgene
+                        // Yıldız sayısına göre göster (yan yana)
+                        if (stars > 0)
+                          Positioned(
+                            // Popup'ın ortasına yerleştir - popup görselinin ortasındaki dikdörtgen alanına
+                            top: popupHeight * 0.45,
+                            left: 0,
+                            right: 0,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: List.generate(stars, (index) {
+                                // Her deniz yıldızı için boyut - popup genişliğine göre dinamik
+                                // Popup'ın ortasındaki dikdörtgene sığacak şekilde
+                                final individualSize = (popupWidth * 0.15).clamp(40.0, 80.0);
+                                return TweenAnimationBuilder<double>(
+                                  duration: Duration(milliseconds: 400 + (index * 200)),
+                                  tween: Tween(begin: 0.0, end: 1.0),
+                                  curve: Curves.elasticOut,
+                                  builder: (context, scaleValue, child) {
+                                    return Transform.scale(
+                                      scale: scaleValue,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: popupWidth * 0.02,
                                         ),
-                                        tween: Tween(begin: 0.0, end: 1.0),
-                                        curve: Curves.elasticOut,
-                                        builder: (context, scaleValue, child) {
-                                          return Transform.scale(
-                                            scale: scaleValue,
-                                            child: Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: popupWidth * 0.02,
-                                              ),
-                                              child: Image.asset(
-                                                'assets/popup/denizyildizi.png',
-                                                width: individualSize,
-                                                height: individualSize,
-                                                fit: BoxFit.contain,
-                                                errorBuilder: (
-                                                  context,
-                                                  error,
-                                                  stackTrace,
-                                                ) {
-                                                  return Container(
-                                                    width: individualSize,
-                                                    height: individualSize,
-                                                    color: Colors.grey.shade200,
-                                                    child: const Icon(
-                                                      Icons.star,
-                                                      size: 30,
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    }),
+                                        child: Image.asset(
+                                          'assets/popup/denizyildizi.png',
+                                          width: individualSize,
+                                          height: individualSize,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }),
+                            ),
+                          ),
+                        // MENÜYE GİT butonu - popup'ın alt kısmına transparan buton
+                        Positioned(
+                          bottom: popupHeight * 0.28,
+                          left: popupWidth * 0.15,
+                          right: popupWidth * 0.15,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ClassificationQuestionsScreen(),
                                   ),
-                                ),
-                              // MENÜYE GİT butonu - popup'ın alt kısmına transparan buton
-                              Positioned(
-                                bottom: popupHeight * 0.28,
-                                left: popupWidth * 0.15,
-                                right: popupWidth * 0.15,
-                                child: Material(
+                                  (route) => false,
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                width: double.infinity,
+                                height: (popupHeight * 0.1).clamp(45.0, 65.0),
+                                decoration: BoxDecoration(
                                   color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () {
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pushAndRemoveUntil(
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) =>
-                                                  const ClassificationQuestionsScreen(),
-                                        ),
-                                        (route) => false,
-                                      );
-                                    },
-                                    borderRadius: BorderRadius.circular(16),
-                                    child: Container(
-                                      width: double.infinity,
-                                      height: (popupHeight * 0.1).clamp(
-                                        45.0,
-                                        65.0,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.transparent,
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                    ),
-                                  ),
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
                               ),
-                              // Trophy Handles
-                              Positioned(
-                                left: 10,
-                                top: 25,
-                                child: Container(
-                                  width: 20,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    color: Colors.amber.shade300,
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: Colors.blue.shade800,
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                right: 10,
-                                top: 25,
-                                child: Container(
-                                  width: 20,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    color: Colors.amber.shade300,
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: Colors.blue.shade800,
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Trophy Base
-                              Positioned(
-                                bottom: 0,
-                                child: Container(
-                                  width: 100,
-                                  height: 25,
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue.shade800,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.blue.shade800,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Container(
-                                      width: 60,
-                                      height: 8,
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue.shade400,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // Decorative Stars
-                              Positioned(
-                                top: 5,
-                                left: 20,
-                                child: Icon(
-                                  Icons.star,
-                                  color: Colors.amber.shade400,
-                                  size: 12,
-                                ),
-                              ),
-                              Positioned(
-                                top: 5,
-                                right: 20,
-                                child: Icon(
-                                  Icons.star,
-                                  color: Colors.amber.shade400,
-                                  size: 12,
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 30,
-                                left: 15,
-                                child: Icon(
-                                  Icons.star,
-                                  color: Colors.amber.shade400,
-                                  size: 10,
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 30,
-                                right: 15,
-                                child: Icon(
-                                  Icons.star,
-                                  color: Colors.amber.shade400,
-                                  size: 10,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-      );
-    } catch (e) {
-      // Hata durumunda sessizce devam et
-      debugPrint('Popup gösterilirken hata: $e');
-    }
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -399,229 +274,217 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
     final screenSize = MediaQuery.of(context).size;
     final iconSize = screenSize.width * 0.065;
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.blue.shade200,
-                  Colors.blue.shade200,
-                  Colors.white,
-                ],
-                stops: const [0.0, 0.5, 1.0],
-              ),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade200,
+                Colors.blue.shade200,
+                Colors.white,
+              ],
+              stops: const [0.0, 0.5, 1.0],
             ),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.95),
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: iconSize,
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 1,
                             ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 1,
+                            child: Text(
+                              isEnglish
+                                  ? 'Drag the animals to their habitats!'
+                                  : 'Hayvanları yaşam alanlarına sürükle!',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
                               ),
-                              child: Text(
-                                isEnglish
-                                    ? 'Drag the animals to their habitats!'
-                                    : 'Hayvanları yaşam alanlarına sürükle!',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            const SizedBox(height: 15),
-                            Expanded(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Expanded(
-                                    flex: 3,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        _buildGroup(
-                                          'water',
-                                          isEnglish ? 'Water' : 'Su',
-                                          Colors.purple.shade100,
-                                          Colors.purple.shade300,
-                                          habitatGroups['water']!,
-                                        ),
-                                        _buildGroup(
-                                          'air',
-                                          isEnglish ? 'Air' : 'Hava',
-                                          Colors.blue.shade100,
-                                          Colors.blue.shade400,
-                                          habitatGroups['air']!,
-                                        ),
-                                        _buildGroup(
-                                          'land',
-                                          isEnglish ? 'Land' : 'Kara',
-                                          Colors.yellow.shade100,
-                                          Colors.yellow.shade600,
-                                          habitatGroups['land']!,
-                                        ),
-                                      ],
-                                    ),
+                          ),
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      _buildGroup(
+                                        'water',
+                                        isEnglish ? 'Water' : 'Su',
+                                        Colors.purple.shade100,
+                                        Colors.purple.shade300,
+                                        habitatGroups['water']!,
+                                      ),
+                                      _buildGroup(
+                                        'air',
+                                        isEnglish ? 'Air' : 'Hava',
+                                        Colors.blue.shade100,
+                                        Colors.blue.shade400,
+                                        habitatGroups['air']!,
+                                      ),
+                                      _buildGroup(
+                                        'land',
+                                        isEnglish ? 'Land' : 'Kara',
+                                        Colors.yellow.shade100,
+                                        Colors.yellow.shade600,
+                                        habitatGroups['land']!,
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    flex: 2,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children:
-                                          items
-                                              .where(
-                                                (item) => !item['isPlaced'],
-                                              )
-                                              .map(
-                                                (item) => Draggable<
-                                                  Map<String, dynamic>
-                                                >(
-                                                  data: item,
-                                                  feedback: Material(
-                                                    color: Colors.transparent,
-                                                    child: _buildDraggableItem(
-                                                      item,
-                                                    ),
-                                                  ),
-                                                  childWhenDragging: Opacity(
-                                                    opacity: 0.3,
-                                                    child: _buildDraggableItem(
-                                                      item,
-                                                    ),
-                                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children:
+                                        items
+                                            .where((item) => !item['isPlaced'])
+                                            .map(
+                                              (item) => Draggable<
+                                                Map<String, dynamic>
+                                              >(
+                                                data: item,
+                                                feedback: Material(
+                                                  color: Colors.transparent,
                                                   child: _buildDraggableItem(
                                                     item,
                                                   ),
                                                 ),
-                                              )
-                                              .toList(),
+                                                childWhenDragging: Opacity(
+                                                  opacity: 0.3,
+                                                  child: _buildDraggableItem(
+                                                    item,
+                                                  ),
+                                                ),
+                                                child: _buildDraggableItem(
+                                                  item,
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child:
+                      showFeedback
+                          ? ScaleTransition(
+                            scale: CurvedAnimation(
+                              parent: _feedbackController,
+                              curve: Curves.elasticOut,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 20,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    isCorrect
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color:
+                                        isCorrect ? Colors.green : Colors.red,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    isCorrect
+                                        ? (isEnglish
+                                            ? 'Well done! 🎉'
+                                            : 'Aferin! 🎉')
+                                        : (isEnglish
+                                            ? 'Try again! 😔'
+                                            : 'Tekrar dene! 😔'),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 80,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
-                    ),
-                    child:
-                        showFeedback
-                            ? ScaleTransition(
-                              scale: CurvedAnimation(
-                                parent: _feedbackController,
-                                curve: Curves.elasticOut,
-                              ),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 10,
-                                  horizontal: 20,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 10,
-                                      offset: Offset(0, 5),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      isCorrect
-                                          ? Icons.check_circle
-                                          : Icons.cancel,
-                                      color:
-                                          isCorrect ? Colors.green : Colors.red,
-                                      size: 28,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      isCorrect
-                                          ? (isEnglish
-                                              ? 'Well done! 🎉'
-                                              : 'Aferin! 🎉')
-                                          : (isEnglish
-                                              ? 'Try again! 😔'
-                                              : 'Tekrar dene! 😔'),
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color:
-                                            isCorrect
-                                                ? Colors.green
-                                                : Colors.red,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                            : const SizedBox.shrink(),
-                  ),
-                ],
-              ),
+                          )
+                          : const SizedBox.shrink(),
+                ),
+              ],
             ),
           ),
-          InGameMenu(
-            isSoundOn: _isSoundOn,
-            onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
-            onHome: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (context) => const ClassificationQuestionsScreen(),
-                ),
-                (route) => false,
-              );
-            },
-            onEntryScreen: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                (route) => false,
-              );
-            },
-            iconSize: iconSize,
-          ),
-        ],
+        ),
       ),
     );
   }

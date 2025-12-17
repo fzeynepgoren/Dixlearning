@@ -6,6 +6,7 @@ import '../utils/activity_tracker.dart';
 import '../widgets/in_game_menu.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Soru2 extends StatefulWidget {
   const Soru2({super.key});
@@ -77,6 +78,13 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama2_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('asama2_wrong_count', wrongCount);
+  }
+
   void _handleLeftTap(int index) {
     if (matchedLeft[index]) return;
     setState(() {
@@ -119,6 +127,8 @@ class _Soru2State extends State<Soru2> with TickerProviderStateMixin {
             }
           });
         }
+      } else {
+        _trackWrongAnswer();
       }
 
       Future.delayed(const Duration(seconds: 1), () {

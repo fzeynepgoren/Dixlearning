@@ -113,11 +113,11 @@ class _KarsilastirmaSorulariScreenState
                 height: MediaQuery.of(context).size.height,
                 child: Stack(
                   children: [
-                    // Level 1: Az-Çok (En alt - ortada başlangıç)
+                    // Level 1: Az-Çok (Alt orta - başlangıç)
                     _buildLevelButton(
                       context,
                       level: 1,
-                      leftFactor: 0.50,
+                      leftFactor: 0.55,
                       topFactor: 0.82,
                       emoji: '🎯',
                       title: 'Az-Çok',
@@ -135,12 +135,12 @@ class _KarsilastirmaSorulariScreenState
                       isCompleted: completedLevel >= 1,
                     ),
 
-                    // Level 2: Büyük-Küçük (Orta-alt - solda)
+                    // Level 2: Büyük-Küçük (Sağ kıvrım)
                     _buildLevelButton(
                       context,
                       level: 2,
-                      leftFactor: 0.25,
-                      topFactor: 0.62,
+                      leftFactor: 0.75,
+                      topFactor: 0.60,
                       emoji: '🎨',
                       title: 'Büyük-Küçük',
                       color: const Color(0xFF27AE60), // Canlı yeşil
@@ -157,11 +157,11 @@ class _KarsilastirmaSorulariScreenState
                       isCompleted: completedLevel >= 2,
                     ),
 
-                    // Level 3: Kalın-İnce (Orta - sağda)
+                    // Level 3: Kalın-İnce (Sol kıvrım)
                     _buildLevelButton(
                       context,
                       level: 3,
-                      leftFactor: 0.75,
+                      leftFactor: 0.35,
                       topFactor: 0.42,
                       emoji: '🎪',
                       title: 'Kalın-İnce',
@@ -179,11 +179,11 @@ class _KarsilastirmaSorulariScreenState
                       isCompleted: completedLevel >= 3,
                     ),
 
-                    // Level 4: Uzun-Kısa (Üst - ortada)
+                    // Level 4: Uzun-Kısa (Üst kıvrım)
                     _buildLevelButton(
                       context,
                       level: 4,
-                      leftFactor: 0.50,
+                      leftFactor: 0.45,
                       topFactor: 0.22,
                       emoji: '🎁',
                       title: 'Uzun-Kısa',
@@ -210,7 +210,7 @@ class _KarsilastirmaSorulariScreenState
                 ),
               ),
 
-              // Sevimli geri butonu - Çöl Teması (Güneş Şekli)
+              // Sevimli geri butonu
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -230,12 +230,12 @@ class _KarsilastirmaSorulariScreenState
                         gradient: const LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [Color(0xFFFFB347), Color(0xFFFF8C3C)],
+                          colors: [Color(0xFFC1825D), Color(0xFFC1825D)],
                         ),
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.orange.withOpacity(0.5),
+                            color: const Color(0xFFF06491).withOpacity(0.5),
                             blurRadius: 20,
                             spreadRadius: 2,
                             offset: const Offset(0, 6),
@@ -245,9 +245,18 @@ class _KarsilastirmaSorulariScreenState
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          // Güneş ışınları efekti
-                          Positioned.fill(
-                            child: CustomPaint(painter: SunRaysPainter()),
+                          // Parlama efekti
+                          Positioned(
+                            top: 10,
+                            left: 12,
+                            child: Container(
+                              width: 15,
+                              height: 15,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.4),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
                           ),
                           const Icon(
                             Icons.arrow_back_rounded,
@@ -354,8 +363,8 @@ class _KarsilastirmaSorulariScreenState
 
             // Level butonu - Canlı ve sevimli
             Container(
-              width: 100,
-              height: 100,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 // Renkli yumuşak gölgeler

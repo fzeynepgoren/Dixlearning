@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import 'soru5.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
@@ -68,6 +69,13 @@ class _AtikSiniflaState extends State<AtikSinifla>
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('siniflama4_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('siniflama4_wrong_count', wrongCount);
+  }
+
   void _handleDrag(Map<String, dynamic> item, String type) {
     setState(() {
       isCorrect = item['type'] == type;
@@ -89,6 +97,9 @@ class _AtikSiniflaState extends State<AtikSinifla>
         }
       });
       _checkCompletion();
+    } else {
+      // Yanlış eşleşme
+      _trackWrongAnswer();
     }
 
     Future.delayed(const Duration(seconds: 1), () {

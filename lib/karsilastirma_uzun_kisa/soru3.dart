@@ -1,5 +1,6 @@
 import 'package:dixlearning/karsilastirma_uzun_kisa/soru4.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/karsilastirma_sorulari_screen.dart';
 import '../screens/home_screen.dart';
 import '../widgets/in_game_menu.dart';
@@ -50,6 +51,13 @@ class _KisaUzunYolSorusuState extends State<KisaUzunYolSorusu>
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('uzun_kisa_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('uzun_kisa_wrong_count', wrongCount);
+  }
+
   void _handleSelect(int index) {
     setState(() {
       selectedIndex = index;
@@ -65,6 +73,7 @@ class _KisaUzunYolSorusuState extends State<KisaUzunYolSorusu>
         );
       });
     } else {
+      _trackWrongAnswer();
       Future.delayed(const Duration(seconds: 2), () {
         if (!mounted) return;
         setState(() {

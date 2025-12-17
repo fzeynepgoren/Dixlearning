@@ -75,6 +75,27 @@ class _SeninWidgetState extends State<SeninWidget>
     await prefs.setBool('asama2_completed', true);
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama2_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('asama2_wrong_count', wrongCount);
+  }
+
+  Future<int> _calculateStars() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama2_wrong_count') ?? 0;
+
+    if (wrongCount >= 0 && wrongCount <= 3) {
+      return 3;
+    } else if (wrongCount >= 4 && wrongCount <= 8) {
+      return 2;
+    } else {
+      // 9 ve üzeri
+      return 1;
+    }
+  }
+
   void _handleTap(int index, bool isLeft) {
     if (allMatched) return;
 
@@ -116,6 +137,8 @@ class _SeninWidgetState extends State<SeninWidget>
           });
         }
       }
+    } else {
+      _trackWrongAnswer();
     }
 
     Future.delayed(const Duration(seconds: 1), () {
@@ -129,77 +152,128 @@ class _SeninWidgetState extends State<SeninWidget>
     });
   }
 
-  void _showCompletionDialog() {
+  void _showCompletionDialog() async {
+    // Önce yıldız hesapla (yanlış sayısı sıfırlanmadan önce)
+    int stars = await _calculateStars();
+    
+    // Yanlış sayısını kaydet ve sıfırla
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('asama2_wrong_count') ?? 0;
+    await prefs.setInt('asama2_final_wrong_count', wrongCount);
+    await prefs.setInt('asama2_wrong_count', 0);
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder:
-          (context) => Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.deepPurple.shade100,
-                    Colors.deepPurple.shade50,
-                  ],
-                ),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.emoji_events, size: 80, color: Colors.amber),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Tebrikler! 🎉',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    '2. aşamayı tamamladınız!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 18, color: Colors.deepPurple),
-                  ),
-                  const SizedBox(height: 30),
-                  ElevatedButton(
-                    onPressed: () {
-                      ActivityTracker.completeActivity();
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) => const MatchingQuestionsScreen(),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(20),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final screenHeight = MediaQuery.of(context).size.height;
+            // Ekrana sığdır - dinamik boyut
+            final popupWidth = screenWidth * 0.9;
+            final popupHeight = screenHeight * 0.75;
+
+            return TweenAnimationBuilder<double>(
+              duration: const Duration(milliseconds: 600),
+              tween: Tween(begin: 0.0, end: 1.0),
+              curve: Curves.easeOutBack,
+              builder: (context, value, child) {
+                return Transform.scale(
+                  scale: 0.8 + (value * 0.2),
+                  child: Opacity(
+                    opacity: value,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Uzay popup görseli - ekranın ortasına
+                        Image.asset(
+                          'assets/popup/uzay_popup.png',
+                          width: popupWidth,
+                          height: popupHeight,
+                          fit: BoxFit.contain,
                         ),
-                        (route) => false,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 15,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    child: const Text(
-                      'Ana Menüye Dön',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                        // Yıldız görseli - popup'ın ortasındaki dikdörtgene
+                        // Yıldız sayısına göre göster (yan yana)
+                        if (stars > 0)
+                          Positioned(
+                            // Popup'ın ortasına yerleştir - popup görselinin ortasındaki dikdörtgen alanına
+                            top: popupHeight * 0.45,
+                            left: 0,
+                            right: 0,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: List.generate(stars, (index) {
+                                // Her yıldız için boyut - popup genişliğine göre dinamik
+                                // Popup'ın ortasındaki dikdörtgene sığacak şekilde
+                                final individualSize = (popupWidth * 0.15).clamp(40.0, 80.0);
+                                return TweenAnimationBuilder<double>(
+                                  duration: Duration(milliseconds: 400 + (index * 200)),
+                                  tween: Tween(begin: 0.0, end: 1.0),
+                                  curve: Curves.elasticOut,
+                                  builder: (context, scaleValue, child) {
+                                    return Transform.scale(
+                                      scale: scaleValue,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: popupWidth * 0.02,
+                                        ),
+                                        child: Image.asset(
+                                          'assets/popup/yildiz.png',
+                                          width: individualSize,
+                                          height: individualSize,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }),
+                            ),
+                          ),
+                        // MENÜYE GİT butonu - popup'ın alt kısmına transparan buton
+                        Positioned(
+                          bottom: popupHeight * 0.28,
+                          left: popupWidth * 0.15,
+                          right: popupWidth * 0.15,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                ActivityTracker.completeActivity();
+                                Navigator.of(context).pop();
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const MatchingQuestionsScreen(),
+                                  ),
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                width: double.infinity,
+                                height: (popupHeight * 0.1).clamp(45.0, 65.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
+                );
+              },
+            );
+          },
+        ),
+      ),
     );
   }
 

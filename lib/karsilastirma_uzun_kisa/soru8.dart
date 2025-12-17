@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/karsilastirma_sorulari_screen.dart';
 import 'soru9.dart';
 import '../screens/home_screen.dart';
@@ -52,6 +53,13 @@ class _UzunKisaPalmiyeSupurgeSorusuState
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('uzun_kisa_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('uzun_kisa_wrong_count', wrongCount);
+  }
+
   void _handleSelect(int index) {
     setState(() {
       selectedIndex = index;
@@ -69,6 +77,7 @@ class _UzunKisaPalmiyeSupurgeSorusuState
         );
       });
     } else {
+      _trackWrongAnswer();
       Future.delayed(const Duration(seconds: 2), () {
         if (!mounted) return;
         setState(() {

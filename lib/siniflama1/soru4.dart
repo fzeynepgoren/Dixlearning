@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import 'soru5.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
@@ -59,9 +60,20 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
     super.dispose();
   }
 
+  Future<void> _trackWrongAnswer() async {
+    final prefs = await SharedPreferences.getInstance();
+    int wrongCount = prefs.getInt('siniflama1_wrong_count') ?? 0;
+    wrongCount++;
+    await prefs.setInt('siniflama1_wrong_count', wrongCount);
+  }
+
   void _handleDragFeedback(bool correct) {
     // Eğer zaten doğru geri bildirim gösteriliyorsa, yanlış geri bildirimi engelle
     if (showFeedback && isCorrect && !correct) return;
+
+    if (!correct) {
+      _trackWrongAnswer();
+    }
 
     setState(() {
       isCorrect = correct;
