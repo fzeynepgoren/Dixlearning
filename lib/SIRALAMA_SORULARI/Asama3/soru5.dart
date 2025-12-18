@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import 'package:dixlearning/screens/sorting_roadmap_screen_new.dart';
+import '../../widgets/in_game_menu.dart';
+import '../../screens/home_screen.dart';
 
 class Asama3Soru5 extends StatefulWidget {
   const Asama3Soru5({super.key});
@@ -24,6 +26,7 @@ class _Asama3Soru5State extends State<Asama3Soru5>
   late List<_PlantStage?> dropTargets;
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
 
   @override
@@ -194,7 +197,9 @@ class _Asama3Soru5State extends State<Asama3Soru5>
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             // 'const' kaldırıldı
             gradient: LinearGradient(
@@ -211,28 +216,6 @@ class _Asama3Soru5State extends State<Asama3Soru5>
           child: SafeArea(
             child: Column(
               children: [
-                // Üst kısım - Geri butonu ve Aşama yazısı
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: 28,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) => const SortingRoadmapScreenNew(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                  ],
-                ),
                 // Sıralama Alanı Kartı (Başlık ve buton da içinde)
                 Expanded(
                   child: Center(
@@ -434,6 +417,29 @@ class _Asama3Soru5State extends State<Asama3Soru5>
               ],
             ),
           ),
+            ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const SortingRoadmapScreenNew(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const HomeScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              iconSize: screenWidth * 0.065,
+            ),
+          ],
         ),
       ),
     );

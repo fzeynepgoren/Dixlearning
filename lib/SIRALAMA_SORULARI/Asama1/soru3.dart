@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import 'soru4.dart';
 import 'package:dixlearning/screens/sorting_roadmap_screen_new.dart';
+import '../../widgets/in_game_menu.dart';
+import '../../screens/home_screen.dart';
 
 class Asama1Soru3 extends StatefulWidget {
   const Asama1Soru3({super.key});
@@ -24,6 +26,7 @@ class _Asama1Soru3State extends State<Asama1Soru3>
   late List<_ItemStage> dragSources;
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
 
   bool _isInCorrectOrder() {
@@ -39,18 +42,9 @@ class _Asama1Soru3State extends State<Asama1Soru3>
   void initState() {
     super.initState();
     stages = [
-      _ItemStage(
-        'Minik',
-        'assets/SIRALAMA_RESIMLERI/Asama1/soru3/minik.png',
-      ),
-      _ItemStage(
-        'Orta',
-        'assets/SIRALAMA_RESIMLERI/Asama1/soru3/orta.png',
-      ),
-      _ItemStage(
-        'Buyuk',
-        'assets/SIRALAMA_RESIMLERI/Asama1/soru3/buyuk.png',
-      ),
+      _ItemStage('Minik', 'assets/SIRALAMA_RESIMLERI/Asama1/soru3/minik.png'),
+      _ItemStage('Orta', 'assets/SIRALAMA_RESIMLERI/Asama1/soru3/orta.png'),
+      _ItemStage('Buyuk', 'assets/SIRALAMA_RESIMLERI/Asama1/soru3/buyuk.png'),
     ];
     dragSources = List.from(stages);
     // Doğru sırada başlamaması için karıştır
@@ -141,248 +135,284 @@ class _Asama1Soru3State extends State<Asama1Soru3>
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.blue.shade200,
-                Colors.blue.shade200,
-                const Color(0xffffffff),
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                // Üst kısım - Geri butonu ve Aşama yazısı
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: 28,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) => const SortingRoadmapScreenNew(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blue.shade200,
+                    Colors.blue.shade200,
+                    const Color(0xffffffff),
                   ],
+                  stops: const [0.0, 0.5, 1.0],
                 ),
-                // Sıralama Alanı Kartı (Başlık ve buton da içinde)
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Container(
-                      margin: const EdgeInsets.fromLTRB(8, 6, 8, 16),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.97),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 20,
-                            offset: Offset(0, 10),
+              ),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    // Üst kısım - Geri butonu ve Aşama yazısı
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.black,
+                            size: 28,
                           ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // Başlık
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 6.0),
-                            child: Text(
-                              isEnglish
-                                  ? 'Sort the teddy bears from smallest to largest.'
-                                  : 'Oyuncak ayıları küçükten büyüğe doğru sırala.',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                          onPressed: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        const SortingRoadmapScreenNew(),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          // Sıralama Alanı
-                          Expanded(
-                            child: ReorderableListView(
-                              onReorder: (oldIndex, newIndex) {
-                                setState(() {
-                                  if (newIndex > oldIndex) newIndex--;
-                                  final item = dragSources.removeAt(oldIndex);
-                                  dragSources.insert(newIndex, item);
-                                });
-                              },
-                              buildDefaultDragHandles: false,
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              children: [
-                                for (int i = 0; i < dragSources.length; i++)
-                                  AnimatedContainer(
-                                    key: ValueKey(dragSources[i].label),
-                                    duration: const Duration(milliseconds: 200),
-                                    margin: const EdgeInsets.symmetric(
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(20),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          blurRadius: 12,
-                                          offset: Offset(0, 6),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 12,
-                                        horizontal: 16,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(12),
-                                              child: Image.asset(
-                                                dragSources[i].assetPath,
-                                                height: screenWidth * 0.28,
-                                                fit: BoxFit.contain,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          ReorderableDragStartListener(
-                                            index: i,
-                                            child: const Icon(
-                                              Icons.drag_handle,
-                                              color: Colors.grey,
-                                              size: 40,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          // Kontrol Butonu
-                          SizedBox(
-                            width: double.infinity,
-                            height: 35,
-                            child: ElevatedButton(
-                              onPressed: !showFeedback ? checkOrder : null,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(
-                                  0xFFFFF59D,
-                                ), // Çok Açık Sarı (Güneş teması)
-                                foregroundColor: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 6,
-                              ),
-                              child: Text(
-                                isEnglish ? 'Check' : 'Kontrol Et',
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                              (route) => false,
+                            );
+                          },
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-                // Geri Bildirim Alanı
-                Container(
-                  height: 50,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 4,
-                  ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
+                    // Sıralama Alanı Kartı (Başlık ve buton da içinde)
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          margin: const EdgeInsets.fromLTRB(8, 6, 8, 16),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 20,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.97),
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 20,
+                                offset: Offset(0, 10),
                               ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              // Başlık
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 6.0),
+                                child: Text(
+                                  isEnglish
+                                      ? 'Sort the teddy bears from smallest to largest.'
+                                      : 'Oyuncak ayıları küçükten büyüğe doğru sırala.',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
                                   ),
-                                ],
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    size: 28,
+                              // Sıralama Alanı
+                              Expanded(
+                                child: ReorderableListView(
+                                  onReorder: (oldIndex, newIndex) {
+                                    setState(() {
+                                      if (newIndex > oldIndex) newIndex--;
+                                      final item = dragSources.removeAt(
+                                        oldIndex,
+                                      );
+                                      dragSources.insert(newIndex, item);
+                                    });
+                                  },
+                                  buildDefaultDragHandles: false,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 4,
                                   ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? (isEnglish
-                                            ? 'Well done! 🎉'
-                                            : 'Aferin! 🎉')
-                                        : (isEnglish
-                                            ? 'Try again! 😔'
-                                            : 'Tekrar dene! 😔'),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color:
-                                          isCorrect ? Colors.green : Colors.red,
+                                  children: [
+                                    for (int i = 0; i < dragSources.length; i++)
+                                      AnimatedContainer(
+                                        key: ValueKey(dragSources[i].label),
+                                        duration: const Duration(
+                                          milliseconds: 200,
+                                        ),
+                                        margin: const EdgeInsets.symmetric(
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              blurRadius: 12,
+                                              offset: Offset(0, 6),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 12,
+                                            horizontal: 16,
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  child: Image.asset(
+                                                    dragSources[i].assetPath,
+                                                    height: screenWidth * 0.28,
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              ReorderableDragStartListener(
+                                                index: i,
+                                                child: const Icon(
+                                                  Icons.drag_handle,
+                                                  color: Colors.grey,
+                                                  size: 40,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              // Kontrol Butonu
+                              SizedBox(
+                                width: double.infinity,
+                                height: 35,
+                                child: ElevatedButton(
+                                  onPressed: !showFeedback ? checkOrder : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(
+                                      0xFFFFF59D,
+                                    ), // Çok Açık Sarı (Güneş teması)
+                                    foregroundColor: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    elevation: 6,
+                                  ),
+                                  child: Text(
+                                    isEnglish ? 'Check' : 'Kontrol Et',
+                                    style: const TextStyle(
+                                      fontSize: 22,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                          )
-                          : const SizedBox.shrink(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Geri Bildirim Alanı
+                    Container(
+                      height: 50,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 4,
+                      ),
+                      child:
+                          showFeedback
+                              ? ScaleTransition(
+                                scale: CurvedAnimation(
+                                  parent: _feedbackController,
+                                  curve: Curves.elasticOut,
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 20,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        isCorrect
+                                            ? Icons.check_circle
+                                            : Icons.cancel,
+                                        color:
+                                            isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        size: 28,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        isCorrect
+                                            ? (isEnglish
+                                                ? 'Well done! 🎉'
+                                                : 'Aferin! 🎉')
+                                            : (isEnglish
+                                                ? 'Try again! 😔'
+                                                : 'Tekrar dene! 😔'),
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color:
+                                              isCorrect
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                              : const SizedBox.shrink(),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const SortingRoadmapScreenNew(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
+              iconSize: screenWidth * 0.065,
+            ),
+          ],
         ),
       ),
     );
   }
 }
-

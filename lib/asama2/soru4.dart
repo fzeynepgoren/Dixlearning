@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'soru5.dart';
 import '../screens/matching_questions_screen.dart';
+import '../screens/home_screen.dart';
+import '../widgets/in_game_menu.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,6 +24,7 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
   bool showFeedback = false;
   bool isCorrect = false;
   bool allMatched = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -184,209 +187,239 @@ class _Soru4State extends State<Soru4> with TickerProviderStateMixin {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.blue.shade200,
-                Colors.blue.shade200,
-                const Color(0xffffffff),
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blue.shade200,
+                    Colors.blue.shade200,
+                    const Color(0xffffffff),
+                  ],
+                  stops: const [0.0, 0.5, 1.0],
+                ),
+              ),
+              child: SafeArea(
+                child: Column(
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) => const MatchingQuestionsScreen(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.arrow_back,
+                            color: Colors.black,
+                            size: iconSize,
                           ),
-                          (route) => false,
-                        );
-                      },
+                          onPressed: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        const MatchingQuestionsScreen(),
+                              ),
+                              (route) => false,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Container(
+                          margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.95),
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 1,
+                                ),
+                                child: Text(
+                                  isEnglish
+                                      ? 'Count and match the candies!'
+                                      : 'Şekerleri say ve eşleştir!',
+                                  style: const TextStyle(
+                                    fontSize: 23,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: List.generate(
+                                          leftNumbers.length,
+                                          (index) => _buildCard(
+                                            index: index,
+                                            isLeft: true,
+                                            text: leftNumbers[index].toString(),
+                                            style: const TextStyle(
+                                              fontSize: 42,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 4,
+                                      height: 425,
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.blue.shade400,
+                                            Colors.blue.shade200,
+                                            Colors.blue.shade100,
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        ),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: List.generate(
+                                          rightNumbers.length,
+                                          (index) => _buildCard(
+                                            index: index,
+                                            isLeft: false,
+                                            text: _getCandies(
+                                              rightNumbers[index],
+                                            ),
+                                            style: const TextStyle(
+                                              fontSize: 26,
+                                              height: 1.2,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: 80,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child:
+                          showFeedback
+                              ? ScaleTransition(
+                                scale: CurvedAnimation(
+                                  parent: _feedbackController,
+                                  curve: Curves.elasticOut,
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 20,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        isCorrect
+                                            ? Icons.check_circle
+                                            : Icons.cancel,
+                                        color:
+                                            isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        size: 28,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        isCorrect
+                                            ? 'Aferin! 🎉'
+                                            : 'Tekrar dene! 😔',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color:
+                                              isCorrect
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                              : const SizedBox.shrink(),
                     ),
                   ],
                 ),
-                Expanded(
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Container(
-                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 1,
-                            ),
-                            child: Text(
-                              isEnglish
-                                  ? 'Count and match the candies!'
-                                  : 'Şekerleri say ve eşleştir!',
-                              style: const TextStyle(
-                                fontSize: 23,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: List.generate(
-                                      leftNumbers.length,
-                                      (index) => _buildCard(
-                                        index: index,
-                                        isLeft: true,
-                                        text: leftNumbers[index].toString(),
-                                        style: const TextStyle(
-                                          fontSize: 42,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  width: 4,
-                                  height: 425,
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.blue.shade400,
-                                        Colors.blue.shade200,
-                                        Colors.blue.shade100,
-                                      ],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                    ),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: List.generate(
-                                      rightNumbers.length,
-                                      (index) => _buildCard(
-                                        index: index,
-                                        isLeft: false,
-                                        text: _getCandies(rightNumbers[index]),
-                                        style: const TextStyle(
-                                          fontSize: 26,
-                                          height: 1.2,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  height: 80,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? 'Aferin! 🎉'
-                                        : 'Tekrar dene! 😔',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color:
-                                          isCorrect ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                          : const SizedBox.shrink(),
-                ),
-              ],
+              ),
             ),
-          ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const MatchingQuestionsScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );

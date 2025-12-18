@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import 'package:dixlearning/screens/sorting_roadmap_screen_new.dart';
 import 'soru2.dart';
+import '../../widgets/in_game_menu.dart';
+import '../../screens/home_screen.dart';
 
 class Asama4Soru1 extends StatefulWidget {
   const Asama4Soru1({super.key});
@@ -24,6 +26,7 @@ class _Asama4Soru1State extends State<Asama4Soru1>
   late List<_Stage> dragSources;
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
 
   @override
@@ -152,7 +155,9 @@ class _Asama4Soru1State extends State<Asama4Soru1>
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -168,28 +173,6 @@ class _Asama4Soru1State extends State<Asama4Soru1>
           child: SafeArea(
             child: Column(
               children: [
-                // Üst kısım - Geri butonu
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: 28,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) => const SortingRoadmapScreenNew(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                  ],
-                ),
                 // Sıralama Kartı
                 Expanded(
                   child: Center(
@@ -389,6 +372,29 @@ class _Asama4Soru1State extends State<Asama4Soru1>
               ],
             ),
           ),
+            ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const SortingRoadmapScreenNew(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const HomeScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              iconSize: screenWidth * 0.065,
+            ),
+          ],
         ),
       ),
     );

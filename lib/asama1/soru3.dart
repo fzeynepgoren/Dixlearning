@@ -1,6 +1,8 @@
 import 'package:dixlearning/asama1/soru4.dart';
 import 'package:flutter/material.dart';
 import '../screens/matching_questions_screen.dart';
+import '../screens/home_screen.dart';
+import '../widgets/in_game_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -126,6 +128,7 @@ class _GeometricMatchingState extends State<GeometricMatching>
   Map<String, String> matches = {};
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
 
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -274,237 +277,271 @@ class _GeometricMatchingState extends State<GeometricMatching>
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    final iconSize = screenSize.width * 0.065;
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.blue.shade200,
-              Colors.blue.shade200,
-              const Color(0xffffffff),
-            ],
-            stops: const [0.0, 0.5, 1.0],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.blue.shade200,
+                  Colors.blue.shade200,
+                  const Color(0xffffffff),
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.arrow_back,
-                      color: Colors.black,
-                      size: screenSize.width * 0.065,
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) => const MatchingQuestionsScreen(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                          size: screenSize.width * 0.065,
                         ),
-                        (route) => false,
-                      );
-                    },
+                        onPressed: () {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => const MatchingQuestionsScreen(),
+                            ),
+                            (route) => false,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: Container(
+                        margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 1,
+                              ),
+                              child: const Text(
+                                'Renkli şekillere tıkla ve gölgeleriyle eşleştir!',
+                                style: TextStyle(
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        ...leftShapes.map((shape) {
+                                          final isMatched = matches.containsKey(
+                                            shape.shape,
+                                          );
+                                          final isSelected =
+                                              selectedLeftShape?.shape ==
+                                              shape.shape;
+
+                                          return GestureDetector(
+                                            onTap:
+                                                isMatched || showFeedback
+                                                    ? null
+                                                    : () {
+                                                      setState(() {
+                                                        selectedLeftShape =
+                                                            shape;
+                                                      });
+                                                    },
+                                            child: buildShapeCard(
+                                              shape,
+                                              isSelected: isSelected,
+                                            ),
+                                          );
+                                        }),
+                                      ],
+                                    ),
+                                  ),
+
+                                  // BAŞLANGIÇ: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ (425.0 Yüksekliğe Ayarlandı)
+                                  SizedBox(
+                                    height:
+                                        425.0, // Çizginin uzunluğu burada ayarlandı
+                                    child: Container(
+                                      width: 4, // Çizginin kalınlığı
+                                      margin: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Colors.blue.shade400,
+                                            Colors.blue.shade200,
+                                            Colors.blue.shade100,
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
+                                    ),
+                                  ),
+
+                                  // SON: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        ...rightShapes.map((shape) {
+                                          final isMatched = matches
+                                              .containsValue(shape.shape);
+                                          return GestureDetector(
+                                            onTap:
+                                                isMatched ||
+                                                        selectedLeftShape ==
+                                                            null ||
+                                                        showFeedback
+                                                    ? null
+                                                    : () {
+                                                      if (selectedLeftShape !=
+                                                          null) {
+                                                        checkMatch(
+                                                          selectedLeftShape!
+                                                              .shape,
+                                                          shape.shape,
+                                                        );
+                                                      }
+                                                    },
+                                            child: buildShapeCard(
+                                              shape,
+                                              isShadow: !isMatched,
+                                              isMatched: isMatched,
+                                            ),
+                                          );
+                                        }),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 80,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    child:
+                        showFeedback
+                            ? ScaleTransition(
+                              scale: CurvedAnimation(
+                                parent: _feedbackController,
+                                curve: Curves.elasticOut,
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 20,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      isCorrect
+                                          ? Icons.check_circle
+                                          : Icons.cancel,
+                                      color:
+                                          isCorrect ? Colors.green : Colors.red,
+                                      size: 28,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      isCorrect
+                                          ? 'Aferin! 🎉'
+                                          : 'Tekrar dene! 😔',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color:
+                                            isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                            : const SizedBox.shrink(),
                   ),
                 ],
               ),
-              Expanded(
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Container(
-                    margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.95),
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 1,
-                          ),
-                          child: const Text(
-                            'Renkli şekillere tıkla ve gölgeleriyle eşleştir!',
-                            style: TextStyle(
-                              fontSize: 23,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    ...leftShapes.map((shape) {
-                                      final isMatched = matches.containsKey(
-                                        shape.shape,
-                                      );
-                                      final isSelected =
-                                          selectedLeftShape?.shape ==
-                                          shape.shape;
-
-                                      return GestureDetector(
-                                        onTap:
-                                            isMatched || showFeedback
-                                                ? null
-                                                : () {
-                                                  setState(() {
-                                                    selectedLeftShape = shape;
-                                                  });
-                                                },
-                                        child: buildShapeCard(
-                                          shape,
-                                          isSelected: isSelected,
-                                        ),
-                                      );
-                                    }),
-                                  ],
-                                ),
-                              ),
-
-                              // BAŞLANGIÇ: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ (425.0 Yüksekliğe Ayarlandı)
-                              SizedBox(
-                                height:
-                                    425.0, // Çizginin uzunluğu burada ayarlandı
-                                child: Container(
-                                  width: 4, // Çizginin kalınlığı
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Colors.blue.shade400,
-                                        Colors.blue.shade200,
-                                        Colors.blue.shade100,
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(2),
-                                  ),
-                                ),
-                              ),
-
-                              // SON: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    ...rightShapes.map((shape) {
-                                      final isMatched = matches.containsValue(
-                                        shape.shape,
-                                      );
-                                      return GestureDetector(
-                                        onTap:
-                                            isMatched ||
-                                                    selectedLeftShape == null ||
-                                                    showFeedback
-                                                ? null
-                                                : () {
-                                                  if (selectedLeftShape !=
-                                                      null) {
-                                                    checkMatch(
-                                                      selectedLeftShape!.shape,
-                                                      shape.shape,
-                                                    );
-                                                  }
-                                                },
-                                        child: buildShapeCard(
-                                          shape,
-                                          isShadow: !isMatched,
-                                          isMatched: isMatched,
-                                        ),
-                                      );
-                                    }),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                height: 80,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                child:
-                    showFeedback
-                        ? ScaleTransition(
-                          scale: CurvedAnimation(
-                            parent: _feedbackController,
-                            curve: Curves.elasticOut,
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 20,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  isCorrect ? Icons.check_circle : Icons.cancel,
-                                  color: isCorrect ? Colors.green : Colors.red,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  isCorrect ? 'Aferin! 🎉' : 'Tekrar dene! 😔',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                        : const SizedBox.shrink(),
-              ),
-            ],
+            ),
           ),
-        ),
+          InGameMenu(
+            isSoundOn: _isSoundOn,
+            onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+            onHome: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const MatchingQuestionsScreen(),
+                ),
+                (route) => false,
+              );
+            },
+            onEntryScreen: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+            iconSize: iconSize,
+          ),
+        ],
       ),
     );
   }

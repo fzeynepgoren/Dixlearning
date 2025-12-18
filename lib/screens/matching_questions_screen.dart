@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -218,7 +217,7 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                 ),
               ),
 
-              // Sevimli geri butonu - Uzay Teması (Yıldız/Roket)
+              // Geri butonu - Diğer menülerle aynı stil
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -240,37 +239,30 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                           end: Alignment.bottomRight,
                           colors: [Color(0xFF6C63FF), Color(0xFF5A52D5)],
                         ),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.yellow.withOpacity(0.4),
-                          width: 2,
-                        ),
+                        borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF64BDD2).withOpacity(0.5),
+                            color: const Color(0xFF6C63FF).withOpacity(0.5),
                             blurRadius: 20,
                             spreadRadius: 2,
                             offset: const Offset(0, 6),
-                          ),
-                          // Yıldız parlama efekti
-                          BoxShadow(
-                            color: Colors.yellow.withOpacity(0.3),
-                            blurRadius: 15,
-                            spreadRadius: 1,
                           ),
                         ],
                       ),
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          // Yıldız parlaması
+                          // Parlama efekti
                           Positioned(
-                            top: 8,
-                            right: 8,
-                            child: Icon(
-                              Icons.star,
-                              color: Colors.yellow.withOpacity(0.6),
-                              size: 12,
+                            top: 10,
+                            left: 12,
+                            child: Container(
+                              width: 15,
+                              height: 15,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.4),
+                                shape: BoxShape.circle,
+                              ),
                             ),
                           ),
                           const Icon(
