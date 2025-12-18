@@ -6,7 +6,6 @@ import '../asama1/soru1.dart';
 import '../asama2/soru1.dart';
 import '../asama3/soru1.dart';
 import '../asama4/soru1.dart';
-import '../widgets/in_game_menu.dart';
 import 'home_screen.dart';
 
 class MatchingQuestionsScreen extends StatefulWidget {
@@ -20,7 +19,6 @@ class MatchingQuestionsScreen extends StatefulWidget {
 class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
     with TickerProviderStateMixin {
   int completedLevel = 0;
-  bool _isSoundOn = true;
   late AnimationController _starController1;
   late AnimationController _starController2;
   late AnimationController _starController3;
@@ -219,22 +217,64 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                 ),
               ),
 
-              // Oyun içi menü butonu
-              InGameMenu(
-                isSoundOn: _isSoundOn,
-                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
-                onHome: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
-                onEntryScreen: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
+              // Geri butonu - Diğer menülerle aynı stil
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => const HomeScreen(),
+                        ),
+                        (route) => false,
+                      );
+                    },
+                    child: Container(
+                      width: 55,
+                      height: 55,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFF6C63FF), Color(0xFF5A52D5)],
+                        ),
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF6C63FF).withOpacity(0.5),
+                            blurRadius: 20,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Parlama efekti
+                          Positioned(
+                            top: 10,
+                            left: 12,
+                            child: Container(
+                              width: 15,
+                              height: 15,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.4),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                          const Icon(
+                            Icons.arrow_back_rounded,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
