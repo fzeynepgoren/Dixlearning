@@ -76,27 +76,153 @@ class _Asama1Soru5State extends State<Asama1Soru5>
     await prefs.setBool('sorting_stage_1_completed', true);
   }
 
-  Future<void> _finalizeStars() async {
+  Future<int> _finalizeStars() async {
     final prefs = await SharedPreferences.getInstance();
     // Son soruya kadar birikmiş doğru ve yanlış sayıları al
     int correctCount = prefs.getInt('asama1_session_correct_count') ?? 0;
     int wrongCount = prefs.getInt('asama1_session_wrong_count') ?? 0;
 
-    // Yıldız hesaplama
-    if (correctCount + wrongCount == 5) {
-      double accuracy = correctCount / 5;
-      int stars = 0;
+    // Toplam soru sayısı
+    int totalCount = correctCount + wrongCount;
+    if (totalCount == 0) totalCount = 5; // Fallback
 
-      if (accuracy == 1.0) {
-        stars = 3;
-      } else if (accuracy >= 0.6) {
-        stars = 2;
-      } else if (accuracy >= 0.4) {
-        stars = 1;
-      }
+    // Yıldız hesaplama - başarı oranına göre
+    double successRate = correctCount / totalCount;
+    int stars = 0;
 
+    if (successRate >= 0.75) {
+      stars = 3; // %75-100 başarı → 3 yıldız
+    } else if (successRate >= 0.50) {
+      stars = 2; // %50-75 başarı → 2 yıldız
+    } else {
+      stars = 1; // %0-50 başarı → 1 yıldız (minimum)
+    }
+
+    // Önceki yıldızlardan daha iyiyse güncelle
+    int previousStars = prefs.getInt('sorting_stage_1_stars') ?? 0;
+    if (stars > previousStars) {
       await prefs.setInt('sorting_stage_1_stars', stars);
     }
+
+    return stars;
+  }
+
+  void _showCompletionDialog(int stars) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.all(20),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final screenWidth = MediaQuery.of(context).size.width;
+                final screenHeight = MediaQuery.of(context).size.height;
+                final popupWidth = screenWidth * 0.9;
+                final popupHeight = screenHeight * 0.75;
+
+                return TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 600),
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  curve: Curves.easeOutBack,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: 0.8 + (value * 0.2),
+                      child: Opacity(
+                        opacity: value,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Popup görseli
+                            Image.asset(
+                              'assets/popup/uzay_popup.png',
+                              width: popupWidth,
+                              height: popupHeight,
+                              fit: BoxFit.contain,
+                            ),
+                            // Yıldızlar
+                            if (stars > 0)
+                              Positioned(
+                                top: popupHeight * 0.45,
+                                left: 0,
+                                right: 0,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: List.generate(stars, (index) {
+                                    final individualSize = (popupWidth * 0.15)
+                                        .clamp(40.0, 80.0);
+                                    return TweenAnimationBuilder<double>(
+                                      duration: Duration(
+                                        milliseconds: 400 + (index * 200),
+                                      ),
+                                      tween: Tween(begin: 0.0, end: 1.0),
+                                      curve: Curves.elasticOut,
+                                      builder: (context, scaleValue, child) {
+                                        return Transform.scale(
+                                          scale: scaleValue,
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: popupWidth * 0.02,
+                                            ),
+                                            child: Image.asset(
+                                              'assets/popup/yildiz.png',
+                                              width: individualSize,
+                                              height: individualSize,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }),
+                                ),
+                              ),
+                            // Menüye Git butonu
+                            Positioned(
+                              bottom: popupHeight * 0.28,
+                              left: popupWidth * 0.15,
+                              right: popupWidth * 0.15,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                const SortingRoadmapScreenNew(),
+                                      ),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: (popupHeight * 0.1).clamp(
+                                      45.0,
+                                      65.0,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+    );
   }
 
   // Yıldız sistemi için doğruluk takibi
@@ -136,21 +262,14 @@ class _Asama1Soru5State extends State<Asama1Soru5>
     // Doğruluk sonucunu kaydet
     await _saveQuestionResult(isCorrect);
 
-    // Son soru olduğu için yıldızları hesapla
+    // Son soru olduğu için yıldızları hesapla ve popup göster
     if (isCorrect) {
       await _saveStageCompletion();
-      await _finalizeStars();
-    }
+      int earnedStars = await _finalizeStars();
 
-    if (isCorrect) {
-      Future.delayed(const Duration(seconds: 2), () {
+      Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (context) => const SortingRoadmapScreenNew(),
-            ),
-            (route) => false,
-          );
+          _showCompletionDialog(earnedStars);
         }
       });
     } else {
