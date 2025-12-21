@@ -100,6 +100,14 @@ class _BuyukKucukSoru9State extends State<BuyukKucukSoru9>
       Future.delayed(const Duration(seconds: 2), () async {
         if (!mounted) return;
         int stars = await _calculateStars();
+        // Yıldızları kaydet (roadmap için) - sadece öncekinden daha iyiyse güncelle
+        final prefs2 = await SharedPreferences.getInstance();
+        int previousStars = prefs2.getInt('comparison_stage_2_stars') ?? 0;
+        if (stars > previousStars) {
+          await prefs2.setInt('comparison_stage_2_stars', stars);
+        } else {
+          stars = previousStars; // Önceki yıldız sayısını kullan
+        }
         _showCompletionDialog(stars);
       });
     } else {

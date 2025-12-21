@@ -19,6 +19,8 @@ class _KarsilastirmaSorulariScreenState
     extends State<KarsilastirmaSorulariScreen>
     with TickerProviderStateMixin {
   int completedLevel = 0;
+  // Her level için yıldız sayıları
+  Map<int, int> levelStars = {};
   late AnimationController _starController1;
   late AnimationController _starController2;
   late AnimationController _starController3;
@@ -53,6 +55,11 @@ class _KarsilastirmaSorulariScreenState
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       completedLevel = prefs.getInt('karsilastirma_completed_level') ?? 0;
+
+      // Her level için yıldız sayılarını yükle
+      for (int i = 1; i <= 4; i++) {
+        levelStars[i] = prefs.getInt('comparison_stage_${i}_stars') ?? 0;
+      }
     });
 
     // Tamamlanan leveller için yıldız animasyonunu başlat
@@ -303,6 +310,7 @@ class _KarsilastirmaSorulariScreenState
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // 1. Yıldız
                   ScaleTransition(
                     scale: CurvedAnimation(
                       parent: _starController1,
@@ -310,17 +318,20 @@ class _KarsilastirmaSorulariScreenState
                     ),
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 3),
-                      child: const Icon(
+                      child: Icon(
                         Icons.star_rounded,
-                        color: Colors.amber,
+                        color: (levelStars[level] ?? 0) >= 1 ? Colors.amber : Colors.grey.shade400,
                         size: 22,
-                        shadows: [
-                          Shadow(color: Colors.orange, blurRadius: 6),
-                          Shadow(color: Colors.amber, blurRadius: 12),
-                        ],
+                        shadows: (levelStars[level] ?? 0) >= 1
+                            ? const [
+                                Shadow(color: Colors.orange, blurRadius: 6),
+                                Shadow(color: Colors.amber, blurRadius: 12),
+                              ]
+                            : null,
                       ),
                     ),
                   ),
+                  // 2. Yıldız
                   ScaleTransition(
                     scale: CurvedAnimation(
                       parent: _starController2,
@@ -328,17 +339,20 @@ class _KarsilastirmaSorulariScreenState
                     ),
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 3),
-                      child: const Icon(
+                      child: Icon(
                         Icons.star_rounded,
-                        color: Colors.amber,
+                        color: (levelStars[level] ?? 0) >= 2 ? Colors.amber : Colors.grey.shade400,
                         size: 22,
-                        shadows: [
-                          Shadow(color: Colors.orange, blurRadius: 6),
-                          Shadow(color: Colors.amber, blurRadius: 12),
-                        ],
+                        shadows: (levelStars[level] ?? 0) >= 2
+                            ? const [
+                                Shadow(color: Colors.orange, blurRadius: 6),
+                                Shadow(color: Colors.amber, blurRadius: 12),
+                              ]
+                            : null,
                       ),
                     ),
                   ),
+                  // 3. Yıldız
                   ScaleTransition(
                     scale: CurvedAnimation(
                       parent: _starController3,
@@ -346,14 +360,16 @@ class _KarsilastirmaSorulariScreenState
                     ),
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 3),
-                      child: const Icon(
+                      child: Icon(
                         Icons.star_rounded,
-                        color: Colors.amber,
+                        color: (levelStars[level] ?? 0) >= 3 ? Colors.amber : Colors.grey.shade400,
                         size: 22,
-                        shadows: [
-                          Shadow(color: Colors.orange, blurRadius: 6),
-                          Shadow(color: Colors.amber, blurRadius: 12),
-                        ],
+                        shadows: (levelStars[level] ?? 0) >= 3
+                            ? const [
+                                Shadow(color: Colors.orange, blurRadius: 6),
+                                Shadow(color: Colors.amber, blurRadius: 12),
+                              ]
+                            : null,
                       ),
                     ),
                   ),

@@ -98,27 +98,6 @@ class _Asama5Soru1State extends State<Asama5Soru1>
     // Kaydet
     await prefs.setInt('asama5_session_correct_count', correctCount);
     await prefs.setInt('asama5_session_wrong_count', wrongCount);
-
-    // Yıldız hesaplama: Birkaç denemede doğru = 2 yıldız, %100 doğru = 3 yıldız
-    int totalQuestions = correctCount + wrongCount;
-    if (totalQuestions >= 5) {
-      // 5 soru tamamlandığında
-      double accuracy = correctCount / totalQuestions;
-      int stars = 0;
-
-      if (accuracy == 1.0) {
-        // %100 doğru
-        stars = 3;
-      } else if (accuracy >= 0.6) {
-        // %60+ doğru (birkaç denemede doğru)
-        stars = 2;
-      } else if (accuracy >= 0.4) {
-        // %40+ doğru
-        stars = 1;
-      }
-
-      await prefs.setInt('sorting_stage_5_stars', stars);
-    }
   }
 
   void checkOrder() async {

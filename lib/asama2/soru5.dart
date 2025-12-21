@@ -163,6 +163,15 @@ class _SeninWidgetState extends State<SeninWidget>
     final prefs = await SharedPreferences.getInstance();
     int wrongCount = prefs.getInt('asama2_wrong_count') ?? 0;
     await prefs.setInt('asama2_final_wrong_count', wrongCount);
+    
+    // Yıldızları kaydet (roadmap için) - sadece öncekinden daha iyiyse güncelle
+    int previousStars = prefs.getInt('matching_stage_2_stars') ?? 0;
+    if (stars > previousStars) {
+      await prefs.setInt('matching_stage_2_stars', stars);
+    } else {
+      stars = previousStars; // Önceki yıldız sayısını kullan
+    }
+    
     await prefs.setInt('asama2_wrong_count', 0);
 
     showDialog(

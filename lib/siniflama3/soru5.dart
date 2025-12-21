@@ -141,6 +141,15 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
         int stars = await _calculateStars();
         int wrongCount = prefs2.getInt('siniflama3_wrong_count') ?? 0;
         await prefs2.setInt('siniflama3_final_wrong_count', wrongCount);
+        
+        // Yıldızları kaydet (roadmap için) - sadece öncekinden daha iyiyse güncelle
+        int previousStars = prefs2.getInt('classification_stage_3_stars') ?? 0;
+        if (stars > previousStars) {
+          await prefs2.setInt('classification_stage_3_stars', stars);
+        } else {
+          stars = previousStars; // Önceki yıldız sayısını kullan
+        }
+        
         await prefs2.setInt('siniflama3_wrong_count', 0); // Reset for next playthrough
 
         if (mounted) {
@@ -149,7 +158,15 @@ class _HayvanYasamSiniflaState extends State<HayvanYasamSinifla>
       } catch (e) {
         // Hata durumunda sessizce devam et veya logla
         if (mounted) {
+          final prefs3 = await SharedPreferences.getInstance();
           int stars = await _calculateStars();
+          // Yıldızları kaydet (roadmap için) - sadece öncekinden daha iyiyse güncelle
+          int previousStars = prefs3.getInt('classification_stage_3_stars') ?? 0;
+          if (stars > previousStars) {
+            await prefs3.setInt('classification_stage_3_stars', stars);
+          } else {
+            stars = previousStars; // Önceki yıldız sayısını kullan
+          }
           _showCompletionDialog(stars);
         }
       }
