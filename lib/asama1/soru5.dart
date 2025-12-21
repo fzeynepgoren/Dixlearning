@@ -103,6 +103,14 @@ class _HayvanEsleState extends State<HayvanEsle> with TickerProviderStateMixin {
                 // Yıldız hesapla
                 int stars = await _calculateStars();
 
+                // Yıldızları kaydet (roadmap için) - sadece öncekinden daha iyiyse güncelle
+                int previousStars = prefs.getInt('matching_stage_1_stars') ?? 0;
+                if (stars > previousStars) {
+                  await prefs.setInt('matching_stage_1_stars', stars);
+                } else {
+                  stars = previousStars; // Önceki yıldız sayısını kullan
+                }
+
                 // Yanlış sayısını sıfırla (bir sonraki aşama için)
                 await prefs.setInt('asama1_wrong_count', 0);
 

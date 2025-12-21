@@ -160,6 +160,15 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
           await prefs.setInt('asama4_final_wrong_count', wrongCount);
 
           int stars = await _calculateStars();
+          
+          // Yıldızları kaydet (roadmap için) - sadece öncekinden daha iyiyse güncelle
+          int previousStars = prefs.getInt('matching_stage_4_stars') ?? 0;
+          if (stars > previousStars) {
+            await prefs.setInt('matching_stage_4_stars', stars);
+          } else {
+            stars = previousStars; // Önceki yıldız sayısını kullan
+          }
+          
           await prefs.setInt('asama4_wrong_count', 0);
 
           _showCompletionDialog(stars);

@@ -347,7 +347,7 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // 1. Yıldız - her zaman dolu (minimum 1 yıldız)
+                  // 1. Yıldız
                   ScaleTransition(
                     scale: CurvedAnimation(
                       parent: _starController1,
@@ -357,9 +357,9 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
                       margin: const EdgeInsets.symmetric(horizontal: 3),
                       child: Icon(
                         Icons.star_rounded,
-                        color: (levelStars[level] ?? 1) >= 1 ? Colors.amber : Colors.grey.shade400,
+                        color: (levelStars[level] ?? 0) >= 1 ? Colors.amber : Colors.grey.shade400,
                         size: 22,
-                        shadows: (levelStars[level] ?? 1) >= 1
+                        shadows: (levelStars[level] ?? 0) >= 1
                             ? const [
                                 Shadow(color: Colors.orange, blurRadius: 6),
                                 Shadow(color: Colors.amber, blurRadius: 12),

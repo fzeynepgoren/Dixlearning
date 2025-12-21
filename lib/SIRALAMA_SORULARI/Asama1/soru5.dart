@@ -98,10 +98,12 @@ class _Asama1Soru5State extends State<Asama1Soru5>
       stars = 1; // %0-50 başarı → 1 yıldız (minimum)
     }
 
-    // Önceki yıldızlardan daha iyiyse güncelle
+    // Yıldızları kaydet - sadece öncekinden daha iyiyse güncelle
     int previousStars = prefs.getInt('sorting_stage_1_stars') ?? 0;
     if (stars > previousStars) {
       await prefs.setInt('sorting_stage_1_stars', stars);
+    } else {
+      stars = previousStars; // Önceki yıldız sayısını kullan
     }
 
     return stars;
