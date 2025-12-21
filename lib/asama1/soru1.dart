@@ -247,30 +247,6 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
               child: SafeArea(
                 child: Column(
                   children: [
-                    // Geri butonu
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: Colors.black,
-                            size: iconSize,
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        const MatchingQuestionsScreen(),
-                              ),
-                              (route) => false,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-
                     const SizedBox(height: 10),
 
                     Expanded(

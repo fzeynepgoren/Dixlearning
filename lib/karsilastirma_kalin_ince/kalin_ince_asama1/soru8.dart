@@ -118,28 +118,6 @@ class _KalinInceSoru8State extends State<KalinInceSoru8>
             child: Column(
               children: [
                 // Üst kısım - Geri butonu ve Aşama yazısı
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const KarsilastirmaSorulariScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                  ],
-                ),
                 // Main Content - Ekranı yukarı alıyoruz
                 Expanded(
                   child: SlideTransition(

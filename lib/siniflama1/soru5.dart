@@ -429,29 +429,6 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
             child: Column(
               children: [
                 // Başlık kaldırıldı, sadece geri tuşu kaldı.
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        // Ana ekrana dönme
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const ClassificationQuestionsScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                  ],
-                ),
                 const SizedBox(height: 10),
                 Expanded(
                   child: SlideTransition(

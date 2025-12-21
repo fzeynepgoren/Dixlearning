@@ -298,27 +298,6 @@ class _GeometricMatchingState extends State<GeometricMatching>
             child: SafeArea(
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.arrow_back,
-                          color: Colors.black,
-                          size: screenSize.width * 0.065,
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => const MatchingQuestionsScreen(),
-                            ),
-                            (route) => false,
-                          );
-                        },
-                      ),
-                    ],
-                  ),
                   Expanded(
                     child: SlideTransition(
                       position: _slideAnimation,

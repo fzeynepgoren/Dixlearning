@@ -199,29 +199,6 @@ class _Soru3State extends State<Soru3> with TickerProviderStateMixin {
                 child: Column(
                   children: [
                     // Üst bar: geri düğmesi
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.black,
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        const MatchingQuestionsScreen(),
-                              ),
-                              (route) => false,
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 48), // hizalama için boşluk
-                      ],
-                    ),
-
                     // Kart ve eşleştirme alanı
                     Expanded(
                       child: SlideTransition(

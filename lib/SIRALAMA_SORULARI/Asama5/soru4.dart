@@ -152,29 +152,6 @@ class _Asama5Soru4State extends State<Asama5Soru4>
               child: SafeArea(
                 child: Column(
                   children: [
-                    // Üst kısım - Geri butonu ve Aşama yazısı
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.black,
-                            size: 28,
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        const SortingRoadmapScreenNew(),
-                              ),
-                              (route) => false,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
                     // Sıralama Alanı Kartı (Başlık ve buton da içinde)
                     Expanded(
                       child: Center(

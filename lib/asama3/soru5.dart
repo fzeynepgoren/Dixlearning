@@ -261,28 +261,6 @@ class _RenkNesneEsleState extends State<RenkNesneEsle>
                 child: Column(
                   children: [
                     // Geri butonu üstte sola hizalı
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: Colors.black,
-                            size: iconSize,
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        const MatchingQuestionsScreen(),
-                              ),
-                              (route) => false,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
                     Expanded(
                       child: SlideTransition(
                         position: _slideAnimation,

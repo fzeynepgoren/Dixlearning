@@ -116,31 +116,6 @@ class _AzCokSoru5State extends State<AzCokSoru5> with TickerProviderStateMixin {
           child: SafeArea(
             child: Column(
               children: [
-                // Üst kısım - Geri butonu ve Aşama yazısı
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const KarsilastirmaSorulariScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
-
-                    SizedBox(width: iconSize),
-                  ],
-                ),
                 // Ana içerik alanı
                 Expanded(
                   child: SlideTransition(
