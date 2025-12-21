@@ -59,14 +59,17 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
   Future<int> _calculateStars() async {
     final prefs = await SharedPreferences.getInstance();
     int wrongCount = prefs.getInt('az_cok_asama1_wrong_count') ?? 0;
+    const int totalQuestions = 9;
 
-    if (wrongCount >= 0 && wrongCount <= 3) {
-      return 3;
-    } else if (wrongCount >= 4 && wrongCount <= 6) {
-      return 2;
+    // Başarı oranına göre yıldız hesapla
+    double successRate = (totalQuestions - wrongCount) / totalQuestions;
+
+    if (successRate >= 0.75) {
+      return 3; // %75-100 başarı → 3 yıldız
+    } else if (successRate >= 0.50) {
+      return 2; // %50-75 başarı → 2 yıldız
     } else {
-      // 7-9 yanlış
-      return 1;
+      return 1; // %0-50 başarı → 1 yıldız (minimum)
     }
   }
 
@@ -129,243 +132,248 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
         body: Stack(
           children: [
             Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.blue.shade200,
-                Colors.blue.shade200,
-                const Color(0xffffffff),
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const KarsilastirmaSorulariScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
-
-                    SizedBox(width: iconSize),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blue.shade200,
+                    Colors.blue.shade200,
+                    const Color(0xffffffff),
                   ],
+                  stops: const [0.0, 0.5, 1.0],
                 ),
-                Expanded(
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Container(
-                      margin: const EdgeInsets.fromLTRB(
-                        4,
-                        0,
-                        4,
-                        0,
-                      ), // Sağdan ve soldan daha geniş
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
+              ),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.arrow_back,
+                            color: Colors.black,
+                            size: iconSize,
                           ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            isEnglish
-                                ? 'Choose the one with more.'
-                                : 'Çok olanı işaretle.',
-                            style: const TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 15),
-                          Expanded(
-                            child: Image.asset(
-                              'assets/az_cok_asa1/soru9/az_papatya.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Center(
-                            child: SizedBox(
-                              width: screenWidth * 0.65,
-                              height: 40,
-                              child: ElevatedButton(
-                                onPressed:
-                                    showFeedback
-                                        ? null
-                                        : () => checkAnswer(false),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      selectedAnswer == false
-                                          ? (isCorrect
-                                              ? Colors.green
-                                              : Colors.red)
-                                          : Color(0xFFFDC726),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  elevation: selectedAnswer == false ? 8 : 4,
-                                  shadowColor:
-                                      selectedAnswer == false
-                                          ? (isCorrect
-                                              ? Colors.green.shade300
-                                              : Colors.red.shade300)
-                                          : Color(0xFFFDC726),
-                                ),
-                                child: const Text(
-                                  'Seç',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
+                          onPressed: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        const KarsilastirmaSorulariScreen(),
                               ),
-                            ),
-                          ),
-                          const SizedBox(height: 70),
-                          Expanded(
-                            child: Image.asset(
-                              'assets/az_cok_asa1/soru9/cok_sekil.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Center(
-                            child: SizedBox(
-                              width: screenWidth * 0.65,
-                              height: 40,
-                              child: ElevatedButton(
-                                onPressed:
-                                    showFeedback
-                                        ? null
-                                        : () => checkAnswer(true),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      selectedAnswer == true
-                                          ? (isCorrect
-                                              ? Colors.green
-                                              : Colors.red)
-                                          : Color(0xFFFDC726),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  elevation: selectedAnswer == true ? 8 : 4,
-                                  shadowColor:
-                                      selectedAnswer == true
-                                          ? (isCorrect
-                                              ? Colors.green.shade300
-                                              : Colors.red.shade300)
-                                          : Color(0xFFFDC726),
-                                ),
-                                child: const Text(
-                                  'Seç',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                              (route) => false,
+                            );
+                          },
+                        ),
+
+                        SizedBox(width: iconSize),
+                      ],
                     ),
-                  ),
-                ),
-                Container(
-                  height: 80,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
+                    Expanded(
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Container(
+                          margin: const EdgeInsets.fromLTRB(
+                            4,
+                            0,
+                            4,
+                            0,
+                          ), // Sağdan ve soldan daha geniş
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.95),
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
                               ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                isEnglish
+                                    ? 'Choose the one with more.'
+                                    : 'Çok olanı işaretle.',
+                                style: const TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? (isEnglish
-                                            ? 'Well done! 🎉'
-                                            : 'Aferin! 🎉')
-                                        : (isEnglish
-                                            ? 'Try again! 😔'
-                                            : 'Tekrar dene! 😔'),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color:
-                                          isCorrect ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
+                              const SizedBox(height: 15),
+                              Expanded(
+                                child: Image.asset(
+                                  'assets/az_cok_asa1/soru9/az_papatya.png',
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Center(
+                                child: SizedBox(
+                                  width: screenWidth * 0.65,
+                                  height: 40,
+                                  child: ElevatedButton(
+                                    onPressed:
+                                        showFeedback
+                                            ? null
+                                            : () => checkAnswer(false),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          selectedAnswer == false
+                                              ? (isCorrect
+                                                  ? Colors.green
+                                                  : Colors.red)
+                                              : Color(0xFFFDC726),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      elevation:
+                                          selectedAnswer == false ? 8 : 4,
+                                      shadowColor:
+                                          selectedAnswer == false
+                                              ? (isCorrect
+                                                  ? Colors.green.shade300
+                                                  : Colors.red.shade300)
+                                              : Color(0xFFFDC726),
+                                    ),
+                                    child: const Text(
+                                      'Seç',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                          )
-                          : const SizedBox.shrink(), // Boş alan
+                              const SizedBox(height: 70),
+                              Expanded(
+                                child: Image.asset(
+                                  'assets/az_cok_asa1/soru9/cok_sekil.png',
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Center(
+                                child: SizedBox(
+                                  width: screenWidth * 0.65,
+                                  height: 40,
+                                  child: ElevatedButton(
+                                    onPressed:
+                                        showFeedback
+                                            ? null
+                                            : () => checkAnswer(true),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          selectedAnswer == true
+                                              ? (isCorrect
+                                                  ? Colors.green
+                                                  : Colors.red)
+                                              : Color(0xFFFDC726),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      elevation: selectedAnswer == true ? 8 : 4,
+                                      shadowColor:
+                                          selectedAnswer == true
+                                              ? (isCorrect
+                                                  ? Colors.green.shade300
+                                                  : Colors.red.shade300)
+                                              : Color(0xFFFDC726),
+                                    ),
+                                    child: const Text(
+                                      'Seç',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: 80,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child:
+                          showFeedback
+                              ? ScaleTransition(
+                                scale: CurvedAnimation(
+                                  parent: _feedbackController,
+                                  curve: Curves.elasticOut,
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 20,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        isCorrect
+                                            ? Icons.check_circle
+                                            : Icons.cancel,
+                                        color:
+                                            isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        size: 28,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        isCorrect
+                                            ? (isEnglish
+                                                ? 'Well done! 🎉'
+                                                : 'Aferin! 🎉')
+                                            : (isEnglish
+                                                ? 'Try again! 😔'
+                                                : 'Tekrar dene! 😔'),
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color:
+                                              isCorrect
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                              : const SizedBox.shrink(), // Boş alan
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
             ),
             InGameMenu(
               isSoundOn: _isSoundOn,
@@ -380,9 +388,7 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
               },
               onEntryScreen: () {
                 Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                    builder: (context) => const HomeScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
                   (route) => false,
                 );
               },
@@ -398,114 +404,122 @@ class _AzCokSoru9State extends State<AzCokSoru9> with TickerProviderStateMixin {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(20),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final screenWidth = MediaQuery.of(context).size.width;
-            final screenHeight = MediaQuery.of(context).size.height;
-            // Ekrana sığdır - dinamik boyut
-            final popupWidth = screenWidth * 0.9;
-            final popupHeight = screenHeight * 0.75;
+      builder:
+          (context) => Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.all(20),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final screenWidth = MediaQuery.of(context).size.width;
+                final screenHeight = MediaQuery.of(context).size.height;
+                // Ekrana sığdır - dinamik boyut
+                final popupWidth = screenWidth * 0.9;
+                final popupHeight = screenHeight * 0.75;
 
-            return TweenAnimationBuilder<double>(
-              duration: const Duration(milliseconds: 600),
-              tween: Tween(begin: 0.0, end: 1.0),
-              curve: Curves.easeOutBack,
-              builder: (context, value, child) {
-                return Transform.scale(
-                  scale: 0.8 + (value * 0.2),
-                  child: Opacity(
-                    opacity: value,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Col popup görseli - ekranın ortasına
-                        Image.asset(
-                          'assets/popup/col_popup.png',
-                          width: popupWidth,
-                          height: popupHeight,
-                          fit: BoxFit.contain,
-                        ),
-                        // Beyaz yıldız görseli - popup'ın ortasındaki dikdörtgene
-                        // Yıldız sayısına göre göster (yan yana)
-                        if (stars > 0)
-                          Positioned(
-                            // Popup'ın ortasına yerleştir - popup görselinin ortasındaki dikdörtgen alanına
-                            top: popupHeight * 0.45,
-                            left: 0,
-                            right: 0,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: List.generate(stars, (index) {
-                                // Her yıldız için boyut - popup genişliğine göre dinamik
-                                // Popup'ın ortasındaki dikdörtgene sığacak şekilde
-                                final individualSize = (popupWidth * 0.15).clamp(40.0, 80.0);
-                                return TweenAnimationBuilder<double>(
-                                  duration: Duration(milliseconds: 400 + (index * 200)),
-                                  tween: Tween(begin: 0.0, end: 1.0),
-                                  curve: Curves.elasticOut,
-                                  builder: (context, scaleValue, child) {
-                                    return Transform.scale(
-                                      scale: scaleValue,
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: popupWidth * 0.02,
-                                        ),
-                                        child: Image.asset(
-                                          'assets/popup/beyazyildiz.png',
-                                          width: individualSize,
-                                          height: individualSize,
-                                          fit: BoxFit.contain,
-                                        ),
+                return TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 600),
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  curve: Curves.easeOutBack,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: 0.8 + (value * 0.2),
+                      child: Opacity(
+                        opacity: value,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Col popup görseli - ekranın ortasına
+                            Image.asset(
+                              'assets/popup/col_popup.png',
+                              width: popupWidth,
+                              height: popupHeight,
+                              fit: BoxFit.contain,
+                            ),
+                            // Beyaz yıldız görseli - popup'ın ortasındaki dikdörtgene
+                            // Yıldız sayısına göre göster (yan yana)
+                            if (stars > 0)
+                              Positioned(
+                                // Popup'ın ortasına yerleştir - popup görselinin ortasındaki dikdörtgen alanına
+                                top: popupHeight * 0.45,
+                                left: 0,
+                                right: 0,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: List.generate(stars, (index) {
+                                    // Her yıldız için boyut - popup genişliğine göre dinamik
+                                    // Popup'ın ortasındaki dikdörtgene sığacak şekilde
+                                    final individualSize = (popupWidth * 0.15)
+                                        .clamp(40.0, 80.0);
+                                    return TweenAnimationBuilder<double>(
+                                      duration: Duration(
+                                        milliseconds: 400 + (index * 200),
                                       ),
+                                      tween: Tween(begin: 0.0, end: 1.0),
+                                      curve: Curves.elasticOut,
+                                      builder: (context, scaleValue, child) {
+                                        return Transform.scale(
+                                          scale: scaleValue,
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: popupWidth * 0.02,
+                                            ),
+                                            child: Image.asset(
+                                              'assets/popup/beyazyildiz.png',
+                                              width: individualSize,
+                                              height: individualSize,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }),
+                                ),
+                              ),
+                            // MENÜYE GİT butonu - popup'ın alt kısmına transparan buton
+                            Positioned(
+                              bottom: popupHeight * 0.28,
+                              left: popupWidth * 0.15,
+                              right: popupWidth * 0.15,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                const KarsilastirmaSorulariScreen(),
+                                      ),
+                                      (route) => false,
                                     );
                                   },
-                                );
-                              }),
-                            ),
-                          ),
-                        // MENÜYE GİT butonu - popup'ın alt kısmına transparan buton
-                        Positioned(
-                          bottom: popupHeight * 0.28,
-                          left: popupWidth * 0.15,
-                          right: popupWidth * 0.15,
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.of(context).pop();
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const KarsilastirmaSorulariScreen(),
-                                  ),
-                                  (route) => false,
-                                );
-                              },
-                              borderRadius: BorderRadius.circular(16),
-                              child: Container(
-                                width: double.infinity,
-                                height: (popupHeight * 0.1).clamp(45.0, 65.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
                                   borderRadius: BorderRadius.circular(16),
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: (popupHeight * 0.1).clamp(
+                                      45.0,
+                                      65.0,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 );
               },
-            );
-          },
-        ),
-      ),
+            ),
+          ),
     );
   }
 }

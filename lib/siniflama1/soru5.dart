@@ -79,14 +79,19 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
   Future<int> _calculateStars() async {
     final prefs = await SharedPreferences.getInstance();
     int wrongCount = prefs.getInt('siniflama1_wrong_count') ?? 0;
-
-    if (wrongCount >= 0 && wrongCount <= 4) {
-      return 3;
-    } else if (wrongCount >= 5 && wrongCount <= 8) {
-      return 2;
+    const int totalItems = 4; // Toplam item sayısı
+    
+    // Başarı oranına göre yıldız hesapla
+    // Not: Doğru cevap sayısı = totalItems (tüm itemler doğru yerleştirilmeli)
+    // Başarı oranı = totalItems / (totalItems + wrongCount)
+    double successRate = totalItems / (totalItems + wrongCount);
+    
+    if (successRate >= 0.75) {
+      return 3; // %75-100 başarı → 3 yıldız
+    } else if (successRate >= 0.50) {
+      return 2; // %50-75 başarı → 2 yıldız
     } else {
-      // 9 ve üzeri
-      return 1;
+      return 1; // %0-50 başarı → 1 yıldız (minimum)
     }
   }
 

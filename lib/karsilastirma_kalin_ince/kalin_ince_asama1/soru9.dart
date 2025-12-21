@@ -59,14 +59,17 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
   Future<int> _calculateStars() async {
     final prefs = await SharedPreferences.getInstance();
     int wrongCount = prefs.getInt('kalin_ince_asama1_wrong_count') ?? 0;
-
-    if (wrongCount >= 0 && wrongCount <= 3) {
-      return 3;
-    } else if (wrongCount >= 4 && wrongCount <= 6) {
-      return 2;
+    const int totalQuestions = 9;
+    
+    // Başarı oranına göre yıldız hesapla
+    double successRate = (totalQuestions - wrongCount) / totalQuestions;
+    
+    if (successRate >= 0.75) {
+      return 3; // %75-100 başarı → 3 yıldız
+    } else if (successRate >= 0.50) {
+      return 2; // %50-75 başarı → 2 yıldız
     } else {
-      // 7-9 yanlış
-      return 1;
+      return 1; // %0-50 başarı → 1 yıldız (minimum)
     }
   }
 
