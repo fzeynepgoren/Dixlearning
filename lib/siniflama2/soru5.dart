@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
+import '../../widgets/in_game_menu.dart';
+import '../../screens/home_screen.dart';
 
 class ParaSinifla extends StatefulWidget {
   const ParaSinifla({super.key});
@@ -27,6 +29,7 @@ class _ParaSiniflaState extends State<ParaSinifla>
   bool showFeedback = false;
   bool isCorrect = false;
   bool _dialogShown = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -107,10 +110,10 @@ class _ParaSiniflaState extends State<ParaSinifla>
     final prefs = await SharedPreferences.getInstance();
     int wrongCount = prefs.getInt('siniflama2_wrong_count') ?? 0;
     const int totalItems = 4; // Toplam item sayısı
-    
+
     // Başarı oranına göre yıldız hesapla
     double successRate = totalItems / (totalItems + wrongCount);
-    
+
     if (successRate >= 0.75) {
       return 3; // %75-100 başarı → 3 yıldız
     } else if (successRate >= 0.50) {
@@ -128,14 +131,14 @@ class _ParaSiniflaState extends State<ParaSinifla>
         await prefs.setInt('siniflama_completed_level', 2);
 
         await Future.delayed(const Duration(milliseconds: 1500));
-        
+
         if (!mounted) return;
-        
+
         final prefs2 = await SharedPreferences.getInstance();
         int stars = await _calculateStars();
         int wrongCount = prefs2.getInt('siniflama2_wrong_count') ?? 0;
         await prefs2.setInt('siniflama2_final_wrong_count', wrongCount);
-        
+
         // Yıldızları kaydet (roadmap için) - sadece öncekinden daha iyiyse güncelle
         int previousStars = prefs2.getInt('classification_stage_2_stars') ?? 0;
         if (stars > previousStars) {
@@ -143,8 +146,11 @@ class _ParaSiniflaState extends State<ParaSinifla>
         } else {
           stars = previousStars; // Önceki yıldız sayısını kullan
         }
-        
-        await prefs2.setInt('siniflama2_wrong_count', 0); // Reset for next playthrough
+
+        await prefs2.setInt(
+          'siniflama2_wrong_count',
+          0,
+        ); // Reset for next playthrough
 
         if (mounted && !_dialogShown) {
           _dialogShown = true;
@@ -156,7 +162,8 @@ class _ParaSiniflaState extends State<ParaSinifla>
           final prefs3 = await SharedPreferences.getInstance();
           int stars = await _calculateStars();
           // Yıldızları kaydet (roadmap için) - sadece öncekinden daha iyiyse güncelle
-          int previousStars = prefs3.getInt('classification_stage_2_stars') ?? 0;
+          int previousStars =
+              prefs3.getInt('classification_stage_2_stars') ?? 0;
           if (stars > previousStars) {
             await prefs3.setInt('classification_stage_2_stars', stars);
           } else {
@@ -172,114 +179,122 @@ class _ParaSiniflaState extends State<ParaSinifla>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(20),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final screenWidth = MediaQuery.of(context).size.width;
-            final screenHeight = MediaQuery.of(context).size.height;
-            // Ekrana sığdır - dinamik boyut
-            final popupWidth = screenWidth * 0.9;
-            final popupHeight = screenHeight * 0.75;
+      builder:
+          (context) => Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.all(20),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final screenWidth = MediaQuery.of(context).size.width;
+                final screenHeight = MediaQuery.of(context).size.height;
+                // Ekrana sığdır - dinamik boyut
+                final popupWidth = screenWidth * 0.9;
+                final popupHeight = screenHeight * 0.75;
 
-            return TweenAnimationBuilder<double>(
-              duration: const Duration(milliseconds: 600),
-              tween: Tween(begin: 0.0, end: 1.0),
-              curve: Curves.easeOutBack,
-              builder: (context, value, child) {
-                return Transform.scale(
-                  scale: 0.8 + (value * 0.2),
-                  child: Opacity(
-                    opacity: value,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Sualtı popup görseli - ekranın ortasına
-                        Image.asset(
-                          'assets/popup/sualti_popup.png',
-                          width: popupWidth,
-                          height: popupHeight,
-                          fit: BoxFit.contain,
-                        ),
-                        // Deniz yıldızı görseli - popup'ın ortasındaki dikdörtgene
-                        // Yıldız sayısına göre göster (yan yana)
-                        if (stars > 0)
-                          Positioned(
-                            // Popup'ın ortasına yerleştir - popup görselinin ortasındaki dikdörtgen alanına
-                            top: popupHeight * 0.45,
-                            left: 0,
-                            right: 0,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: List.generate(stars, (index) {
-                                // Her deniz yıldızı için boyut - popup genişliğine göre dinamik
-                                // Popup'ın ortasındaki dikdörtgene sığacak şekilde
-                                final individualSize = (popupWidth * 0.15).clamp(40.0, 80.0);
-                                return TweenAnimationBuilder<double>(
-                                  duration: Duration(milliseconds: 400 + (index * 200)),
-                                  tween: Tween(begin: 0.0, end: 1.0),
-                                  curve: Curves.elasticOut,
-                                  builder: (context, scaleValue, child) {
-                                    return Transform.scale(
-                                      scale: scaleValue,
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: popupWidth * 0.02,
-                                        ),
-                                        child: Image.asset(
-                                          'assets/popup/denizyildizi.png',
-                                          width: individualSize,
-                                          height: individualSize,
-                                          fit: BoxFit.contain,
-                                        ),
+                return TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 600),
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  curve: Curves.easeOutBack,
+                  builder: (context, value, child) {
+                    return Transform.scale(
+                      scale: 0.8 + (value * 0.2),
+                      child: Opacity(
+                        opacity: value,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Sualtı popup görseli - ekranın ortasına
+                            Image.asset(
+                              'assets/popup/sualti_popup.png',
+                              width: popupWidth,
+                              height: popupHeight,
+                              fit: BoxFit.contain,
+                            ),
+                            // Deniz yıldızı görseli - popup'ın ortasındaki dikdörtgene
+                            // Yıldız sayısına göre göster (yan yana)
+                            if (stars > 0)
+                              Positioned(
+                                // Popup'ın ortasına yerleştir - popup görselinin ortasındaki dikdörtgen alanına
+                                top: popupHeight * 0.45,
+                                left: 0,
+                                right: 0,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: List.generate(stars, (index) {
+                                    // Her deniz yıldızı için boyut - popup genişliğine göre dinamik
+                                    // Popup'ın ortasındaki dikdörtgene sığacak şekilde
+                                    final individualSize = (popupWidth * 0.15)
+                                        .clamp(40.0, 80.0);
+                                    return TweenAnimationBuilder<double>(
+                                      duration: Duration(
+                                        milliseconds: 400 + (index * 200),
                                       ),
+                                      tween: Tween(begin: 0.0, end: 1.0),
+                                      curve: Curves.elasticOut,
+                                      builder: (context, scaleValue, child) {
+                                        return Transform.scale(
+                                          scale: scaleValue,
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: popupWidth * 0.02,
+                                            ),
+                                            child: Image.asset(
+                                              'assets/popup/denizyildizi.png',
+                                              width: individualSize,
+                                              height: individualSize,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }),
+                                ),
+                              ),
+                            // MENÜYE GİT butonu - popup'ın alt kısmına transparan buton
+                            Positioned(
+                              bottom: popupHeight * 0.28,
+                              left: popupWidth * 0.15,
+                              right: popupWidth * 0.15,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                const ClassificationQuestionsScreen(),
+                                      ),
+                                      (route) => false,
                                     );
                                   },
-                                );
-                              }),
-                            ),
-                          ),
-                        // MENÜYE GİT butonu - popup'ın alt kısmına transparan buton
-                        Positioned(
-                          bottom: popupHeight * 0.28,
-                          left: popupWidth * 0.15,
-                          right: popupWidth * 0.15,
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.of(context).pop();
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ClassificationQuestionsScreen(),
-                                  ),
-                                  (route) => false,
-                                );
-                              },
-                              borderRadius: BorderRadius.circular(16),
-                              child: Container(
-                                width: double.infinity,
-                                height: (popupHeight * 0.1).clamp(45.0, 65.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
                                   borderRadius: BorderRadius.circular(16),
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: (popupHeight * 0.1).clamp(
+                                      45.0,
+                                      65.0,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 );
               },
-            );
-          },
-        ),
-      ),
+            ),
+          ),
     );
   }
 
@@ -292,180 +307,214 @@ class _ParaSiniflaState extends State<ParaSinifla>
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.blue.shade200,
-                Colors.blue.shade200,
-                const Color(0xffffffff),
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Container(
-                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 1,
-                            ),
-                            child: Text(
-                              isEnglish
-                                  ? 'Drag the money to the correct group!'
-                                  : 'Paraları doğru gruba sürükle!',
-                              style: const TextStyle(
-                                fontSize: 23,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blue.shade200,
+                    Colors.blue.shade200,
+                    const Color(0xffffffff),
+                  ],
+                  stops: const [0.0, 0.5, 1.0],
+                ),
+              ),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Container(
+                          margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.95),
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
+                            ],
                           ),
-                          const SizedBox(height: 15),
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: Column(
-                                    children:
-                                        kategoriler
-                                            .map(
-                                              (kategori) => Expanded(
-                                                child: _buildGroupContainer(
-                                                  kategori,
-                                                  isEnglish,
-                                                ),
-                                              ),
-                                            )
-                                            .toList(),
-                                  ),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 1,
                                 ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  flex: 2,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children:
-                                        suruklenecekOgeler
-                                            .where(
-                                              (item) =>
-                                                  !eslesenler.contains(item),
-                                            )
-                                            .map((item) {
-                                              return Draggable<String>(
-                                                data: item,
-                                                feedback: Material(
-                                                  color: Colors.transparent,
-                                                  child: _buildItemBox(item),
-                                                ),
-                                                childWhenDragging:
-                                                    const SizedBox.shrink(),
-                                                child: _buildItemBox(item),
-                                              );
-                                            })
-                                            .toList(),
+                                child: Text(
+                                  isEnglish
+                                      ? 'Drag the money to the correct group!'
+                                      : 'Paraları doğru gruba sürükle!',
+                                  style: const TextStyle(
+                                    fontSize: 23,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(height: 15),
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: Column(
+                                        children:
+                                            kategoriler
+                                                .map(
+                                                  (kategori) => Expanded(
+                                                    child: _buildGroupContainer(
+                                                      kategori,
+                                                      isEnglish,
+                                                    ),
+                                                  ),
+                                                )
+                                                .toList(),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children:
+                                            suruklenecekOgeler
+                                                .where(
+                                                  (item) =>
+                                                      !eslesenler.contains(
+                                                        item,
+                                                      ),
+                                                )
+                                                .map((item) {
+                                                  return Draggable<String>(
+                                                    data: item,
+                                                    feedback: Material(
+                                                      color: Colors.transparent,
+                                                      child: _buildItemBox(
+                                                        item,
+                                                      ),
+                                                    ),
+                                                    childWhenDragging:
+                                                        const SizedBox.shrink(),
+                                                    child: _buildItemBox(item),
+                                                  );
+                                                })
+                                                .toList(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
+                    Container(
+                      height: 80,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child:
+                          showFeedback
+                              ? ScaleTransition(
+                                scale: CurvedAnimation(
+                                  parent: _feedbackController,
+                                  curve: Curves.elasticOut,
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 20,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        isCorrect
+                                            ? Icons.check_circle
+                                            : Icons.cancel,
+                                        color:
+                                            isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        size: 28,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        isCorrect
+                                            ? (isEnglish
+                                                ? 'Well done! 🎉'
+                                                : 'Aferin! 🎉')
+                                            : (isEnglish
+                                                ? 'Try again! 😔'
+                                                : 'Tekrar dene! 😔'),
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color:
+                                              isCorrect
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                              : const SizedBox.shrink(),
+                    ),
+                  ],
                 ),
-                Container(
-                  height: 80,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? (isEnglish
-                                            ? 'Well done! 🎉'
-                                            : 'Aferin! 🎉')
-                                        : (isEnglish
-                                            ? 'Try again! 😔'
-                                            : 'Tekrar dene! 😔'),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color:
-                                          isCorrect ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                          : const SizedBox.shrink(),
-                ),
-              ],
+              ),
             ),
-          ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const ClassificationQuestionsScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );
