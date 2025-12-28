@@ -3,11 +3,12 @@ import 'giris_etkinlikleri_screen.dart';
 import 'profile_screen.dart';
 import 'matching_questions_screen.dart';
 import 'karsilastirma_sorulari_screen.dart';
-import 'package:provider/provider.dart';
-import '../providers/language_provider.dart';
 import 'sorting_roadmap_screen_new.dart';
 import 'siniflandirma_sorulari_screen.dart';
 import 'login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -64,12 +65,21 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                );
+                // Oturum bilgilerini temizle
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool('is_logged_in', false);
+                await prefs.remove('current_user');
+                // Login ekranına yönlendir
+                if (context.mounted) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
@@ -120,12 +130,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // Sol üstte profil butonu
+              // Sol üstte çıkış butonu
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: GestureDetector(
-                    onTap: _navigateToProfile,
+                    onTap: _handleLogout,
                     child: Container(
                       width: 50,
                       height: 50,
@@ -141,23 +151,23 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       child: const Icon(
-                        Icons.person,
-                        color: Color(0xFF81D4FA),
-                        size: 40,
+                        Icons.logout,
+                        color: Colors.red,
+                        size: 35,
                       ),
                     ),
                   ),
                 ),
               ),
 
-              // Sağ üstte çıkış butonu
+              // Sağ üstte profil butonu
               SafeArea(
                 child: Align(
                   alignment: Alignment.topRight,
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: GestureDetector(
-                      onTap: _handleLogout,
+                      onTap: _navigateToProfile,
                       child: Container(
                         width: 50,
                         height: 50,
@@ -173,9 +183,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         child: const Icon(
-                          Icons.logout,
-                          color: Colors.red,
-                          size: 35,
+                          Icons.person,
+                          color: Color(0xFF81D4FA),
+                          size: 40,
                         ),
                       ),
                     ),
@@ -256,7 +266,11 @@ class _HomeScreenState extends State<HomeScreen> {
       top: top,
       child: GestureDetector(
         onTap: onTap,
-        child: Container(width: width, height: height, color: Colors.transparent),
+        child: Container(
+          width: width,
+          height: height,
+          color: Colors.transparent,
+        ),
       ),
     );
   }
