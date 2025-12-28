@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import 'soru4.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
+import '../../screens/home_screen.dart';
+import '../../widgets/in_game_menu.dart';
 
 class DuyuOrganlariSinifla extends StatefulWidget {
   const DuyuOrganlariSinifla({super.key});
@@ -31,6 +33,7 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
 
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   bool _dialogShown = false;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -124,215 +127,227 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
     final horizontalPadding = screenSize.width * 0.05;
     final verticalPadding = screenSize.height * 0.02;
 
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.blue.shade200,
-                Colors.blue.shade200,
-                const Color(0xffffffff),
-              ],
-              stops: const [0.0, 0.5, 1.0],
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.blue.shade200,
+                  Colors.blue.shade200,
+                  const Color(0xffffffff),
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
             ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Container(
-                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-                      padding: EdgeInsets.all(screenSize.width * 0.025),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: horizontalPadding,
-                              vertical: verticalPadding * 0.5,
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [],
+                  ),
+                  Expanded(
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: Container(
+                        margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                        padding: EdgeInsets.all(screenSize.width * 0.025),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
                             ),
-                            child: Text(
-                              isEnglish
-                                  ? 'Drag the items to the correct group!'
-                                  : 'Nesneleri doğru duyuya sürükle!',
-                              style: TextStyle(
-                                fontSize: screenSize.width * 0.05,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: horizontalPadding,
+                                vertical: verticalPadding * 0.5,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          SizedBox(height: screenSize.height * 0.02),
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
-                              children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: Column(
-                                    children: [
-                                      _buildGroupContainer(
-                                        isEnglish ? 'Nose' : 'Burun',
-                                        organGroups['burun']!,
-                                        'burun',
-                                        Colors.purple.shade100,
-                                        Colors.purple.shade400,
-                                      ),
-                                      _buildGroupContainer(
-                                        isEnglish ? 'Ear' : 'Kulak',
-                                        organGroups['kulak']!,
-                                        'kulak',
-                                        Colors.blue.shade100,
-                                        Colors.blue.shade400,
-                                      ),
-                                      _buildGroupContainer(
-                                        isEnglish ? 'Tongue' : 'Dil',
-                                        organGroups['dil']!,
-                                        'dil',
-                                        Colors.yellow.shade100,
-                                        Colors.yellow.shade400,
-                                      ),
-                                    ],
-                                  ),
+                              child: Text(
+                                isEnglish
+                                    ? 'Drag the items to the correct group!'
+                                    : 'Nesneleri doğru duyuya sürükle!',
+                                style: TextStyle(
+                                  fontSize: screenSize.width * 0.05,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
                                 ),
-                                SizedBox(width: screenSize.width * 0.04),
-                                Expanded(
-                                  flex: 2,
-                                  child: SingleChildScrollView(
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            SizedBox(height: screenSize.height * 0.02),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+
+                                children: [
+                                  Expanded(
+                                    flex: 3,
                                     child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children:
-                                          items.map((item) {
-                                            return Draggable<
-                                              Map<String, dynamic>
-                                            >(
-                                              data: item,
-                                              feedback: Material(
-                                                color: Colors.transparent,
-                                                child: _buildItemBox(item),
-                                              ),
-                                              childWhenDragging: Opacity(
-                                                opacity: 0.5,
-                                                child: _buildItemBox(item),
-                                              ),
-                                              child:
-                                                  item['isPlaced']
-                                                      ? const SizedBox.shrink()
-                                                      : _buildItemBox(item),
-                                            );
-                                          }).toList(),
+                                      children: [
+                                        _buildGroupContainer(
+                                          isEnglish ? 'Nose' : 'Burun',
+                                          organGroups['burun']!,
+                                          'burun',
+                                          Colors.purple.shade100,
+                                          Colors.purple.shade400,
+                                        ),
+                                        _buildGroupContainer(
+                                          isEnglish ? 'Ear' : 'Kulak',
+                                          organGroups['kulak']!,
+                                          'kulak',
+                                          Colors.blue.shade100,
+                                          Colors.blue.shade400,
+                                        ),
+                                        _buildGroupContainer(
+                                          isEnglish ? 'Tongue' : 'Dil',
+                                          organGroups['dil']!,
+                                          'dil',
+                                          Colors.yellow.shade100,
+                                          Colors.yellow.shade400,
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  height: 80,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
+                                  SizedBox(width: screenSize.width * 0.04),
+                                  Expanded(
+                                    flex: 2,
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children:
+                                            items.map((item) {
+                                              return Draggable<
+                                                Map<String, dynamic>
+                                              >(
+                                                data: item,
+                                                feedback: Material(
+                                                  color: Colors.transparent,
+                                                  child: _buildItemBox(item),
+                                                ),
+                                                childWhenDragging: Opacity(
+                                                  opacity: 0.5,
+                                                  child: _buildItemBox(item),
+                                                ),
+                                                child:
+                                                    item['isPlaced']
+                                                        ? const SizedBox.shrink()
+                                                        : _buildItemBox(item),
+                                              );
+                                            }).toList(),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? (isEnglish
-                                            ? 'Well done! 🎉'
-                                            : 'Aferin! 🎉')
-                                        : (isEnglish
-                                            ? 'Try again! 😔'
-                                            : 'Tekrar dene! 😔'),
-                                    style: TextStyle(
-                                      fontSize: 18,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 80,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    child:
+                        showFeedback
+                            ? ScaleTransition(
+                              scale: CurvedAnimation(
+                                parent: _feedbackController,
+                                curve: Curves.elasticOut,
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 20,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      isCorrect
+                                          ? Icons.check_circle
+                                          : Icons.cancel,
                                       color:
                                           isCorrect ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
+                                      size: 28,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      isCorrect
+                                          ? (isEnglish
+                                              ? 'Well done! 🎉'
+                                              : 'Aferin! 🎉')
+                                          : (isEnglish
+                                              ? 'Try again! 😔'
+                                              : 'Tekrar dene! 😔'),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color:
+                                            isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          )
-                          : const SizedBox.shrink(),
-                ),
-              ],
+                            )
+                            : const SizedBox.shrink(),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
+          InGameMenu(
+            isSoundOn: _isSoundOn,
+            onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+            onHome: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const ClassificationQuestionsScreen(),
+                ),
+                (route) => false,
+              );
+            },
+            onEntryScreen: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+            iconSize: iconSize,
+          ),
+        ],
       ),
     );
   }
@@ -345,7 +360,8 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
     Color borderColor,
   ) {
     final screenSize = MediaQuery.of(context).size;
-    final emojiSize = screenSize.width * 0.12;
+    final isEnglish =
+        Provider.of<LanguageProvider>(context, listen: false).isEnglish;
 
     return Expanded(
       child: DragTarget<Map<String, dynamic>>(
@@ -383,7 +399,9 @@ class _DuyuOrganlariSiniflaState extends State<DuyuOrganlariSinifla>
                           .map(
                             (item) => Text(
                               item['emoji'],
-                              style: TextStyle(fontSize: emojiSize),
+                              style: TextStyle(
+                                fontSize: screenSize.width * 0.12,
+                              ),
                             ),
                           )
                           .toList(),

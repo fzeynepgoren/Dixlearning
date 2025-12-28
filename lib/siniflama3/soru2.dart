@@ -139,15 +139,6 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
           child: SafeArea(
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.black),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
