@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import '../providers/user_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -15,7 +16,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-
   double? _disleksiPercentage;
   double? _disgrafiPercentage;
   double? _diskalkuliPercentage;
@@ -43,19 +43,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required Color mainColor,
   }) {
     return Container(
-<<<<<<< Updated upstream
       height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-=======
-      constraints: BoxConstraints(
-        minHeight: 60 * scaleFactor,
-        maxHeight: double.infinity,
-      ),
-      padding: EdgeInsets.symmetric(
-        horizontal: 8 * scaleFactor,
-        vertical: 6 * scaleFactor,
-      ),
->>>>>>> Stashed changes
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(8),
@@ -73,11 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 20,
-            color: mainColor,
-          ),
+          Icon(icon, size: 20, color: mainColor),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -125,271 +110,326 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Container(
-          height: MediaQuery.of(context).size.height * 0.7,
-          decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0xFF1E1E1E)
-                : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(2),
+      builder:
+          (context) => StatefulBuilder(
+            builder:
+                (context, setModalState) => Container(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  decoration: BoxDecoration(
+                    color:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF1E1E1E)
+                            : Colors.white,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  isEnglish ? 'Edit Profile' : 'Profili Düzenle',
-                  style: GoogleFonts.quicksand(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).brightness == Brightness.dark 
-                        ? Colors.white 
-                        : Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark 
-                        ? Colors.white 
-                        : Colors.black,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: isEnglish ? 'Name' : 'Ad',
-                    labelStyle: TextStyle(
-                      color: Theme.of(context).brightness == Brightness.dark 
-                          ? Colors.grey[300] 
-                          : Colors.grey[600],
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).brightness == Brightness.dark 
-                            ? Colors.grey[600]! 
-                            : Colors.grey[300]!,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).brightness == Brightness.dark 
-                            ? Colors.grey[600]! 
-                            : Colors.grey[300]!,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF4A90E2)),
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context).brightness == Brightness.dark 
-                        ? const Color(0xFF2A2A2A) 
-                        : Colors.grey[50],
-                  ),
-                  onChanged: (value) => tempName = value,
-                  controller: TextEditingController(text: tempName),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark 
-                        ? Colors.white 
-                        : Colors.black,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: isEnglish ? 'Surname' : 'Soyad',
-                    labelStyle: TextStyle(
-                      color: Theme.of(context).brightness == Brightness.dark 
-                          ? Colors.grey[300] 
-                          : Colors.grey[600],
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).brightness == Brightness.dark 
-                            ? Colors.grey[600]! 
-                            : Colors.grey[300]!,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).brightness == Brightness.dark 
-                            ? Colors.grey[600]! 
-                            : Colors.grey[300]!,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF4A90E2)),
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context).brightness == Brightness.dark 
-                        ? const Color(0xFF2A2A2A) 
-                        : Colors.grey[50],
-                  ),
-                  onChanged: (value) => tempSurname = value,
-                  controller: TextEditingController(text: tempSurname),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark 
-                        ? Colors.white 
-                        : Colors.black,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: isEnglish ? 'Age' : 'Yaş',
-                    labelStyle: TextStyle(
-                      color: Theme.of(context).brightness == Brightness.dark 
-                          ? Colors.grey[300] 
-                          : Colors.grey[600],
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).brightness == Brightness.dark 
-                            ? Colors.grey[600]! 
-                            : Colors.grey[300]!,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).brightness == Brightness.dark 
-                            ? Colors.grey[600]! 
-                            : Colors.grey[300]!,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF4A90E2)),
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context).brightness == Brightness.dark 
-                        ? const Color(0xFF2A2A2A) 
-                        : Colors.grey[50],
-                  ),
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) => tempAge = int.tryParse(value) ?? tempAge,
-                  controller: TextEditingController(text: tempAge.toString()),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  isEnglish ? 'Choose Avatar:' : 'Avatar Seç:',
-                  style: GoogleFonts.quicksand(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).brightness == Brightness.dark 
-                        ? Colors.white 
-                        : Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: ['👦', '👧', '🧑', '👨', '👩'].map((emoji) {
-                    return GestureDetector(
-                      onTap: () {
-                        setModalState(() {
-                          tempAvatar = emoji;
-                        });
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 12),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: tempAvatar == emoji 
-                              ? (Theme.of(context).brightness == Brightness.dark 
-                                  ? const Color(0xFF4A90E2).withOpacity(0.3)
-                                  : Colors.blue[100])
-                              : (Theme.of(context).brightness == Brightness.dark 
-                                  ? const Color(0xFF2A2A2A)
-                                  : Colors.grey[100]),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: tempAvatar == emoji 
-                                ? const Color(0xFF4A90E2)
-                                : (Theme.of(context).brightness == Brightness.dark 
-                                    ? Colors.grey[600]!
-                                    : Colors.grey[300]!),
-                            width: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(2),
+                            ),
                           ),
                         ),
-                        child: Text(
-                          emoji,
-                          style: const TextStyle(fontSize: 24),
+                        const SizedBox(height: 20),
+                        Text(
+                          isEnglish ? 'Edit Profile' : 'Profili Düzenle',
+                          style: GoogleFonts.quicksand(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black87,
+                          ),
                         ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const Spacer(),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(
-                          isEnglish ? 'Cancel' : 'İptal',
+                        const SizedBox(height: 20),
+                        TextField(
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: isEnglish ? 'Name' : 'Ad',
+                            labelStyle: TextStyle(
+                              color:
+                                  Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.grey[300]
+                                      : Colors.grey[600],
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color:
+                                    Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.grey[600]!
+                                        : Colors.grey[300]!,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color:
+                                    Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.grey[600]!
+                                        : Colors.grey[300]!,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Color(0xFF4A90E2),
+                              ),
+                            ),
+                            filled: true,
+                            fillColor:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF2A2A2A)
+                                    : Colors.grey[50],
+                          ),
+                          onChanged: (value) => tempName = value,
+                          controller: TextEditingController(text: tempName),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: isEnglish ? 'Surname' : 'Soyad',
+                            labelStyle: TextStyle(
+                              color:
+                                  Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.grey[300]
+                                      : Colors.grey[600],
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color:
+                                    Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.grey[600]!
+                                        : Colors.grey[300]!,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color:
+                                    Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.grey[600]!
+                                        : Colors.grey[300]!,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Color(0xFF4A90E2),
+                              ),
+                            ),
+                            filled: true,
+                            fillColor:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF2A2A2A)
+                                    : Colors.grey[50],
+                          ),
+                          onChanged: (value) => tempSurname = value,
+                          controller: TextEditingController(text: tempSurname),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: isEnglish ? 'Age' : 'Yaş',
+                            labelStyle: TextStyle(
+                              color:
+                                  Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.grey[300]
+                                      : Colors.grey[600],
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color:
+                                    Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.grey[600]!
+                                        : Colors.grey[300]!,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color:
+                                    Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.grey[600]!
+                                        : Colors.grey[300]!,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Color(0xFF4A90E2),
+                              ),
+                            ),
+                            filled: true,
+                            fillColor:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF2A2A2A)
+                                    : Colors.grey[50],
+                          ),
+                          keyboardType: TextInputType.number,
+                          onChanged:
+                              (value) =>
+                                  tempAge = int.tryParse(value) ?? tempAge,
+                          controller: TextEditingController(
+                            text: tempAge.toString(),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          isEnglish ? 'Choose Avatar:' : 'Avatar Seç:',
                           style: GoogleFonts.quicksand(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Theme.of(context).brightness == Brightness.dark 
-                                ? Colors.grey[300] 
-                                : Colors.grey[600],
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black87,
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children:
+                              ['👦', '👧', '🧑', '👨', '👩'].map((emoji) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    setModalState(() {
+                                      tempAvatar = emoji;
+                                    });
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.only(right: 12),
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          tempAvatar == emoji
+                                              ? (Theme.of(context).brightness ==
+                                                      Brightness.dark
+                                                  ? const Color(
+                                                    0xFF4A90E2,
+                                                  ).withOpacity(0.3)
+                                                  : Colors.blue[100])
+                                              : (Theme.of(context).brightness ==
+                                                      Brightness.dark
+                                                  ? const Color(0xFF2A2A2A)
+                                                  : Colors.grey[100]),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color:
+                                            tempAvatar == emoji
+                                                ? const Color(0xFF4A90E2)
+                                                : (Theme.of(
+                                                          context,
+                                                        ).brightness ==
+                                                        Brightness.dark
+                                                    ? Colors.grey[600]!
+                                                    : Colors.grey[300]!),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      emoji,
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                        ),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text(
+                                  isEnglish ? 'Cancel' : 'İptal',
+                                  style: GoogleFonts.quicksand(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color:
+                                        Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.grey[300]
+                                            : Colors.grey[600],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  userProvider.updateUser(
+                                    name: tempName,
+                                    surname: tempSurname,
+                                    age: tempAge,
+                                    avatar: tempAvatar,
+                                  );
+                                  Navigator.pop(context);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF4A90E2),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text(
+                                  isEnglish ? 'Save' : 'Kaydet',
+                                  style: GoogleFonts.quicksand(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          userProvider.updateUser(
-                            name: tempName,
-                            surname: tempSurname,
-                            age: tempAge,
-                            avatar: tempAvatar,
-                          );
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4A90E2),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          isEnglish ? 'Save' : 'Kaydet',
-                          style: GoogleFonts.quicksand(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ],
-            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -405,7 +445,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     const Color mainColor = Color(0xFFB3E5FC); // Açık gök mavisi
     const Color accentColor = Color(0xFF81D4FA); // Daha koyu açık mavi
-    
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -413,7 +453,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             children: [
               const SizedBox(height: 20),
-              
+
               // Profile Summary Card
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -423,7 +463,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: isDark ? const Color(0xFF333333) : Colors.grey[200]!,
+                      color:
+                          isDark ? const Color(0xFF333333) : Colors.grey[200]!,
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -446,279 +487,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 gradient: LinearGradient(
-                                  colors: isDark
-                                      ? [const Color(0xFF4A90E2), const Color(0xFF357ABD)]
-                                      : [const Color(0xFF4A90E2), const Color(0xFF357ABD)],
+                                  colors:
+                                      isDark
+                                          ? [
+                                            const Color(0xFF4A90E2),
+                                            const Color(0xFF357ABD),
+                                          ]
+                                          : [
+                                            const Color(0xFF4A90E2),
+                                            const Color(0xFF357ABD),
+                                          ],
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFF4A90E2).withOpacity(0.3),
+                                    color: const Color(
+                                      0xFF4A90E2,
+                                    ).withOpacity(0.3),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
                                 ],
                               ),
-<<<<<<< Updated upstream
                               child: Center(
-=======
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: cardSpacing),
-
-                // General Stats Section
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: Container(
-                    padding: EdgeInsets.all(cardPadding),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(borderRadius),
-                      border: Border.all(
-                        color:
-                            isDark
-                                ? const Color(0xFF333333)
-                                : Colors.grey[200]!,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: mainColor.withOpacity(isDark ? 0.22 : 0.12),
-                          blurRadius: blurRadius,
-                          offset: Offset(0, shadowOffset),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        // Stats Header
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: mediumSpacing,
-                            vertical: 8 * scaleFactor,
-                          ),
-                          decoration: BoxDecoration(
-                            color: mainColor,
-                            borderRadius: BorderRadius.circular(
-                              18 * scaleFactor,
-                            ),
-                          ),
-                          child: Text(
-                            isEnglish ? 'General Stats' : 'Genel İstatistikler',
-                            style: GoogleFonts.quicksand(
-                              fontSize: 15 * scaleFactor,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: cardSpacing),
-
-                        // Stats Grid - Horizontal Layout
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildSimpleStatCard(
-                                icon: Icons.flag,
-                                title: isEnglish ? 'First Try' : 'İlk Deneme',
-                                value: '3',
-                                isDark: isDark,
-                                mainColor: mainColor,
-                                scaleFactor: scaleFactor,
-                              ),
-                            ),
-                            SizedBox(width: 8 * scaleFactor),
-                            Expanded(
-                              child: _buildSimpleStatCard(
-                                icon: Icons.local_fire_department,
-                                title:
-                                    isEnglish ? 'Max Streak' : 'Maksimum Seri',
-                                value: '2',
-                                isDark: isDark,
-                                mainColor: mainColor,
-                                scaleFactor: scaleFactor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8 * scaleFactor),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildSimpleStatCard(
-                                icon: Icons.sports_esports,
-                                title: isEnglish ? 'Games Won' : 'Oyun Kazanma',
-                                value: '0',
-                                isDark: isDark,
-                                mainColor: mainColor,
-                                scaleFactor: scaleFactor,
-                              ),
-                            ),
-                            SizedBox(width: 8 * scaleFactor),
-                            Expanded(
-                              child: _buildSimpleStatCard(
-                                icon: Icons.emoji_events,
-                                title:
-                                    isEnglish ? 'Achievements' : 'Başarımlar',
-                                value: '0',
-                                isDark: isDark,
-                                mainColor: mainColor,
-                                scaleFactor: scaleFactor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: cardSpacing),
-
-                // GİRİŞ İSTATİSTİKLERİ
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: Container(
-                    padding: EdgeInsets.all(cardPadding),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(borderRadius),
-                      border: Border.all(
-                        color:
-                            isDark
-                                ? const Color(0xFF333333)
-                                : Colors.grey[200]!,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: mainColor.withOpacity(isDark ? 0.22 : 0.12),
-                          blurRadius: blurRadius,
-                          offset: Offset(0, shadowOffset),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        // Header
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: mediumSpacing,
-                            vertical: 8 * scaleFactor,
-                          ),
-                          decoration: BoxDecoration(
-                            color: mainColor,
-                            borderRadius: BorderRadius.circular(
-                              18 * scaleFactor,
-                            ),
-                          ),
-                          child: Text(
-                            isEnglish
-                                ? 'Login Statistics'
-                                : 'Giriş İstatistikleri',
-                            style: GoogleFonts.quicksand(
-                              fontSize: 15 * scaleFactor,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: cardSpacing),
-
-                        // Stats Grid - Disleksi, Disgrafi, Diskalkuli
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: _buildSimpleStatCard(
-                                icon: Icons.text_fields,
-                                title: isEnglish ? 'Dyslexia' : 'Disleksi',
-                                value:
-                                    _disleksiPercentage != null
-                                        ? '${_disleksiPercentage!.toStringAsFixed(0)}%'
-                                        : '-',
-                                isDark: isDark,
-                                mainColor: mainColor,
-                                scaleFactor: scaleFactor,
-                              ),
-                            ),
-                            SizedBox(width: 8 * scaleFactor),
-                            Expanded(
-                              flex: 1,
-                              child: _buildSimpleStatCard(
-                                icon: Icons.edit,
-                                title: isEnglish ? 'Dysgraphia' : 'Disgrafi',
-                                value:
-                                    _disgrafiPercentage != null
-                                        ? '${_disgrafiPercentage!.toStringAsFixed(0)}%'
-                                        : '-',
-                                isDark: isDark,
-                                mainColor: mainColor,
-                                scaleFactor: scaleFactor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8 * scaleFactor),
-                        _buildSimpleStatCard(
-                          icon: Icons.calculate,
-                          title: isEnglish ? 'Dyscalculia' : 'Diskalkuli',
-                          value:
-                              _diskalkuliPercentage != null
-                                  ? '${_diskalkuliPercentage!.toStringAsFixed(0)}%'
-                                  : '-',
-                          isDark: isDark,
-                          mainColor: mainColor,
-                          scaleFactor: scaleFactor,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: cardSpacing),
-
-                // BİLDİRİMLER
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _notificationsExpanded = !_notificationsExpanded;
-                      });
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      padding: EdgeInsets.all(cardPadding),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(borderRadiusLarge),
-                        color: cardBg,
-                        boxShadow: [
-                          BoxShadow(
-                            color: cardShadow,
-                            blurRadius: blurRadius,
-                            offset: Offset(0, shadowOffset),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                FluentIcons.alert_24_regular,
-                                color: Colors.teal,
-                                size: iconSize,
-                              ),
-                              SizedBox(width: smallSpacing),
-                              Expanded(
->>>>>>> Stashed changes
                                 child: Text(
                                   userProvider.avatar,
                                   style: const TextStyle(fontSize: 36),
@@ -733,9 +523,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 width: 24,
                                 height: 24,
                                 decoration: BoxDecoration(
-                                  color: isDark ? const Color(0xFF4A90E2) : Colors.orange,
+                                  color:
+                                      isDark
+                                          ? const Color(0xFF4A90E2)
+                                          : Colors.orange,
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 2),
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
                                 ),
                                 child: const Icon(
                                   Icons.edit,
@@ -758,7 +554,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               style: GoogleFonts.quicksand(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(context).textTheme.bodyLarge!.color!,
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).textTheme.bodyLarge!.color!,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -767,14 +566,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Icon(
                                   Icons.calendar_today,
                                   size: 16,
-                                  color: isDark ? Colors.white70 : Colors.grey[600],
+                                  color:
+                                      isDark
+                                          ? Colors.white70
+                                          : Colors.grey[600],
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
                                   '10/2025',
                                   style: GoogleFonts.quicksand(
                                     fontSize: 14,
-                                    color: isDark ? Colors.white70 : Colors.grey[600],
+                                    color:
+                                        isDark
+                                            ? Colors.white70
+                                            : Colors.grey[600],
                                   ),
                                 ),
                               ],
@@ -786,9 +591,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // General Stats Section
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -798,7 +603,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: isDark ? const Color(0xFF333333) : Colors.grey[200]!,
+                      color:
+                          isDark ? const Color(0xFF333333) : Colors.grey[200]!,
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -812,7 +618,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       // Stats Header
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: mainColor,
                           borderRadius: BorderRadius.circular(20),
@@ -827,7 +636,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      
+
                       // Stats Grid - Horizontal Layout
                       Row(
                         children: [
@@ -880,7 +689,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 20),
             ],
           ),
@@ -893,18 +702,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                pageBuilder:
+                    (context, animation, secondaryAnimation) =>
+                        const HomeScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
                   const begin = Offset(-1.0, 0.0);
                   const end = Offset.zero;
                   const curve = Curves.easeInOutCubic;
-                  
-                  var tween = Tween(begin: begin, end: end).chain(
-                    CurveTween(curve: curve),
-                  );
-                  
+
+                  var tween = Tween(
+                    begin: begin,
+                    end: end,
+                  ).chain(CurveTween(curve: curve));
+
                   var offsetAnimation = animation.drive(tween);
-                  
+
                   return SlideTransition(
                     position: offsetAnimation,
                     child: child,
@@ -917,18 +734,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => const SettingsScreen(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                pageBuilder:
+                    (context, animation, secondaryAnimation) =>
+                        const SettingsScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
                   const begin = Offset(1.0, 0.0);
                   const end = Offset.zero;
                   const curve = Curves.easeInOutCubic;
-                  
-                  var tween = Tween(begin: begin, end: end).chain(
-                    CurveTween(curve: curve),
-                  );
-                  
+
+                  var tween = Tween(
+                    begin: begin,
+                    end: end,
+                  ).chain(CurveTween(curve: curve));
+
                   var offsetAnimation = animation.drive(tween);
-                  
+
                   return SlideTransition(
                     position: offsetAnimation,
                     child: child,
