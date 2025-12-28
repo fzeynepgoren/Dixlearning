@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'soru2.dart';
 import '../screens/matching_questions_screen.dart';
+import '../screens/home_screen.dart';
 import '../utils/activity_tracker.dart';
+import '../widgets/in_game_menu.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
 import '../providers/progress_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MeyveEsle extends StatefulWidget {
   const MeyveEsle({super.key});
@@ -29,6 +30,7 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
   late List<int> matchedPairs;
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -224,322 +226,328 @@ class _MeyveEsleState extends State<MeyveEsle> with TickerProviderStateMixin {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          // Arka plan gradyanı resimdeki gibi (hafif mavi)
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.blue.shade200,
-                Colors.blue.shade200,
-                const Color(0xffffffff),
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                // Geri butonu
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+        body: Stack(
+          children: [
+            Container(
+              width: double.infinity,
+              height: double.infinity,
+              // Arka plan gradyanı resimdeki gibi (hafif mavi)
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blue.shade200,
+                    Colors.blue.shade200,
+                    const Color(0xffffffff),
+                  ],
+                  stops: const [0.0, 0.5, 1.0],
+                ),
+              ),
+              child: SafeArea(
+                child: Column(
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) => const MatchingQuestionsScreen(),
+                    const SizedBox(height: 10),
+
+                    Expanded(
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.95),
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
                           ),
-                          (route) => false,
-                        );
-                      },
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 1,
+                                ),
+                                child: Text(
+                                  isEnglish
+                                      ? 'Match the fruits!'
+                                      : 'Meyveleri eşleştir!',
+                                  style: const TextStyle(
+                                    fontSize: 23,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: List.generate(
+                                          pageFruits[currentPage].length,
+                                          (index) => GestureDetector(
+                                            onTap: () => _handleLeftTap(index),
+                                            child: AnimatedContainer(
+                                              duration:
+                                                  showFeedback
+                                                      ? Duration.zero
+                                                      : const Duration(
+                                                        milliseconds: 300,
+                                                      ),
+                                              curve: Curves.easeInOut,
+                                              width: 120,
+                                              height: 120,
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 8,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    matchedLeft[currentPage][index]
+                                                        ? Colors.green.shade400
+                                                        : (showFeedback
+                                                            ? ((selectedLeftIndex ==
+                                                                        index &&
+                                                                    !isCorrect)
+                                                                ? Colors
+                                                                    .red
+                                                                    .shade400
+                                                                : Colors.white)
+                                                            : (selectedLeftIndex ==
+                                                                    index
+                                                                ? Colors
+                                                                    .blue
+                                                                    .shade200
+                                                                : Colors
+                                                                    .white)),
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.2),
+                                                    blurRadius: 6,
+                                                    offset: const Offset(0, 3),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  pageFruits[currentPage][index],
+                                                  style: const TextStyle(
+                                                    fontSize: 48,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    // BAŞLANGIÇ: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ (Kısaltıldı)
+                                    SizedBox(
+                                      // Çizginin uzunluğunu (yüksekliğini) 450.0'a kısıtladık.
+                                      height: 425.0,
+                                      child: Container(
+                                        width: 4, // Çizginin kalınlığı
+                                        margin: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              Colors.blue.shade400,
+                                              Colors.blue.shade200,
+                                              Colors.blue.shade100,
+                                            ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            2,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    // SON: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: List.generate(
+                                          rightFruits[currentPage].length,
+                                          (index) => GestureDetector(
+                                            onTap: () => _handleRightTap(index),
+                                            child: AnimatedContainer(
+                                              duration:
+                                                  showFeedback
+                                                      ? Duration.zero
+                                                      : const Duration(
+                                                        milliseconds: 300,
+                                                      ),
+                                              curve: Curves.easeInOut,
+                                              width: 120,
+                                              height: 120,
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 8,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    matchedRight[currentPage][index]
+                                                        ? Colors.green.shade400
+                                                        : (showFeedback
+                                                            ? ((selectedRightIndex ==
+                                                                        index &&
+                                                                    !isCorrect)
+                                                                ? Colors
+                                                                    .red
+                                                                    .shade400
+                                                                : Colors.white)
+                                                            : (selectedRightIndex ==
+                                                                    index
+                                                                ? Colors
+                                                                    .blue
+                                                                    .shade200
+                                                                : Colors
+                                                                    .white)),
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.2),
+                                                    blurRadius: 6,
+                                                    offset: const Offset(0, 3),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  rightFruits[currentPage][index],
+                                                  style: const TextStyle(
+                                                    fontSize: 48,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
+
+                    Container(
+                      height: 80,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child:
+                          showFeedback
+                              ? ScaleTransition(
+                                scale: CurvedAnimation(
+                                  parent: _feedbackController,
+                                  curve: Curves.elasticOut,
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 20,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        isCorrect
+                                            ? Icons.check_circle
+                                            : Icons.cancel,
+                                        color:
+                                            isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        size: 28,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        isCorrect
+                                            ? (isEnglish
+                                                ? 'Well done! 🎉'
+                                                : 'Aferin! 🎉')
+                                            : (isEnglish
+                                                ? 'Try again! 😔'
+                                                : 'Tekrar dene! 😔'),
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color:
+                                              isCorrect
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                              : const SizedBox.shrink(),
+                    ),
+                    const SizedBox(height: 10),
                   ],
                 ),
-
-                const SizedBox(height: 10),
-
-                Expanded(
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 1,
-                            ),
-                            child: Text(
-                              isEnglish
-                                  ? 'Match the fruits!'
-                                  : 'Meyveleri eşleştir!',
-                              style: const TextStyle(
-                                fontSize: 23,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: List.generate(
-                                      pageFruits[currentPage].length,
-                                      (index) => GestureDetector(
-                                        onTap: () => _handleLeftTap(index),
-                                        child: AnimatedContainer(
-                                          duration:
-                                              showFeedback
-                                                  ? Duration.zero
-                                                  : const Duration(
-                                                    milliseconds: 300,
-                                                  ),
-                                          curve: Curves.easeInOut,
-                                          width: 120,
-                                          height: 120,
-                                          margin: const EdgeInsets.symmetric(
-                                            vertical: 8,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                matchedLeft[currentPage][index]
-                                                    ? Colors.green.shade400
-                                                    : (showFeedback
-                                                        ? ((selectedLeftIndex ==
-                                                                    index &&
-                                                                !isCorrect)
-                                                            ? Colors
-                                                                .red
-                                                                .shade400
-                                                            : Colors.white)
-                                                        : (selectedLeftIndex ==
-                                                                index
-                                                            ? Colors
-                                                                .blue
-                                                                .shade200
-                                                            : Colors.white)),
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.2,
-                                                ),
-                                                blurRadius: 6,
-                                                offset: const Offset(0, 3),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              pageFruits[currentPage][index],
-                                              style: const TextStyle(
-                                                fontSize: 48,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                // BAŞLANGIÇ: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ (Kısaltıldı)
-                                SizedBox(
-                                  // Çizginin uzunluğunu (yüksekliğini) 450.0'a kısıtladık.
-                                  height: 425.0,
-                                  child: Container(
-                                    width: 4, // Çizginin kalınlığı
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          Colors.blue.shade400,
-                                          Colors.blue.shade200,
-                                          Colors.blue.shade100,
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(2),
-                                    ),
-                                  ),
-                                ),
-
-                                // SON: MAVİ GRADYAN ÇİZGİ BÖLÜMÜ
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: List.generate(
-                                      rightFruits[currentPage].length,
-                                      (index) => GestureDetector(
-                                        onTap: () => _handleRightTap(index),
-                                        child: AnimatedContainer(
-                                          duration:
-                                              showFeedback
-                                                  ? Duration.zero
-                                                  : const Duration(
-                                                    milliseconds: 300,
-                                                  ),
-                                          curve: Curves.easeInOut,
-                                          width: 120,
-                                          height: 120,
-                                          margin: const EdgeInsets.symmetric(
-                                            vertical: 8,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                matchedRight[currentPage][index]
-                                                    ? Colors.green.shade400
-                                                    : (showFeedback
-                                                        ? ((selectedRightIndex ==
-                                                                    index &&
-                                                                !isCorrect)
-                                                            ? Colors
-                                                                .red
-                                                                .shade400
-                                                            : Colors.white)
-                                                        : (selectedRightIndex ==
-                                                                index
-                                                            ? Colors
-                                                                .blue
-                                                                .shade200
-                                                            : Colors.white)),
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.2,
-                                                ),
-                                                blurRadius: 6,
-                                                offset: const Offset(0, 3),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              rightFruits[currentPage][index],
-                                              style: const TextStyle(
-                                                fontSize: 48,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                Container(
-                  height: 80,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? (isEnglish
-                                            ? 'Well done! 🎉'
-                                            : 'Aferin! 🎉')
-                                        : (isEnglish
-                                            ? 'Try again! 😔'
-                                            : 'Tekrar dene! 😔'),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color:
-                                          isCorrect ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                          : const SizedBox.shrink(),
-                ),
-                const SizedBox(height: 10),
-              ],
+              ),
             ),
-          ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const MatchingQuestionsScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );

@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,6 +19,8 @@ class MatchingQuestionsScreen extends StatefulWidget {
 class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
     with TickerProviderStateMixin {
   int completedLevel = 0;
+  // Her level için yıldız sayıları
+  Map<int, int> levelStars = {};
   late AnimationController _starController1;
   late AnimationController _starController2;
   late AnimationController _starController3;
@@ -60,6 +61,11 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
       if (prefs.getBool('asama3_completed') ?? false) completed = 3;
       if (prefs.getBool('asama4_completed') ?? false) completed = 4;
       completedLevel = completed;
+
+      // Her level için yıldız sayılarını yükle
+      for (int i = 1; i <= 4; i++) {
+        levelStars[i] = prefs.getInt('matching_stage_${i}_stars') ?? 0;
+      }
     });
 
     // Tamamlanan leveller için yıldız animasyonunu başlat
@@ -218,7 +224,7 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                 ),
               ),
 
-              // Sevimli geri butonu - Uzay Teması (Yıldız/Roket)
+              // Geri butonu - Diğer menülerle aynı stil
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -240,37 +246,30 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                           end: Alignment.bottomRight,
                           colors: [Color(0xFF6C63FF), Color(0xFF5A52D5)],
                         ),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.yellow.withOpacity(0.4),
-                          width: 2,
-                        ),
+                        borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF64BDD2).withOpacity(0.5),
+                            color: const Color(0xFF6C63FF).withOpacity(0.5),
                             blurRadius: 20,
                             spreadRadius: 2,
                             offset: const Offset(0, 6),
-                          ),
-                          // Yıldız parlama efekti
-                          BoxShadow(
-                            color: Colors.yellow.withOpacity(0.3),
-                            blurRadius: 15,
-                            spreadRadius: 1,
                           ),
                         ],
                       ),
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          // Yıldız parlaması
+                          // Parlama efekti
                           Positioned(
-                            top: 8,
-                            right: 8,
-                            child: Icon(
-                              Icons.star,
-                              color: Colors.yellow.withOpacity(0.6),
-                              size: 12,
+                            top: 10,
+                            left: 12,
+                            child: Container(
+                              width: 15,
+                              height: 15,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.4),
+                                shape: BoxShape.circle,
+                              ),
                             ),
                           ),
                           const Icon(
@@ -318,6 +317,7 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // 1. Yıldız
                   ScaleTransition(
                     scale: CurvedAnimation(
                       parent: _starController1,
@@ -325,17 +325,20 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                     ),
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 3),
-                      child: const Icon(
+                      child: Icon(
                         Icons.star_rounded,
-                        color: Colors.amber,
+                        color: (levelStars[level] ?? 0) >= 1 ? Colors.amber : Colors.grey.shade400,
                         size: 22,
-                        shadows: [
-                          Shadow(color: Colors.orange, blurRadius: 6),
-                          Shadow(color: Colors.amber, blurRadius: 12),
-                        ],
+                        shadows: (levelStars[level] ?? 0) >= 1
+                            ? const [
+                                Shadow(color: Colors.orange, blurRadius: 6),
+                                Shadow(color: Colors.amber, blurRadius: 12),
+                              ]
+                            : null,
                       ),
                     ),
                   ),
+                  // 2. Yıldız
                   ScaleTransition(
                     scale: CurvedAnimation(
                       parent: _starController2,
@@ -343,17 +346,20 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                     ),
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 3),
-                      child: const Icon(
+                      child: Icon(
                         Icons.star_rounded,
-                        color: Colors.amber,
+                        color: (levelStars[level] ?? 0) >= 2 ? Colors.amber : Colors.grey.shade400,
                         size: 22,
-                        shadows: [
-                          Shadow(color: Colors.orange, blurRadius: 6),
-                          Shadow(color: Colors.amber, blurRadius: 12),
-                        ],
+                        shadows: (levelStars[level] ?? 0) >= 2
+                            ? const [
+                                Shadow(color: Colors.orange, blurRadius: 6),
+                                Shadow(color: Colors.amber, blurRadius: 12),
+                              ]
+                            : null,
                       ),
                     ),
                   ),
+                  // 3. Yıldız
                   ScaleTransition(
                     scale: CurvedAnimation(
                       parent: _starController3,
@@ -361,14 +367,16 @@ class _MatchingQuestionsScreenState extends State<MatchingQuestionsScreen>
                     ),
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 3),
-                      child: const Icon(
+                      child: Icon(
                         Icons.star_rounded,
-                        color: Colors.amber,
+                        color: (levelStars[level] ?? 0) >= 3 ? Colors.amber : Colors.grey.shade400,
                         size: 22,
-                        shadows: [
-                          Shadow(color: Colors.orange, blurRadius: 6),
-                          Shadow(color: Colors.amber, blurRadius: 12),
-                        ],
+                        shadows: (levelStars[level] ?? 0) >= 3
+                            ? const [
+                                Shadow(color: Colors.orange, blurRadius: 6),
+                                Shadow(color: Colors.amber, blurRadius: 12),
+                              ]
+                            : null,
                       ),
                     ),
                   ),

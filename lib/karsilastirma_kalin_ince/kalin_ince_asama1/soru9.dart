@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/karsilastirma_sorulari_screen.dart';
+import '../../widgets/in_game_menu.dart';
+import '../../../screens/home_screen.dart';
 
 class KalinInceSoru9 extends StatefulWidget {
   const KalinInceSoru9({super.key});
@@ -16,6 +18,7 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
   bool? selectedAnswer;
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -56,14 +59,17 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
   Future<int> _calculateStars() async {
     final prefs = await SharedPreferences.getInstance();
     int wrongCount = prefs.getInt('kalin_ince_asama1_wrong_count') ?? 0;
-
-    if (wrongCount >= 0 && wrongCount <= 3) {
-      return 3;
-    } else if (wrongCount >= 4 && wrongCount <= 6) {
-      return 2;
+    const int totalQuestions = 9;
+    
+    // Başarı oranına göre yıldız hesapla
+    double successRate = (totalQuestions - wrongCount) / totalQuestions;
+    
+    if (successRate >= 0.75) {
+      return 3; // %75-100 başarı → 3 yıldız
+    } else if (successRate >= 0.50) {
+      return 2; // %50-75 başarı → 2 yıldız
     } else {
-      // 7-9 yanlış
-      return 1;
+      return 1; // %0-50 başarı → 1 yıldız (minimum)
     }
   }
 
@@ -94,6 +100,14 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
       Future.delayed(const Duration(seconds: 2), () async {
         if (mounted) {
           int stars = await _calculateStars();
+          // Yıldızları kaydet (roadmap için) - sadece öncekinden daha iyiyse güncelle
+          final prefs2 = await SharedPreferences.getInstance();
+          int previousStars = prefs2.getInt('comparison_stage_3_stars') ?? 0;
+          if (stars > previousStars) {
+            await prefs2.setInt('comparison_stage_3_stars', stars);
+          } else {
+            stars = previousStars; // Önceki yıldız sayısını kullan
+          }
           _showCompletionDialog(stars);
         }
       });
@@ -122,7 +136,9 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -139,28 +155,6 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
             child: Column(
               children: [
                 // Üst kısım - Geri butonu ve Aşama yazısı
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const KarsilastirmaSorulariScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                  ],
-                ),
                 // Main Content - Ekranı yukarı alıyoruz
                 Expanded(
                   child: SlideTransition(
@@ -409,6 +403,29 @@ class _KalinInceSoru9State extends State<KalinInceSoru9>
               ],
             ),
           ),
+            ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const KarsilastirmaSorulariScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const HomeScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );

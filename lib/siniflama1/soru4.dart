@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import 'soru5.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
+import '../../screens/home_screen.dart';
+import '../../widgets/in_game_menu.dart';
 
 class YiyecekIcecekSinifla extends StatefulWidget {
   const YiyecekIcecekSinifla({super.key});
@@ -25,6 +27,7 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
   final List<Map<String, dynamic>> drinkGroup = [];
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
 
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -253,10 +256,10 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final iconSize = MediaQuery.of(context).size.width * 0.065;
 
-    return PopScope(
-      canPop: false,
-      child: Scaffold(
-        body: Container(
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -272,28 +275,6 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
           child: SafeArea(
             child: Column(
               children: [
-                // Başlık kaldırıldı, sadece geri tuşu kaldı.
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        // Ana ekrana dönme
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder: (context) => const ClassificationQuestionsScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                  ],
-                ),
                 const SizedBox(height: 10),
                 Expanded(
                   child: SlideTransition(
@@ -334,7 +315,8 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                           const SizedBox(height: 15),
                           Expanded(
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Expanded(
@@ -439,7 +421,9 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
                                     style: TextStyle(
                                       fontSize: 18,
                                       color:
-                                          isCorrect ? Colors.green : Colors.red,
+                                            isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -453,6 +437,26 @@ class _YiyecekIcecekSiniflaState extends State<YiyecekIcecekSinifla>
             ),
           ),
         ),
+          InGameMenu(
+            isSoundOn: _isSoundOn,
+            onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+            onHome: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const ClassificationQuestionsScreen(),
+                ),
+                (route) => false,
+              );
+            },
+            onEntryScreen: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+            iconSize: iconSize,
+          ),
+        ],
       ),
     );
   }

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'soru3.dart';
 import '../screens/matching_questions_screen.dart';
+import '../screens/home_screen.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
+import '../widgets/in_game_menu.dart';
 
 class HarfHayvanEsle extends StatefulWidget {
   const HarfHayvanEsle({super.key});
@@ -21,6 +25,7 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
   List<bool> matchedRight = [false, false, false];
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -219,10 +224,12 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
     final screenSize = MediaQuery.of(context).size;
     final iconSize = screenSize.width * 0.065;
 
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        body: Container(
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    
+    return Scaffold(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -238,27 +245,6 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
           child: SafeArea(
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) => const MatchingQuestionsScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                  ],
-                ),
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
@@ -406,6 +392,26 @@ class _HarfHayvanEsleState extends State<HarfHayvanEsle>
             ),
           ),
         ),
+          InGameMenu(
+                isSoundOn: _isSoundOn,
+                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+                onHome: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const MatchingQuestionsScreen(),
+                    ),
+                    (route) => false,
+                  );
+                },
+                onEntryScreen: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+                  );
+                },
+            iconSize: iconSize,
+              ),
+          ],
       ),
     );
   }

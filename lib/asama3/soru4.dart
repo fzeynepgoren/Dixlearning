@@ -3,8 +3,10 @@ import 'dart:async';
 import '../utils/activity_tracker.dart';
 import 'soru5.dart';
 import '../screens/matching_questions_screen.dart';
+import '../screens/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import '../widgets/in_game_menu.dart';
 
 class YapiNesneEsle extends StatefulWidget {
   const YapiNesneEsle({super.key});
@@ -28,6 +30,7 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
   List<bool> matchedLeft = [false, false, false];
   List<bool> matchedRight = [false, false, false];
   bool showFeedback = false;
+  bool _isSoundOn = true;
   bool isCorrect = false;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -177,225 +180,226 @@ class _YapiNesneEsleState extends State<YapiNesneEsle>
     final screenSize = MediaQuery.of(context).size;
     final iconSize = screenSize.width * 0.065;
 
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.blue.shade200,
-                Colors.blue.shade200,
-                const Color(0xffffffff),
-              ],
-              stops: const [0.0, 0.5, 1.0],
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.blue.shade200,
+                  Colors.blue.shade200,
+                  const Color(0xffffffff),
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
             ),
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) => const MatchingQuestionsScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Container(
-                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 1,
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: Container(
+                        margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
                             ),
-                            child: Text(
-                              isEnglish
-                                  ? 'Match the structures with their appropriate objects.'
-                                  : 'Resimdeki yapıları uygun nesne ile eşleştir.',
-                              style: const TextStyle(
-                                fontSize: 23,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: List.generate(
-                                      leftBuildings.length,
-                                      (index) => _buildCard(
-                                        index: index,
-                                        isLeft: true,
-                                        text: leftBuildings[index],
-                                        style: const TextStyle(
-                                          fontSize: 42,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  width: 4,
-                                  height: 425,
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.blue.shade400,
-                                        Colors.blue.shade200,
-                                        Colors.blue.shade100,
-                                      ],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                    ),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                ),
-
-                                Expanded(
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: List.generate(
-                                      shuffledItems.length,
-                                      (index) => _buildCard(
-                                        index: index,
-                                        isLeft: false,
-                                        text: shuffledItems[index],
-                                        style: TextStyle(
-                                          fontSize:
-                                              isEnglish &&
-                                                      shuffledItems[index]
-                                                              .length >
-                                                          10
-                                                  ? 14
-                                                  : 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                // Alt bildirim alanı
-                Container(
-                  height: 80,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child:
-                      showFeedback
-                          ? ScaleTransition(
-                            scale: CurvedAnimation(
-                              parent: _feedbackController,
-                              curve: Curves.elasticOut,
-                            ),
-                            child: Container(
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
                               padding: const EdgeInsets.symmetric(
-                                vertical: 10,
                                 horizontal: 20,
+                                vertical: 1,
                               ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
+                              child: Text(
+                                isEnglish
+                                    ? 'Match the structures with their appropriate objects.'
+                                    : 'Resimdeki yapıları uygun nesne ile eşleştir.',
+                                style: const TextStyle(
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: List.generate(
+                                        leftBuildings.length,
+                                        (index) => _buildCard(
+                                          index: index,
+                                          isLeft: true,
+                                          text: leftBuildings[index],
+                                          style: const TextStyle(
+                                            fontSize: 42,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 4,
+                                    height: 425,
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Colors.blue.shade400,
+                                          Colors.blue.shade200,
+                                          Colors.blue.shade100,
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: List.generate(
+                                        shuffledItems.length,
+                                        (index) => _buildCard(
+                                          index: index,
+                                          isLeft: false,
+                                          text: shuffledItems[index],
+                                          style: TextStyle(
+                                            fontSize:
+                                                isEnglish &&
+                                                        shuffledItems[index]
+                                                                .length >
+                                                            10
+                                                    ? 14
+                                                    : 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isCorrect
-                                        ? Icons.check_circle
-                                        : Icons.cancel,
-                                    color:
-                                        isCorrect ? Colors.green : Colors.red,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    isCorrect
-                                        ? (isEnglish
-                                            ? 'Well done! 🎉'
-                                            : 'Aferin! 🎉')
-                                        : (isEnglish
-                                            ? 'Try again! 😔'
-                                            : 'Tekrar dene! 😔'),
-                                    style: TextStyle(
-                                      fontSize: 18,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Alt bildirim alanı
+                  Container(
+                    height: 80,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    child:
+                        showFeedback
+                            ? ScaleTransition(
+                              scale: CurvedAnimation(
+                                parent: _feedbackController,
+                                curve: Curves.elasticOut,
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 20,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      isCorrect
+                                          ? Icons.check_circle
+                                          : Icons.cancel,
                                       color:
                                           isCorrect ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
+                                      size: 28,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      isCorrect
+                                          ? (isEnglish
+                                              ? 'Well done! 🎉'
+                                              : 'Aferin! 🎉')
+                                          : (isEnglish
+                                              ? 'Try again! 😔'
+                                              : 'Tekrar dene! 😔'),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color:
+                                            isCorrect
+                                                ? Colors.green
+                                                : Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          )
-                          : const SizedBox.shrink(),
-                ),
-              ],
+                            )
+                            : const SizedBox.shrink(),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
+          InGameMenu(
+            isSoundOn: _isSoundOn,
+            onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+            onHome: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const MatchingQuestionsScreen(),
+                ),
+                (route) => false,
+              );
+            },
+            onEntryScreen: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
+            },
+            iconSize: iconSize,
+          ),
+        ],
       ),
     );
   }

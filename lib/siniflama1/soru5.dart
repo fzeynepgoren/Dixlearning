@@ -79,14 +79,19 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
   Future<int> _calculateStars() async {
     final prefs = await SharedPreferences.getInstance();
     int wrongCount = prefs.getInt('siniflama1_wrong_count') ?? 0;
-
-    if (wrongCount >= 0 && wrongCount <= 4) {
-      return 3;
-    } else if (wrongCount >= 5 && wrongCount <= 8) {
-      return 2;
+    const int totalItems = 4; // Toplam item sayısı
+    
+    // Başarı oranına göre yıldız hesapla
+    // Not: Doğru cevap sayısı = totalItems (tüm itemler doğru yerleştirilmeli)
+    // Başarı oranı = totalItems / (totalItems + wrongCount)
+    double successRate = totalItems / (totalItems + wrongCount);
+    
+    if (successRate >= 0.75) {
+      return 3; // %75-100 başarı → 3 yıldız
+    } else if (successRate >= 0.50) {
+      return 2; // %50-75 başarı → 2 yıldız
     } else {
-      // 9 ve üzeri
-      return 1;
+      return 1; // %0-50 başarı → 1 yıldız (minimum)
     }
   }
 
@@ -109,6 +114,15 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
         int stars = await _calculateStars();
         int wrongCount = prefs2.getInt('siniflama1_wrong_count') ?? 0;
         await prefs2.setInt('siniflama1_final_wrong_count', wrongCount);
+        
+        // Yıldızları kaydet (roadmap için) - sadece öncekinden daha iyiyse güncelle
+        int previousStars = prefs2.getInt('classification_stage_1_stars') ?? 0;
+        if (stars > previousStars) {
+          await prefs2.setInt('classification_stage_1_stars', stars);
+        } else {
+          stars = previousStars; // Önceki yıldız sayısını kullan
+        }
+        
         await prefs2.setInt('siniflama1_wrong_count', 0); // Reset for next playthrough
 
         if (mounted) {
@@ -118,7 +132,15 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
         // Hata durumunda sessizce devam et veya logla
         if (mounted) {
           // Hata olsa bile popup'ı göster
+          final prefs3 = await SharedPreferences.getInstance();
           int stars = await _calculateStars();
+          // Yıldızları kaydet (roadmap için) - sadece öncekinden daha iyiyse güncelle
+          int previousStars = prefs3.getInt('classification_stage_1_stars') ?? 0;
+          if (stars > previousStars) {
+            await prefs3.setInt('classification_stage_1_stars', stars);
+          } else {
+            stars = previousStars; // Önceki yıldız sayısını kullan
+          }
           _showCompletionDialog(stars);
         }
       }
@@ -407,29 +429,6 @@ class _HayvanBacakSiniflaState extends State<HayvanBacakSinifla>
             child: Column(
               children: [
                 // Başlık kaldırıldı, sadece geri tuşu kaldı.
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        // Ana ekrana dönme
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const ClassificationQuestionsScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                  ],
-                ),
                 const SizedBox(height: 10),
                 Expanded(
                   child: SlideTransition(

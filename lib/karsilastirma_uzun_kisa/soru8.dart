@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/karsilastirma_sorulari_screen.dart';
 import 'soru9.dart';
+import '../screens/home_screen.dart';
+import '../widgets/in_game_menu.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 
 class UzunKisaPalmiyeSupurgeSorusu extends StatefulWidget {
   const UzunKisaPalmiyeSupurgeSorusu({super.key});
@@ -17,6 +21,7 @@ class _UzunKisaPalmiyeSupurgeSorusuState
   int? selectedIndex;
   bool? isCorrect;
   bool showFeedback = false;
+  bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -93,10 +98,14 @@ class _UzunKisaPalmiyeSupurgeSorusuState
     const double buttonHeight = 50;
     final double buttonWidth = screenWidth * 0.28;
 
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -112,30 +121,6 @@ class _UzunKisaPalmiyeSupurgeSorusuState
           child: SafeArea(
             child: Column(
               children: [
-                // Üst kısım - Sadece geri butonu mavi arka planda
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const KarsilastirmaSorulariScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                    SizedBox(width: iconSize),
-                  ],
-                ),
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
@@ -342,6 +327,29 @@ class _UzunKisaPalmiyeSupurgeSorusuState
               ],
             ),
           ),
+            ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const KarsilastirmaSorulariScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const HomeScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );
