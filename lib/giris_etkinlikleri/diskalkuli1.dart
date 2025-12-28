@@ -217,173 +217,107 @@ class _Diskalkuli1State extends State<Diskalkuli1>
                           ),
                         ],
                       ),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 500),
-                        transitionBuilder: (
-                          Widget child,
-                          Animation<double> animation,
-                        ) {
-                          return FadeTransition(
-                            opacity: animation,
-                            child: SlideTransition(
-                              position: Tween<Offset>(
-                                begin: const Offset(1, 0),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            ),
-                          );
-                        },
-                        child: Column(
-                          key: ValueKey<int>(currentIndex),
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
+                      child: SingleChildScrollView(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 500),
+                          transitionBuilder: (
+                            Widget child,
+                            Animation<double> animation,
+                          ) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(1, 0),
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: child,
                               ),
-                              child: Text(
-                                isEnglish
-                                    ? 'Count the objects!'
-                                    : 'Nesneleri say ve kutulara yaz!',
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            _buildEmojiGroup(
-                              current[0],
-                              0,
-                              current[0].length,
-                              isEnglish,
-                            ),
-                            const SizedBox(height: 24),
-                            _buildEmojiGroup(
-                              current[1],
-                              1,
-                              current[1].length,
-                              isEnglish,
-                            ),
-                            const SizedBox(height: 36),
-                            // Kontrol Et butonu
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.blue.shade400,
-                                    Colors.blue.shade600,
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                              child: ElevatedButton(
-                                onPressed: showFeedback ? null : checkAnswers,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  shadowColor: Colors.transparent,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 40,
-                                    vertical: 18,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(24),
-                                  ),
+                            );
+                          },
+                          child: Column(
+                            key: ValueKey<int>(currentIndex),
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
                                 ),
                                 child: Text(
-                                  isEnglish ? 'Check' : 'Kontrol Et',
+                                  isEnglish
+                                      ? 'Count the objects!'
+                                      : 'Nesneleri say ve kutulara yaz!',
                                   style: const TextStyle(
-                                    fontSize: 24,
-                                    color: Colors.black,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              _buildEmojiGroup(
+                                current[0],
+                                0,
+                                current[0].length,
+                                isEnglish,
+                              ),
+                              const SizedBox(height: 20),
+                              _buildEmojiGroup(
+                                current[1],
+                                1,
+                                current[1].length,
+                                isEnglish,
+                              ),
+                              const SizedBox(height: 24),
+                              // Kontrol Et butonu
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.blue.shade400,
+                                      Colors.blue.shade600,
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: showFeedback ? null : checkAnswers,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 40,
+                                      vertical: 18,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    isEnglish ? 'Check' : 'Kontrol Et',
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 10),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-                // Alt feedback strip - her iki cevap da doğruysa veya her ikisi de yanlışsa göster
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 300),
-                    opacity:
-                        (showFeedback &&
-                                ((isCorrect[0] == true &&
-                                        isCorrect[1] == true) ||
-                                    (isCorrect[0] == false &&
-                                        isCorrect[1] == false)))
-                            ? 1.0
-                            : 0.0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            (isCorrect[0] == true && isCorrect[1] == true)
-                                ? Icons.check_circle
-                                : Icons.cancel,
-                            color:
-                                (isCorrect[0] == true && isCorrect[1] == true)
-                                    ? Colors.green
-                                    : Colors.red,
-                            size: 24,
-                          ),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              (isCorrect[0] == true && isCorrect[1] == true)
-                                  ? (isEnglish ? 'Well done! 🎉' : 'Aferin! 🎉')
-                                  : (isEnglish
-                                      ? "Here's the right one! 🧐"
-                                      : 'İşte doğrusu! 🧐'),
-                              style: TextStyle(
-                                fontSize: 16,
-                                color:
-                                    (isCorrect[0] == true &&
-                                            isCorrect[1] == true)
-                                        ? Colors.green
-                                        : Colors.red,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                // Alt feedback strip
                 Container(
-                  height: 80,
+                  constraints: const BoxConstraints(maxHeight: 80),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
-                    vertical: 10,
+                    vertical: 8,
                   ),
                   child:
                       showFeedback
@@ -424,23 +358,26 @@ class _Diskalkuli1State extends State<Diskalkuli1>
                                     size: 28,
                                   ),
                                   const SizedBox(width: 10),
-                                  Text(
-                                    (isCorrect[0] == true &&
-                                            isCorrect[1] == true)
-                                        ? (isEnglish
-                                            ? 'Well done! 🎉'
-                                            : 'Aferin! 🎉')
-                                        : (isEnglish
-                                            ? "Try again! 😔"
-                                            : "Tekrar dene! 😔"),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color:
-                                          (isCorrect[0] == true &&
-                                                  isCorrect[1] == true)
-                                              ? Colors.green
-                                              : Colors.red,
-                                      fontWeight: FontWeight.bold,
+                                  Flexible(
+                                    child: Text(
+                                      (isCorrect[0] == true &&
+                                              isCorrect[1] == true)
+                                          ? (isEnglish
+                                              ? 'Well done! 🎉'
+                                              : 'Aferin! 🎉')
+                                          : (isEnglish
+                                              ? "Try again! 😔"
+                                              : "Tekrar dene! 😔"),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color:
+                                            (isCorrect[0] == true &&
+                                                    isCorrect[1] == true)
+                                                ? Colors.green
+                                                : Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
                                   ),
                                 ],

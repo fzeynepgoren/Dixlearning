@@ -33,6 +33,7 @@ flutter:
   assets:
     - assets/giris/disgrafi1/ses1.mp3
     - assets/giris/disgrafi1/ses2.mp3
+    - assets/golgeoyunu/
     - assets/asama3/
     - assets/asama3/soru1/block_tower.png
     - assets/asama3/soru1/finger_painting.png

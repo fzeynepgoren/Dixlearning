@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/activity_tracker.dart';
 import 'package:flutter/services.dart';
 import 'dart:math';
-import 'disgrafi1.dart';
+import 'diskalkuli4.dart';
 import '../screens/home_screen.dart';
 
 class Diskalkuli3 extends StatefulWidget {
@@ -98,7 +98,7 @@ class _Diskalkuli3State extends State<Diskalkuli3>
         ActivityTracker.completeActivity();
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const Disgrafi1()),
+          MaterialPageRoute(builder: (context) => const Diskalkuli4()),
         );
       }
     }
