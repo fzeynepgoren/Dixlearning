@@ -6,8 +6,6 @@ import '../providers/language_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/user_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter_switch/flutter_switch.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -18,12 +16,24 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool _notificationsEnabled = true;
-  bool _notificationsExpanded = false;
-  bool _languageExpanded = false;
-  bool _themeExpanded = false;
-  bool _privacyExpanded = false;
-  bool _logoutExpanded = false;
+  double? _disleksiPercentage;
+  double? _disgrafiPercentage;
+  double? _diskalkuliPercentage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEntryStatistics();
+  }
+
+  Future<void> _loadEntryStatistics() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _disleksiPercentage = prefs.getDouble('disleksi_first_percentage');
+      _disgrafiPercentage = prefs.getDouble('disgrafi_first_percentage');
+      _diskalkuliPercentage = prefs.getDouble('diskalkuli_first_percentage');
+    });
+  }
 
   Widget _buildSimpleStatCard({
     required IconData icon,
@@ -54,13 +64,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 20 * scaleFactor, color: mainColor),
-          SizedBox(width: 8 * scaleFactor),
+          Icon(icon, size: 20, color: mainColor),
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   title,
@@ -80,6 +92,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     fontWeight: FontWeight.bold,
                     color: mainColor,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -425,156 +439,97 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Verileri her build'de yeniden yükle (sayfa her açıldığında güncel verileri göster)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadEntryStatistics();
+    });
+
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final themeProvider = Provider.of<ThemeProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     const Color mainColor = Color(0xFFB3E5FC); // Açık gök mavisi
     const Color accentColor = Color(0xFF81D4FA); // Daha koyu açık mavi
-    final Color cardBg = Theme.of(context).cardColor;
-    final Color cardText = Theme.of(context).textTheme.bodyLarge!.color!;
-    final Color cardSubText =
-        Theme.of(context).brightness == Brightness.dark
-            ? Colors.white70
-            : Colors.grey[600]!;
-    final Color cardShadow = mainColor.withOpacity(
-      Theme.of(context).brightness == Brightness.dark ? 0.25 : 0.10,
-    );
-
-    // Ekran boyutuna göre ölçeklendirme (6.6 inç ekran referans: ~800 dp yükseklik)
-    final screenHeight = MediaQuery.of(context).size.height;
-    final refHeight = 800.0; // 6.6 inç ekran referans yüksekliği
-    final scaleFactor = screenHeight / refHeight;
-
-    // Dinamik boyutlar
-    final double cardPadding = 18 * scaleFactor;
-    final double horizontalPadding = 20 * scaleFactor;
-    final double cardSpacing = 16 * scaleFactor;
-    final double borderRadius = 20 * scaleFactor;
-    final double borderRadiusLarge = 22 * scaleFactor;
-    final double titleFontSize = 17 * scaleFactor;
-    final double subtitleFontSize = 12.5 * scaleFactor;
-    final double iconSize = 26 * scaleFactor;
-    final double avatarSize = 80 * scaleFactor;
-    final double avatarFontSize = 36 * scaleFactor;
-    final double homeButtonSize = 50 * scaleFactor;
-    final double homeIconSize = 28 * scaleFactor;
-    final double blurRadius = 12 * scaleFactor;
-    final double shadowOffset = 4 * scaleFactor;
-    final double smallSpacing = 12 * scaleFactor;
-    final double mediumSpacing = 16 * scaleFactor;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Stack(
-        children: [
-          // Arka plan görseli
-          Positioned.fill(
-            child: Image.asset(
-              'assets/screensphoto/profil_arkaplan.png',
-              fit: BoxFit.cover,
-              alignment: Alignment.center,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                );
-              },
-            ),
-          ),
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(
-                  height:
-                      MediaQuery.of(context).padding.top + (20 * scaleFactor),
-                ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
 
-                // Profile Summary Card
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: Container(
-                    padding: EdgeInsets.all(cardPadding),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(borderRadius),
-                      border: Border.all(
-                        color:
-                            isDark
-                                ? const Color(0xFF333333)
-                                : Colors.grey[200]!,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: mainColor.withOpacity(isDark ? 0.22 : 0.12),
-                          blurRadius: blurRadius,
-                          offset: Offset(0, shadowOffset),
-                        ),
-                      ],
+              // Profile Summary Card
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color:
+                          isDark ? const Color(0xFF333333) : Colors.grey[200]!,
                     ),
-                    child: Row(
-                      children: [
-                        // Large Avatar
-                        GestureDetector(
-                          onTap:
-                              () => _showEditProfileModal(context, isEnglish),
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: avatarSize,
-                                height: avatarSize,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    colors:
-                                        isDark
-                                            ? [
-                                              const Color(0xFF4A90E2),
-                                              const Color(0xFF357ABD),
-                                            ]
-                                            : [
-                                              const Color(0xFF4A90E2),
-                                              const Color(0xFF357ABD),
-                                            ],
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(
-                                        0xFF4A90E2,
-                                      ).withOpacity(0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
+                    boxShadow: [
+                      BoxShadow(
+                        color: mainColor.withOpacity(isDark ? 0.25 : 0.10),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      // Large Avatar
+                      GestureDetector(
+                        onTap: () => _showEditProfileModal(context, isEnglish),
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors:
+                                      isDark
+                                          ? [
+                                            const Color(0xFF4A90E2),
+                                            const Color(0xFF357ABD),
+                                          ]
+                                          : [
+                                            const Color(0xFF4A90E2),
+                                            const Color(0xFF357ABD),
+                                          ],
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    userProvider.avatar,
-                                    style: TextStyle(fontSize: avatarFontSize),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFF4A90E2,
+                                    ).withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
                                   ),
                                 ),
                               ),
-                              // Edit Icon
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  width: 24 * scaleFactor,
-                                  height: 24 * scaleFactor,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        isDark
-                                            ? const Color(0xFF4A90E2)
-                                            : Colors.orange,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: Icon(
-                                    Icons.edit,
-                                    size: 12 * scaleFactor,
+                            ),
+                            // Edit Icon
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  color:
+                                      isDark
+                                          ? const Color(0xFF4A90E2)
+                                          : Colors.orange,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
                                     color: Colors.white,
+                                    width: 2,
                                   ),
                                 ),
                               ),
@@ -818,14 +773,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SizedBox(height: 8 * scaleFactor),
                         Row(
                           children: [
-                            Expanded(
-                              child: _buildSimpleStatCard(
-                                icon: Icons.trending_up,
-                                title: '',
-                                value: '-',
-                                isDark: isDark,
-                                mainColor: mainColor,
-                                scaleFactor: scaleFactor,
+                            Text(
+                              userProvider.fullName,
+                              style: GoogleFonts.quicksand(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).textTheme.bodyLarge!.color!,
                               ),
                             ),
                             SizedBox(width: 8 * scaleFactor),
@@ -920,128 +876,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Switch(
-                                  value: _notificationsEnabled,
-                                  activeColor: accentColor,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _notificationsEnabled = value;
-                                    });
-                                  },
+                                Icon(
+                                  Icons.calendar_today,
+                                  size: 16,
+                                  color:
+                                      isDark
+                                          ? Colors.white70
+                                          : Colors.grey[600],
                                 ),
-                              ],
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: cardSpacing),
-
-                // DİL DEĞİŞİMİ
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _languageExpanded = !_languageExpanded;
-                      });
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      padding: EdgeInsets.all(cardPadding),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(borderRadiusLarge),
-                        color: cardBg,
-                        boxShadow: [
-                          BoxShadow(
-                            color: cardShadow,
-                            blurRadius: blurRadius,
-                            offset: Offset(0, shadowOffset),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                FluentIcons.globe_24_regular,
-                                color: Colors.teal,
-                                size: iconSize,
-                              ),
-                              SizedBox(width: smallSpacing),
-                              Expanded(
-                                child: Text(
-                                  isEnglish ? 'Language' : 'Dil',
-                                  style: TextStyle(
-                                    fontSize: titleFontSize,
-                                    fontWeight: FontWeight.bold,
-                                    color: cardText,
-                                  ),
-                                ),
-                              ),
-                              Icon(
-                                _languageExpanded
-                                    ? Icons.expand_less
-                                    : Icons.expand_more,
-                                color: cardText,
-                                size: iconSize * 0.9,
-                              ),
-                            ],
-                          ),
-                          if (_languageExpanded) ...[
-                            SizedBox(height: smallSpacing),
-                            Padding(
-                              padding: EdgeInsets.only(left: 38 * scaleFactor),
-                              child: Text(
-                                isEnglish
-                                    ? 'Switch app language'
-                                    : 'Uygulama dilini değiştir',
-                                style: GoogleFonts.poppins(
-                                  fontSize: subtitleFontSize,
-                                  color: cardSubText,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: mediumSpacing),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.3),
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: FlutterSwitch(
-                                    width: 110.0 * scaleFactor,
-                                    height: 38.0 * scaleFactor,
-                                    valueFontSize: 14.0 * scaleFactor,
-                                    toggleSize: 28.0 * scaleFactor,
-                                    value: isEnglish,
-                                    borderRadius: 20.0 * scaleFactor,
-                                    padding: 4.0 * scaleFactor,
-                                    activeColor: mainColor,
-                                    inactiveColor: accentColor,
-                                    activeText: 'English',
-                                    inactiveText: 'Türkçe',
-                                    activeTextFontWeight: FontWeight.w700,
-                                    inactiveTextFontWeight: FontWeight.w700,
-                                    showOnOff: true,
-                                    onToggle: (val) async {
-                                      await Provider.of<LanguageProvider>(
-                                        context,
-                                        listen: false,
-                                      ).setLanguage(val);
-                                    },
+                                const SizedBox(width: 6),
+                                Text(
+                                  '10/2025',
+                                  style: GoogleFonts.quicksand(
+                                    fontSize: 14,
+                                    color:
+                                        isDark
+                                            ? Colors.white70
+                                            : Colors.grey[600],
                                   ),
                                 ),
                               ],
@@ -1052,151 +903,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
+              ),
 
-                SizedBox(height: cardSpacing),
+              const SizedBox(height: 20),
 
-                // TEMA
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _themeExpanded = !_themeExpanded;
-                      });
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      padding: EdgeInsets.all(cardPadding),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(borderRadiusLarge),
-                        color: cardBg,
-                        boxShadow: [
-                          BoxShadow(
-                            color: cardShadow,
-                            blurRadius: blurRadius,
-                            offset: Offset(0, shadowOffset),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                FluentIcons.weather_sunny_24_regular,
-                                color: Colors.amber[700],
-                                size: iconSize,
-                              ),
-                              SizedBox(width: smallSpacing),
-                              Expanded(
-                                child: Text(
-                                  isEnglish ? 'Theme' : 'Tema',
-                                  style: TextStyle(
-                                    fontSize: titleFontSize,
-                                    fontWeight: FontWeight.bold,
-                                    color: cardText,
-                                  ),
-                                ),
-                              ),
-                              Icon(
-                                _themeExpanded
-                                    ? Icons.expand_less
-                                    : Icons.expand_more,
-                                color: cardText,
-                                size: iconSize * 0.9,
-                              ),
-                            ],
-                          ),
-                          if (_themeExpanded) ...[
-                            SizedBox(height: smallSpacing),
-                            Padding(
-                              padding: EdgeInsets.only(left: 38 * scaleFactor),
-                              child: Text(
-                                isEnglish
-                                    ? 'Switch between light and dark mode'
-                                    : 'Açık ve koyu mod arasında geçiş yap',
-                                style: GoogleFonts.poppins(
-                                  fontSize: subtitleFontSize,
-                                  color: cardSubText,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: mediumSpacing),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                      20 * scaleFactor,
-                                    ),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.3),
-                                      width: 2 * scaleFactor,
-                                    ),
-                                  ),
-                                  child: FlutterSwitch(
-                                    width: 110.0 * scaleFactor,
-                                    height: 38.0 * scaleFactor,
-                                    valueFontSize: 14.0 * scaleFactor,
-                                    toggleSize: 28.0 * scaleFactor,
-                                    value: themeProvider.isDark,
-                                    borderRadius: 20.0,
-                                    padding: 4.0,
-                                    activeColor: mainColor,
-                                    inactiveColor: accentColor,
-                                    activeText: isEnglish ? 'Dark' : 'Koyu',
-                                    inactiveText: isEnglish ? 'Light' : 'Açık',
-                                    activeTextFontWeight: FontWeight.w700,
-                                    inactiveTextFontWeight: FontWeight.w700,
-                                    showOnOff: true,
-                                    onToggle: (val) {
-                                      themeProvider.setThemeMode(
-                                        val ? ThemeMode.dark : ThemeMode.light,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ],
+              // General Stats Section
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color:
+                          isDark ? const Color(0xFF333333) : Colors.grey[200]!,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: mainColor.withOpacity(isDark ? 0.25 : 0.10),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
                     ),
                   ),
-                ),
-
-                SizedBox(height: cardSpacing),
-
-                // GİZLİLİK
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _privacyExpanded = !_privacyExpanded;
-                      });
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      padding: EdgeInsets.all(cardPadding),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(borderRadiusLarge),
-                        color: cardBg,
-                        boxShadow: [
-                          BoxShadow(
-                            color: cardShadow,
-                            blurRadius: blurRadius,
-                            offset: Offset(0, shadowOffset),
+                  child: Column(
+                    children: [
+                      // Stats Header
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: mainColor,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          isEnglish ? 'General Stats' : 'Genel İstatistikler',
+                          style: GoogleFonts.quicksand(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ],
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      const SizedBox(height: 20),
+
+                      // Stats Grid - Horizontal Layout
+                      Row(
                         children: [
                           Row(
                             children: [
@@ -1405,81 +1160,78 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-                Center(
-                  child: Text(
-                    'V1.0',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                ),
-                SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
-              ],
-            ),
+              ),
+
+              const SizedBox(height: 20),
+            ],
           ),
-          // Sağ üstte anasayfa butonu
-          Positioned(
-            top: MediaQuery.of(context).padding.top + (10 * scaleFactor),
-            right: horizontalPadding,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pushReplacement(
+        ),
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: 0,
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder:
+                    (context, animation, secondaryAnimation) =>
+                        const HomeScreen(),
+                transitionsBuilder: (
                   context,
-                  PageRouteBuilder(
-                    pageBuilder:
-                        (context, animation, secondaryAnimation) =>
-                            const HomeScreen(),
-                    transitionsBuilder: (
-                      context,
-                      animation,
-                      secondaryAnimation,
-                      child,
-                    ) {
-                      const begin = Offset(-1.0, 0.0);
-                      const end = Offset.zero;
-                      const curve = Curves.easeInOutCubic;
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
+                  const begin = Offset(-1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOutCubic;
 
-                      var tween = Tween(
-                        begin: begin,
-                        end: end,
-                      ).chain(CurveTween(curve: curve));
+                  var tween = Tween(
+                    begin: begin,
+                    end: end,
+                  ).chain(CurveTween(curve: curve));
 
-                      var offsetAnimation = animation.drive(tween);
+                  var offsetAnimation = animation.drive(tween);
 
-                      return SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      );
-                    },
-                    transitionDuration: const Duration(milliseconds: 300),
-                  ),
-                );
-              },
-              child: Container(
-                width: homeButtonSize,
-                height: homeButtonSize,
-                decoration: BoxDecoration(
-                  color:
-                      isDark
-                          ? Colors.white.withOpacity(0.15)
-                          : Colors.white.withOpacity(0.9),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 8 * scaleFactor,
-                      offset: Offset(0, 2 * scaleFactor),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.home,
-                  color: isDark ? Colors.white : const Color(0xFF4A90E2),
-                  size: homeIconSize * 1.4,
-                ),
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 300),
+              ),
+            );
+          } else if (index == 2) {
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder:
+                    (context, animation, secondaryAnimation) =>
+                        const SettingsScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOutCubic;
+
+                  var tween = Tween(
+                    begin: begin,
+                    end: end,
+                  ).chain(CurveTween(curve: curve));
+
+                  var offsetAnimation = animation.drive(tween);
+
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 300),
               ),
             ),
           ),

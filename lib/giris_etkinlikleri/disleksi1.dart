@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'disleksi2.dart';
 import '../screens/home_screen.dart';
 import 'package:provider/provider.dart';
@@ -43,6 +44,8 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
   bool showFeedback = false;
   bool isCorrect = false;
   String? selectedLetter;
+  int correctCount = 0;
+  int totalQuestions = 0;
 
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -51,6 +54,7 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    totalQuestions = questions.length;
     _feedbackController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -75,17 +79,25 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void checkAnswer(String letter) {
+  void checkAnswer(String letter) async {
+    final isAnswerCorrect = letter == questions[currentQuestionIndex].correctLetter;
+    
     setState(() {
       selectedLetter = letter;
-      isCorrect = letter == questions[currentQuestionIndex].correctLetter;
+      isCorrect = isAnswerCorrect;
       showFeedback = true;
+      if (isAnswerCorrect) {
+        correctCount++;
+      }
     });
     _feedbackController.forward(from: 0);
 
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () async {
       if (mounted) {
         if (currentQuestionIndex == questions.length - 1) {
+          // Disleksi1 tamamlandı - başarı yüzdesini kaydet
+          await _saveDisleksiProgress();
+          
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
@@ -118,6 +130,31 @@ class _Disleksi1State extends State<Disleksi1> with TickerProviderStateMixin {
         }
       }
     });
+  }
+
+  Future<void> _saveDisleksiProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Disleksi1 için doğru ve toplam sayıları kaydet
+    int disleksi1Correct = prefs.getInt('disleksi1_correct') ?? 0;
+    int disleksi1Total = prefs.getInt('disleksi1_total') ?? 0;
+    
+    disleksi1Correct += correctCount;
+    disleksi1Total += totalQuestions;
+    
+    await prefs.setInt('disleksi1_correct', disleksi1Correct);
+    await prefs.setInt('disleksi1_total', disleksi1Total);
+    
+    // Disleksi kategori toplamını hesapla (disleksi1 + disleksi2 + disleksi4)
+    int disleksi2Correct = prefs.getInt('disleksi2_correct') ?? 0;
+    int disleksi2Total = prefs.getInt('disleksi2_total') ?? 0;
+    int disleksi4Correct = prefs.getInt('disleksi4_correct') ?? 0;
+    int disleksi4Total = prefs.getInt('disleksi4_total') ?? 0;
+    
+    int disleksiTotalCorrect = disleksi1Correct + disleksi2Correct + disleksi4Correct;
+    int disleksiTotal = disleksi1Total + disleksi2Total + disleksi4Total;
+    
+    await prefs.setInt('disleksi_correct', disleksiTotalCorrect);
+    await prefs.setInt('disleksi_total', disleksiTotal);
   }
 
   @override

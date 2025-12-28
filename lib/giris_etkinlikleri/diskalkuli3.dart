@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/activity_tracker.dart';
 import 'package:flutter/services.dart';
 import 'dart:math';
@@ -23,6 +24,8 @@ class _Diskalkuli3State extends State<Diskalkuli3>
   int _currentProblemIndex = 0;
   bool _isWrong = false;
   String? _feedbackText;
+  int correctCount = 0;
+  int totalQuestions = 0;
   late AnimationController _fadeController;
   late AnimationController _congratsController;
   late AnimationController _shakeController;
@@ -30,6 +33,7 @@ class _Diskalkuli3State extends State<Diskalkuli3>
   @override
   void initState() {
     super.initState();
+    totalQuestions = _problems.length;
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -53,6 +57,39 @@ class _Diskalkuli3State extends State<Diskalkuli3>
     super.dispose();
   }
 
+  Future<void> _saveDiskalkuliProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Diskalkuli3 için doğru ve toplam sayıları kaydet
+    int diskalkuli3Correct = prefs.getInt('diskalkuli3_correct') ?? 0;
+    int diskalkuli3Total = prefs.getInt('diskalkuli3_total') ?? 0;
+    
+    diskalkuli3Correct += correctCount;
+    diskalkuli3Total += totalQuestions;
+    
+    await prefs.setInt('diskalkuli3_correct', diskalkuli3Correct);
+    await prefs.setInt('diskalkuli3_total', diskalkuli3Total);
+    
+    // Diskalkuli kategori toplamını hesapla (diskalkuli1 + diskalkuli2 + diskalkuli3)
+    int diskalkuli1Correct = prefs.getInt('diskalkuli1_correct') ?? 0;
+    int diskalkuli1Total = prefs.getInt('diskalkuli1_total') ?? 0;
+    int diskalkuli2Correct = prefs.getInt('diskalkuli2_correct') ?? 0;
+    int diskalkuli2Total = prefs.getInt('diskalkuli2_total') ?? 0;
+    
+    int diskalkuliTotalCorrect = diskalkuli1Correct + diskalkuli2Correct + diskalkuli3Correct;
+    int diskalkuliTotal = diskalkuli1Total + diskalkuli2Total + diskalkuli3Total;
+    
+    await prefs.setInt('diskalkuli_correct', diskalkuliTotalCorrect);
+    await prefs.setInt('diskalkuli_total', diskalkuliTotal);
+    
+    // İlk kez tamamlandıysa yüzdeyi kaydet
+    bool isFirstCompleted = !(prefs.getBool('diskalkuli_first_completed') ?? false);
+    if (isFirstCompleted && diskalkuliTotal > 0) {
+      double percentage = (diskalkuliTotalCorrect / diskalkuliTotal) * 100;
+      await prefs.setDouble('diskalkuli_first_percentage', percentage);
+      await prefs.setBool('diskalkuli_first_completed', true);
+    }
+  }
+
   void _onDrop(int value) async {
     final problem = _problems[_currentProblemIndex];
     final isCorrect = value == problem['answer'];
@@ -62,6 +99,7 @@ class _Diskalkuli3State extends State<Diskalkuli3>
     });
 
     if (isCorrect) {
+      correctCount++;
       setState(() {
         _feedbackText = "Aferin! 🎉";
       });
@@ -95,6 +133,8 @@ class _Diskalkuli3State extends State<Diskalkuli3>
     } else {
       await Future.delayed(const Duration(milliseconds: 500));
       if (mounted) {
+        // Diskalkuli3 tamamlandı - başarı yüzdesini kaydet
+        await _saveDiskalkuliProgress();
         ActivityTracker.completeActivity();
         Navigator.pushReplacement(
           context,

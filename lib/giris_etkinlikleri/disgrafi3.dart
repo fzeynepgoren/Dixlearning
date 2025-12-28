@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/home_screen.dart';
 import '../utils/activity_tracker.dart';
 import 'dart:math';
@@ -64,6 +65,8 @@ class _HeceDoldurmaState extends State<HeceDoldurma>
   bool isCorrect = false;
   bool isWrong = false;
   bool showFeedback = false;
+  int correctCount = 0;
+  int totalQuestions = 0;
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
   late AnimationController _feedbackController;
@@ -73,6 +76,7 @@ class _HeceDoldurmaState extends State<HeceDoldurma>
   @override
   void initState() {
     super.initState();
+    totalQuestions = items.length;
     userInputs = List.generate(
       items.length,
       (i) => List.filled(items[i]['answer']!.length, null),
@@ -117,10 +121,13 @@ class _HeceDoldurmaState extends State<HeceDoldurma>
     setState(() {
       isCorrect = answerIsCorrect;
       showFeedback = true;
+      if (answerIsCorrect) {
+        correctCount++;
+      }
     });
     _feedbackController.forward(from: 0);
 
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () async {
       if (mounted) {
         if (currentIndex < items.length - 1) {
           setState(() {
@@ -133,6 +140,8 @@ class _HeceDoldurmaState extends State<HeceDoldurma>
           });
         } else {
           print('Disgrafi3 tamamlandı, bir sonraki aktiviteye geçiliyor');
+          // Disgrafi3 tamamlandı - başarı yüzdesini kaydet
+          await _saveDisgrafiProgress();
           // Etkinlik tamamlandı
           ActivityTracker.completeActivity();
           Navigator.pushReplacement(
@@ -142,6 +151,39 @@ class _HeceDoldurmaState extends State<HeceDoldurma>
         }
       }
     });
+  }
+
+  Future<void> _saveDisgrafiProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Disgrafi3 için doğru ve toplam sayıları kaydet
+    int disgrafi3Correct = prefs.getInt('disgrafi3_correct') ?? 0;
+    int disgrafi3Total = prefs.getInt('disgrafi3_total') ?? 0;
+    
+    disgrafi3Correct += correctCount;
+    disgrafi3Total += totalQuestions;
+    
+    await prefs.setInt('disgrafi3_correct', disgrafi3Correct);
+    await prefs.setInt('disgrafi3_total', disgrafi3Total);
+    
+    // Disgrafi kategori toplamını hesapla (disgrafi1 + disgrafi2 + disgrafi3)
+    int disgrafi1Correct = prefs.getInt('disgrafi1_correct') ?? 0;
+    int disgrafi1Total = prefs.getInt('disgrafi1_total') ?? 0;
+    int disgrafi2Correct = prefs.getInt('disgrafi2_correct') ?? 0;
+    int disgrafi2Total = prefs.getInt('disgrafi2_total') ?? 0;
+    
+    int disgrafiTotalCorrect = disgrafi1Correct + disgrafi2Correct + disgrafi3Correct;
+    int disgrafiTotal = disgrafi1Total + disgrafi2Total + disgrafi3Total;
+    
+    await prefs.setInt('disgrafi_correct', disgrafiTotalCorrect);
+    await prefs.setInt('disgrafi_total', disgrafiTotal);
+    
+    // İlk kez tamamlandıysa yüzdeyi kaydet
+    bool isFirstCompleted = !(prefs.getBool('disgrafi_first_completed') ?? false);
+    if (isFirstCompleted && disgrafiTotal > 0) {
+      double percentage = (disgrafiTotalCorrect / disgrafiTotal) * 100;
+      await prefs.setDouble('disgrafi_first_percentage', percentage);
+      await prefs.setBool('disgrafi_first_completed', true);
+    }
   }
 
   void clearInput(int i) {

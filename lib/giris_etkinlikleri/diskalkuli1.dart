@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/activity_tracker.dart';
 import 'diskalkuli2.dart';
 import '../screens/home_screen.dart';
@@ -45,6 +46,8 @@ class _Diskalkuli1State extends State<Diskalkuli1>
   List<bool?> isCorrect = [null, null];
   bool showFeedback = false;
   bool _dialogShown = false;
+  int correctCount = 0;
+  int totalQuestions = 0;
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
   late AnimationController _feedbackController;
@@ -52,6 +55,8 @@ class _Diskalkuli1State extends State<Diskalkuli1>
   @override
   void initState() {
     super.initState();
+    // Her soru için 2 kutu var, toplam soru sayısı = soru sayısı x 2
+    totalQuestions = questions.length * 2;
     _slideController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -90,6 +95,13 @@ class _Diskalkuli1State extends State<Diskalkuli1>
       isCorrect[0] = isFirstCorrect;
       isCorrect[1] = isSecondCorrect;
       showFeedback = true;
+      // Her doğru kutu için correctCount artırılmalı
+      if (isFirstCorrect) {
+        correctCount++;
+      }
+      if (isSecondCorrect) {
+        correctCount++;
+      }
     });
 
     _feedbackController.forward(from: 0);
@@ -105,7 +117,7 @@ class _Diskalkuli1State extends State<Diskalkuli1>
     }
   }
 
-  void _nextQuestion() {
+  void _nextQuestion() async {
     if (!mounted) return;
 
     // Önce geri bildirim çipini gizle
@@ -113,7 +125,7 @@ class _Diskalkuli1State extends State<Diskalkuli1>
       showFeedback = false;
     });
 
-    Future.delayed(const Duration(milliseconds: 800), () {
+    Future.delayed(const Duration(milliseconds: 800), () async {
       if (!mounted) return;
 
       if (currentIndex < questions.length - 1) {
@@ -126,6 +138,8 @@ class _Diskalkuli1State extends State<Diskalkuli1>
         _slideController.forward(from: 0.0);
       } else if (!_dialogShown) {
         _dialogShown = true;
+        // Diskalkuli1 tamamlandı - başarı yüzdesini kaydet
+        await _saveDiskalkuliProgress();
         ActivityTracker.completeActivity();
         Navigator.pushReplacement(
           context,
@@ -152,6 +166,31 @@ class _Diskalkuli1State extends State<Diskalkuli1>
         );
       }
     });
+  }
+
+  Future<void> _saveDiskalkuliProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Diskalkuli1 için doğru ve toplam sayıları kaydet
+    int diskalkuli1Correct = prefs.getInt('diskalkuli1_correct') ?? 0;
+    int diskalkuli1Total = prefs.getInt('diskalkuli1_total') ?? 0;
+    
+    diskalkuli1Correct += correctCount;
+    diskalkuli1Total += totalQuestions;
+    
+    await prefs.setInt('diskalkuli1_correct', diskalkuli1Correct);
+    await prefs.setInt('diskalkuli1_total', diskalkuli1Total);
+    
+    // Diskalkuli kategori toplamını hesapla (diskalkuli1 + diskalkuli2 + diskalkuli3)
+    int diskalkuli2Correct = prefs.getInt('diskalkuli2_correct') ?? 0;
+    int diskalkuli2Total = prefs.getInt('diskalkuli2_total') ?? 0;
+    int diskalkuli3Correct = prefs.getInt('diskalkuli3_correct') ?? 0;
+    int diskalkuli3Total = prefs.getInt('diskalkuli3_total') ?? 0;
+    
+    int diskalkuliTotalCorrect = diskalkuli1Correct + diskalkuli2Correct + diskalkuli3Correct;
+    int diskalkuliTotal = diskalkuli1Total + diskalkuli2Total + diskalkuli3Total;
+    
+    await prefs.setInt('diskalkuli_correct', diskalkuliTotalCorrect);
+    await prefs.setInt('diskalkuli_total', diskalkuliTotal);
   }
 
   @override

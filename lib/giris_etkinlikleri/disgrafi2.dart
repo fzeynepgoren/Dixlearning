@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/activity_tracker.dart';
 import 'disgrafi3.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +18,8 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
   bool _isCorrect = false;
   bool _showFeedback = false;
   int _attemptCount = 0; // Deneme sayacı
+  int _correctCount = 0;
+  int _totalQuestions = 1; // Disgrafi2'de 1 soru var
 
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -66,8 +69,13 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
 
     // İlk deneme doğruysa veya ikinci deneme sonrası Disgrafi3'e geç
     if (isAnswerCorrect || _attemptCount >= 2) {
-      Future.delayed(const Duration(seconds: 3), () {
+      if (isAnswerCorrect) {
+        _correctCount = 1;
+      }
+      Future.delayed(const Duration(seconds: 3), () async {
         if (!mounted) return;
+        // Disgrafi2 tamamlandı - başarı yüzdesini kaydet
+        await _saveDisgrafiProgress();
         ActivityTracker.completeActivity();
         Navigator.pushReplacement(
           context,
@@ -83,6 +91,31 @@ class _Disgrafi2State extends State<Disgrafi2> with TickerProviderStateMixin {
         });
       });
     }
+  }
+
+  Future<void> _saveDisgrafiProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Disgrafi2 için doğru ve toplam sayıları kaydet
+    int disgrafi2Correct = prefs.getInt('disgrafi2_correct') ?? 0;
+    int disgrafi2Total = prefs.getInt('disgrafi2_total') ?? 0;
+    
+    disgrafi2Correct += _correctCount;
+    disgrafi2Total += _totalQuestions;
+    
+    await prefs.setInt('disgrafi2_correct', disgrafi2Correct);
+    await prefs.setInt('disgrafi2_total', disgrafi2Total);
+    
+    // Disgrafi kategori toplamını hesapla (disgrafi1 + disgrafi2 + disgrafi3)
+    int disgrafi1Correct = prefs.getInt('disgrafi1_correct') ?? 0;
+    int disgrafi1Total = prefs.getInt('disgrafi1_total') ?? 0;
+    int disgrafi3Correct = prefs.getInt('disgrafi3_correct') ?? 0;
+    int disgrafi3Total = prefs.getInt('disgrafi3_total') ?? 0;
+    
+    int disgrafiTotalCorrect = disgrafi1Correct + disgrafi2Correct + disgrafi3Correct;
+    int disgrafiTotal = disgrafi1Total + disgrafi2Total + disgrafi3Total;
+    
+    await prefs.setInt('disgrafi_correct', disgrafiTotalCorrect);
+    await prefs.setInt('disgrafi_total', disgrafiTotal);
   }
 
   @override
