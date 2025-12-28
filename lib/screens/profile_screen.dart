@@ -16,6 +16,25 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
 
+  double? _disleksiPercentage;
+  double? _disgrafiPercentage;
+  double? _diskalkuliPercentage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEntryStatistics();
+  }
+
+  Future<void> _loadEntryStatistics() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _disleksiPercentage = prefs.getDouble('disleksi_first_percentage');
+      _disgrafiPercentage = prefs.getDouble('disgrafi_first_percentage');
+      _diskalkuliPercentage = prefs.getDouble('diskalkuli_first_percentage');
+    });
+  }
+
   Widget _buildSimpleStatCard({
     required IconData icon,
     required String title,
@@ -24,8 +43,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required Color mainColor,
   }) {
     return Container(
+<<<<<<< Updated upstream
       height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+=======
+      constraints: BoxConstraints(
+        minHeight: 60 * scaleFactor,
+        maxHeight: double.infinity,
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: 8 * scaleFactor,
+        vertical: 6 * scaleFactor,
+      ),
+>>>>>>> Stashed changes
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(8),
@@ -41,6 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             icon,
@@ -52,6 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   title,
@@ -71,6 +103,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     fontWeight: FontWeight.bold,
                     color: mainColor,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -361,6 +395,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Verileri her build'de yeniden yükle (sayfa her açıldığında güncel verileri göster)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadEntryStatistics();
+    });
+
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final userProvider = Provider.of<UserProvider>(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -419,7 +458,267 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ],
                               ),
+<<<<<<< Updated upstream
                               child: Center(
+=======
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: cardSpacing),
+
+                // General Stats Section
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: Container(
+                    padding: EdgeInsets.all(cardPadding),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(borderRadius),
+                      border: Border.all(
+                        color:
+                            isDark
+                                ? const Color(0xFF333333)
+                                : Colors.grey[200]!,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: mainColor.withOpacity(isDark ? 0.22 : 0.12),
+                          blurRadius: blurRadius,
+                          offset: Offset(0, shadowOffset),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        // Stats Header
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: mediumSpacing,
+                            vertical: 8 * scaleFactor,
+                          ),
+                          decoration: BoxDecoration(
+                            color: mainColor,
+                            borderRadius: BorderRadius.circular(
+                              18 * scaleFactor,
+                            ),
+                          ),
+                          child: Text(
+                            isEnglish ? 'General Stats' : 'Genel İstatistikler',
+                            style: GoogleFonts.quicksand(
+                              fontSize: 15 * scaleFactor,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: cardSpacing),
+
+                        // Stats Grid - Horizontal Layout
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildSimpleStatCard(
+                                icon: Icons.flag,
+                                title: isEnglish ? 'First Try' : 'İlk Deneme',
+                                value: '3',
+                                isDark: isDark,
+                                mainColor: mainColor,
+                                scaleFactor: scaleFactor,
+                              ),
+                            ),
+                            SizedBox(width: 8 * scaleFactor),
+                            Expanded(
+                              child: _buildSimpleStatCard(
+                                icon: Icons.local_fire_department,
+                                title:
+                                    isEnglish ? 'Max Streak' : 'Maksimum Seri',
+                                value: '2',
+                                isDark: isDark,
+                                mainColor: mainColor,
+                                scaleFactor: scaleFactor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8 * scaleFactor),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildSimpleStatCard(
+                                icon: Icons.sports_esports,
+                                title: isEnglish ? 'Games Won' : 'Oyun Kazanma',
+                                value: '0',
+                                isDark: isDark,
+                                mainColor: mainColor,
+                                scaleFactor: scaleFactor,
+                              ),
+                            ),
+                            SizedBox(width: 8 * scaleFactor),
+                            Expanded(
+                              child: _buildSimpleStatCard(
+                                icon: Icons.emoji_events,
+                                title:
+                                    isEnglish ? 'Achievements' : 'Başarımlar',
+                                value: '0',
+                                isDark: isDark,
+                                mainColor: mainColor,
+                                scaleFactor: scaleFactor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: cardSpacing),
+
+                // GİRİŞ İSTATİSTİKLERİ
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: Container(
+                    padding: EdgeInsets.all(cardPadding),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(borderRadius),
+                      border: Border.all(
+                        color:
+                            isDark
+                                ? const Color(0xFF333333)
+                                : Colors.grey[200]!,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: mainColor.withOpacity(isDark ? 0.22 : 0.12),
+                          blurRadius: blurRadius,
+                          offset: Offset(0, shadowOffset),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        // Header
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: mediumSpacing,
+                            vertical: 8 * scaleFactor,
+                          ),
+                          decoration: BoxDecoration(
+                            color: mainColor,
+                            borderRadius: BorderRadius.circular(
+                              18 * scaleFactor,
+                            ),
+                          ),
+                          child: Text(
+                            isEnglish
+                                ? 'Login Statistics'
+                                : 'Giriş İstatistikleri',
+                            style: GoogleFonts.quicksand(
+                              fontSize: 15 * scaleFactor,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: cardSpacing),
+
+                        // Stats Grid - Disleksi, Disgrafi, Diskalkuli
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: _buildSimpleStatCard(
+                                icon: Icons.text_fields,
+                                title: isEnglish ? 'Dyslexia' : 'Disleksi',
+                                value:
+                                    _disleksiPercentage != null
+                                        ? '${_disleksiPercentage!.toStringAsFixed(0)}%'
+                                        : '-',
+                                isDark: isDark,
+                                mainColor: mainColor,
+                                scaleFactor: scaleFactor,
+                              ),
+                            ),
+                            SizedBox(width: 8 * scaleFactor),
+                            Expanded(
+                              flex: 1,
+                              child: _buildSimpleStatCard(
+                                icon: Icons.edit,
+                                title: isEnglish ? 'Dysgraphia' : 'Disgrafi',
+                                value:
+                                    _disgrafiPercentage != null
+                                        ? '${_disgrafiPercentage!.toStringAsFixed(0)}%'
+                                        : '-',
+                                isDark: isDark,
+                                mainColor: mainColor,
+                                scaleFactor: scaleFactor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8 * scaleFactor),
+                        _buildSimpleStatCard(
+                          icon: Icons.calculate,
+                          title: isEnglish ? 'Dyscalculia' : 'Diskalkuli',
+                          value:
+                              _diskalkuliPercentage != null
+                                  ? '${_diskalkuliPercentage!.toStringAsFixed(0)}%'
+                                  : '-',
+                          isDark: isDark,
+                          mainColor: mainColor,
+                          scaleFactor: scaleFactor,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: cardSpacing),
+
+                // BİLDİRİMLER
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _notificationsExpanded = !_notificationsExpanded;
+                      });
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      padding: EdgeInsets.all(cardPadding),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(borderRadiusLarge),
+                        color: cardBg,
+                        boxShadow: [
+                          BoxShadow(
+                            color: cardShadow,
+                            blurRadius: blurRadius,
+                            offset: Offset(0, shadowOffset),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                FluentIcons.alert_24_regular,
+                                color: Colors.teal,
+                                size: iconSize,
+                              ),
+                              SizedBox(width: smallSpacing),
+                              Expanded(
+>>>>>>> Stashed changes
                                 child: Text(
                                   userProvider.avatar,
                                   style: const TextStyle(fontSize: 36),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
 import 'disleksi4.dart';
 import '../screens/home_screen.dart';
@@ -61,6 +62,7 @@ class _Disleksi2State extends State<Disleksi2>
   String? selectedOption;
   int currentQuestionNumber = 1;
   int totalQuestions = 0;
+  int correctCount = 0;
 
   @override
   void initState() {
@@ -108,20 +110,28 @@ class _Disleksi2State extends State<Disleksi2>
     });
   }
 
-  void checkAnswer(String option) {
+  void checkAnswer(String option) async {
+    final isAnswerCorrect = option == currentWordData["word"]![0];
+    
     setState(() {
       selectedOption = option;
       isAnswered = true;
-      isCorrect = option == currentWordData["word"]![0];
+      isCorrect = isAnswerCorrect;
+      if (isAnswerCorrect) {
+        correctCount++;
+      }
     });
 
     _feedbackController.forward(from: 0);
 
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () async {
       if (mounted) {
         if (remainingWords.isNotEmpty) {
           getNextWord();
         } else {
+          // Disleksi2 tamamlandı - başarı yüzdesini kaydet
+          await _saveDisleksiProgress();
+          
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
@@ -150,6 +160,31 @@ class _Disleksi2State extends State<Disleksi2>
         }
       }
     });
+  }
+
+  Future<void> _saveDisleksiProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Disleksi2 için doğru ve toplam sayıları kaydet
+    int disleksi2Correct = prefs.getInt('disleksi2_correct') ?? 0;
+    int disleksi2Total = prefs.getInt('disleksi2_total') ?? 0;
+    
+    disleksi2Correct += correctCount;
+    disleksi2Total += totalQuestions;
+    
+    await prefs.setInt('disleksi2_correct', disleksi2Correct);
+    await prefs.setInt('disleksi2_total', disleksi2Total);
+    
+    // Disleksi kategori toplamını hesapla (disleksi1 + disleksi2 + disleksi4)
+    int disleksi1Correct = prefs.getInt('disleksi1_correct') ?? 0;
+    int disleksi1Total = prefs.getInt('disleksi1_total') ?? 0;
+    int disleksi4Correct = prefs.getInt('disleksi4_correct') ?? 0;
+    int disleksi4Total = prefs.getInt('disleksi4_total') ?? 0;
+    
+    int disleksiTotalCorrect = disleksi1Correct + disleksi2Correct + disleksi4Correct;
+    int disleksiTotal = disleksi1Total + disleksi2Total + disleksi4Total;
+    
+    await prefs.setInt('disleksi_correct', disleksiTotalCorrect);
+    await prefs.setInt('disleksi_total', disleksiTotal);
   }
 
   @override

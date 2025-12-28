@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/activity_tracker.dart';
 import 'dart:math';
 import "package:flutter_animate/flutter_animate.dart";
@@ -65,6 +66,39 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
     _slideController.dispose();
     _feedbackController.dispose();
     super.dispose();
+  }
+
+  Future<void> _saveDisleksiProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Disleksi4 için doğru ve toplam sayıları kaydet (6 harf = 6 soru)
+    int disleksi4Correct = prefs.getInt('disleksi4_correct') ?? 0;
+    int disleksi4Total = prefs.getInt('disleksi4_total') ?? 0;
+    
+    disleksi4Correct += correctCount;
+    disleksi4Total += letters.length;
+    
+    await prefs.setInt('disleksi4_correct', disleksi4Correct);
+    await prefs.setInt('disleksi4_total', disleksi4Total);
+    
+    // Disleksi kategori toplamını hesapla (disleksi1 + disleksi2 + disleksi4)
+    int disleksi1Correct = prefs.getInt('disleksi1_correct') ?? 0;
+    int disleksi1Total = prefs.getInt('disleksi1_total') ?? 0;
+    int disleksi2Correct = prefs.getInt('disleksi2_correct') ?? 0;
+    int disleksi2Total = prefs.getInt('disleksi2_total') ?? 0;
+    
+    int disleksiTotalCorrect = disleksi1Correct + disleksi2Correct + disleksi4Correct;
+    int disleksiTotal = disleksi1Total + disleksi2Total + disleksi4Total;
+    
+    await prefs.setInt('disleksi_correct', disleksiTotalCorrect);
+    await prefs.setInt('disleksi_total', disleksiTotal);
+    
+    // İlk kez tamamlandıysa yüzdeyi kaydet
+    bool isFirstCompleted = !(prefs.getBool('disleksi_first_completed') ?? false);
+    if (isFirstCompleted && disleksiTotal > 0) {
+      double percentage = (disleksiTotalCorrect / disleksiTotal) * 100;
+      await prefs.setDouble('disleksi_first_percentage', percentage);
+      await prefs.setBool('disleksi_first_completed', true);
+    }
   }
 
   void _initializeGame() {
@@ -281,8 +315,11 @@ class _Disleksi4State extends State<Disleksi4> with TickerProviderStateMixin {
                                                 const Duration(
                                                   milliseconds: 1000,
                                                 ),
-                                                () {
+                                                () async {
                                                   if (mounted) {
+                                                    // Disleksi4 tamamlandı - başarı yüzdesini kaydet
+                                                    await _saveDisleksiProgress();
+                                                    
                                                     ActivityTracker.completeActivity();
 
                                                     Navigator.pushReplacement(
