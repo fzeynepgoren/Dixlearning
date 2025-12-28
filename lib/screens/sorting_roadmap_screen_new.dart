@@ -86,8 +86,8 @@ class _SortingRoadmapScreenNewState extends State<SortingRoadmapScreenNew>
   }
 
   bool _isLevelUnlocked(int level) {
-    // Level 5 (İleri Seviye) her zaman açık
-    if (level == 5) {
+    // İlk level her zaman açık, diğerleri önceki level tamamlandıktan sonra açılır
+    if (level == 1) {
       return true;
     }
     return level <= completedLevel + 1;

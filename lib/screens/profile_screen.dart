@@ -24,6 +24,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _themeExpanded = false;
   bool _privacyExpanded = false;
   bool _logoutExpanded = false;
+  
+  // Giriş istatistikleri yüzdeleri
+  double? _disleksiPercentage;
+  double? _disgrafiPercentage;
+  double? _diskalkuliPercentage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEntryStatistics();
+  }
+
+  Future<void> _loadEntryStatistics() async {
+    final prefs = await SharedPreferences.getInstance();
+    
+    // Tüm giriş etkinliklerinin tamamlanıp tamamlanmadığını kontrol et
+    // Disleksi: disleksi1, disleksi2, disleksi4
+    bool disleksi1Completed = (prefs.getInt('disleksi1_total') ?? 0) > 0;
+    bool disleksi2Completed = (prefs.getInt('disleksi2_total') ?? 0) > 0;
+    bool disleksi4Completed = (prefs.getInt('disleksi4_total') ?? 0) > 0;
+    bool allDisleksiCompleted = disleksi1Completed && disleksi2Completed && disleksi4Completed;
+    
+    // Disgrafi: disgrafi1, disgrafi2, disgrafi3
+    bool disgrafi1Completed = (prefs.getInt('disgrafi1_total') ?? 0) > 0;
+    bool disgrafi2Completed = (prefs.getInt('disgrafi2_total') ?? 0) > 0;
+    bool disgrafi3Completed = (prefs.getInt('disgrafi3_total') ?? 0) > 0;
+    bool allDisgrafiCompleted = disgrafi1Completed && disgrafi2Completed && disgrafi3Completed;
+    
+    // Diskalkuli: diskalkuli1, diskalkuli2, diskalkuli3
+    bool diskalkuli1Completed = (prefs.getInt('diskalkuli1_total') ?? 0) > 0;
+    bool diskalkuli2Completed = (prefs.getInt('diskalkuli2_total') ?? 0) > 0;
+    bool diskalkuli3Completed = (prefs.getInt('diskalkuli3_total') ?? 0) > 0;
+    bool allDiskalkuliCompleted = diskalkuli1Completed && diskalkuli2Completed && diskalkuli3Completed;
+    
+    // TÜM kategoriler (Disleksi, Disgrafi, Diskalkuli) tamamlanmadan hiçbir yüzde gösterilmez
+    bool allCategoriesCompleted = allDisleksiCompleted && allDisgrafiCompleted && allDiskalkuliCompleted;
+    
+    // Sadece tüm kategoriler tamamlandıysa ilk tamamlandığında kaydedilen yüzdeleri göster
+    // Bu yüzdeler her çözümde değişmez, ilk çözümdeki başarı yüzdesini gösterir
+    if (allCategoriesCompleted) {
+      _disleksiPercentage = prefs.getDouble('disleksi_first_percentage');
+      _disgrafiPercentage = prefs.getDouble('disgrafi_first_percentage');
+      _diskalkuliPercentage = prefs.getDouble('diskalkuli_first_percentage');
+    } else {
+      // Tüm kategoriler tamamlanmamışsa hiçbir yüzde gösterilmez
+      _disleksiPercentage = null;
+      _disgrafiPercentage = null;
+      _diskalkuliPercentage = null;
+    }
+    
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   Widget _buildSimpleStatCard({
     required IconData icon,
@@ -787,16 +841,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: cardSpacing),
+                        const SizedBox(height: 16),
 
-                        // Stats Grid - Horizontal Layout (Boş kutular)
+                        // Stats Grid - Disleksi, Disgrafi, Diskalkuli
                         Row(
+                          mainAxisSize: MainAxisSize.max,
                           children: [
                             Expanded(
+                              flex: 1,
                               child: _buildSimpleStatCard(
-                                icon: Icons.calendar_today,
-                                title: '',
-                                value: '-',
+                                icon: Icons.text_fields,
+                                title: isEnglish ? 'Dyslexia' : 'Disleksi',
+                                value:
+                                    _disleksiPercentage != null
+                                        ? '${_disleksiPercentage!.toStringAsFixed(0)}%'
+                                        : '-',
                                 isDark: isDark,
                                 mainColor: mainColor,
                                 scaleFactor: scaleFactor,
@@ -804,10 +863,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             SizedBox(width: 8 * scaleFactor),
                             Expanded(
+                              flex: 1,
                               child: _buildSimpleStatCard(
-                                icon: Icons.access_time,
-                                title: '',
-                                value: '-',
+                                icon: Icons.edit,
+                                title: isEnglish ? 'Dysgraphia' : 'Disgrafi',
+                                value:
+                                    _disgrafiPercentage != null
+                                        ? '${_disgrafiPercentage!.toStringAsFixed(0)}%'
+                                        : '-',
                                 isDark: isDark,
                                 mainColor: mainColor,
                                 scaleFactor: scaleFactor,
@@ -816,30 +879,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         ),
                         SizedBox(height: 8 * scaleFactor),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildSimpleStatCard(
-                                icon: Icons.trending_up,
-                                title: '',
-                                value: '-',
-                                isDark: isDark,
-                                mainColor: mainColor,
-                                scaleFactor: scaleFactor,
-                              ),
-                            ),
-                            SizedBox(width: 8 * scaleFactor),
-                            Expanded(
-                              child: _buildSimpleStatCard(
-                                icon: Icons.bar_chart,
-                                title: '',
-                                value: '-',
-                                isDark: isDark,
-                                mainColor: mainColor,
-                                scaleFactor: scaleFactor,
-                              ),
-                            ),
-                          ],
+                        _buildSimpleStatCard(
+                          icon: Icons.calculate,
+                          title: isEnglish ? 'Dyscalculia' : 'Diskalkuli',
+                          value:
+                              _diskalkuliPercentage != null
+                                  ? '${_diskalkuliPercentage!.toStringAsFixed(0)}%'
+                                  : '-',
+                          isDark: isDark,
+                          mainColor: mainColor,
+                          scaleFactor: scaleFactor,
                         ),
                       ],
                     ),
