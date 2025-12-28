@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
-import 'settings_screen.dart';
-import '../widgets/custom_bottom_nav_bar.dart';
+import 'login_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import '../providers/theme_provider.dart';
 import '../providers/user_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,21 +41,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String value,
     required bool isDark,
     required Color mainColor,
+    required double scaleFactor,
   }) {
     return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      height: 60 * scaleFactor,
+      padding: EdgeInsets.symmetric(
+        horizontal: 8 * scaleFactor,
+        vertical: 6 * scaleFactor,
+      ),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8 * scaleFactor),
         border: Border.all(
           color: isDark ? const Color(0xFF404040) : Colors.grey[200]!,
         ),
         boxShadow: [
           BoxShadow(
             color: mainColor.withOpacity(isDark ? 0.15 : 0.05),
-            blurRadius: 2,
-            offset: const Offset(0, 1),
+            blurRadius: 2 * scaleFactor,
+            offset: Offset(0, 1 * scaleFactor),
           ),
         ],
       ),
@@ -73,18 +77,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Text(
                   title,
                   style: GoogleFonts.quicksand(
-                    fontSize: 10,
+                    fontSize: 10 * scaleFactor,
                     fontWeight: FontWeight.w600,
                     color: isDark ? Colors.grey[300] : Colors.grey[600],
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2 * scaleFactor),
                 Text(
                   value,
                   style: GoogleFonts.quicksand(
-                    fontSize: 16,
+                    fontSize: 16 * scaleFactor,
                     fontWeight: FontWeight.bold,
                     color: mainColor,
                   ),
@@ -441,6 +445,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+    final themeProvider = Provider.of<ThemeProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     const Color mainColor = Color(0xFFB3E5FC); // Açık gök mavisi
@@ -506,12 +511,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
-                                ],
-                              ),
-                              child: Center(
-                                child: Text(
-                                  userProvider.avatar,
-                                  style: const TextStyle(fontSize: 36),
                                 ),
                               ),
                             ),
@@ -533,21 +532,246 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     width: 2,
                                   ),
                                 ),
-                                child: const Icon(
-                                  Icons.edit,
-                                  size: 12,
-                                  color: Colors.white,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: mediumSpacing),
+                        // User Info
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                userProvider.fullName,
+                                style: GoogleFonts.quicksand(
+                                  fontSize: 22 * scaleFactor,
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      Theme.of(
+                                        context,
+                                      ).textTheme.bodyLarge!.color!,
                                 ),
+                              ),
+                              SizedBox(height: 4 * scaleFactor),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.calendar_today,
+                                    size: 16 * scaleFactor,
+                                    color:
+                                        isDark
+                                            ? Colors.white70
+                                            : Colors.grey[600],
+                                  ),
+                                  SizedBox(width: 6 * scaleFactor),
+                                  Text(
+                                    '10/2025',
+                                    style: GoogleFonts.quicksand(
+                                      fontSize: 14 * scaleFactor,
+                                      color:
+                                          isDark
+                                              ? Colors.white70
+                                              : Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: cardSpacing),
+
+                // General Stats Section
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: Container(
+                    padding: EdgeInsets.all(cardPadding),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(borderRadius),
+                      border: Border.all(
+                        color:
+                            isDark
+                                ? const Color(0xFF333333)
+                                : Colors.grey[200]!,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: mainColor.withOpacity(isDark ? 0.22 : 0.12),
+                          blurRadius: blurRadius,
+                          offset: Offset(0, shadowOffset),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        // Stats Header
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: mediumSpacing,
+                            vertical: 8 * scaleFactor,
+                          ),
+                          decoration: BoxDecoration(
+                            color: mainColor,
+                            borderRadius: BorderRadius.circular(
+                              18 * scaleFactor,
+                            ),
+                          ),
+                          child: Text(
+                            isEnglish ? 'General Stats' : 'Genel İstatistikler',
+                            style: GoogleFonts.quicksand(
+                              fontSize: 15 * scaleFactor,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: cardSpacing),
+
+                        // Stats Grid - Horizontal Layout
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildSimpleStatCard(
+                                icon: Icons.flag,
+                                title: isEnglish ? 'First Try' : 'İlk Deneme',
+                                value: '3',
+                                isDark: isDark,
+                                mainColor: mainColor,
+                                scaleFactor: scaleFactor,
+                              ),
+                            ),
+                            SizedBox(width: 8 * scaleFactor),
+                            Expanded(
+                              child: _buildSimpleStatCard(
+                                icon: Icons.local_fire_department,
+                                title:
+                                    isEnglish ? 'Max Streak' : 'Maksimum Seri',
+                                value: '2',
+                                isDark: isDark,
+                                mainColor: mainColor,
+                                scaleFactor: scaleFactor,
                               ),
                             ),
                           ],
                         ),
+                        SizedBox(height: 8 * scaleFactor),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildSimpleStatCard(
+                                icon: Icons.sports_esports,
+                                title: isEnglish ? 'Games Won' : 'Oyun Kazanma',
+                                value: '0',
+                                isDark: isDark,
+                                mainColor: mainColor,
+                                scaleFactor: scaleFactor,
+                              ),
+                            ),
+                            SizedBox(width: 8 * scaleFactor),
+                            Expanded(
+                              child: _buildSimpleStatCard(
+                                icon: Icons.emoji_events,
+                                title:
+                                    isEnglish ? 'Achievements' : 'Başarımlar',
+                                value: '0',
+                                isDark: isDark,
+                                mainColor: mainColor,
+                                scaleFactor: scaleFactor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: cardSpacing),
+
+                // GİRİŞ İSTATİSTİKLERİ
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: Container(
+                    padding: EdgeInsets.all(cardPadding),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(borderRadius),
+                      border: Border.all(
+                        color:
+                            isDark
+                                ? const Color(0xFF333333)
+                                : Colors.grey[200]!,
                       ),
-                      const SizedBox(width: 16),
-                      // User Info
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      boxShadow: [
+                        BoxShadow(
+                          color: mainColor.withOpacity(isDark ? 0.22 : 0.12),
+                          blurRadius: blurRadius,
+                          offset: Offset(0, shadowOffset),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        // Header
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: mediumSpacing,
+                            vertical: 8 * scaleFactor,
+                          ),
+                          decoration: BoxDecoration(
+                            color: mainColor,
+                            borderRadius: BorderRadius.circular(
+                              18 * scaleFactor,
+                            ),
+                          ),
+                          child: Text(
+                            isEnglish
+                                ? 'Login Statistics'
+                                : 'Giriş İstatistikleri',
+                            style: GoogleFonts.quicksand(
+                              fontSize: 15 * scaleFactor,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: cardSpacing),
+
+                        // Stats Grid - Horizontal Layout (Boş kutular)
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildSimpleStatCard(
+                                icon: Icons.calendar_today,
+                                title: '',
+                                value: '-',
+                                isDark: isDark,
+                                mainColor: mainColor,
+                                scaleFactor: scaleFactor,
+                              ),
+                            ),
+                            SizedBox(width: 8 * scaleFactor),
+                            Expanded(
+                              child: _buildSimpleStatCard(
+                                icon: Icons.access_time,
+                                title: '',
+                                value: '-',
+                                isDark: isDark,
+                                mainColor: mainColor,
+                                scaleFactor: scaleFactor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8 * scaleFactor),
+                        Row(
                           children: [
                             Text(
                               userProvider.fullName,
@@ -560,8 +784,97 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ).textTheme.bodyLarge!.color!,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(width: 8 * scaleFactor),
+                            Expanded(
+                              child: _buildSimpleStatCard(
+                                icon: Icons.bar_chart,
+                                title: '',
+                                value: '-',
+                                isDark: isDark,
+                                mainColor: mainColor,
+                                scaleFactor: scaleFactor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: cardSpacing),
+
+                // BİLDİRİMLER
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _notificationsExpanded = !_notificationsExpanded;
+                      });
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      padding: EdgeInsets.all(cardPadding),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(borderRadiusLarge),
+                        color: cardBg,
+                        boxShadow: [
+                          BoxShadow(
+                            color: cardShadow,
+                            blurRadius: blurRadius,
+                            offset: Offset(0, shadowOffset),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                FluentIcons.alert_24_regular,
+                                color: Colors.teal,
+                                size: iconSize,
+                              ),
+                              SizedBox(width: smallSpacing),
+                              Expanded(
+                                child: Text(
+                                  isEnglish ? 'Notifications' : 'Bildirimler',
+                                  style: TextStyle(
+                                    fontSize: titleFontSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: cardText,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                _notificationsExpanded
+                                    ? Icons.expand_less
+                                    : Icons.expand_more,
+                                color: cardText,
+                                size: iconSize * 0.9,
+                              ),
+                            ],
+                          ),
+                          if (_notificationsExpanded) ...[
+                            SizedBox(height: smallSpacing),
+                            Padding(
+                              padding: EdgeInsets.only(left: 38 * scaleFactor),
+                              child: Text(
+                                isEnglish
+                                    ? 'Get notified about new events!'
+                                    : 'Yeni etkinliklerden haberdar ol!',
+                                style: TextStyle(
+                                  fontSize: subtitleFontSize,
+                                  color: cardSubText,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: mediumSpacing),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 Icon(
                                   Icons.calendar_today,
@@ -585,9 +898,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ],
                             ),
                           ],
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -612,7 +925,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
-                    ],
+                    ),
                   ),
                   child: Column(
                     children: [
@@ -633,59 +946,218 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
-                        ),
+                        ],
                       ),
                       const SizedBox(height: 20),
 
                       // Stats Grid - Horizontal Layout
                       Row(
                         children: [
-                          Expanded(
-                            child: _buildSimpleStatCard(
-                              icon: Icons.flag,
-                              title: isEnglish ? 'First Try' : 'İlk Deneme',
-                              value: '3',
-                              isDark: isDark,
-                              mainColor: mainColor,
-                            ),
+                          Row(
+                            children: [
+                              Icon(
+                                FluentIcons.shield_24_regular,
+                                color: Colors.blue,
+                                size: iconSize,
+                              ),
+                              SizedBox(width: 14 * scaleFactor),
+                              Expanded(
+                                child: Text(
+                                  isEnglish
+                                      ? 'Privacy & Security'
+                                      : 'Gizlilik & Güvenlik',
+                                  style: TextStyle(
+                                    fontSize: titleFontSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: cardText,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                _privacyExpanded
+                                    ? Icons.expand_less
+                                    : Icons.expand_more,
+                                color: cardText,
+                                size: iconSize * 0.9,
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: _buildSimpleStatCard(
-                              icon: Icons.local_fire_department,
-                              title: isEnglish ? 'Max Streak' : 'Maksimum Seri',
-                              value: '2',
-                              isDark: isDark,
-                              mainColor: mainColor,
+                          if (_privacyExpanded) ...[
+                            SizedBox(height: smallSpacing),
+                            Padding(
+                              padding: EdgeInsets.only(left: 40 * scaleFactor),
+                              child: Text(
+                                isEnglish
+                                    ? 'Your information is always safe!'
+                                    : 'Bilgilerin güvende!',
+                                style: TextStyle(
+                                  fontSize: subtitleFontSize,
+                                  color: cardSubText,
+                                ),
+                              ),
                             ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: cardSpacing),
+
+                // ÇIKIŞ YAP
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _logoutExpanded = !_logoutExpanded;
+                      });
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      padding: EdgeInsets.all(cardPadding),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(borderRadiusLarge),
+                        color: cardBg,
+                        boxShadow: [
+                          BoxShadow(
+                            color: cardShadow,
+                            blurRadius: blurRadius,
+                            offset: Offset(0, shadowOffset),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: _buildSimpleStatCard(
-                              icon: Icons.sports_esports,
-                              title: isEnglish ? 'Games Won' : 'Oyun Kazanma',
-                              value: '0',
-                              isDark: isDark,
-                              mainColor: mainColor,
-                            ),
+                          Row(
+                            children: [
+                              Icon(
+                                FluentIcons.sign_out_24_regular,
+                                color: Colors.red,
+                                size: iconSize,
+                              ),
+                              SizedBox(width: 14 * scaleFactor),
+                              Expanded(
+                                child: Text(
+                                  isEnglish ? 'Logout' : 'Çıkış Yap',
+                                  style: TextStyle(
+                                    fontSize: titleFontSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: cardText,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                _logoutExpanded
+                                    ? Icons.expand_less
+                                    : Icons.expand_more,
+                                color: cardText,
+                                size: iconSize * 0.9,
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: _buildSimpleStatCard(
-                              icon: Icons.emoji_events,
-                              title: isEnglish ? 'Achievements' : 'Başarımlar',
-                              value: '0',
-                              isDark: isDark,
-                              mainColor: mainColor,
+                          if (_logoutExpanded) ...[
+                            SizedBox(height: smallSpacing),
+                            Padding(
+                              padding: EdgeInsets.only(left: 40 * scaleFactor),
+                              child: Text(
+                                isEnglish
+                                    ? 'Sign out of your account'
+                                    : 'Hesabınızdan çıkış yapın',
+                                style: TextStyle(
+                                  fontSize: subtitleFontSize,
+                                  color: cardSubText,
+                                ),
+                              ),
                             ),
-                          ),
+                            SizedBox(height: mediumSpacing),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text(
+                                          isEnglish ? 'Logout' : 'Çıkış Yap',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        content: Text(
+                                          isEnglish
+                                              ? 'Are you sure you want to logout?'
+                                              : 'Çıkış yapmak istediğinizden emin misiniz?',
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed:
+                                                () =>
+                                                    Navigator.of(context).pop(),
+                                            child: Text(
+                                              isEnglish ? 'Cancel' : 'İptal',
+                                              style: TextStyle(
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () async {
+                                              Navigator.of(context).pop();
+                                              // Oturum bilgilerini temizle
+                                              final prefs =
+                                                  await SharedPreferences.getInstance();
+                                              await prefs.setBool(
+                                                'is_logged_in',
+                                                false,
+                                              );
+                                              await prefs.remove(
+                                                'current_user',
+                                              );
+                                              // Login ekranına yönlendir
+                                              if (context.mounted) {
+                                                Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder:
+                                                        (context) =>
+                                                            const LoginScreen(),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red,
+                                              foregroundColor: Colors.white,
+                                            ),
+                                            child: Text(
+                                              isEnglish ? 'Logout' : 'Çıkış',
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 12,
+                                  ),
+                                ),
+                                child: Text(isEnglish ? 'Logout' : 'Çıkış Yap'),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -761,12 +1233,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
                 transitionDuration: const Duration(milliseconds: 300),
               ),
-            );
-          }
-        },
-        mainColor: mainColor,
-        accentColor: accentColor,
-        isEnglish: isEnglish,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -174,29 +174,6 @@ class _GDisgrafi1State extends State<GDisgrafi1> with TickerProviderStateMixin {
               child: SafeArea(
                 child: Column(
                   children: [
-                    // Geri ok
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: Colors.black,
-                            size: iconSize,
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        const MatchingQuestionsScreen(),
-                              ),
-                              (route) => false,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
                     Expanded(
                       child: SlideTransition(
                         position: _slideAnimation,

@@ -230,28 +230,6 @@ class _EmojiAnimalMatchingState extends State<EmojiAnimalMatching>
                 child: Column(
                   children: [
                     // Üst geri düğmesi
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.black,
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        const MatchingQuestionsScreen(),
-                              ),
-                              (route) => false,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-
                     // İçerik kartı + animasyon
                     Expanded(
                       child: SlideTransition(

@@ -117,30 +117,6 @@ class _AzCokSoru8State extends State<AzCokSoru8> with TickerProviderStateMixin {
           child: SafeArea(
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    const KarsilastirmaSorulariScreen(),
-                          ),
-                          (route) => false,
-                        );
-                      },
-                    ),
-
-                    SizedBox(width: iconSize),
-                  ],
-                ),
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,

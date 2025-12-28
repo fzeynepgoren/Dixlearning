@@ -330,21 +330,6 @@ class _OlaySiniflaState extends State<OlaySinifla>
           child: SafeArea(
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                        size: iconSize,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
                 Expanded(
                   child: SlideTransition(
                     position: _slideAnimation,
