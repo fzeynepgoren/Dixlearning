@@ -4,7 +4,9 @@ import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
+import '../../screens/home_screen.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
+import '../../widgets/in_game_menu.dart';
 
 class CinsiyetEsleme extends StatefulWidget {
   const CinsiyetEsleme({super.key});
@@ -50,6 +52,7 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
 
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
 
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -260,7 +263,9 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
     return PopScope(
       canPop: false,
       child: Scaffold(
-        body: Container(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -440,6 +445,27 @@ class _CinsiyetEslemeState extends State<CinsiyetEsleme>
               ],
             ),
           ),
+        ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const ClassificationQuestionsScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );

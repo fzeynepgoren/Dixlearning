@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../screens/home_screen.dart';
+import '../../screens/siniflandirma_sorulari_screen.dart';
+import '../../widgets/in_game_menu.dart';
 import '../utils/activity_tracker.dart';
 import 'soru4.dart'; // TasitSinifla sınıfının olduğu dosya
 
@@ -29,6 +32,7 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
 
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   bool _dialogShown = false;
 
   late AnimationController _feedbackController;
@@ -120,10 +124,13 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
 
   @override
   Widget build(BuildContext context) {
+    final iconSize = MediaQuery.of(context).size.width * 0.065;
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -303,6 +310,27 @@ class _BoyutSiniflaState extends State<BoyutSinifla>
               ],
             ),
           ),
+        ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const ClassificationQuestionsScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );

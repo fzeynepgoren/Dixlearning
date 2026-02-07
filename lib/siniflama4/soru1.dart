@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/language_provider.dart';
 import '../../screens/home_screen.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
-import '../../widgets/matching_pause_menu.dart';
+import '../../widgets/in_game_menu.dart';
 
 class DuyguSiniflama extends StatefulWidget {
   const DuyguSiniflama({super.key});
@@ -36,7 +36,6 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
   bool showFeedback = false;
   bool isCorrect = false;
   bool _dialogShown = false;
-  bool _showPauseMenu = false;
   bool _isSoundOn = true;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -148,20 +147,7 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
     final horizontalPadding = screenSize.width * 0.05;
     final verticalPadding = screenSize.height * 0.02;
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (_showPauseMenu) {
-          setState(() {
-            _showPauseMenu = false;
-          });
-        } else {
-          setState(() {
-            _showPauseMenu = true;
-          });
-        }
-        return false;
-      },
-      child: Scaffold(
+    return Scaffold(
         body: Stack(
           children: [
             Container(
@@ -180,56 +166,7 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
               child: SafeArea(
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _showPauseMenu = true;
-                              });
-                            },
-                            child: Container(
-                              width: iconSize * 1.6,
-                              height: iconSize * 1.6,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    Colors.blue.shade200,
-                                    Colors.blue.shade200,
-                                    const Color(0xffffffff),
-                                  ],
-                                  stops: const [0.0, 0.5, 1.0],
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.blue.shade800.withOpacity(0.5),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                    spreadRadius: 1,
-                                  ),
-                                  BoxShadow(
-                                    color: Colors.white.withOpacity(0.3),
-                                    blurRadius: 4,
-                                    offset: const Offset(-2, -2),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                Icons.home_rounded,
-                                color: Colors.black,
-                                size: iconSize * 0.9,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    const SizedBox(height: 10),
                     Expanded(
                       child: SlideTransition(
                         position: _slideAnimation,
@@ -409,35 +346,28 @@ class _DuyguSiniflamaState extends State<DuyguSiniflama>
                 ),
               ),
             ),
-            if (_showPauseMenu)
-              MatchingPauseMenu(
-                isEnglish: isEnglish,
-                isSoundOn: _isSoundOn,
-                onResume: () => setState(() => _showPauseMenu = false),
-                onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
-                onHome: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder:
-                          (context) => const ClassificationQuestionsScreen(),
-                    ),
-                    (route) => false,
-                  );
-                },
-                onEntryScreen: () {
-                  setState(() => _showPauseMenu = false);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    (route) => false,
-                  );
-                },
-                onDismiss: () => setState(() => _showPauseMenu = false),
-              ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const ClassificationQuestionsScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
           ],
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildGroupContainer(

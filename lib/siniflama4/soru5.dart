@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/language_provider.dart';
 import '../screens/siniflandirma_sorulari_screen.dart';
+import '../../screens/home_screen.dart';
+import '../../widgets/in_game_menu.dart';
 
 class OlaySinifla extends StatefulWidget {
   const OlaySinifla({super.key});
@@ -42,6 +44,7 @@ class _OlaySiniflaState extends State<OlaySinifla>
 
   bool showFeedback = false;
   bool isCorrect = false;
+  bool _isSoundOn = true;
   bool _dialogShown = false;
   late AnimationController _feedbackController;
   late AnimationController _slideController;
@@ -314,7 +317,9 @@ class _OlaySiniflaState extends State<OlaySinifla>
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        body: Container(
+        body: Stack(
+          children: [
+            Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -493,6 +498,27 @@ class _OlaySiniflaState extends State<OlaySinifla>
               ],
             ),
           ),
+        ),
+            InGameMenu(
+              isSoundOn: _isSoundOn,
+              onToggleSound: () => setState(() => _isSoundOn = !_isSoundOn),
+              onHome: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const ClassificationQuestionsScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              onEntryScreen: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
+              iconSize: iconSize,
+            ),
+          ],
         ),
       ),
     );
