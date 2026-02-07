@@ -1412,15 +1412,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               await prefs.remove(
                                                 'current_user',
                                               );
-                                              // Login ekranına yönlendir
+                                              // Tüm ekranları kapatıp login ekranına dön
                                               if (context.mounted) {
-                                                Navigator.pushReplacement(
-                                                  context,
+                                                Navigator.of(context).pushAndRemoveUntil(
                                                   MaterialPageRoute(
                                                     builder:
                                                         (context) =>
                                                             const LoginScreen(),
                                                   ),
+                                                  (route) => false,
                                                 );
                                               }
                                             },

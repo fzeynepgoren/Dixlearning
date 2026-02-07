@@ -259,10 +259,13 @@ class _MascotBottomSheetState extends State<MascotBottomSheet>
                             child: Align(
                               alignment: Alignment.topCenter,
                               heightFactor: 0.6, // Sadece üst kısmı göster
-                              child: Image.asset(
-                                widget.assetPath,
-                                height: mascotSize,
-                                fit: BoxFit.contain,
+                              child: Container(
+                                color: const Color(0xFFA7C7E7),
+                                child: Image.asset(
+                                  widget.assetPath,
+                                  height: mascotSize,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                           ),

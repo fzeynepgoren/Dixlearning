@@ -71,13 +71,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 final prefs = await SharedPreferences.getInstance();
                 await prefs.setBool('is_logged_in', false);
                 await prefs.remove('current_user');
-                // Login ekranına yönlendir
+                // Tüm ekranları kapatıp login ekranına dön
                 if (context.mounted) {
-                  Navigator.pushReplacement(
-                    context,
+                  Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
                       builder: (context) => const LoginScreen(),
                     ),
+                    (route) => false,
                   );
                 }
               },
